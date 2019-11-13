@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  build-and-test:
     docker:
       - image: circleci/golang:1.13
 
@@ -28,3 +28,9 @@ jobs:
           key: v1-pkg-cache
           paths:
             - "/go/pkg"
+
+workflows:
+  version: 2
+  build-and-test:
+    jobs:
+      - build-and-test
