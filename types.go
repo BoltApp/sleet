@@ -44,7 +44,7 @@ type CaptureResponse struct {
 	ErrorCode *string
 }
 
-type VoidRequset struct {
+type VoidRequest struct {
 	TransactionReference string
 }
 
