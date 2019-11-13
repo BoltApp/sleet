@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/BoltApp/sleet"
 )
 
 var baseURL = "https://api.stripe.com"
@@ -35,7 +37,7 @@ func NewStripeClient(apiKey string) *StripeClient {
 	}
 }
 
-func (client *StripeClient) Authorize(amount *Amount, creditCard *CreditCard) (*AuthorizeResponse, error) {
+func (client *StripeClient) Authorize(amount *sleet.Amount, creditCard *sleet.CreditCard) (*sleet.AuthorizationResponse, error) {
 	// Tokenize
 	params := net_url.Values{}
 	params.Add("card[number]", creditCard.Number)
