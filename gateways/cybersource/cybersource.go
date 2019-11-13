@@ -5,7 +5,7 @@ import (
 	"github.com/pkg/errors"
 	"net/http"
 	"time"
-	"sleet"
+	"github.com/BoltApp/sleet"
 )
 
 var baseURL = "https://apitest.cybersource.com"
