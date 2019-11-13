@@ -1,0 +1,30 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.13
+
+    working_directory: /go/src/github.com/BoltApp/sleet
+
+    steps:
+      - checkout
+      - run: mkdir -p $TEST_RESULTS
+
+      - restore_cache:
+          keys:
+            - v1-pkg-cache
+
+      - run:
+          name: Build
+          command: |
+            go build ./...
+
+      - run:
+          name: Test
+          command: |
+            go test ./...
+
+      - save_cache:
+          key: v1-pkg-cache
+          paths:
+            - "/go/pkg"
