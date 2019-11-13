@@ -15,7 +15,7 @@ import (
 
 var baseURL = "https://api.stripe.com"
 
-type StripeClient struct{
+type StripeClient struct {
 	apiKey string
 	// TODO allow override of this
 	httpClient *http.Client
@@ -54,7 +54,7 @@ func (client *StripeClient) Authorize(amount *sleet.Amount, creditCard *sleet.Cr
 	return nil, nil
 }
 
-func (client *StripeClient) sendRequest(path string, data net_url.Values) ([]byte, error){
+func (client *StripeClient) sendRequest(path string, data net_url.Values) ([]byte, error) {
 	req, err := client.buildPOSTRequest(path, data)
 	if err != nil {
 		return nil, err

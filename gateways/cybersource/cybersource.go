@@ -17,9 +17,7 @@ var defaultHttpClient = &http.Client{
 	},
 }
 
-
-
-type CybersourceClient struct{
+type CybersourceClient struct {
 	apiKey string // TODO: Check if need apiKey or some other auth
 	// TODO allow override of this
 	httpClient *http.Client
