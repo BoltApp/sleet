@@ -27,7 +27,7 @@ type CybersourceClient struct{
 	httpClient *http.Client
 }
 
-func NewCybersourceClient(merchantID string, apiKey string, sharedSecretKey string) *CybersourceClient {
+func NewClient(merchantID string, apiKey string, sharedSecretKey string) *CybersourceClient {
 	return &CybersourceClient{
 		merchantID:      merchantID,
 		apiKey:          apiKey,
