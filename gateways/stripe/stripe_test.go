@@ -1,4 +1,4 @@
-package sleet
+package stripe
 
 import (
 	"testing"
