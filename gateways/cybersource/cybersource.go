@@ -2,11 +2,13 @@ package cybersource
 
 import (
 	"crypto/tls"
+	"github.com/pkg/errors"
 	"net/http"
 	"time"
+	"sleet"
 )
 
-var baseURL = "https://api.stripe.com"
+var baseURL = "https://apitest.cybersource.com"
 
 var defaultHttpClient = &http.Client{
 	Timeout: 60 * time.Second,
@@ -17,15 +19,35 @@ var defaultHttpClient = &http.Client{
 	},
 }
 
-type CybersourceClient struct {
-	apiKey string // TODO: Check if need apiKey or some other auth
+type CybersourceClient struct{
+	merchantID      string
+	apiKey          string
+	sharedSecretKey string
 	// TODO allow override of this
 	httpClient *http.Client
 }
 
-func NewCybersourceClient(apiKey string) *CybersourceClient {
+func NewClient(merchantID string, apiKey string, sharedSecretKey string) *CybersourceClient {
 	return &CybersourceClient{
-		apiKey:     apiKey,
-		httpClient: defaultHttpClient,
+		merchantID:      merchantID,
+		apiKey:          apiKey,
+		sharedSecretKey: sharedSecretKey,
+		httpClient:      defaultHttpClient,
 	}
+}
+
+func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
+	return nil, errors.Errorf("Not Implemented")
+}
+
+func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
+	return nil, errors.Errorf("Not Implemented")
+}
+
+func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+	return nil, errors.Errorf("Not Implemented")
+}
+
+func (client *CybersourceClient) Credit(request *sleet.CreditRequest) (*sleet.CreditResponse, error) {
+	return nil, errors.Errorf("Not Implemented")
 }

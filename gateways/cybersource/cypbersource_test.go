@@ -5,5 +5,5 @@ import (
 )
 
 func Test(t *testing.T) {
-	NewCybersourceClient("USEYOURKEY")
+	NewClient("merchantID", "apiKey", "secretKey")
 }
