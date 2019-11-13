@@ -19,8 +19,6 @@ var defaultHttpClient = &http.Client{
 	},
 }
 
-
-
 type CybersourceClient struct{
 	merchantID      string
 	apiKey          string
