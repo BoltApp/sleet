@@ -106,7 +106,7 @@ func (client *StripeClient) Authorize(request *sleet.AuthorizationRequest) (*sle
 		return nil, err
 	}
 	if code != 200 {
-		return &sleet.AuthorizationResponse{Success:false, TransactionReference:"", AvsResult:nil, CvvResult:nil,ErrorCode:strconv.Itoa(code)}, nil
+		return &sleet.AuthorizationResponse{Success:false, TransactionReference:"", AvsResult:nil, CvvResult:"",ErrorCode:strconv.Itoa(code)}, nil
 	}
 	var chargeResponse ChargeResponse
 	if err := json.Unmarshal(resp, &chargeResponse); err != nil {
@@ -127,8 +127,21 @@ func (client *StripeClient) Capture(request *sleet.CaptureRequest) (*sleet.Captu
 		return nil,err
 	}
 	convertedCode := strconv.Itoa(code)
-	fmt.Printf("response %s\n", string(resp)) // debug
+	fmt.Printf("response capture %s\n", string(resp)) // debug
 	return &sleet.CaptureResponse{ErrorCode:&convertedCode}, nil
+}
+
+func (client *StripeClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	paramsRefund := net_url.Values{}
+	paramsRefund.Add("charge", request.TransactionReference)
+	paramsRefund.Add("amount", strconv.FormatInt(request.Amount.Amount, 10))
+	code, resp, err := client.sendRequest("v1/refunds", paramsRefund)
+	if err != nil {
+		return nil,err
+	}
+	convertedCode := strconv.Itoa(code)
+	fmt.Printf("response refund %s\n", string(resp)) // debug
+	return &sleet.RefundResponse{ErrorCode:&convertedCode}, nil
 }
 
 func (client *StripeClient) sendRequest(path string, data net_url.Values) (int, []byte, error) {
