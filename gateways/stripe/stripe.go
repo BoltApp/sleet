@@ -55,7 +55,7 @@ func NewWithHTTPClient(apiKey string, httpClient *http.Client) *StripeClient {
 	}
 }
 
-func (client *StripeClient) Authorize(amount *sleet.Amount, creditCard *sleet.CreditCard) (*sleet.AuthorizationResponse, error) {
+func (client *StripeClient) Authorize(amount *sleet.Amount, creditCard *sleet.CreditCard, billingAddress *sleet.BillingAddress) (*sleet.AuthorizationResponse, error) {
 	// Tokenize
 	paramsToken := net_url.Values{}
 	paramsToken.Add("card[number]", creditCard.Number)
@@ -63,24 +63,26 @@ func (client *StripeClient) Authorize(amount *sleet.Amount, creditCard *sleet.Cr
 	paramsToken.Add("card[exp_year]", strconv.Itoa(creditCard.ExpirationYear))
 	paramsToken.Add("card[cvc]", creditCard.CVV)
 	paramsToken.Add("card[name]", creditCard.FirstName + " " + creditCard.LastName)
-	if creditCard.StreetAddress1 != nil {
-		paramsToken.Add("card[address_line1]", *creditCard.StreetAddress1)
+
+	if billingAddress.StreetAddress1 != nil {
+		paramsToken.Add("card[address_line1]", *billingAddress.StreetAddress1)
 	}
-	if creditCard.StreetAddress2 != nil {
-		paramsToken.Add("card[address_line2]", *creditCard.StreetAddress2)
+	if billingAddress.StreetAddress2 != nil {
+		paramsToken.Add("card[address_line2]", *billingAddress.StreetAddress2)
 	}
-	if creditCard.Locality != nil {
-		paramsToken.Add("card[address_city]", *creditCard.Locality)
+	if billingAddress.Locality != nil {
+		paramsToken.Add("card[address_city]", *billingAddress.Locality)
 	}
-	if creditCard.RegionCode != nil {
-		paramsToken.Add("card[address_state]", *creditCard.RegionCode)
+	if billingAddress.RegionCode != nil {
+		paramsToken.Add("card[address_state]", *billingAddress.RegionCode)
 	}
-	if creditCard.CountryCode != nil {
-		paramsToken.Add("card[address_country]", *creditCard.CountryCode)
+	if billingAddress.CountryCode != nil {
+		paramsToken.Add("card[address_country]", *billingAddress.CountryCode)
 	}
-	if creditCard.PostalCode != nil {
-		paramsToken.Add("card[address_zip]", *creditCard.PostalCode)
+	if billingAddress.PostalCode != nil {
+		paramsToken.Add("card[address_zip]", *billingAddress.PostalCode)
 	}
+
 	code, resp, err := client.sendRequest("v1/tokens", paramsToken)
 	if err != nil {
 		return nil, err

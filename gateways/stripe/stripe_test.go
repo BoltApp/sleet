@@ -7,12 +7,13 @@ import (
 )
 
 func Test(t *testing.T) {
-	client := NewClient("")
+	client := NewClient("sk_test_cTZ7WLcEPDqcHPAKCQbR11Xb00OXbHjDmw")
 	amount := sleet.Amount{
 		Amount:   100,
 		Currency: "USD",
 	}
 	postalCode := "94103"
+	address := sleet.BillingAddress{PostalCode:&postalCode}
 	card := sleet.CreditCard{
 		FirstName:       "Bolt",
 		LastName:        "Checkout",
@@ -20,7 +21,6 @@ func Test(t *testing.T) {
 		ExpirationMonth: 8,
 		ExpirationYear:  2024,
 		CVV:             "111",
-		PostalCode:      &postalCode,
 	}
-	client.Authorize(&amount, &card)
+	client.Authorize(&amount, &card, &address)
 }

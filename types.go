@@ -12,6 +12,15 @@ type Amount struct {
 	Currency string
 }
 
+type BillingAddress struct {
+	StreetAddress1 *string
+	StreetAddress2 *string
+	Locality       *string
+	RegionCode     *string
+	PostalCode     *string
+	CountryCode    *string
+}
+
 type CreditCard struct {
 	FirstName       string
 	LastName        string
@@ -19,12 +28,6 @@ type CreditCard struct {
 	ExpirationMonth int
 	ExpirationYear  int
 	CVV             string
-	StreetAddress1 *string
-	StreetAddress2 *string
-	Locality       *string
-	RegionCode     *string
-	PostalCode     *string
-	CountryCode    *string
 }
 
 type AuthorizationRequest struct {
