@@ -2,6 +2,7 @@ package stripe
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -18,6 +19,20 @@ var baseURL = "https://api.stripe.com"
 type StripeClient struct {
 	apiKey     string
 	httpClient *http.Client
+}
+
+type TokenResponse struct {
+	ID string `json:"id"`
+	Card StripeCard `json:"card"`
+}
+
+type ChargeResponse struct {
+	ID string `json:"id"`
+}
+
+type StripeCard struct {
+	CVCCheck *string `json:"cvc_check"`
+	AddressZipCheck *string `json:"address_zip_check"`
 }
 
 var defaultHttpClient = &http.Client{
@@ -42,29 +57,51 @@ func NewWithHTTPClient(apiKey string, httpClient *http.Client) *StripeClient {
 
 func (client *StripeClient) Authorize(amount *sleet.Amount, creditCard *sleet.CreditCard) (*sleet.AuthorizationResponse, error) {
 	// Tokenize
-	params := net_url.Values{}
-	params.Add("card[number]", creditCard.Number)
-	params.Add("card[exp_month]", strconv.Itoa(creditCard.ExpirationMonth))
-	params.Add("card[exp_year]", strconv.Itoa(creditCard.ExpirationYear))
-	resp, err := client.sendRequest("v1/tokens", params)
+	paramsToken := net_url.Values{}
+	paramsToken.Add("card[number]", creditCard.Number)
+	paramsToken.Add("card[exp_month]", strconv.Itoa(creditCard.ExpirationMonth))
+	paramsToken.Add("card[exp_year]", strconv.Itoa(creditCard.ExpirationYear))
+	code, resp, err := client.sendRequest("v1/tokens", paramsToken)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("response %s\n", string(resp)) // debug
-
-	// TODO: charge
-
-	return nil, nil
-}
-
-func (client *StripeClient) sendRequest(path string, data net_url.Values) ([]byte, error) {
-	req, err := client.buildPOSTRequest(path, data)
+	var tokenResponse TokenResponse
+	if code != 200 {
+		return &sleet.AuthorizationResponse{Success:false, TransactionReference:"", AvsResult:nil, CvvResult:nil,ErrorCode:strconv.Itoa(code)}, nil
+	}
+	if err := json.Unmarshal(resp, &tokenResponse); err != nil {
+		return nil, err
+	}
+	fmt.Printf("response %s\n", tokenResponse.ID) // debug
+	paramsCharge := net_url.Values{}
+	// We can potentially add more stuff here like description and capture
+	paramsCharge.Add("amount", strconv.FormatInt(amount.Amount, 10))
+	paramsCharge.Add("currency", amount.Currency)
+	paramsCharge.Add("source", tokenResponse.ID)
+	code, resp, err = client.sendRequest("v1/charges", paramsCharge)
+	if code != 200 {
+		return &sleet.AuthorizationResponse{Success:false, TransactionReference:"", AvsResult:nil, CvvResult:nil,ErrorCode:strconv.Itoa(code)}, nil
+	}
 	if err != nil {
 		return nil, err
+	}
+	var chargeResponse ChargeResponse
+	if err := json.Unmarshal(resp, &chargeResponse); err != nil {
+		return nil, err
+	}
+	fmt.Printf("response %s\n", chargeResponse.ID) // debug
+
+	return &sleet.AuthorizationResponse{Success:true, TransactionReference:chargeResponse.ID, AvsResult:tokenResponse.Card.AddressZipCheck, CvvResult:tokenResponse.Card.CVCCheck,ErrorCode:strconv.Itoa(code)}, nil
+}
+
+func (client *StripeClient) sendRequest(path string, data net_url.Values) (int, []byte, error) {
+	req, err := client.buildPOSTRequest(path, data)
+	if err != nil {
+		return -1, nil, err
 	}
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
-		return nil, err
+		return -1, nil, err
 	}
 	defer func() {
 		err := resp.Body.Close()
@@ -74,7 +111,8 @@ func (client *StripeClient) sendRequest(path string, data net_url.Values) ([]byt
 	}()
 
 	fmt.Printf("status %s\n", resp.Status) // debug
-	return ioutil.ReadAll(resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
+	return resp.StatusCode, body, err
 }
 
 func (client *StripeClient) buildPOSTRequest(path string, data net_url.Values) (*http.Request, error) {
