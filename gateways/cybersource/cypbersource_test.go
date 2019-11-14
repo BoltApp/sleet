@@ -15,7 +15,7 @@ func TestAuthorize(t *testing.T) {
 	client := NewClient("bolt", "9b473fca-d9dc-4daf-baae-121e20af43ce", "2Ji1F/9mIYCJtdc2Enr5WvD8VBZ6sb0YS14asKinwQo=") // don't care if it leaks
 	options := make(map[string]interface{})
 	options["email"] = "test@bolt.com"
-	client.Authorize(&sleet.AuthorizationRequest{
+	resp, err := client.Authorize(&sleet.AuthorizationRequest{
 		Amount: &sleet.Amount{
 			Amount:   100,
 			Currency: "USD",
@@ -38,4 +38,11 @@ func TestAuthorize(t *testing.T) {
 		},
 		Options: options,
 	})
+	if err != nil {
+		t.Errorf("Expected no error: received: %s", err)
+	}
+	if resp.AvsResult != pointer.ToString("X") {
+		t.Errorf("Expected AVS Result X: received: %s", *resp.AvsResult)
+
+	}
 }
