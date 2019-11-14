@@ -79,12 +79,12 @@ func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.
 		return nil, err
 	}
 
-	var response sleet.CaptureResponse
 	if cybersourceResponse.ErrorReason != nil {
 		// return error
-		response.ErrorCode = cybersourceResponse.ErrorReason
+		response := sleet.CaptureResponse{ErrorCode: cybersourceResponse.ErrorReason}
+		return &response, nil
 	}
-	return &response, errors.New("not implemented")
+	return &sleet.CaptureResponse{}, nil
 }
 
 func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
