@@ -34,9 +34,9 @@ func NewClient(merchantName string, transactionKey string) *AuthorizeNetClient {
 
 func NewWithHttpClient(merchantName string, transactionKey string, httpClient *http.Client) *AuthorizeNetClient {
 	return &AuthorizeNetClient{
-		merchantName:      merchantName,
+		merchantName:   merchantName,
 		transactionKey: transactionKey,
-		httpClient:      httpClient,
+		httpClient:     httpClient,
 	}
 }
 
@@ -80,8 +80,6 @@ func (client *AuthorizeNetClient) Capture(request *sleet.CaptureRequest) (*sleet
 	}
 
 	if authorizeNetResponse.TransactionResponse.ResponseCode != ResponseCodeApproved {
-		// return first error
-		//fmt.Printf("Error found: [%v] [%+v]\n", authorizeNetResponse.Messsages.Message[0], authorizeNetResponse)
 		var errorCode string
 		if len(authorizeNetResponse.TransactionResponse.Errors) > 0 {
 			errorCode = authorizeNetResponse.TransactionResponse.Errors[0].ErrorCode
@@ -95,7 +93,27 @@ func (client *AuthorizeNetClient) Capture(request *sleet.CaptureRequest) (*sleet
 }
 
 func (client *AuthorizeNetClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
-	return nil, nil
+	authorizeNetCaptureRequest, err := buildVoidRequest(client.merchantName, client.transactionKey, request)
+	if err != nil {
+		return nil, err
+	}
+
+	authorizeNetResponse, err := client.sendRequest(*authorizeNetCaptureRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	if authorizeNetResponse.TransactionResponse.ResponseCode != ResponseCodeApproved {
+		var errorCode string
+		if len(authorizeNetResponse.TransactionResponse.Errors) > 0 {
+			errorCode = authorizeNetResponse.TransactionResponse.Errors[0].ErrorCode
+		} else {
+			errorCode = authorizeNetResponse.TransactionResponse.ResponseCode
+		}
+		response := sleet.VoidResponse{ErrorCode: &errorCode}
+		return &response, nil
+	}
+	return &sleet.VoidResponse{}, nil
 }
 
 func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
