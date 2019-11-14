@@ -13,10 +13,15 @@ Payment abstraction library - one interface for multiple payment processors
 #### Example
 
 ```
-client := sleet.NewStripeClient("stripe_api_key", sleet.ModeTest)
+import (
+  "github.com/BoltApp/sleet"
+  "github.com/BoltApp/sleet/gateways/authorize_net"
+)
+client := authorize_net.NewClient("AUTH_NET_LOGIN_ID", "AUTH_NET_TXN_KEY")
+
 amount := sleet.Amount{
-    Amount: 100,
-    Currency: "USD",
+  Amount: 100,
+  Currency: "USD",
 }
 card := sleet.CreditCard{
   FirstName: "Bolt",
@@ -26,5 +31,33 @@ card := sleet.CreditCard{
   EpxYear: 2010,
   CVV: "000",
 }
-client.Authorize(amount, card) 
+streetAddress := "22 Linda St."
+locality := "Hoboken"
+regionCode := "NJ"
+postalCode := "07030"
+countryCode := "US"
+address := sleet.BillingAddress{
+  StreetAddress1: &streetAddress,
+  Locality:       &locality,
+  RegionCode:     &regionCode,
+  PostalCode:     &postalCode,
+  CountryCode:    &countryCode,
+}
+authorizeRequest := sleet.AuthorizationRequest{
+  Amount: &amount,
+  CreditCard: &card,
+  BillingAddress: &address,
+}
+authorizeResponse, _ := client.Authorize(&authorizeRequest) 
+
+captureRequest := sleet.CaptureRequest{
+  Amount:               &amount,
+  TransactionReference: resp.TransactionReference,
+}
+client.Capture(&captureRequest)
 ```
+
+#### Supported Gateways
+* [Authorize.Net](https://developer.authorize.net/api/reference/index.html#payment-transactions)
+* [CyberSource](https://developer.cybersource.com/api-reference-assets/index.html#payments)
+* [Stripe](https://stripe.com/docs/api)
