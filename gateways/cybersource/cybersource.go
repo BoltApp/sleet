@@ -2,13 +2,14 @@ package cybersource
 
 import (
 	"crypto/tls"
+	"fmt"
 	"github.com/pkg/errors"
 	"net/http"
 	"time"
 	"github.com/BoltApp/sleet"
 )
 
-var baseURL = "https://apitest.cybersource.com"
+var baseURL = "https://apitest.cybersource.com/pts/v2/payments"
 
 var defaultHttpClient = &http.Client{
 	Timeout: 60 * time.Second,
@@ -41,6 +42,12 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 }
 
 func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
+	requestBody, err := buildCaptureRequest(request)
+	if err != nil {
+		return nil, err
+	}
+	captureURL := baseURL + "/" + request.TransactionReference + "/captures"
+	fmt.Printf("Sending to %s [%v]", captureURL, requestBody)
 	return nil, errors.Errorf("Not Implemented")
 }
 

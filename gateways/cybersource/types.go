@@ -7,6 +7,10 @@ type AuthorizationRequest struct {
 	PaymentInformation         PaymentInformation         `json:"paymentInformation"`
 }
 
+type CaptureRequest struct {
+	OrderInformation           OrderInformation           `json:"orderInformation"`
+}
+
 type ClientReferenceInformation struct {
 	Code          string `json:"code"`
 	TransactionID string `json:"transactionID"`
