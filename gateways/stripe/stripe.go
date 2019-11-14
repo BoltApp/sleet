@@ -144,6 +144,18 @@ func (client *StripeClient) Refund(request *sleet.RefundRequest) (*sleet.RefundR
 	return &sleet.RefundResponse{ErrorCode:&convertedCode}, nil
 }
 
+func (client *StripeClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+	paramsRefund := net_url.Values{}
+	paramsRefund.Add("charge", request.TransactionReference)
+	code, resp, err := client.sendRequest("v1/refunds", paramsRefund)
+	if err != nil {
+		return nil,err
+	}
+	convertedCode := strconv.Itoa(code)
+	fmt.Printf("response refund %s\n", string(resp)) // debug
+	return &sleet.VoidResponse{ErrorCode:&convertedCode}, nil
+}
+
 func (client *StripeClient) sendRequest(path string, data net_url.Values) (int, []byte, error) {
 	req, err := client.buildPOSTRequest(path, data)
 	if err != nil {
