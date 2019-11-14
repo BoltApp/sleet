@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/BoltApp/sleet"
-	"github.com/pkg/errors"
 )
 
 const (
