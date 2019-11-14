@@ -2,6 +2,7 @@ package authorize_net
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"testing"
 
@@ -10,8 +11,9 @@ import (
 
 func Test(t *testing.T) {
 	client := NewClient(os.Getenv("AUTH_NET_LOGIN_ID"), os.Getenv("AUTH_NET_TXN_KEY"))
+	randAmount := rand.Int63n(1000000)
 	amount := sleet.Amount{
-		Amount:   100,
+		Amount:   randAmount,
 		Currency: "USD",
 	}
 	postalCode := "94103"
@@ -26,7 +28,15 @@ func Test(t *testing.T) {
 	}
 	resp, err := client.Authorize(&sleet.AuthorizationRequest{Amount: &amount, CreditCard: &card, BillingAddress: &address})
 	fmt.Printf("resp: [%+v] err [%s]", resp, err)
-	voidResp, err := client.Void(&sleet.VoidRequest{TransactionReference: resp.TransactionReference})
-	fmt.Printf("voidResp: [%+v] err [%s]", voidResp, err)
-
+	fmt.Printf("resp: [%+v] err [%s]\n", resp, err)
+	capResp, err := client.Capture(&sleet.CaptureRequest{
+		Amount:               &amount,
+		TransactionReference: resp.TransactionReference,
+	})
+	fmt.Printf("capResp: [%+v] err [%s]\n", capResp, err)
+	refundResp, err := client.Refund(&sleet.RefundRequest{
+		Amount:               &amount,
+		TransactionReference: resp.TransactionReference,
+	})
+	fmt.Printf("refundResp: [%+v] err [%s]\n", refundResp, err)
 }
