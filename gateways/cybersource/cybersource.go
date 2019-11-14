@@ -63,15 +63,21 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 }
 
 func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
-	requestBody, err := buildCaptureRequest(request)
+	cybersourceCaptureRequest, err := buildCaptureRequest(request)
 	if err != nil {
 		return nil, err
 	}
 	captureURL := baseURL + authPath + "/" + request.TransactionReference + "/captures"
-	fmt.Printf("Sending to %s [%v]", captureURL, requestBody)
-
-	// ??? send and unmarshall
+	payload, err := json.Marshal(cybersourceCaptureRequest)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := client.sendRequest(captureURL, payload)
 	var cybersourceResponse CaptureResponse
+	err = json.Unmarshal(resp, cybersourceResponse)
+	if err != nil {
+		return nil, err
+	}
 
 	var response sleet.CaptureResponse
 	if cybersourceResponse.ErrorReason != nil {
@@ -153,5 +159,4 @@ func (client *CybersourceClient) buildPOSTRequest(path string, data []byte) (*ht
 	req.Header.Add("Content-Type", "application/json")
 
 	return req, nil
-
 }
