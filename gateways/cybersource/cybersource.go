@@ -12,7 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/AlekSi/pointer"
 	"github.com/BoltApp/sleet"
 )
 
@@ -61,10 +60,8 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 	}
 
 	resp, err := client.sendRequest(authPath, payload)
-	fmt.Println("Niraj niraj")
-	fmt.Println(string(resp))
 	var cybersourceResponse Response
-	err = json.Unmarshal(resp, cybersourceResponse)
+	err = json.Unmarshal(resp, &cybersourceResponse)
 	if err != nil {
 		return nil, err
 	}
@@ -76,8 +73,8 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 	return &sleet.AuthorizationResponse{
 		Success:              true,
 		TransactionReference: *cybersourceResponse.ID,
-		AvsResult:            pointer.ToString(""),
-		CvvResult:            "",
+		AvsResult:            &cybersourceResponse.ProcessorInformation.AVS.Code,
+		CvvResult:            cybersourceResponse.ProcessorInformation.ApprovalCode,
 		ErrorCode:            "",
 	}, nil
 }
