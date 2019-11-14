@@ -25,5 +25,5 @@ func Test(t *testing.T) {
 		CVV:             "111",
 	}
 	resp, err := client.Authorize(&sleet.AuthorizationRequest{Amount: &amount, CreditCard: &card, BillingAddress: &address})
-	fmt.Printf("resp: [%v] err [%s]", resp, err)
+	fmt.Printf("resp: [%+v] err [%s]", resp, err)
 }
