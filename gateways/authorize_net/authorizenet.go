@@ -12,8 +12,7 @@ import (
 )
 
 const (
-	baseURL                 = "https://apitest.authorize.net/xml/v1/request.api"
-	transactionTypeAuthOnly = "authOnlyTransaction"
+	baseURL = "https://apitest.authorize.net/xml/v1/request.api"
 )
 
 var defaultHttpClient = &http.Client{
@@ -42,36 +41,11 @@ func NewWithHttpClient(merchantName string, transactionKey string, httpClient *h
 }
 
 func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
-	amountStr := fmt.Sprintf("%.2f", float64(request.Amount.Amount) / 100.0)
-
-	billingAddress := request.BillingAddress
-	authRequest := CreateTransactionRequest{
-		MerchantAuthentication: MerchantAuthentication{
-			Name:           client.merchantName,
-			TransactionKey: client.transactionKey,
-		},
-		TransactionRequest:     TransactionRequest{
-			TransactionType: transactionTypeAuthOnly,
-			Amount:          &amountStr,
-			Payment:         &Payment{
-				CreditCard: CreditCard{
-					CardNumber:     request.CreditCard.Number,
-					ExpirationDate: fmt.Sprintf("%d-%d", request.CreditCard.ExpirationYear, request.CreditCard.ExpirationMonth),
-					CardCode:       request.CreditCard.CVV,
-				},
-			},
-			BillingAddress:  &BillingAddress{
-				FirstName: request.CreditCard.FirstName,
-				LastName:  request.CreditCard.LastName,
-				Address:   billingAddress.StreetAddress1,
-				City:      billingAddress.Locality,
-				State:     billingAddress.RegionCode,
-				Zip:       billingAddress.PostalCode,
-				Country:   billingAddress.CountryCode,
-			},
-		},
+	authorizeNetAuthorizeRequest, err := buildAuthRequest(client.merchantName, client.transactionKey, request)
+	if err != nil {
+		return nil, err
 	}
-	response, err := client.sendRequest(Request{CreateTransactionRequest: authRequest})
+	response, err := client.sendRequest(*authorizeNetAuthorizeRequest)
 	if err != nil {
 		return nil, err
 	}
