@@ -54,17 +54,12 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 	if err != nil {
 		return nil, err
 	}
-	payload, err := json.Marshal(cybersourceAuthRequest)
+
+	cybersourceResponse, err := client.sendRequest(authPath, cybersourceAuthRequest)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := client.sendRequest(authPath, payload)
-	var cybersourceResponse Response
-	err = json.Unmarshal(resp, &cybersourceResponse)
-	if err != nil {
-		return nil, err
-	}
 	if cybersourceResponse.ErrorReason != nil {
 		// return error
 		response := sleet.AuthorizationResponse{ErrorCode: *cybersourceResponse.ErrorReason}
@@ -85,13 +80,7 @@ func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.
 		return nil, err
 	}
 	capturePath := authPath + "/" + request.TransactionReference + "/captures"
-	payload, err := json.Marshal(cybersourceCaptureRequest)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := client.sendRequest(capturePath, payload)
-	var cybersourceResponse Response
-	err = json.Unmarshal(resp, cybersourceResponse)
+	cybersourceResponse, err := client.sendRequest(capturePath, cybersourceCaptureRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -110,10 +99,7 @@ func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidRe
 		return nil, err
 	}
 	voidPath := authPath + "/" + request.TransactionReference + "/voids"
-	payload, err := json.Marshal(cybersourceVoidRequest)
-	resp, err := client.sendRequest(voidPath, payload)
-	var cybersourceResponse Response
-	err = json.Unmarshal(resp, cybersourceResponse)
+	cybersourceResponse, err := client.sendRequest(voidPath, cybersourceVoidRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -132,10 +118,7 @@ func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 		return nil, err
 	}
 	refundPath := authPath + "/" + request.TransactionReference + "/refunds"
-	payload, err := json.Marshal(cybersourceRefundRequest)
-	resp, err := client.sendRequest(refundPath, payload)
-	var cybersourceResponse Response
-	err = json.Unmarshal(resp, cybersourceResponse)
+	cybersourceResponse, err := client.sendRequest(refundPath, cybersourceRefundRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -148,8 +131,12 @@ func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 	return &sleet.RefundResponse{}, nil
 }
 
-func (client *CybersourceClient) sendRequest(path string, data []byte) ([]byte, error) {
-	req, err := client.buildPOSTRequest(path, data)
+func (client *CybersourceClient) sendRequest(path string, data *Request) (*Response, error) {
+	payload, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+	req, err := client.buildPOSTRequest(path, payload)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +152,16 @@ func (client *CybersourceClient) sendRequest(path string, data []byte) ([]byte, 
 	}()
 
 	fmt.Printf("status %s\n", resp.Status) // debug
-	return ioutil.ReadAll(resp.Body)
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	var cybersourceResponse Response
+	err = json.Unmarshal(respBody, &cybersourceResponse)
+	if err != nil {
+		return nil, err
+	}
+	return &cybersourceResponse, nil
 }
 
 // POST requests have to generate a digest as well to sign

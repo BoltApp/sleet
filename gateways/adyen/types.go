@@ -3,8 +3,10 @@ package adyen
 import "github.com/BoltApp/sleet"
 
 type AuthRequest struct {
-	Amount        *sleet.Amount `json:"amount"`
-	PaymentMethod *CreditCard   `json:"paymentMethod"`
+	Amount          *sleet.Amount `json:"amount"`
+	Card            *CreditCard   `json:"card"`
+	Reference       string        `json:"reference"`
+	MerchantAccount string        `json:"merchantAccount"`
 }
 
 type CreditCard struct {

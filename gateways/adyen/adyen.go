@@ -43,7 +43,7 @@ func NewWithHTTPClient(apiKey string, merchantAccount string, httpClient *http.C
 }
 
 func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
-	adyenAuthRequest, err := buildAuthRequest(request)
+	adyenAuthRequest, err := buildAuthRequest(request, "PASS REFERENCE HERE", client.merchantAccount)
 	if err != nil {
 		return nil, err
 	}
