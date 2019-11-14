@@ -53,7 +53,16 @@ func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.
 	}
 	captureURL := baseURL + "/" + request.TransactionReference + "/captures"
 	fmt.Printf("Sending to %s [%v]", captureURL, requestBody)
-	return nil, errors.New("Not Implemented")
+
+	// ??? send and unmarshall
+	var cybersourceResponse CaptureResponse
+
+	var response sleet.CaptureResponse
+	if cybersourceResponse.ErrorReason != nil {
+		// return error
+		response.ErrorCode = cybersourceResponse.ErrorReason
+	}
+	return &response, errors.New("not implemented")
 }
 
 func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
@@ -63,7 +72,7 @@ func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidRe
 	}
 	voidURL := baseURL + "/" + request.TransactionReference + "/voids"
 	fmt.Printf("Sending to %s [%v]", voidURL, requestBody)
-	return nil, errors.New("Not Implemented")
+	return nil, errors.New("not implemented")
 }
 
 func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
@@ -73,5 +82,5 @@ func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 	}
 	refundURL := baseURL + "/" + request.TransactionReference + "/refunds"
 	fmt.Printf("Sending to %s [%v]", refundURL, requestBody)
-	return nil, errors.New("Not Implemented")
+	return nil, errors.New("not implemented")
 }

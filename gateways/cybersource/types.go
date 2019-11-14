@@ -12,6 +12,18 @@ type CaptureRequest struct {
 	OrderInformation           OrderInformation           `json:"orderInformation"`
 }
 
+type CaptureResponse struct {
+	SubmitTimeUTC              string                      `json:"submitTimeUtc"`
+	Status                     string                      `json:"status"`
+	ClientReferenceInformation *ClientReferenceInformation `json:"clientReferenceInformation,omitempty"`
+	ID                         *string                     `json:"id,omitempty"`
+	OrderInformation           *OrderInformation           `json:"orderInformation,omitempty"`
+	ReconciliationID           *string                     `json:"reconciliationId,omitempty"`
+	Links                      *Links                      `json:"_links,omitempty"`
+	ErrorReason                *string                     `json:"reason,omitempty"`
+	ErrorMessage               *string                     `json:"message,omitempty"`
+}
+
 type VoidRequest struct {
 	OrderInformation           OrderInformation           `json:"orderInformation"`
 }
@@ -63,4 +75,15 @@ type CardInformation struct {
 	ExpMonth string `json:"expirationMonth"`
 	Number   string `json:"number"`
 	CVV      string `json:"securityCode"`
+}
+
+type Links struct {
+	Self   Link `json:"self"`
+	Refund Link `json:"refund"`
+	Void   Link `json:"void"`
+}
+
+type Link struct {
+	Href   string `json:"href"`
+	Method string `json:"method"`
 }
