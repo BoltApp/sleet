@@ -2,6 +2,8 @@ package authorize_net
 
 const (
 	ResponseCodeApproved = "1"
+	transactionTypeAuthOnly = "authOnlyTransaction"
+	transactionTypepriorAuthCapture = "priorAuthCaptureTransaction"
 )
 
 type Request struct {
