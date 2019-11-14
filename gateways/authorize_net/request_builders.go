@@ -7,7 +7,7 @@ import (
 )
 
 func buildAuthRequest(merchantName string, transactionKey string, authRequest *sleet.AuthorizationRequest) (*Request, error) {
-	amountStr := sleet.AmountToCentsString(authRequest.Amount)
+	amountStr := sleet.AmountToString(authRequest.Amount)
 	billingAddress := authRequest.BillingAddress
 	authorizeRequest := CreateTransactionRequest{
 		MerchantAuthentication: authentication(merchantName, transactionKey),
@@ -50,7 +50,7 @@ func buildVoidRequest(merchantName string, transactionKey string, voidRequest *s
 }
 
 func buildCaptureRequest(merchantName string, transactionKey string, captureRequest *sleet.CaptureRequest) (*Request, error) {
-	amountStr := sleet.AmountToCentsString(captureRequest.Amount)
+	amountStr := sleet.AmountToString(captureRequest.Amount)
 	request := &Request{
 		CreateTransactionRequest: CreateTransactionRequest{
 			MerchantAuthentication: authentication(merchantName, transactionKey),
@@ -73,7 +73,7 @@ func buildRefundRequest(merchantName string, transactionKey string, refundReques
 	if len(lastFourAsString) != 4 {
 		return nil, errors.New("incorrect credit card last four digits")
 	}
-	amountStr := sleet.AmountToCentsString(refundRequest.Amount)
+	amountStr := sleet.AmountToString(refundRequest.Amount)
 	request := &Request{
 		CreateTransactionRequest: CreateTransactionRequest{
 			MerchantAuthentication: authentication(merchantName, transactionKey),
