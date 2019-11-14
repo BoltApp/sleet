@@ -73,7 +73,7 @@ func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.
 		return nil, err
 	}
 	resp, err := client.sendRequest(captureURL, payload)
-	var cybersourceResponse CaptureResponse
+	var cybersourceResponse Response
 	err = json.Unmarshal(resp, cybersourceResponse)
 	if err != nil {
 		return nil, err
