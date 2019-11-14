@@ -17,8 +17,7 @@ import (
 var baseURL = "https://api.stripe.com"
 
 type StripeClient struct {
-	apiKey string
-	// TODO allow override of this
+	apiKey     string
 	httpClient *http.Client
 }
 
@@ -45,10 +44,14 @@ var defaultHttpClient = &http.Client{
 	},
 }
 
-func NewStripeClient(apiKey string) *StripeClient {
+func NewClient(apiKey string) *StripeClient {
+	return NewWithHTTPClient(apiKey, defaultHttpClient)
+}
+
+func NewWithHTTPClient(apiKey string, httpClient *http.Client) *StripeClient {
 	return &StripeClient{
 		apiKey:     apiKey,
-		httpClient: defaultHttpClient,
+		httpClient: httpClient,
 	}
 }
 

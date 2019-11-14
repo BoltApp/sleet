@@ -1,5 +1,7 @@
 ### Sleet
 
+[![CircleCI status](https://circleci.com/gh/BoltApp/sleet.png?circle-token=d60ceb64eb6ebdfd6a45a4703563c1752598db63 "CircleCI status")](https://circleci.com/gh/BoltApp/sleet)
+
 Payment abstraction library - one interface for multiple payment processors
 
 #### Supported operations
