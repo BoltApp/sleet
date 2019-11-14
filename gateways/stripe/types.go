@@ -1,10 +1,10 @@
 package stripe
 
 type ChargeRequest struct {
-	Amount string `form:"amount`
-	Currency string `form:"amount`
-	Source string `form:"amount`
-	Capture string `form:"amount`
+	Amount string `form:"amount"`
+	Currency string `form:"currency"`
+	Source string `form:"source"`
+	Capture string `form:"capture"`
 }
 
 type PostAuthRequest struct {

@@ -7,7 +7,7 @@ import (
 )
 
 func Test(t *testing.T) {
-	client := NewClient("sk_test_cTZ7WLcEPDqcHPAKCQbR11Xb00OXbHjDmw")
+	client := NewClient("")
 	amount := sleet.Amount{
 		Amount:   100,
 		Currency: "USD",
@@ -22,9 +22,9 @@ func Test(t *testing.T) {
 		ExpirationYear:  2024,
 		CVV:             "111",
 	}
-	client.Authorize(&sleet.AuthorizationRequest{Amount: &amount, CreditCard: &card, BillingAddress: &address})
-	//client.Void(&sleet.VoidRequest{TransactionReference:auth.TransactionReference})
-	//auth2, _ := client.Authorize(&sleet.AuthorizationRequest{Amount: &amount, CreditCard: &card, BillingAddress: &address})
-	//client.Capture(&sleet.CaptureRequest{TransactionReference:auth2.TransactionReference, Amount:&amount})
-	//client.Refund(&sleet.RefundRequest{TransactionReference:auth2.TransactionReference, Amount:&amount})
+	auth, _ := client.Authorize(&sleet.AuthorizationRequest{Amount: &amount, CreditCard: &card, BillingAddress: &address})
+	client.Void(&sleet.VoidRequest{TransactionReference:auth.TransactionReference})
+	auth2, _ := client.Authorize(&sleet.AuthorizationRequest{Amount: &amount, CreditCard: &card, BillingAddress: &address})
+	client.Capture(&sleet.CaptureRequest{TransactionReference:auth2.TransactionReference, Amount:&amount})
+	client.Refund(&sleet.RefundRequest{TransactionReference:auth2.TransactionReference, Amount:&amount})
 }
