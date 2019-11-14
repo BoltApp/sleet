@@ -22,4 +22,6 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, reference string,
 	return request, nil
 }
 
-func buildCaptureRequest(captureRequest *sleet.CaptureRequest, merchantAccount string) *Cap
+func buildCaptureRequest(captureRequest *sleet.CaptureRequest, merchantAccount string) (*CaptureRequest, error) {
+	return nil, nil
+}
