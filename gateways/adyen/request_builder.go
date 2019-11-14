@@ -14,7 +14,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*AuthRequest, er
 				ExpiryMonth: strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
 				Number:   authRequest.CreditCard.Number,
 				CVC:      authRequest.CreditCard.CVV,
-				HolderName: authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName
+				HolderName: authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
 		},
 	}
 	return request, nil
