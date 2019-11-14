@@ -8,11 +8,13 @@ import (
 	"github.com/BoltApp/sleet"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"time"
 )
 
 const (
-	baseURL  = "https://apitest.authorize.net/xml/v1/request.api"
+	baseURL                 = "https://apitest.authorize.net/xml/v1/request.api"
+	transactionTypeAuthOnly = "authOnlyTransaction"
 )
 
 var defaultHttpClient = &http.Client{
@@ -41,12 +43,52 @@ func NewWithHttpClient(merchantName string, transactionKey string, httpClient *h
 }
 
 func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
-	// TODO format request
-	resp, err := client.sendRequest(nil)
-	fmt.Printf("err %s", err) // debug
-	fmt.Printf("body %s", string(resp)) // debug
-	// TODO format response
-	return nil, nil
+	amountStr := strconv.FormatInt(request.Amount.Amount, 10)
+	billingAddress := request.BillingAddress
+	authRequest := CreateTransactionRequest{
+		MerchantAuthentication: MerchantAuthentication{
+			Name:           client.merchantName,
+			TransactionKey: client.transactionKey,
+		},
+		RefID:                  "",
+		TransactionRequest:     TransactionRequest{
+			TransactionType: transactionTypeAuthOnly,
+			Amount:          &amountStr,
+			Payment:         &Payment{
+				CreditCard: CreditCard{
+					CardNumber:     request.CreditCard.Number,
+					ExpirationDate: fmt.Sprintf("%d-%d", request.CreditCard.ExpirationYear, request.CreditCard.ExpirationMonth),
+					CardCode:       request.CreditCard.CVV,
+				},
+			},
+			BillingAddress:  &BillingAddress{
+				FirstName: request.CreditCard.FirstName,
+				LastName:  request.CreditCard.LastName,
+				Address:   billingAddress.StreetAddress1,
+				City:      billingAddress.Locality,
+				State:     billingAddress.RegionCode,
+				Zip:       billingAddress.PostalCode,
+				Country:   billingAddress.CountryCode,
+			},
+		},
+	}
+	body, err := client.sendRequest(Request{CreateTransactionRequest: authRequest})
+	if err != nil {
+		return nil, err
+	}
+	var response Response
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return nil, err
+	}
+	txnResponse := response.TransactionResponse
+	return &sleet.AuthorizationResponse{
+		Success:              txnResponse.ResponseCode == ResponseCodeApproved,
+		TransactionReference: txnResponse.TransID,
+		AvsResult:            &txnResponse.AVSResultCode,
+		CvvResult:            txnResponse.CVVResultCode,
+		ErrorCode:            response.Messsages.ResultCode,
+	}, nil
 }
 
 func (client *AuthorizeNetClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
@@ -84,5 +126,10 @@ func (client *AuthorizeNetClient) sendRequest(data interface{}) ([]byte, error) 
 	}()
 
 	fmt.Printf("status %s\n", resp.Status) // debug
-	return ioutil.ReadAll(resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	// trim UTF-8 BOM
+	return bytes.TrimPrefix(body, []byte("\xef\xbb\xbf")), nil
 }
