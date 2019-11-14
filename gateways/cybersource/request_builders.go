@@ -6,13 +6,13 @@ import (
 	"github.com/BoltApp/sleet"
 )
 
-func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*AuthorizationRequest, error) {
-	request := &AuthorizationRequest{
-		ProcessingInformation: ProcessingInformation{
+func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error) {
+	request := &Request{
+		ProcessingInformation: &ProcessingInformation{
 			Capture:           false, // no autocapture for now
 			CommerceIndicator: "internet",
 		},
-		PaymentInformation: PaymentInformation{
+		PaymentInformation: &PaymentInformation{
 			Card: CardInformation{
 				ExpYear:  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
 				ExpMonth: strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
@@ -20,7 +20,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*AuthorizationRe
 				CVV:      authRequest.CreditCard.CVV,
 			},
 		},
-		OrderInformation: OrderInformation{
+		OrderInformation: &OrderInformation{
 			BillingAmount: BillingAmount{
 				Amount:   strconv.Itoa(int(authRequest.Amount.Amount)),
 				Currency: authRequest.Amount.Currency,
@@ -30,9 +30,9 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*AuthorizationRe
 	return request, nil
 }
 
-func buildCaptureRequest(captureRequest *sleet.CaptureRequest) (*CaptureRequest, error) {
-	request := &CaptureRequest{
-		OrderInformation: OrderInformation{
+func buildCaptureRequest(captureRequest *sleet.CaptureRequest) (*Request, error) {
+	request := &Request{
+		OrderInformation: &OrderInformation{
 			BillingAmount: BillingAmount{
 				Amount:   strconv.Itoa(int(captureRequest.Amount.Amount)),
 				Currency: captureRequest.Amount.Currency,
@@ -42,15 +42,15 @@ func buildCaptureRequest(captureRequest *sleet.CaptureRequest) (*CaptureRequest,
 	return request, nil
 }
 
-func buildVoidRequest(voidRequest *sleet.VoidRequest) (*VoidRequest, error) {
+func buildVoidRequest(voidRequest *sleet.VoidRequest) (*Request, error) {
 	// Maybe add reason / more details, but for now nothing
-	request := &VoidRequest{}
+	request := &Request{}
 	return request, nil
 }
 
-func buildRefundRequest(refundRequest *sleet.RefundRequest) (*RefundRequest, error) {
-	request := &RefundRequest{
-		OrderInformation: OrderInformation{
+func buildRefundRequest(refundRequest *sleet.RefundRequest) (*Request, error) {
+	request := &Request{
+		OrderInformation: &OrderInformation{
 			BillingAmount: BillingAmount{
 				Amount:   strconv.Itoa(int(refundRequest.Amount.Amount)),
 				Currency: refundRequest.Amount.Currency,

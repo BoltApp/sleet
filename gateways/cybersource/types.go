@@ -1,15 +1,11 @@
 package cybersource
 
 // Should we just combine these to one Request and have pointers?
-type AuthorizationRequest struct {
-	ClientReferenceInformation ClientReferenceInformation `json:"clientReferenceInformation"`
-	ProcessingInformation      ProcessingInformation      `json:"processingInformation"`
-	OrderInformation           OrderInformation           `json:"orderInformation"`
-	PaymentInformation         PaymentInformation         `json:"paymentInformation"`
-}
-
-type CaptureRequest struct {
-	OrderInformation           OrderInformation           `json:"orderInformation"`
+type Request struct {
+	ClientReferenceInformation *ClientReferenceInformation `json:"clientReferenceInformation,omitempty"`
+	ProcessingInformation      *ProcessingInformation      `json:"processingInformation,omitempty"`
+	OrderInformation           *OrderInformation           `json:"orderInformation,omitempty"`
+	PaymentInformation         *PaymentInformation         `json:"paymentInformation,omitempty"`
 }
 
 type Response struct {
@@ -22,14 +18,7 @@ type Response struct {
 	Links                      *Links                      `json:"_links,omitempty"`
 	ErrorReason                *string                     `json:"reason,omitempty"`
 	ErrorMessage               *string                     `json:"message,omitempty"`
-}
-
-type VoidRequest struct {
-	OrderInformation           OrderInformation           `json:"orderInformation"`
-}
-
-type RefundRequest struct {
-	OrderInformation           OrderInformation           `json:"orderInformation"`
+	// TODO: Add payment additional response info
 }
 
 type ClientReferenceInformation struct {
