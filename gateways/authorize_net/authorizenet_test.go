@@ -15,7 +15,7 @@ func Test(t *testing.T) {
 		Currency: "USD",
 	}
 	postalCode := "94103"
-	address := sleet.BillingAddress{PostalCode:&postalCode}
+	address := sleet.BillingAddress{PostalCode: &postalCode}
 	card := sleet.CreditCard{
 		FirstName:       "Bolt",
 		LastName:        "Checkout",
@@ -28,5 +28,5 @@ func Test(t *testing.T) {
 	fmt.Printf("resp: [%+v] err [%s]", resp, err)
 	voidResp, err := client.Void(&sleet.VoidRequest{TransactionReference: resp.TransactionReference})
 	fmt.Printf("voidResp: [%+v] err [%s]", voidResp, err)
-	
+
 }

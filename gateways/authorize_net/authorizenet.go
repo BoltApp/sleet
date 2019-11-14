@@ -34,9 +34,9 @@ func NewClient(merchantName string, transactionKey string) *AuthorizeNetClient {
 
 func NewWithHttpClient(merchantName string, transactionKey string, httpClient *http.Client) *AuthorizeNetClient {
 	return &AuthorizeNetClient{
-		merchantName:      merchantName,
+		merchantName:   merchantName,
 		transactionKey: transactionKey,
-		httpClient:      httpClient,
+		httpClient:     httpClient,
 	}
 }
 

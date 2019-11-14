@@ -4,7 +4,7 @@ const (
 	ResponseCodeApproved = "1"
 
 	transactionTypeAuthOnly         = "authOnlyTransaction"
-	transactionTypeVoid = "voidTransaction"
+	transactionTypeVoid             = "voidTransaction"
 	transactionTypePriorAuthCapture = "priorAuthCaptureTransaction"
 	transactionTypeRefund           = "refundTransaction"
 )
@@ -25,7 +25,7 @@ type MerchantAuthentication struct {
 }
 
 type TransactionRequest struct {
-	TransactionType  string         `json:"transactionType"`
+	TransactionType  string          `json:"transactionType"`
 	Amount           *string         `json:"amount,omitempty"`
 	Payment          *Payment        `json:"payment,omitempty"`
 	BillingAddress   *BillingAddress `json:"billTo,omitempty"`
@@ -44,9 +44,9 @@ type CreditCard struct {
 }
 
 type BillingAddress struct {
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
-	Company   string `json:"company"`
+	FirstName string  `json:"firstName"`
+	LastName  string  `json:"lastName"`
+	Company   string  `json:"company"`
 	Address   *string `json:"address"`
 	City      *string `json:"city"`
 	State     *string `json:"state"`
