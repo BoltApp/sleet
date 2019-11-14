@@ -59,8 +59,13 @@ func buildCaptureRequest(merchantName string, transactionKey string, captureRequ
 }
 
 func buildRefundRequest(merchantName string, transactionKey string, refundRequest *sleet.RefundRequest) (*Request, error) {
-	if refundRequest.CreditCardLastFour == nil || len(*refundRequest.CreditCardLastFour) != 4 {
+	lastFour, ok := refundRequest.Options["credit_card"]
+	if !ok {
 		return nil, errors.New("missing credit card last four digits")
+	}
+	lastFourAsString := lastFour.(string)
+	if len(lastFourAsString) != 4 {
+		return nil, errors.New("incorrect credit card last four digits")
 	}
 	amount := fmt.Sprintf("%.2f", float64(refundRequest.Amount.Amount) / 100.0)
 	request := &Request{
@@ -75,7 +80,7 @@ func buildRefundRequest(merchantName string, transactionKey string, refundReques
 				RefTransactionID: &refundRequest.TransactionReference,
 				Payment: &Payment{
 					CreditCard: CreditCard{
-						CardNumber:     *refundRequest.CreditCardLastFour,
+						CardNumber:     lastFourAsString,
 						ExpirationDate: expirationDateXXXX,
 					},
 				},

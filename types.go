@@ -65,7 +65,7 @@ type VoidResponse struct {
 type RefundRequest struct {
 	Amount               *Amount
 	TransactionReference string
-	CreditCardLastFour   *string
+	Options              map[string]interface{}
 }
 
 type RefundResponse struct {

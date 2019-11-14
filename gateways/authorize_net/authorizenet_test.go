@@ -38,10 +38,12 @@ func Test(t *testing.T) {
 	fmt.Printf("capResp: [%+v] err [%s]\n", capResp, err)
 
 	lastFour := card.Number[len(card.Number)-4:]
+	options := make(map[string]interface{})
+	options["credit_card"] = lastFour
 	refundResp, err := client.Refund(&sleet.RefundRequest{
 		Amount:               &amount,
 		TransactionReference: resp.TransactionReference,
-		CreditCardLastFour:   &lastFour,
+		Options:   options,
 	})
 	fmt.Printf("refundResp: [%+v] err [%s]\n", refundResp, err)
 }
