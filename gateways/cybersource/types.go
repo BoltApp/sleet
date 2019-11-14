@@ -12,9 +12,9 @@ type CaptureRequest struct {
 	OrderInformation           OrderInformation           `json:"orderInformation"`
 }
 
-type CaptureResponse struct {
+type Response struct {
 	SubmitTimeUTC              string                      `json:"submitTimeUtc"`
-	Status                     string                      `json:"status"`
+	Status                     string                      `json:"status"` // TODO: Make into enum
 	ClientReferenceInformation *ClientReferenceInformation `json:"clientReferenceInformation,omitempty"`
 	ID                         *string                     `json:"id,omitempty"`
 	OrderInformation           *OrderInformation           `json:"orderInformation,omitempty"`
@@ -78,9 +78,11 @@ type CardInformation struct {
 }
 
 type Links struct {
-	Self   Link `json:"self"`
-	Refund Link `json:"refund"`
-	Void   Link `json:"void"`
+	Self           *Link `json:"self,omitempty"`
+	AuthReversal   *Link `json:"authReversal,omitempty"`
+	Capture        *Link `json:"capture,omitempty"`
+	Refund         *Link `json:"refund,omitempty"`
+	Void           *Link `json:"void,omitempty"`
 }
 
 type Link struct {
