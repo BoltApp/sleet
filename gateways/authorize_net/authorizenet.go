@@ -50,7 +50,6 @@ func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest)
 			Name:           client.merchantName,
 			TransactionKey: client.transactionKey,
 		},
-		RefID:                  "",
 		TransactionRequest:     TransactionRequest{
 			TransactionType: transactionTypeAuthOnly,
 			Amount:          &amountStr,
