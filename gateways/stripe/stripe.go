@@ -30,10 +30,14 @@ var defaultHttpClient = &http.Client{
 	},
 }
 
-func NewStripeClient(apiKey string) *StripeClient {
+func NewClient(apiKey string) *StripeClient {
+	return NewWithHTTPClient(apiKey, defaultHttpClient)
+}
+
+func NewWithHTTPClient(apiKey string, httpClient *http.Client) *StripeClient {
 	return &StripeClient{
 		apiKey:     apiKey,
-		httpClient: defaultHttpClient,
+		httpClient: httpClient,
 	}
 }
 

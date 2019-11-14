@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/BoltApp/sleet"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -34,16 +33,19 @@ type CybersourceClient struct {
 	merchantID      string
 	apiKey          string
 	sharedSecretKey string
-	// TODO allow override of this
-	httpClient *http.Client
+	httpClient      *http.Client
 }
 
 func NewClient(merchantID string, apiKey string, sharedSecretKey string) *CybersourceClient {
+	return NewWithHttpClient(merchantID, apiKey, sharedSecretKey, defaultHttpClient)
+}
+
+func NewWithHttpClient(merchantID string, apiKey string, sharedSecretKey string, httpClient *http.Client) *CybersourceClient {
 	return &CybersourceClient{
 		merchantID:      merchantID,
 		apiKey:          apiKey,
 		sharedSecretKey: sharedSecretKey,
-		httpClient:      defaultHttpClient,
+		httpClient:      httpClient,
 	}
 }
 
