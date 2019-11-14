@@ -7,18 +7,20 @@ import (
 )
 
 func Test(t *testing.T) {
-	client := NewClient("USEYOURKEY")
+	client := NewClient("")
 	amount := sleet.Amount{
 		Amount:   100,
 		Currency: "USD",
 	}
+	postalCode := "94103"
+	address := sleet.BillingAddress{PostalCode:&postalCode}
 	card := sleet.CreditCard{
 		FirstName:       "Bolt",
 		LastName:        "Checkout",
 		Number:          "4111111111111111",
 		ExpirationMonth: 8,
 		ExpirationYear:  2024,
-		CVV:             "000",
+		CVV:             "111",
 	}
-	client.Authorize(&amount, &card)
+	client.Authorize(&sleet.AuthorizationRequest{Amount: &amount, CreditCard: &card, BillingAddress: &address})
 }
