@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	net_url "net/url"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/BoltApp/sleet"
+	"github.com/go-playground/form"
 )
 
 var baseURL = "https://api.stripe.com"
@@ -45,14 +47,13 @@ func (client *StripeClient) Authorize(request *sleet.AuthorizationRequest) (*sle
 	if err != nil {
 		return nil, err
 	}
-	payload, err := json.Marshal(tokenRequest)
+	encoder := form.NewEncoder()
+	form, err := encoder.Encode(tokenRequest)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Println("token payload")
-	fmt.Println(string(payload))
-	code, resp, err := client.sendRequest("v1/tokens", payload)
+	code, resp, err := client.sendRequest("v1/tokens", form)
 	if err != nil {
 		return nil, err
 	}
@@ -68,13 +69,11 @@ func (client *StripeClient) Authorize(request *sleet.AuthorizationRequest) (*sle
 	if err != nil {
 		return nil, err
 	}
-	payload, err = json.Marshal(chargeRequest)
+	form, err = encoder.Encode(chargeRequest)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("token payload")
-	fmt.Println(payload)
-	code, resp, err = client.sendRequest("v1/charges", payload)
+	code, resp, err = client.sendRequest("v1/charges", form)
 	if err != nil {
 		return nil, err
 	}
@@ -97,11 +96,12 @@ func (client *StripeClient) Capture(request *sleet.CaptureRequest) (*sleet.Captu
 	if err != nil {
 		return nil, err
 	}
-	payload, err := json.Marshal(captureRequest)
+	encoder := form.NewEncoder()
+	form, err := encoder.Encode(captureRequest)
 	if err != nil {
 		return nil, err
 	}
-	code, resp, err := client.sendRequest(capturePath, payload)
+	code, resp, err := client.sendRequest(capturePath, form)
 	if err != nil {
 		return nil,err
 	}
@@ -115,11 +115,12 @@ func (client *StripeClient) Refund(request *sleet.RefundRequest) (*sleet.RefundR
 	if err != nil {
 		return nil, err
 	}
-	payload, err := json.Marshal(refundRequest)
+	encoder := form.NewEncoder()
+	form, err := encoder.Encode(refundRequest)
 	if err != nil {
 		return nil, err
 	}
-	code, resp, err := client.sendRequest("v1/refunds", payload)
+	code, resp, err := client.sendRequest("v1/refunds", form)
 	if err != nil {
 		return nil,err
 	}
@@ -133,11 +134,12 @@ func (client *StripeClient) Void(request *sleet.VoidRequest) (*sleet.VoidRespons
 	if err != nil {
 		return nil, err
 	}
-	payload, err := json.Marshal(voidRequest)
+	encoder := form.NewEncoder()
+	form, err := encoder.Encode(voidRequest)
 	if err != nil {
 		return nil, err
 	}
-	code, resp, err := client.sendRequest("v1/refunds", payload)
+	code, resp, err := client.sendRequest("v1/refunds", form)
 	if err != nil {
 		return nil,err
 	}
@@ -146,7 +148,7 @@ func (client *StripeClient) Void(request *sleet.VoidRequest) (*sleet.VoidRespons
 	return &sleet.VoidResponse{ErrorCode:&convertedCode}, nil
 }
 
-func (client *StripeClient) sendRequest(path string, data []byte) (int, []byte, error) {
+func (client *StripeClient) sendRequest(path string, data net_url.Values) (int, []byte, error) {
 	req, err := client.buildPOSTRequest(path, data)
 	if err != nil {
 		return -1, nil, err
@@ -167,11 +169,11 @@ func (client *StripeClient) sendRequest(path string, data []byte) (int, []byte, 
 	return resp.StatusCode, body, err
 }
 
-func (client *StripeClient) buildPOSTRequest(path string, data []byte) (*http.Request, error) {
+func (client *StripeClient) buildPOSTRequest(path string, data net_url.Values) (*http.Request, error) {
 	url := baseURL + "/" + path
 
-	fmt.Printf("data %s\n", data) // debug
-	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(string(data)))
+	fmt.Printf("data %s\n", data.Encode()) // debug
+	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(data.Encode()))
 	if err != nil {
 		return nil, err
 	}
