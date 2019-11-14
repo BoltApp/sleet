@@ -9,13 +9,15 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*AuthRequest, er
 	request := &AuthRequest{
 		Amount: authRequest.Amount,
 		PaymentMethod: &CreditCard{
-			    Type: "scheme",
-				ExpiryYear:  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
-				ExpiryMonth: strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
-				Number:   authRequest.CreditCard.Number,
-				CVC:      authRequest.CreditCard.CVV,
-				HolderName: authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
+			Type:        "scheme",
+			ExpiryYear:  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
+			ExpiryMonth: strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
+			Number:      authRequest.CreditCard.Number,
+			CVC:         authRequest.CreditCard.CVV,
+			HolderName:  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
 		},
 	}
 	return request, nil
 }
+
+func buildCaptureRequest(captureRequest *sleet.CaptureRequest, merchantAccount string) *Cap
