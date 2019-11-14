@@ -6,7 +6,7 @@ type Request struct {
 
 type CreateTransactionRequest struct {
 	MerchantAuthentication MerchantAuthentication `json:"merchantAuthentication"`
-	RefID                  string                 `json:"refId"`
+	RefID                  *string                `json:"refId,omitempty"`
 	TransactionRequest     TransactionRequest     `json:"transactionRequest"`
 }
 
