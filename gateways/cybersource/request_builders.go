@@ -41,3 +41,21 @@ func buildCaptureRequest(captureRequest *sleet.CaptureRequest) (*CaptureRequest,
 	}
 	return request, nil
 }
+
+func buildVoidRequest(voidRequest *sleet.VoidRequest) (*VoidRequest, error) {
+	// Maybe add reason / more details, but for now nothing
+	request := &VoidRequest{}
+	return request, nil
+}
+
+func buildRefundRequest(refundRequest *sleet.RefundRequest) (*RefundRequest, error) {
+	request := &RefundRequest{
+		OrderInformation: OrderInformation{
+			BillingAmount: BillingAmount{
+				Amount:   strconv.Itoa(int(refundRequest.Amount.Amount)),
+				Currency: refundRequest.Amount.Currency,
+			},
+		},
+	}
+	return request, nil
+}

@@ -1,5 +1,6 @@
 package cybersource
 
+// Should we just combine these to one Request and have pointers?
 type AuthorizationRequest struct {
 	ClientReferenceInformation ClientReferenceInformation `json:"clientReferenceInformation"`
 	ProcessingInformation      ProcessingInformation      `json:"processingInformation"`
@@ -8,6 +9,14 @@ type AuthorizationRequest struct {
 }
 
 type CaptureRequest struct {
+	OrderInformation           OrderInformation           `json:"orderInformation"`
+}
+
+type VoidRequest struct {
+	OrderInformation           OrderInformation           `json:"orderInformation"`
+}
+
+type RefundRequest struct {
 	OrderInformation           OrderInformation           `json:"orderInformation"`
 }
 

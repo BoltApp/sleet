@@ -3,7 +3,7 @@ package cybersource
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/pkg/errors"
+	"errors"
 	"net/http"
 	"time"
 	"github.com/BoltApp/sleet"
@@ -38,7 +38,12 @@ func NewClient(merchantID string, apiKey string, sharedSecretKey string) *Cybers
 }
 
 func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
-	return nil, errors.Errorf("Not Implemented")
+	requestBody, err := buildAuthRequest(request)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Printf("Sending to %s [%v]", baseURL, requestBody)
+	return nil, errors.New("Not Implemented")
 }
 
 func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
@@ -48,13 +53,25 @@ func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.
 	}
 	captureURL := baseURL + "/" + request.TransactionReference + "/captures"
 	fmt.Printf("Sending to %s [%v]", captureURL, requestBody)
-	return nil, errors.Errorf("Not Implemented")
+	return nil, errors.New("Not Implemented")
 }
 
 func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
-	return nil, errors.Errorf("Not Implemented")
+	requestBody, err := buildVoidRequest(request)
+	if err != nil {
+		return nil, err
+	}
+	voidURL := baseURL + "/" + request.TransactionReference + "/voids"
+	fmt.Printf("Sending to %s [%v]", voidURL, requestBody)
+	return nil, errors.New("Not Implemented")
 }
 
-func (client *CybersourceClient) Credit(request *sleet.CreditRequest) (*sleet.CreditResponse, error) {
-	return nil, errors.Errorf("Not Implemented")
+func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	requestBody, err := buildRefundRequest(request)
+	if err != nil {
+		return nil, err
+	}
+	refundURL := baseURL + "/" + request.TransactionReference + "/refunds"
+	fmt.Printf("Sending to %s [%v]", refundURL, requestBody)
+	return nil, errors.New("Not Implemented")
 }
