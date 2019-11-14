@@ -74,16 +74,17 @@ func (client *StripeClient) Authorize(amount *sleet.Amount, creditCard *sleet.Cr
 	}
 	fmt.Printf("response %s\n", tokenResponse.ID) // debug
 	paramsCharge := net_url.Values{}
-	// We can potentially add more stuff here like description and capture
+	// We can potentially add more stuff here like description and autocapture
 	paramsCharge.Add("amount", strconv.FormatInt(amount.Amount, 10))
 	paramsCharge.Add("currency", amount.Currency)
 	paramsCharge.Add("source", tokenResponse.ID)
+	paramsCharge.Add("capture", "false")
 	code, resp, err = client.sendRequest("v1/charges", paramsCharge)
-	if code != 200 {
-		return &sleet.AuthorizationResponse{Success:false, TransactionReference:"", AvsResult:nil, CvvResult:nil,ErrorCode:strconv.Itoa(code)}, nil
-	}
 	if err != nil {
 		return nil, err
+	}
+	if code != 200 {
+		return &sleet.AuthorizationResponse{Success:false, TransactionReference:"", AvsResult:nil, CvvResult:nil,ErrorCode:strconv.Itoa(code)}, nil
 	}
 	var chargeResponse ChargeResponse
 	if err := json.Unmarshal(resp, &chargeResponse); err != nil {
@@ -92,6 +93,19 @@ func (client *StripeClient) Authorize(amount *sleet.Amount, creditCard *sleet.Cr
 	fmt.Printf("response %s\n", chargeResponse.ID) // debug
 
 	return &sleet.AuthorizationResponse{Success:true, TransactionReference:chargeResponse.ID, AvsResult:tokenResponse.Card.AddressZipCheck, CvvResult:tokenResponse.Card.CVCCheck,ErrorCode:strconv.Itoa(code)}, nil
+}
+
+func (client *StripeClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
+	capturePath := fmt.Sprintf("v1/charges/%s/capture", request.TransactionReference)
+	paramsCapture := net_url.Values{}
+	paramsCapture.Add("amount", strconv.FormatInt(request.Amount.Amount, 10))
+	code, resp, err := client.sendRequest(capturePath, paramsCapture)
+	if err != nil {
+		return nil,err
+	}
+	convertedCode := strconv.Itoa(code)
+	fmt.Printf("response %s\n", string(resp)) // debug
+	return &sleet.CaptureResponse{ErrorCode:&convertedCode}, nil
 }
 
 func (client *StripeClient) sendRequest(path string, data net_url.Values) (int, []byte, error) {

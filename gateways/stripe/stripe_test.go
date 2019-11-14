@@ -7,7 +7,7 @@ import (
 )
 
 func Test(t *testing.T) {
-	client := NewClient("USEYOURKEY")
+	client := NewClient("")
 	amount := sleet.Amount{
 		Amount:   100,
 		Currency: "USD",
@@ -20,5 +20,6 @@ func Test(t *testing.T) {
 		ExpirationYear:  2024,
 		CVV:             "000",
 	}
-	client.Authorize(&amount, &card)
+	auth, _ := client.Authorize(&amount, &card)
+	client.Capture(&sleet.CaptureRequest{TransactionReference:auth.TransactionReference, Amount:&amount})
 }
