@@ -63,15 +63,126 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 }
 
 func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
-	return nil, errors.Errorf("Not Implemented")
+	cybersourceCaptureRequest, err := buildCaptureRequest(request)
+	if err != nil {
+		return nil, err
+	}
+	capturePath := authPath + "/" + request.TransactionReference + "/captures"
+	payload, err := json.Marshal(cybersourceCaptureRequest)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := client.sendRequest(capturePath, payload)
+	var cybersourceResponse Response
+	err = json.Unmarshal(resp, cybersourceResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	if cybersourceResponse.ErrorReason != nil {
+		// return error
+		response := sleet.CaptureResponse{ErrorCode: cybersourceResponse.ErrorReason}
+		return &response, nil
+	}
+	return &sleet.CaptureResponse{}, nil
 }
 
 func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
-	return nil, errors.Errorf("Not Implemented")
+	cybersourceVoidRequest, err := buildVoidRequest(request)
+	if err != nil {
+		return nil, err
+	}
+	voidPath := authPath + "/" + request.TransactionReference + "/voids"
+	payload, err := json.Marshal(cybersourceVoidRequest)
+	resp, err := client.sendRequest(voidPath, payload)
+	var cybersourceResponse Response
+	err = json.Unmarshal(resp, cybersourceResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	if cybersourceResponse.ErrorReason != nil {
+		// return error
+		response := sleet.VoidResponse{ErrorCode: cybersourceResponse.ErrorReason}
+		return &response, nil
+	}
+	return &sleet.VoidResponse{}, nil
 }
 
-func (client *CybersourceClient) Credit(request *sleet.CreditRequest) (*sleet.CreditResponse, error) {
-	return nil, errors.Errorf("Not Implemented")
+func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	cybersourceRefundRequest, err := buildRefundRequest(request)
+	if err != nil {
+		return nil, err
+	}
+	refundPath := authPath + "/" + request.TransactionReference + "/refunds"
+	payload, err := json.Marshal(cybersourceRefundRequest)
+	resp, err := client.sendRequest(refundPath, payload)
+	var cybersourceResponse Response
+	err = json.Unmarshal(resp, cybersourceResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	if cybersourceResponse.ErrorReason != nil {
+		// return error
+		response := sleet.RefundResponse{ErrorCode: cybersourceResponse.ErrorReason}
+		return &response, nil
+	}
+	return &sleet.RefundResponse{}, nil
+}
+
+func (client *CybersourceClient) sendRequest(path string, data []byte) ([]byte, error) {
+	req, err := client.buildPOSTRequest(path, data)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := client.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		err := resp.Body.Close()
+		if err != nil {
+			// TODO log
+		}
+	}()
+
+	fmt.Printf("status %s\n", resp.Status) // debug
+	return ioutil.ReadAll(resp.Body)
+}
+
+// POST requests have to generate a digest as well to sign
+func (client *CybersourceClient) buildPOSTRequest(path string, data []byte) (*http.Request, error) {
+	url := baseURL + path // weird thing where we need path to include forward /
+
+	payloadHash := sha256.Sum256(data)
+	digest := "SHA-256=" + base64.StdEncoding.EncodeToString(payloadHash[:])
+	now := time.Now().UTC().Format(time.RFC1123)
+	sig := "host: apitest.cybersource.com\ndate: " + now + "\n(request-target): post " + path + "\ndigest: " + digest + "\nv-c-merchant-id: " + client.merchantID
+	sigBytes := []byte(sig)
+	decodedSecret, err := base64.StdEncoding.DecodeString(client.sharedSecretKey)
+	hmacSha256 := hmac.New(sha256.New, decodedSecret)
+	hmacSha256.Write(sigBytes)
+	signature := base64.StdEncoding.EncodeToString(hmacSha256.Sum(nil))
+
+	keyID := client.apiKey
+	algorithm := "HmacSHA256"
+	headers := "host date (request-target) digest v-c-merchant-id"
+	signatureHeader := fmt.Sprintf(`keyid="%s",algorithm="%s",headers="%s",signature="%s"`, keyID, algorithm, headers, signature)
+
+	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(string(data)))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("v-c-merchant-id", "bolt")
+	req.Header.Add("Host", "apitest.cybersource.com")
+	req.Header.Add("Date", now)
+	req.Header.Add("Digest", digest)
+	req.Header.Add("Signature", signatureHeader)
+	req.Header.Add("Content-Type", "application/json")
+
+	return req, nil
 }
 
 func (client *CybersourceClient) sendRequest(path string, data []byte) ([]byte, error) {
