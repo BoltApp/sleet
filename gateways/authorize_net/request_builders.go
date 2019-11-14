@@ -6,7 +6,7 @@ import (
 )
 
 func buildCaptureRequest(merchantName string, transactionKey string, captureRequest *sleet.CaptureRequest) (*Request, error) {
-	amount := fmt.Sprintf("%.2f", float64(captureRequest.Amount.Amount) / 100.0))
+	amount := fmt.Sprintf("%.2f", float64(captureRequest.Amount.Amount) / 100.0)
 	request := &Request{
 		CreateTransactionRequest:CreateTransactionRequest{
 			MerchantAuthentication: MerchantAuthentication{
