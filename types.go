@@ -12,6 +12,15 @@ type Amount struct {
 	Currency string
 }
 
+type BillingAddress struct {
+	StreetAddress1 *string
+	StreetAddress2 *string
+	Locality       *string
+	RegionCode     *string
+	PostalCode     *string
+	CountryCode    *string
+}
+
 type CreditCard struct {
 	FirstName       string
 	LastName        string
@@ -24,6 +33,7 @@ type CreditCard struct {
 type AuthorizationRequest struct {
 	Amount     *Amount
 	CreditCard *CreditCard
+	BillingAddress *BillingAddress
 	Options    map[string]interface{}
 }
 
@@ -31,7 +41,7 @@ type AuthorizationResponse struct {
 	Success              bool
 	TransactionReference string
 	AvsResult            *string
-	CvvResult            *string
+	CvvResult            string
 	ErrorCode            string
 }
 

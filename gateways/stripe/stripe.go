@@ -31,7 +31,7 @@ type ChargeResponse struct {
 }
 
 type StripeCard struct {
-	CVCCheck *string `json:"cvc_check"`
+	CVCCheck string `json:"cvc_check"`
 	AddressZipCheck *string `json:"address_zip_check"`
 }
 
@@ -55,28 +55,50 @@ func NewWithHTTPClient(apiKey string, httpClient *http.Client) *StripeClient {
 	}
 }
 
-func (client *StripeClient) Authorize(amount *sleet.Amount, creditCard *sleet.CreditCard) (*sleet.AuthorizationResponse, error) {
+func (client *StripeClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	// Tokenize
 	paramsToken := net_url.Values{}
-	paramsToken.Add("card[number]", creditCard.Number)
-	paramsToken.Add("card[exp_month]", strconv.Itoa(creditCard.ExpirationMonth))
-	paramsToken.Add("card[exp_year]", strconv.Itoa(creditCard.ExpirationYear))
+	paramsToken.Add("card[number]", request.CreditCard.Number)
+	paramsToken.Add("card[exp_month]", strconv.Itoa(request.CreditCard.ExpirationMonth))
+	paramsToken.Add("card[exp_year]", strconv.Itoa(request.CreditCard.ExpirationYear))
+	paramsToken.Add("card[cvc]", request.CreditCard.CVV)
+	paramsToken.Add("card[name]", request.CreditCard.FirstName + " " + request.CreditCard.LastName)
+
+	if request.BillingAddress.StreetAddress1 != nil {
+		paramsToken.Add("card[address_line1]", *request.BillingAddress.StreetAddress1)
+	}
+	if request.BillingAddress.StreetAddress2 != nil {
+		paramsToken.Add("card[address_line2]", *request.BillingAddress.StreetAddress2)
+	}
+	if request.BillingAddress.Locality != nil {
+		paramsToken.Add("card[address_city]", *request.BillingAddress.Locality)
+	}
+	if request.BillingAddress.RegionCode != nil {
+		paramsToken.Add("card[address_state]", *request.BillingAddress.RegionCode)
+	}
+	if request.BillingAddress.CountryCode != nil {
+		paramsToken.Add("card[address_country]", *request.BillingAddress.CountryCode)
+	}
+	if request.BillingAddress.PostalCode != nil {
+		paramsToken.Add("card[address_zip]", *request.BillingAddress.PostalCode)
+	}
+
 	code, resp, err := client.sendRequest("v1/tokens", paramsToken)
 	if err != nil {
 		return nil, err
 	}
 	var tokenResponse TokenResponse
 	if code != 200 {
-		return &sleet.AuthorizationResponse{Success:false, TransactionReference:"", AvsResult:nil, CvvResult:nil,ErrorCode:strconv.Itoa(code)}, nil
+		return &sleet.AuthorizationResponse{Success:false, TransactionReference:"", AvsResult:nil, CvvResult:"",ErrorCode:strconv.Itoa(code)}, nil
 	}
 	if err := json.Unmarshal(resp, &tokenResponse); err != nil {
 		return nil, err
 	}
 	fmt.Printf("response %s\n", tokenResponse.ID) // debug
 	paramsCharge := net_url.Values{}
-	// We can potentially add more stuff here like description and autocapture
-	paramsCharge.Add("amount", strconv.FormatInt(amount.Amount, 10))
-	paramsCharge.Add("currency", amount.Currency)
+	// We can potentially add more stuff here like description and capture
+	paramsCharge.Add("amount", strconv.FormatInt(request.Amount.Amount, 10))
+	paramsCharge.Add("currency", request.Amount.Currency)
 	paramsCharge.Add("source", tokenResponse.ID)
 	paramsCharge.Add("capture", "false")
 	code, resp, err = client.sendRequest("v1/charges", paramsCharge)
@@ -91,6 +113,7 @@ func (client *StripeClient) Authorize(amount *sleet.Amount, creditCard *sleet.Cr
 		return nil, err
 	}
 	fmt.Printf("response %s\n", chargeResponse.ID) // debug
+	fmt.Printf("response %s\n", tokenResponse.Card.CVCCheck) // debug
 
 	return &sleet.AuthorizationResponse{Success:true, TransactionReference:chargeResponse.ID, AvsResult:tokenResponse.Card.AddressZipCheck, CvvResult:tokenResponse.Card.CVCCheck,ErrorCode:strconv.Itoa(code)}, nil
 }
