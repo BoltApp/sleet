@@ -6,6 +6,7 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -63,15 +64,33 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 }
 
 func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
-	return nil, errors.Errorf("Not Implemented")
+	requestBody, err := buildCaptureRequest(request)
+	if err != nil {
+		return nil, err
+	}
+	captureURL := baseURL + authPath + "/" + request.TransactionReference + "/captures"
+	fmt.Printf("Sending to %s [%v]", captureURL, requestBody)
+	return nil, errors.New("Not Implemented")
 }
 
 func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
-	return nil, errors.Errorf("Not Implemented")
+	requestBody, err := buildVoidRequest(request)
+	if err != nil {
+		return nil, err
+	}
+	voidURL := baseURL + authPath + "/" + request.TransactionReference + "/voids"
+	fmt.Printf("Sending to %s [%v]", voidURL, requestBody)
+	return nil, errors.New("Not Implemented")
 }
 
-func (client *CybersourceClient) Credit(request *sleet.CreditRequest) (*sleet.CreditResponse, error) {
-	return nil, errors.Errorf("Not Implemented")
+func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	requestBody, err := buildRefundRequest(request)
+	if err != nil {
+		return nil, err
+	}
+	refundURL := baseURL + authPath + "/" + request.TransactionReference + "/refunds"
+	fmt.Printf("Sending to %s [%v]", refundURL, requestBody)
+	return nil, errors.New("Not Implemented")
 }
 
 func (client *CybersourceClient) sendRequest(path string, data []byte) ([]byte, error) {
