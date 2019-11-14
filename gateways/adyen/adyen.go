@@ -2,17 +2,18 @@ package adyen
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	net_url "net/url"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/BoltApp/sleet"
 )
 
-var baseURL = "FILL THIS IN"
+var baseURL = "https://pal-test.adyen.com/pal/servlet/Payment/v51"
 
 type AdyenClient struct {
 	apiKey     string
@@ -40,7 +41,21 @@ func NewWithHTTPClient(apiKey string, httpClient *http.Client) *AdyenClient {
 }
 
 func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
-	// Do This
+	adyenAuthRequest, err := buildAuthRequest(request)
+	if err != nil {
+		return nil, err
+	}
+	payload, err := json.Marshal(adyenAuthRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	code, resp, err := client.sendRequest("/authorise", payload)
+	fmt.Println(string(resp))
+	fmt.Println(code)
+	if code != 200 {
+		return &sleet.AuthorizationResponse{Success:false, TransactionReference:"", AvsResult:nil, CvvResult:"",ErrorCode:strconv.Itoa(code)}, nil
+	}
 	return nil, nil
 }
 
@@ -52,7 +67,7 @@ func (client *AdyenClient) Refund(request *sleet.RefundRequest) (*sleet.RefundRe
 	return nil, nil
 }
 
-func (client *AdyenClient) sendRequest(path string, data net_url.Values) (int, []byte, error) {
+func (client *AdyenClient) sendRequest(path string, data []byte) (int, []byte, error) {
 	req, err := client.buildPOSTRequest(path, data)
 	if err != nil {
 		return -1, nil, err
@@ -73,17 +88,16 @@ func (client *AdyenClient) sendRequest(path string, data net_url.Values) (int, [
 	return resp.StatusCode, body, err
 }
 
-func (client *AdyenClient) buildPOSTRequest(path string, data net_url.Values) (*http.Request, error) {
+func (client *AdyenClient) buildPOSTRequest(path string, data []byte) (*http.Request, error) {
 	url := baseURL + "/" + path
 
-	fmt.Printf("data %s\n", data.Encode()) // debug
-	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(data.Encode()))
+	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(string(data)))
 	if err != nil {
 		return nil, err
 	}
 
-	authorization := "Bearer " + client.apiKey
-	req.Header.Add("Authorization", authorization)
+	authorization := client.apiKey
+	req.Header.Add("X-API-key", authorization)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Add("User-Agent", "sleet")
 
