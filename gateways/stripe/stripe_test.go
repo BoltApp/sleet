@@ -7,7 +7,7 @@ import (
 )
 
 func Test(t *testing.T) {
-	client := NewStripeClient("USEYOURKEY")
+	client := NewClient("USEYOURKEY")
 	amount := sleet.Amount{
 		Amount:   100,
 		Currency: "USD",
