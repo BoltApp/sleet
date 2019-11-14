@@ -50,7 +50,6 @@ func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest)
 			Name:           client.merchantName,
 			TransactionKey: client.transactionKey,
 		},
-		RefID:                  "",
 		TransactionRequest:     TransactionRequest{
 			TransactionType: transactionTypeAuthOnly,
 			Amount:          &amountStr,
@@ -92,7 +91,24 @@ func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest)
 }
 
 func (client *AuthorizeNetClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
-	return nil, nil
+	authorizeNetCaptureRequest, err := buildCaptureRequest(client.merchantName, client.transactionKey, request)
+	if err != nil {
+		return nil, err
+	}
+
+	payload, err := json.Marshal(authorizeNetCaptureRequest)
+	resp, err := client.sendRequest(payload)
+	var authorizeNetResponse Response
+	err = json.Unmarshal(resp, authorizeNetResponse)
+	if err != nil {
+		return nil, err
+	}
+	if authorizeNetResponse.Messsages.ResultCode != "OK" {
+		// return first error
+		response := sleet.CaptureResponse{ErrorCode: &authorizeNetResponse.Messsages.Message[0].Code}
+		return &response, nil
+	}
+	return &sleet.CaptureResponse{}, nil
 }
 
 func (client *AuthorizeNetClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
