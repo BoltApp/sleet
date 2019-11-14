@@ -5,7 +5,7 @@ const (
 )
 
 type Request struct {
-	CreateTransactionRequest CreateTransactionRequest `json:"createTransactionRequest,omitempty"`
+	CreateTransactionRequest CreateTransactionRequest `json:"createTransactionRequest"`
 }
 
 type CreateTransactionRequest struct {

@@ -8,7 +8,6 @@ import (
 	"github.com/BoltApp/sleet"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -43,7 +42,8 @@ func NewWithHttpClient(merchantName string, transactionKey string, httpClient *h
 }
 
 func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
-	amountStr := strconv.FormatInt(request.Amount.Amount, 10)
+	amountStr := fmt.Sprintf("%.2f", float64(request.Amount.Amount) / 100.0)
+
 	billingAddress := request.BillingAddress
 	authRequest := CreateTransactionRequest{
 		MerchantAuthentication: MerchantAuthentication{
@@ -71,12 +71,7 @@ func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest)
 			},
 		},
 	}
-	body, err := client.sendRequest(Request{CreateTransactionRequest: authRequest})
-	if err != nil {
-		return nil, err
-	}
-	var response Response
-	err = json.Unmarshal(body, &response)
+	response, err := client.sendRequest(Request{CreateTransactionRequest: authRequest})
 	if err != nil {
 		return nil, err
 	}
@@ -96,13 +91,11 @@ func (client *AuthorizeNetClient) Capture(request *sleet.CaptureRequest) (*sleet
 		return nil, err
 	}
 
-	payload, err := json.Marshal(authorizeNetCaptureRequest)
-	resp, err := client.sendRequest(payload)
-	var authorizeNetResponse Response
-	err = json.Unmarshal(resp, authorizeNetResponse)
+	authorizeNetResponse, err := client.sendRequest(*authorizeNetCaptureRequest)
 	if err != nil {
 		return nil, err
 	}
+
 	if authorizeNetResponse.Messsages.ResultCode != "OK" {
 		// return first error
 		response := sleet.CaptureResponse{ErrorCode: &authorizeNetResponse.Messsages.Message[0].Code}
@@ -119,7 +112,7 @@ func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.R
 	return nil, nil
 }
 
-func (client *AuthorizeNetClient) sendRequest(data interface{}) ([]byte, error) {
+func (client *AuthorizeNetClient) sendRequest(data Request) (*Response, error) {
 	bodyJSON, err := json.Marshal(data)
 	if err != nil {
 		return nil, err
@@ -130,6 +123,7 @@ func (client *AuthorizeNetClient) sendRequest(data interface{}) ([]byte, error) 
 	if err != nil {
 		return nil, err
 	}
+
 	resp, err := client.httpClient.Do(request)
 	if err != nil {
 		return nil, err
@@ -147,5 +141,11 @@ func (client *AuthorizeNetClient) sendRequest(data interface{}) ([]byte, error) 
 		return nil, err
 	}
 	// trim UTF-8 BOM
-	return bytes.TrimPrefix(body, []byte("\xef\xbb\xbf")), nil
+	bodyBytes := bytes.TrimPrefix(body, []byte("\xef\xbb\xbf"))
+	var authorizeNetResponse Response
+	err = json.Unmarshal(bodyBytes, &authorizeNetResponse)
+	if err != nil {
+		return nil, err
+	}
+	return &authorizeNetResponse, nil
 }
