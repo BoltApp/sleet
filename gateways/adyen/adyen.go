@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -52,6 +53,9 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 	code, resp, err := client.sendRequest("/authorise", payload)
 	fmt.Println(string(resp))
 	fmt.Println(code)
+	if code != 200 {
+		return &sleet.AuthorizationResponse{Success:false, TransactionReference:"", AvsResult:nil, CvvResult:"",ErrorCode:strconv.Itoa(code)}, nil
+	}
 	return nil, nil
 }
 
