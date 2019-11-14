@@ -12,7 +12,7 @@ import (
 	"github.com/BoltApp/sleet"
 )
 
-var baseURL = "https://checkout-test.adyen.com"
+var baseURL = "https://pal-test.adyen.com/pal/servlet/Payment/v51"
 
 type AdyenClient struct {
 	apiKey     string
@@ -49,7 +49,7 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 		return nil, err
 	}
 
-	code, resp, err := client.sendRequest("v51/payments", payload)
+	code, resp, err := client.sendRequest("/authorise", payload)
 	fmt.Println(string(resp))
 	fmt.Println(code)
 	return nil, nil
