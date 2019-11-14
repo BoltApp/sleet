@@ -16,8 +16,9 @@ import (
 var baseURL = "https://pal-test.adyen.com/pal/servlet/Payment/v51"
 
 type AdyenClient struct {
-	apiKey     string
-	httpClient *http.Client
+	merchantAccount string
+	apiKey          string
+	httpClient      *http.Client
 }
 
 var defaultHttpClient = &http.Client{
@@ -29,14 +30,15 @@ var defaultHttpClient = &http.Client{
 	},
 }
 
-func NewClient(apiKey string) *AdyenClient {
-	return NewWithHTTPClient(apiKey, defaultHttpClient)
+func NewClient(apiKey string, merchantAccount string) *AdyenClient {
+	return NewWithHTTPClient(apiKey, merchantAccount, defaultHttpClient)
 }
 
-func NewWithHTTPClient(apiKey string, httpClient *http.Client) *AdyenClient {
+func NewWithHTTPClient(apiKey string, merchantAccount string, httpClient *http.Client) *AdyenClient {
 	return &AdyenClient{
-		apiKey:     apiKey,
-		httpClient: httpClient,
+		apiKey:          apiKey,
+		merchantAccount: merchantAccount,
+		httpClient:      httpClient,
 	}
 }
 
@@ -54,7 +56,7 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 	fmt.Println(string(resp))
 	fmt.Println(code)
 	if code != 200 {
-		return &sleet.AuthorizationResponse{Success:false, TransactionReference:"", AvsResult:nil, CvvResult:"",ErrorCode:strconv.Itoa(code)}, nil
+		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: nil, CvvResult: "", ErrorCode: strconv.Itoa(code)}, nil
 	}
 	return nil, nil
 }

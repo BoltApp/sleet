@@ -19,7 +19,7 @@ func Test(t *testing.T) {
 		Currency: "USD",
 	}
 	postalCode := "94103"
-	address := sleet.BillingAddress{PostalCode:&postalCode}
+	address := sleet.BillingAddress{PostalCode: &postalCode}
 	card := sleet.CreditCard{
 		FirstName:       "Bolt",
 		LastName:        "Checkout",
