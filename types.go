@@ -29,7 +29,7 @@ type AuthorizationRequest struct {
 
 type AuthorizationResponse struct {
 	Success              bool
-	TransactionReference *string
+	TransactionReference string
 	AvsResult            *string
 	CvvResult            *string
 	ErrorCode            string

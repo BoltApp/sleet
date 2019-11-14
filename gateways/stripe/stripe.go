@@ -67,7 +67,7 @@ func (client *StripeClient) Authorize(amount *sleet.Amount, creditCard *sleet.Cr
 	}
 	var tokenResponse TokenResponse
 	if code != 200 {
-		return &sleet.AuthorizationResponse{Success:false, TransactionReference:nil, AvsResult:nil, CvvResult:nil,ErrorCode:strconv.Itoa(code)}, nil
+		return &sleet.AuthorizationResponse{Success:false, TransactionReference:"", AvsResult:nil, CvvResult:nil,ErrorCode:strconv.Itoa(code)}, nil
 	}
 	if err := json.Unmarshal(resp, &tokenResponse); err != nil {
 		return nil, err
@@ -80,7 +80,7 @@ func (client *StripeClient) Authorize(amount *sleet.Amount, creditCard *sleet.Cr
 	paramsCharge.Add("source", tokenResponse.ID)
 	code, resp, err = client.sendRequest("v1/charges", paramsCharge)
 	if code != 200 {
-		return &sleet.AuthorizationResponse{Success:false, TransactionReference:nil, AvsResult:nil, CvvResult:nil,ErrorCode:strconv.Itoa(code)}, nil
+		return &sleet.AuthorizationResponse{Success:false, TransactionReference:"", AvsResult:nil, CvvResult:nil,ErrorCode:strconv.Itoa(code)}, nil
 	}
 	if err != nil {
 		return nil, err
@@ -91,7 +91,7 @@ func (client *StripeClient) Authorize(amount *sleet.Amount, creditCard *sleet.Cr
 	}
 	fmt.Printf("response %s\n", chargeResponse.ID) // debug
 
-	return &sleet.AuthorizationResponse{Success:true, TransactionReference:&chargeResponse.ID, AvsResult:tokenResponse.Card.AddressZipCheck, CvvResult:tokenResponse.Card.CVCCheck,ErrorCode:strconv.Itoa(code)}, nil
+	return &sleet.AuthorizationResponse{Success:true, TransactionReference:chargeResponse.ID, AvsResult:tokenResponse.Card.AddressZipCheck, CvvResult:tokenResponse.Card.CVCCheck,ErrorCode:strconv.Itoa(code)}, nil
 }
 
 func (client *StripeClient) sendRequest(path string, data net_url.Values) (int, []byte, error) {
