@@ -7,6 +7,8 @@ const (
 	transactionTypeVoid             = "voidTransaction"
 	transactionTypePriorAuthCapture = "priorAuthCaptureTransaction"
 	transactionTypeRefund           = "refundTransaction"
+
+	expirationDateXXXX = "XXXX"
 )
 
 type Request struct {
@@ -40,7 +42,7 @@ type Payment struct {
 type CreditCard struct {
 	CardNumber     string `json:"cardNumber"`
 	ExpirationDate string `json:"expirationDate"`
-	CardCode       string `json:"cardCode"`
+	CardCode       *string `json:"cardCode,omitempty"`
 }
 
 type BillingAddress struct {
