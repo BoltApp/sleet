@@ -42,7 +42,7 @@ func buildVoidRequest(merchantName string, transactionKey string, voidRequest *s
 			MerchantAuthentication: authentication(merchantName, transactionKey),
 			TransactionRequest: TransactionRequest{
 				TransactionType:  transactionTypeVoid,
-				RefTransactionID: voidRequest.TransactionReference,
+				RefTransactionID: &voidRequest.TransactionReference,
 			},
 		},
 	}

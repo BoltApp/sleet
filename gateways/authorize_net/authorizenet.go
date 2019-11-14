@@ -80,8 +80,6 @@ func (client *AuthorizeNetClient) Capture(request *sleet.CaptureRequest) (*sleet
 	}
 
 	if authorizeNetResponse.TransactionResponse.ResponseCode != ResponseCodeApproved {
-		// return first error
-		//fmt.Printf("Error found: [%v] [%+v]\n", authorizeNetResponse.Messsages.Message[0], authorizeNetResponse)
 		var errorCode string
 		if len(authorizeNetResponse.TransactionResponse.Errors) > 0 {
 			errorCode = authorizeNetResponse.TransactionResponse.Errors[0].ErrorCode
@@ -105,9 +103,14 @@ func (client *AuthorizeNetClient) Void(request *sleet.VoidRequest) (*sleet.VoidR
 		return nil, err
 	}
 
-	if authorizeNetResponse.Messsages.ResultCode != "Ok" {
-		// return first error
-		response := sleet.VoidResponse{ErrorCode: &authorizeNetResponse.Messsages.Message[0].Code}
+	if authorizeNetResponse.TransactionResponse.ResponseCode != ResponseCodeApproved {
+		var errorCode string
+		if len(authorizeNetResponse.TransactionResponse.Errors) > 0 {
+			errorCode = authorizeNetResponse.TransactionResponse.Errors[0].ErrorCode
+		} else {
+			errorCode = authorizeNetResponse.TransactionResponse.ResponseCode
+		}
+		response := sleet.VoidResponse{ErrorCode: &errorCode}
 		return &response, nil
 	}
 	return &sleet.VoidResponse{}, nil
