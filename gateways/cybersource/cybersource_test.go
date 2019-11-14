@@ -47,7 +47,6 @@ func TestAuthorize(t *testing.T) {
 
 	}
 
-
 	capResp, err := client.Capture(&sleet.CaptureRequest{
 		Amount:               amount,
 		TransactionReference: resp.TransactionReference,
