@@ -63,13 +63,28 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 }
 
 func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
-	requestBody, err := buildCaptureRequest(request)
+	cybersourceCaptureRequest, err := buildCaptureRequest(request)
 	if err != nil {
 		return nil, err
 	}
 	captureURL := baseURL + authPath + "/" + request.TransactionReference + "/captures"
-	fmt.Printf("Sending to %s [%v]", captureURL, requestBody)
-	return nil, errors.New("Not Implemented")
+	payload, err := json.Marshal(cybersourceCaptureRequest)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := client.sendRequest(captureURL, payload)
+	var cybersourceResponse CaptureResponse
+	err = json.Unmarshal(resp, cybersourceResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	if cybersourceResponse.ErrorReason != nil {
+		// return error
+		response := sleet.CaptureResponse{ErrorCode: cybersourceResponse.ErrorReason}
+		return &response, nil
+	}
+	return &sleet.CaptureResponse{}, nil
 }
 
 func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
@@ -79,7 +94,7 @@ func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidRe
 	}
 	voidURL := baseURL + authPath + "/" + request.TransactionReference + "/voids"
 	fmt.Printf("Sending to %s [%v]", voidURL, requestBody)
-	return nil, errors.New("Not Implemented")
+	return nil, errors.New("not implemented")
 }
 
 func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
@@ -89,7 +104,7 @@ func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 	}
 	refundURL := baseURL + authPath + "/" + request.TransactionReference + "/refunds"
 	fmt.Printf("Sending to %s [%v]", refundURL, requestBody)
-	return nil, errors.New("Not Implemented")
+	return nil, errors.New("not implemented")
 }
 
 func (client *CybersourceClient) sendRequest(path string, data []byte) ([]byte, error) {
@@ -144,5 +159,4 @@ func (client *CybersourceClient) buildPOSTRequest(path string, data []byte) (*ht
 	req.Header.Add("Content-Type", "application/json")
 
 	return req, nil
-
 }
