@@ -22,5 +22,5 @@ func Test(t *testing.T) {
 		ExpirationYear:  2024,
 		CVV:             "111",
 	}
-	client.Authorize(&amount, &card, &address)
+	client.Authorize(&sleet.AuthorizationRequest{Amount: &amount, CreditCard: &card, BillingAddress: &address})
 }

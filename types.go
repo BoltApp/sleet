@@ -33,6 +33,7 @@ type CreditCard struct {
 type AuthorizationRequest struct {
 	Amount     *Amount
 	CreditCard *CreditCard
+	BillingAddress *BillingAddress
 	Options    map[string]interface{}
 }
 

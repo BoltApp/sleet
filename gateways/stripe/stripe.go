@@ -55,32 +55,32 @@ func NewWithHTTPClient(apiKey string, httpClient *http.Client) *StripeClient {
 	}
 }
 
-func (client *StripeClient) Authorize(amount *sleet.Amount, creditCard *sleet.CreditCard, billingAddress *sleet.BillingAddress) (*sleet.AuthorizationResponse, error) {
+func (client *StripeClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	// Tokenize
 	paramsToken := net_url.Values{}
-	paramsToken.Add("card[number]", creditCard.Number)
-	paramsToken.Add("card[exp_month]", strconv.Itoa(creditCard.ExpirationMonth))
-	paramsToken.Add("card[exp_year]", strconv.Itoa(creditCard.ExpirationYear))
-	paramsToken.Add("card[cvc]", creditCard.CVV)
-	paramsToken.Add("card[name]", creditCard.FirstName + " " + creditCard.LastName)
+	paramsToken.Add("card[number]", request.CreditCard.Number)
+	paramsToken.Add("card[exp_month]", strconv.Itoa(request.CreditCard.ExpirationMonth))
+	paramsToken.Add("card[exp_year]", strconv.Itoa(request.CreditCard.ExpirationYear))
+	paramsToken.Add("card[cvc]", request.CreditCard.CVV)
+	paramsToken.Add("card[name]", request.CreditCard.FirstName + " " + request.CreditCard.LastName)
 
-	if billingAddress.StreetAddress1 != nil {
-		paramsToken.Add("card[address_line1]", *billingAddress.StreetAddress1)
+	if request.BillingAddress.StreetAddress1 != nil {
+		paramsToken.Add("card[address_line1]", *request.BillingAddress.StreetAddress1)
 	}
-	if billingAddress.StreetAddress2 != nil {
-		paramsToken.Add("card[address_line2]", *billingAddress.StreetAddress2)
+	if request.BillingAddress.StreetAddress2 != nil {
+		paramsToken.Add("card[address_line2]", *request.BillingAddress.StreetAddress2)
 	}
-	if billingAddress.Locality != nil {
-		paramsToken.Add("card[address_city]", *billingAddress.Locality)
+	if request.BillingAddress.Locality != nil {
+		paramsToken.Add("card[address_city]", *request.BillingAddress.Locality)
 	}
-	if billingAddress.RegionCode != nil {
-		paramsToken.Add("card[address_state]", *billingAddress.RegionCode)
+	if request.BillingAddress.RegionCode != nil {
+		paramsToken.Add("card[address_state]", *request.BillingAddress.RegionCode)
 	}
-	if billingAddress.CountryCode != nil {
-		paramsToken.Add("card[address_country]", *billingAddress.CountryCode)
+	if request.BillingAddress.CountryCode != nil {
+		paramsToken.Add("card[address_country]", *request.BillingAddress.CountryCode)
 	}
-	if billingAddress.PostalCode != nil {
-		paramsToken.Add("card[address_zip]", *billingAddress.PostalCode)
+	if request.BillingAddress.PostalCode != nil {
+		paramsToken.Add("card[address_zip]", *request.BillingAddress.PostalCode)
 	}
 
 	code, resp, err := client.sendRequest("v1/tokens", paramsToken)
@@ -97,8 +97,8 @@ func (client *StripeClient) Authorize(amount *sleet.Amount, creditCard *sleet.Cr
 	fmt.Printf("response %s\n", tokenResponse.ID) // debug
 	paramsCharge := net_url.Values{}
 	// We can potentially add more stuff here like description and capture
-	paramsCharge.Add("amount", strconv.FormatInt(amount.Amount, 10))
-	paramsCharge.Add("currency", amount.Currency)
+	paramsCharge.Add("amount", strconv.FormatInt(request.Amount.Amount, 10))
+	paramsCharge.Add("currency", request.Amount.Currency)
 	paramsCharge.Add("source", tokenResponse.ID)
 	code, resp, err = client.sendRequest("v1/charges", paramsCharge)
 	if code != 200 {
