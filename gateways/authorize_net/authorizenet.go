@@ -2,6 +2,7 @@ package authorize_net
 
 import (
 	"crypto/tls"
+	"github.com/BoltApp/sleet"
 	"net/http"
 	"time"
 )
@@ -33,5 +34,21 @@ func NewWithHttpClient(merchantName string, transactionKey string, httpClient *h
 		transactionKey: transactionKey,
 		httpClient:      httpClient,
 	}
+}
+
+func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
+	return nil, nil
+}
+
+func (client *AuthorizeNetClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
+	return nil, nil
+}
+
+func (client *AuthorizeNetClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+	return nil, nil
+}
+
+func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	return nil, nil
 }
 
