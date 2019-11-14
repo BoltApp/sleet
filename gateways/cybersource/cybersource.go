@@ -66,12 +66,12 @@ func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.
 	if err != nil {
 		return nil, err
 	}
-	captureURL := baseURL + authPath + "/" + request.TransactionReference + "/captures"
+	capturePath := authPath + "/" + request.TransactionReference + "/captures"
 	payload, err := json.Marshal(cybersourceCaptureRequest)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := client.sendRequest(captureURL, payload)
+	resp, err := client.sendRequest(capturePath, payload)
 	var cybersourceResponse Response
 	err = json.Unmarshal(resp, cybersourceResponse)
 	if err != nil {
@@ -91,9 +91,9 @@ func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidRe
 	if err != nil {
 		return nil, err
 	}
-	voidURL := baseURL + authPath + "/" + request.TransactionReference + "/voids"
+	voidPath := authPath + "/" + request.TransactionReference + "/voids"
 	payload, err := json.Marshal(cybersourceVoidRequest)
-	resp, err := client.sendRequest(voidURL, payload)
+	resp, err := client.sendRequest(voidPath, payload)
 	var cybersourceResponse Response
 	err = json.Unmarshal(resp, cybersourceResponse)
 	if err != nil {
@@ -113,9 +113,9 @@ func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 	if err != nil {
 		return nil, err
 	}
-	refundURL := baseURL + authPath + "/" + request.TransactionReference + "/refunds"
+	refundPath := authPath + "/" + request.TransactionReference + "/refunds"
 	payload, err := json.Marshal(cybersourceRefundRequest)
-	resp, err := client.sendRequest(refundURL, payload)
+	resp, err := client.sendRequest(refundPath, payload)
 	var cybersourceResponse Response
 	err = json.Unmarshal(resp, cybersourceResponse)
 	if err != nil {
