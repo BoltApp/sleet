@@ -50,12 +50,21 @@ func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest)
 		return nil, err
 	}
 	txnResponse := response.TransactionResponse
+	var errorCode string
+	if txnResponse.ResponseCode != ResponseCodeApproved {
+		if len(txnResponse.Errors) > 0 {
+			errorCode = txnResponse.Errors[0].ErrorCode
+		} else {
+			errorCode = txnResponse.ResponseCode
+		}
+	}
+
 	return &sleet.AuthorizationResponse{
 		Success:              txnResponse.ResponseCode == ResponseCodeApproved,
 		TransactionReference: txnResponse.TransID,
 		AvsResult:            &txnResponse.AVSResultCode,
 		CvvResult:            txnResponse.CVVResultCode,
-		ErrorCode:            response.Messsages.ResultCode, // TODO: Use Errors[0].ErrorCode
+		ErrorCode:            errorCode,
 	}, nil
 }
 
@@ -73,7 +82,13 @@ func (client *AuthorizeNetClient) Capture(request *sleet.CaptureRequest) (*sleet
 	if authorizeNetResponse.TransactionResponse.ResponseCode != ResponseCodeApproved {
 		// return first error
 		//fmt.Printf("Error found: [%v] [%+v]\n", authorizeNetResponse.Messsages.Message[0], authorizeNetResponse)
-		response := sleet.CaptureResponse{ErrorCode: &authorizeNetResponse.TransactionResponse.Errors[0].ErrorCode}
+		var errorCode string
+		if len(authorizeNetResponse.TransactionResponse.Errors) > 0 {
+			errorCode = authorizeNetResponse.TransactionResponse.Errors[0].ErrorCode
+		} else {
+			errorCode = authorizeNetResponse.TransactionResponse.ResponseCode
+		}
+		response := sleet.CaptureResponse{ErrorCode: &errorCode}
 		return &response, nil
 	}
 	return &sleet.CaptureResponse{}, nil
@@ -97,7 +112,13 @@ func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.R
 	if authorizeNetResponse.TransactionResponse.ResponseCode != ResponseCodeApproved {
 		// return first error
 		//fmt.Printf("Error found: [%v] [%+v]\n", authorizeNetResponse.TransactionResponse.Errors, authorizeNetResponse)
-		response := sleet.RefundResponse{ErrorCode: &authorizeNetResponse.TransactionResponse.Errors[0].ErrorCode}
+		var errorCode string
+		if len(authorizeNetResponse.TransactionResponse.Errors) > 0 {
+			errorCode = authorizeNetResponse.TransactionResponse.Errors[0].ErrorCode
+		} else {
+			errorCode = authorizeNetResponse.TransactionResponse.ResponseCode
+		}
+		response := sleet.RefundResponse{ErrorCode: &errorCode}
 		return &response, nil
 	}
 	return &sleet.RefundResponse{}, nil
