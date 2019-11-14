@@ -19,6 +19,12 @@ type CreditCard struct {
 	ExpirationMonth int
 	ExpirationYear  int
 	CVV             string
+	StreetAddress1 *string
+	StreetAddress2 *string
+	Locality       *string
+	RegionCode     *string
+	PostalCode     *string
+	CountryCode    *string
 }
 
 type AuthorizationRequest struct {
@@ -31,7 +37,7 @@ type AuthorizationResponse struct {
 	Success              bool
 	TransactionReference string
 	AvsResult            *string
-	CvvResult            *string
+	CvvResult            string
 	ErrorCode            string
 }
 
