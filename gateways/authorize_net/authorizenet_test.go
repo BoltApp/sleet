@@ -1,13 +1,14 @@
-package stripe
+package authorize_net
 
 import (
+	"os"
 	"testing"
 
 	"github.com/BoltApp/sleet"
 )
 
 func Test(t *testing.T) {
-	client := NewClient("")
+	client := NewClient(os.Getenv("AUTH_NET_LOGIN_ID"), os.Getenv("AUTH_NET_TXN_KEY"))
 	amount := sleet.Amount{
 		Amount:   100,
 		Currency: "USD",
@@ -22,7 +23,5 @@ func Test(t *testing.T) {
 		ExpirationYear:  2024,
 		CVV:             "111",
 	}
-	auth, _ := client.Authorize(&sleet.AuthorizationRequest{Amount: &amount, CreditCard: &card, BillingAddress: &address})
-	client.Capture(&sleet.CaptureRequest{TransactionReference:auth.TransactionReference, Amount:&amount})
-	client.Refund(&sleet.RefundRequest{TransactionReference:auth.TransactionReference, Amount:&amount})
+	client.Authorize(&sleet.AuthorizationRequest{Amount: &amount, CreditCard: &card, BillingAddress: &address})
 }
