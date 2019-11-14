@@ -48,9 +48,27 @@ func buildCaptureRequest(merchantName string, transactionKey string, captureRequ
 				TransactionKey: transactionKey,
 			},
 			TransactionRequest: TransactionRequest{
-				TransactionType:  transactionTypepriorAuthCapture,
+				TransactionType:  transactionTypePriorAuthCapture,
 				Amount:           &amount,
 				RefTransactionID: captureRequest.TransactionReference,
+			},
+		},
+	}
+	return request, nil
+}
+
+func buildRefundRequest(merchantName string, transactionKey string, refundRequest *sleet.RefundRequest) (*Request, error) {
+	amount := fmt.Sprintf("%.2f", float64(refundRequest.Amount.Amount) / 100.0)
+	request := &Request{
+		CreateTransactionRequest:CreateTransactionRequest{
+			MerchantAuthentication: MerchantAuthentication{
+				Name:           merchantName,
+				TransactionKey: transactionKey,
+			},
+			TransactionRequest: TransactionRequest{
+				TransactionType:  transactionTypeRefund,
+				Amount:           &amount,
+				RefTransactionID: refundRequest.TransactionReference,
 			},
 		},
 	}
