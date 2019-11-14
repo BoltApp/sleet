@@ -88,23 +88,47 @@ func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.
 }
 
 func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
-	requestBody, err := buildVoidRequest(request)
+	cybersourceVoidRequest, err := buildVoidRequest(request)
 	if err != nil {
 		return nil, err
 	}
 	voidURL := baseURL + authPath + "/" + request.TransactionReference + "/voids"
-	fmt.Printf("Sending to %s [%v]", voidURL, requestBody)
-	return nil, errors.New("not implemented")
+	payload, err := json.Marshal(cybersourceVoidRequest)
+	resp, err := client.sendRequest(voidURL, payload)
+	var cybersourceResponse Response
+	err = json.Unmarshal(resp, cybersourceResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	if cybersourceResponse.ErrorReason != nil {
+		// return error
+		response := sleet.VoidResponse{ErrorCode: cybersourceResponse.ErrorReason}
+		return &response, nil
+	}
+	return &sleet.VoidResponse{}, nil
 }
 
 func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
-	requestBody, err := buildRefundRequest(request)
+	cybersourceRefundRequest, err := buildRefundRequest(request)
 	if err != nil {
 		return nil, err
 	}
 	refundURL := baseURL + authPath + "/" + request.TransactionReference + "/refunds"
-	fmt.Printf("Sending to %s [%v]", refundURL, requestBody)
-	return nil, errors.New("not implemented")
+	payload, err := json.Marshal(cybersourceRefundRequest)
+	resp, err := client.sendRequest(refundURL, payload)
+	var cybersourceResponse Response
+	err = json.Unmarshal(resp, cybersourceResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	if cybersourceResponse.ErrorReason != nil {
+		// return error
+		response := sleet.RefundResponse{ErrorCode: cybersourceResponse.ErrorReason}
+		return &response, nil
+	}
+	return &sleet.RefundResponse{}, nil
 }
 
 func (client *CybersourceClient) sendRequest(path string, data []byte) ([]byte, error) {
