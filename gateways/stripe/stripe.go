@@ -152,7 +152,7 @@ func (client *StripeClient) Void(request *sleet.VoidRequest) (*sleet.VoidRespons
 		return nil,err
 	}
 	convertedCode := strconv.Itoa(code)
-	fmt.Printf("response refund %s\n", string(resp)) // debug
+	fmt.Printf("response void %s\n", string(resp)) // debug
 	return &sleet.VoidResponse{ErrorCode:&convertedCode}, nil
 }
 
