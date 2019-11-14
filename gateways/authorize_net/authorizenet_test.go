@@ -5,12 +5,14 @@ import (
 	"math/rand"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/BoltApp/sleet"
 )
 
 func Test(t *testing.T) {
 	client := NewClient(os.Getenv("AUTH_NET_LOGIN_ID"), os.Getenv("AUTH_NET_TXN_KEY"))
+	rand.Seed(time.Now().Unix())
 	randAmount := rand.Int63n(1000000)
 	amount := sleet.Amount{
 		Amount:   randAmount,
@@ -27,15 +29,19 @@ func Test(t *testing.T) {
 		CVV:             "111",
 	}
 	resp, err := client.Authorize(&sleet.AuthorizationRequest{Amount: &amount, CreditCard: &card, BillingAddress: &address})
+
 	fmt.Printf("resp: [%+v] err [%s]\n", resp, err)
 	capResp, err := client.Capture(&sleet.CaptureRequest{
 		Amount:               &amount,
 		TransactionReference: resp.TransactionReference,
 	})
 	fmt.Printf("capResp: [%+v] err [%s]\n", capResp, err)
+
+	lastFour := card.Number[len(card.Number)-4:]
 	refundResp, err := client.Refund(&sleet.RefundRequest{
 		Amount:               &amount,
 		TransactionReference: resp.TransactionReference,
+		CreditCardLastFour:   &lastFour,
 	})
 	fmt.Printf("refundResp: [%+v] err [%s]\n", refundResp, err)
 }

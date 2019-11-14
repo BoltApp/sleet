@@ -1,6 +1,7 @@
 package authorize_net
 
 import (
+	"errors"
 	"fmt"
 	"github.com/BoltApp/sleet"
 )
@@ -21,7 +22,7 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 				CreditCard: CreditCard{
 					CardNumber:     authRequest.CreditCard.Number,
 					ExpirationDate: fmt.Sprintf("%d-%d", authRequest.CreditCard.ExpirationYear, authRequest.CreditCard.ExpirationMonth),
-					CardCode:       authRequest.CreditCard.CVV,
+					CardCode:       &authRequest.CreditCard.CVV,
 				},
 			},
 			BillingAddress:  &BillingAddress{
@@ -58,6 +59,9 @@ func buildCaptureRequest(merchantName string, transactionKey string, captureRequ
 }
 
 func buildRefundRequest(merchantName string, transactionKey string, refundRequest *sleet.RefundRequest) (*Request, error) {
+	if refundRequest.CreditCardLastFour == nil || len(*refundRequest.CreditCardLastFour) != 4 {
+		return nil, errors.New("missing credit card last four digits")
+	}
 	amount := fmt.Sprintf("%.2f", float64(refundRequest.Amount.Amount) / 100.0)
 	request := &Request{
 		CreateTransactionRequest:CreateTransactionRequest{
@@ -69,6 +73,12 @@ func buildRefundRequest(merchantName string, transactionKey string, refundReques
 				TransactionType:  transactionTypeRefund,
 				Amount:           &amount,
 				RefTransactionID: &refundRequest.TransactionReference,
+				Payment: &Payment{
+					CreditCard: CreditCard{
+						CardNumber:     *refundRequest.CreditCardLastFour,
+						ExpirationDate: expirationDateXXXX,
+					},
+				},
 			},
 		},
 	}

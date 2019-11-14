@@ -81,7 +81,6 @@ func (client *AuthorizeNetClient) Capture(request *sleet.CaptureRequest) (*sleet
 
 	if authorizeNetResponse.TransactionResponse.ResponseCode != ResponseCodeApproved {
 		// return first error
-		//fmt.Printf("Error found: [%v] [%+v]\n", authorizeNetResponse.Messsages.Message[0], authorizeNetResponse)
 		var errorCode string
 		if len(authorizeNetResponse.TransactionResponse.Errors) > 0 {
 			errorCode = authorizeNetResponse.TransactionResponse.Errors[0].ErrorCode
@@ -111,7 +110,6 @@ func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.R
 
 	if authorizeNetResponse.TransactionResponse.ResponseCode != ResponseCodeApproved {
 		// return first error
-		//fmt.Printf("Error found: [%v] [%+v]\n", authorizeNetResponse.TransactionResponse.Errors, authorizeNetResponse)
 		var errorCode string
 		if len(authorizeNetResponse.TransactionResponse.Errors) > 0 {
 			errorCode = authorizeNetResponse.TransactionResponse.Errors[0].ErrorCode
@@ -129,7 +127,6 @@ func (client *AuthorizeNetClient) sendRequest(data Request) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	//fmt.Printf("Sending:\n%s\n", bodyJSON)
 
 	reader := bytes.NewReader(bodyJSON)
 	request, err := http.NewRequest(http.MethodPost, baseURL, reader)
