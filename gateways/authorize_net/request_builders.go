@@ -50,7 +50,7 @@ func buildCaptureRequest(merchantName string, transactionKey string, captureRequ
 			TransactionRequest: TransactionRequest{
 				TransactionType:  transactionTypePriorAuthCapture,
 				Amount:           &amount,
-				RefTransactionID: captureRequest.TransactionReference,
+				RefTransactionID: &captureRequest.TransactionReference,
 			},
 		},
 	}
@@ -68,7 +68,7 @@ func buildRefundRequest(merchantName string, transactionKey string, refundReques
 			TransactionRequest: TransactionRequest{
 				TransactionType:  transactionTypeRefund,
 				Amount:           &amount,
-				RefTransactionID: refundRequest.TransactionReference,
+				RefTransactionID: &refundRequest.TransactionReference,
 			},
 		},
 	}

@@ -28,7 +28,7 @@ type TransactionRequest struct {
 	Amount           *string         `json:"amount,omitempty"`
 	Payment          *Payment        `json:"payment,omitempty"`
 	BillingAddress   *BillingAddress `json:"billTo,omitempty"`
-	RefTransactionID string          `json:"refTransId,omitempty"`
+	RefTransactionID *string         `json:"refTransId,omitempty"`
 	// Ignoring Line items, Shipping, Tax, Duty, etc.
 }
 
@@ -71,11 +71,17 @@ type TransactionResponse struct {
 	AccountNumber  string                       `json:"accountNumber"`
 	AccountType    string                       `json:"accountType"`
 	Messages       []TransactionResponseMessage `json:"messages"`
+	Errors         []Error                      `json:"errors"`
 }
 
 type TransactionResponseMessage struct {
 	Code        string `json:"code"`
 	Description string `json:"description"`
+}
+
+type Error struct {
+	ErrorCode string `json:"errorCode"`
+	ErrorText string `json:"errorText"`
 }
 
 type Messages struct {
