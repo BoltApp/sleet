@@ -6,8 +6,7 @@ import (
 )
 
 func buildAuthRequest(merchantName string, transactionKey string, authRequest *sleet.AuthorizationRequest) (*Request, error) {
-	amountStr := fmt.Sprintf("%.2f", float64(authRequest.Amount.Amount)/100.0)
-
+	amountStr := sleet.AmountToCentsString(authRequest.Amount.Amount)
 	billingAddress := authRequest.BillingAddress
 	authorizeRequest := CreateTransactionRequest{
 		MerchantAuthentication: authentication(merchantName, transactionKey),
@@ -50,13 +49,13 @@ func buildVoidRequest(merchantName string, transactionKey string, voidRequest *s
 }
 
 func buildCaptureRequest(merchantName string, transactionKey string, captureRequest *sleet.CaptureRequest) (*Request, error) {
-	amount := fmt.Sprintf("%.2f", float64(captureRequest.Amount.Amount)/100.0)
+	amountStr := sleet.AmountToCentsString(captureRequest.Amount.Amount)
 	request := &Request{
 		CreateTransactionRequest: CreateTransactionRequest{
 			MerchantAuthentication: authentication(merchantName, transactionKey),
 			TransactionRequest: TransactionRequest{
 				TransactionType:  transactionTypePriorAuthCapture,
-				Amount:           &amount,
+				Amount:           &amountStr,
 				RefTransactionID: &captureRequest.TransactionReference,
 			},
 		},
@@ -65,13 +64,13 @@ func buildCaptureRequest(merchantName string, transactionKey string, captureRequ
 }
 
 func buildRefundRequest(merchantName string, transactionKey string, refundRequest *sleet.RefundRequest) (*Request, error) {
-	amount := fmt.Sprintf("%.2f", float64(refundRequest.Amount.Amount)/100.0)
+	amountStr := sleet.AmountToCentsString(refundRequest.Amount.Amount)
 	request := &Request{
 		CreateTransactionRequest: CreateTransactionRequest{
 			MerchantAuthentication: authentication(merchantName, transactionKey),
 			TransactionRequest: TransactionRequest{
 				TransactionType:  transactionTypeRefund,
-				Amount:           &amount,
+				Amount:           &amountStr,
 				RefTransactionID: &refundRequest.TransactionReference,
 			},
 		},
