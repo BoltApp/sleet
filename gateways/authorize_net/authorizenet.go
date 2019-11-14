@@ -49,6 +49,18 @@ func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest)
 	return nil, nil
 }
 
+func (client *AuthorizeNetClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
+	return nil, nil
+}
+
+func (client *AuthorizeNetClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+	return nil, nil
+}
+
+func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	return nil, nil
+}
+
 func (client *AuthorizeNetClient) sendRequest(data interface{}) ([]byte, error) {
 	bodyJSON, err := json.Marshal(data)
 	if err != nil {
