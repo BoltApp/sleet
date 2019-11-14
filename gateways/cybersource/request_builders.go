@@ -29,3 +29,15 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*AuthorizationRe
 	}
 	return request, nil
 }
+
+func buildCaptureRequest(captureRequest *sleet.CaptureRequest) (*CaptureRequest, error) {
+	request := &CaptureRequest{
+		OrderInformation: OrderInformation{
+			BillingAmount: BillingAmount{
+				Amount:   strconv.Itoa(int(captureRequest.Amount.Amount)),
+				Currency: captureRequest.Amount.Currency,
+			},
+		},
+	}
+	return request, nil
+}
