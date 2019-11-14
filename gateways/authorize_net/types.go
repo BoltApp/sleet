@@ -4,6 +4,7 @@ const (
 	ResponseCodeApproved = "1"
 
 	transactionTypeAuthOnly         = "authOnlyTransaction"
+	transactionTypeVoid = "voidTransaction"
 	transactionTypePriorAuthCapture = "priorAuthCaptureTransaction"
 	transactionTypeRefund           = "refundTransaction"
 )

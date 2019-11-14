@@ -79,7 +79,22 @@ func (client *AuthorizeNetClient) Capture(request *sleet.CaptureRequest) (*sleet
 }
 
 func (client *AuthorizeNetClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
-	return nil, nil
+	authorizeNetCaptureRequest, err := buildVoidRequest(client.merchantName, client.transactionKey, request)
+	if err != nil {
+		return nil, err
+	}
+
+	authorizeNetResponse, err := client.sendRequest(*authorizeNetCaptureRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	if authorizeNetResponse.Messsages.ResultCode != "Ok" {
+		// return first error
+		response := sleet.VoidResponse{ErrorCode: &authorizeNetResponse.Messsages.Message[0].Code}
+		return &response, nil
+	}
+	return &sleet.VoidResponse{}, nil
 }
 
 func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {

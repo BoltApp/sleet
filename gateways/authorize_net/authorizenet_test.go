@@ -26,4 +26,7 @@ func Test(t *testing.T) {
 	}
 	resp, err := client.Authorize(&sleet.AuthorizationRequest{Amount: &amount, CreditCard: &card, BillingAddress: &address})
 	fmt.Printf("resp: [%+v] err [%s]", resp, err)
+	voidResp, err := client.Void(&sleet.VoidRequest{TransactionReference: resp.TransactionReference})
+	fmt.Printf("voidResp: [%+v] err [%s]", voidResp, err)
+	
 }
