@@ -16,8 +16,7 @@ import (
 var baseURL = "https://api.stripe.com"
 
 type StripeClient struct {
-	apiKey string
-	// TODO allow override of this
+	apiKey     string
 	httpClient *http.Client
 }
 
