@@ -1,5 +1,9 @@
 package authorize_net
 
+const (
+	ResponseCodeApproved = "1"
+)
+
 type Request struct {
 	CreateTransactionRequest CreateTransactionRequest `json:"createTransactionRequest,omitempty"`
 }
@@ -38,11 +42,11 @@ type BillingAddress struct {
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
 	Company   string `json:"company"`
-	Address   string `json:"address"`
-	City      string `json:"city"`
-	State     string `json:"state"`
-	Zip       string `json:"zip"`
-	Country   string `json:"country"`
+	Address   *string `json:"address"`
+	City      *string `json:"city"`
+	State     *string `json:"state"`
+	Zip       *string `json:"zip"`
+	Country   *string `json:"country"`
 }
 
 type Response struct {

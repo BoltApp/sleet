@@ -1,6 +1,7 @@
 package authorize_net
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -23,5 +24,6 @@ func Test(t *testing.T) {
 		ExpirationYear:  2024,
 		CVV:             "111",
 	}
-	client.Authorize(&sleet.AuthorizationRequest{Amount: &amount, CreditCard: &card, BillingAddress: &address})
+	resp, err := client.Authorize(&sleet.AuthorizationRequest{Amount: &amount, CreditCard: &card, BillingAddress: &address})
+	fmt.Printf("resp: [%v] err [%s]", resp, err)
 }

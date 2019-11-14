@@ -18,7 +18,19 @@ type Response struct {
 	Links                      *Links                      `json:"_links,omitempty"`
 	ErrorReason                *string                     `json:"reason,omitempty"`
 	ErrorMessage               *string                     `json:"message,omitempty"`
+	ProcessorInformation       *ProcessorInformation       `json:"processorInformation,omitempty"`
 	// TODO: Add payment additional response info
+}
+type ProcessorInformation struct {
+	ApprovalCode     string `json:"approvalCode"`
+	CardVerification struct {
+		ResultCode string `json:"resultCode"`
+	} `json:"cardVerification"`
+	ResponseCode string `json:"responseCode"`
+	AVS          struct {
+		Code    string `json:"code"`
+		CodeRaw string `json:"codeRaw"`
+	} `json:"avs"`
 }
 
 type ClientReferenceInformation struct {
@@ -67,11 +79,11 @@ type CardInformation struct {
 }
 
 type Links struct {
-	Self           *Link `json:"self,omitempty"`
-	AuthReversal   *Link `json:"authReversal,omitempty"`
-	Capture        *Link `json:"capture,omitempty"`
-	Refund         *Link `json:"refund,omitempty"`
-	Void           *Link `json:"void,omitempty"`
+	Self         *Link `json:"self,omitempty"`
+	AuthReversal *Link `json:"authReversal,omitempty"`
+	Capture      *Link `json:"capture,omitempty"`
+	Refund       *Link `json:"refund,omitempty"`
+	Void         *Link `json:"void,omitempty"`
 }
 
 type Link struct {
