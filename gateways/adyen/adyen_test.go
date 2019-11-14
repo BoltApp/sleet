@@ -6,13 +6,13 @@ import (
 )
 
 func Test(t *testing.T) {
-	client := NewClient("AQEmhmfuXNWTK0Qc+iSSnWgslOWVTIlCFWNh7jMy7Ff1wHdZNcUZ+WQQwV1bDb7kfNy1WIxIIkxgBw==-E2ghSMRS0NT/uP/zufqNo964AFSbuu+QLu60iZEY98Y=-9svIkccqZBT5ncLz")
+	client := NewClient("AQEmhmfuXNWTK0Qc+iSSnWgslOWVTIlCFWNh7jMy7Ff1wHdZNcUZ+WQQwV1bDb7kfNy1WIxIIkxgBw==-E2ghSMRS0NT/uP/zufqNo964AFSbuu+QLu60iZEY98Y=-9svIkccqZBT5ncLz", "BoltSandboxECOM")
 	amount := sleet.Amount{
 		Amount:   100,
 		Currency: "USD",
 	}
 	postalCode := "94103"
-	address := sleet.BillingAddress{PostalCode:&postalCode}
+	address := sleet.BillingAddress{PostalCode: &postalCode}
 	card := sleet.CreditCard{
 		FirstName:       "Bolt",
 		LastName:        "Checkout",
