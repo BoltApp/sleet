@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	net_url "net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -19,20 +18,6 @@ var baseURL = "https://api.stripe.com"
 type StripeClient struct {
 	apiKey     string
 	httpClient *http.Client
-}
-
-type TokenResponse struct {
-	ID string `json:"id"`
-	Card StripeCard `json:"card"`
-}
-
-type ChargeResponse struct {
-	ID string `json:"id"`
-}
-
-type StripeCard struct {
-	CVCCheck string `json:"cvc_check"`
-	AddressZipCheck *string `json:"address_zip_check"`
 }
 
 var defaultHttpClient = &http.Client{
@@ -56,34 +41,18 @@ func NewWithHTTPClient(apiKey string, httpClient *http.Client) *StripeClient {
 }
 
 func (client *StripeClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
-	// Tokenize
-	paramsToken := net_url.Values{}
-	paramsToken.Add("card[number]", request.CreditCard.Number)
-	paramsToken.Add("card[exp_month]", strconv.Itoa(request.CreditCard.ExpirationMonth))
-	paramsToken.Add("card[exp_year]", strconv.Itoa(request.CreditCard.ExpirationYear))
-	paramsToken.Add("card[cvc]", request.CreditCard.CVV)
-	paramsToken.Add("card[name]", request.CreditCard.FirstName + " " + request.CreditCard.LastName)
-
-	if request.BillingAddress.StreetAddress1 != nil {
-		paramsToken.Add("card[address_line1]", *request.BillingAddress.StreetAddress1)
+	tokenRequest, err := buildAuthRequest(request)
+	if err != nil {
+		return nil, err
 	}
-	if request.BillingAddress.StreetAddress2 != nil {
-		paramsToken.Add("card[address_line2]", *request.BillingAddress.StreetAddress2)
-	}
-	if request.BillingAddress.Locality != nil {
-		paramsToken.Add("card[address_city]", *request.BillingAddress.Locality)
-	}
-	if request.BillingAddress.RegionCode != nil {
-		paramsToken.Add("card[address_state]", *request.BillingAddress.RegionCode)
-	}
-	if request.BillingAddress.CountryCode != nil {
-		paramsToken.Add("card[address_country]", *request.BillingAddress.CountryCode)
-	}
-	if request.BillingAddress.PostalCode != nil {
-		paramsToken.Add("card[address_zip]", *request.BillingAddress.PostalCode)
+	payload, err := json.Marshal(tokenRequest)
+	if err != nil {
+		return nil, err
 	}
 
-	code, resp, err := client.sendRequest("v1/tokens", paramsToken)
+	fmt.Println("token payload")
+	fmt.Println(string(payload))
+	code, resp, err := client.sendRequest("v1/tokens", payload)
 	if err != nil {
 		return nil, err
 	}
@@ -95,13 +64,17 @@ func (client *StripeClient) Authorize(request *sleet.AuthorizationRequest) (*sle
 		return nil, err
 	}
 	fmt.Printf("response %s\n", tokenResponse.ID) // debug
-	paramsCharge := net_url.Values{}
-	// We can potentially add more stuff here like description and capture
-	paramsCharge.Add("amount", strconv.FormatInt(request.Amount.Amount, 10))
-	paramsCharge.Add("currency", request.Amount.Currency)
-	paramsCharge.Add("source", tokenResponse.ID)
-	paramsCharge.Add("capture", "false")
-	code, resp, err = client.sendRequest("v1/charges", paramsCharge)
+	chargeRequest, err := buildChargeRequest(request, tokenResponse.ID)
+	if err != nil {
+		return nil, err
+	}
+	payload, err = json.Marshal(chargeRequest)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("token payload")
+	fmt.Println(payload)
+	code, resp, err = client.sendRequest("v1/charges", payload)
 	if err != nil {
 		return nil, err
 	}
@@ -120,9 +93,15 @@ func (client *StripeClient) Authorize(request *sleet.AuthorizationRequest) (*sle
 
 func (client *StripeClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	capturePath := fmt.Sprintf("v1/charges/%s/capture", request.TransactionReference)
-	paramsCapture := net_url.Values{}
-	paramsCapture.Add("amount", strconv.FormatInt(request.Amount.Amount, 10))
-	code, resp, err := client.sendRequest(capturePath, paramsCapture)
+	captureRequest, err := buildCaptureRequest(request)
+	if err != nil {
+		return nil, err
+	}
+	payload, err := json.Marshal(captureRequest)
+	if err != nil {
+		return nil, err
+	}
+	code, resp, err := client.sendRequest(capturePath, payload)
 	if err != nil {
 		return nil,err
 	}
@@ -132,10 +111,15 @@ func (client *StripeClient) Capture(request *sleet.CaptureRequest) (*sleet.Captu
 }
 
 func (client *StripeClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
-	paramsRefund := net_url.Values{}
-	paramsRefund.Add("charge", request.TransactionReference)
-	paramsRefund.Add("amount", strconv.FormatInt(request.Amount.Amount, 10))
-	code, resp, err := client.sendRequest("v1/refunds", paramsRefund)
+	refundRequest, err := buildRefundRequest(request)
+	if err != nil {
+		return nil, err
+	}
+	payload, err := json.Marshal(refundRequest)
+	if err != nil {
+		return nil, err
+	}
+	code, resp, err := client.sendRequest("v1/refunds", payload)
 	if err != nil {
 		return nil,err
 	}
@@ -145,9 +129,15 @@ func (client *StripeClient) Refund(request *sleet.RefundRequest) (*sleet.RefundR
 }
 
 func (client *StripeClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
-	paramsRefund := net_url.Values{}
-	paramsRefund.Add("charge", request.TransactionReference)
-	code, resp, err := client.sendRequest("v1/refunds", paramsRefund)
+	voidRequest, err := buildVoidRequest(request)
+	if err != nil {
+		return nil, err
+	}
+	payload, err := json.Marshal(voidRequest)
+	if err != nil {
+		return nil, err
+	}
+	code, resp, err := client.sendRequest("v1/refunds", payload)
 	if err != nil {
 		return nil,err
 	}
@@ -156,7 +146,7 @@ func (client *StripeClient) Void(request *sleet.VoidRequest) (*sleet.VoidRespons
 	return &sleet.VoidResponse{ErrorCode:&convertedCode}, nil
 }
 
-func (client *StripeClient) sendRequest(path string, data net_url.Values) (int, []byte, error) {
+func (client *StripeClient) sendRequest(path string, data []byte) (int, []byte, error) {
 	req, err := client.buildPOSTRequest(path, data)
 	if err != nil {
 		return -1, nil, err
@@ -177,11 +167,11 @@ func (client *StripeClient) sendRequest(path string, data net_url.Values) (int, 
 	return resp.StatusCode, body, err
 }
 
-func (client *StripeClient) buildPOSTRequest(path string, data net_url.Values) (*http.Request, error) {
+func (client *StripeClient) buildPOSTRequest(path string, data []byte) (*http.Request, error) {
 	url := baseURL + "/" + path
 
-	fmt.Printf("data %s\n", data.Encode()) // debug
-	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(data.Encode()))
+	fmt.Printf("data %s\n", data) // debug
+	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(string(data)))
 	if err != nil {
 		return nil, err
 	}
