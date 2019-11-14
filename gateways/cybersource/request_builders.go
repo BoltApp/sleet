@@ -25,6 +25,16 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 				Amount:   strconv.Itoa(int(authRequest.Amount.Amount)),
 				Currency: authRequest.Amount.Currency,
 			},
+			BillTo: BillingInformation{
+				FirstName:  authRequest.CreditCard.FirstName,
+				LastName:   authRequest.CreditCard.LastName,
+				Address1:   *authRequest.BillingAddress.StreetAddress1,
+				PostalCode: *authRequest.BillingAddress.PostalCode,
+				Locality:   *authRequest.BillingAddress.Locality,
+				AdminArea:  *authRequest.BillingAddress.RegionCode,
+				Country:    *authRequest.BillingAddress.CountryCode,
+				Email:      authRequest.Options["email"].(string),
+			},
 		},
 	}
 	return request, nil
