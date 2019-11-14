@@ -23,6 +23,8 @@ func Test(t *testing.T) {
 		CVV:             "111",
 	}
 	auth, _ := client.Authorize(&sleet.AuthorizationRequest{Amount: &amount, CreditCard: &card, BillingAddress: &address})
-	client.Capture(&sleet.CaptureRequest{TransactionReference:auth.TransactionReference, Amount:&amount})
-	client.Refund(&sleet.RefundRequest{TransactionReference:auth.TransactionReference, Amount:&amount})
+	client.Void(&sleet.VoidRequest{TransactionReference:auth.TransactionReference})
+	auth2, _ := client.Authorize(&sleet.AuthorizationRequest{Amount: &amount, CreditCard: &card, BillingAddress: &address})
+	client.Capture(&sleet.CaptureRequest{TransactionReference:auth2.TransactionReference, Amount:&amount})
+	client.Refund(&sleet.RefundRequest{TransactionReference:auth2.TransactionReference, Amount:&amount})
 }
