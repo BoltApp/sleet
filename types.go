@@ -4,7 +4,7 @@ type Client interface {
 	Authorize(request *AuthorizationRequest) (*AuthorizationResponse, error)
 	Capture(request *CaptureRequest) (*CaptureResponse, error)
 	Void(request *VoidRequest) (*VoidResponse, error)
-	Credit(request *CreditRequest) (*CreditResponse, error)
+	Refund(request *RefundRequest) (*RefundResponse, error)
 }
 
 type Amount struct {
@@ -52,11 +52,11 @@ type VoidResponse struct {
 	ErrorCode *string
 }
 
-type CreditRequest struct {
+type RefundRequest struct {
 	Amount               *Amount
 	TransactionReference string
 }
 
-type CreditResponse struct {
+type RefundResponse struct {
 	ErrorCode *string
 }
