@@ -41,7 +41,7 @@ func TestAuthorize(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected no error: received: %s", err)
 	}
-	if resp.AvsResult != pointer.ToString("X") {
+	if *resp.AvsResult != "X" {
 		t.Errorf("Expected AVS Result X: received: %s", *resp.AvsResult)
 
 	}
