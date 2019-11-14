@@ -7,7 +7,7 @@ import (
 )
 
 func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error) {
-	amountStr := sleet.AmountToCentsString(authRequest.Amount)
+	amountStr := sleet.AmountToString(authRequest.Amount)
 	request := &Request{
 		ProcessingInformation: &ProcessingInformation{
 			Capture:           false, // no autocapture for now
@@ -42,7 +42,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 }
 
 func buildCaptureRequest(captureRequest *sleet.CaptureRequest) (*Request, error) {
-	amountStr := sleet.AmountToCentsString(captureRequest.Amount)
+	amountStr := sleet.AmountToString(captureRequest.Amount)
 	request := &Request{
 		OrderInformation: &OrderInformation{
 			BillingAmount: BillingAmount{
@@ -61,7 +61,7 @@ func buildVoidRequest(voidRequest *sleet.VoidRequest) (*Request, error) {
 }
 
 func buildRefundRequest(refundRequest *sleet.RefundRequest) (*Request, error) {
-	amountStr := sleet.AmountToCentsString(refundRequest.Amount)
+	amountStr := sleet.AmountToString(refundRequest.Amount)
 	request := &Request{
 		OrderInformation: &OrderInformation{
 			BillingAmount: BillingAmount{

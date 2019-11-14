@@ -2,7 +2,7 @@ package sleet
 
 import "fmt"
 
-func AmountToCentsString(amount *Amount) string {
+func AmountToString(amount *Amount) string {
 	switch amount.Currency {
 	case "USD":
 	case "CAN":
