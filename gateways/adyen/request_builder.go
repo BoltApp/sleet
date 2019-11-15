@@ -25,10 +25,19 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 	return request, nil
 }
 
-func buildCaptureRequest(captureRequest *sleet.CaptureRequest, merchantAccount string) (*CaptureRequest, error) {
-	request := &CaptureRequest{
+func buildCaptureRequest(captureRequest *sleet.CaptureRequest, merchantAccount string) (*PostAuthRequest, error) {
+	request := &PostAuthRequest{
 		OriginalReference:  captureRequest.TransactionReference,
 		ModificationAmount: &ModificationAmount{Value: captureRequest.Amount.Amount, Currency: captureRequest.Amount.Currency},
+		MerchantAccount:    merchantAccount,
+	}
+	return request, nil
+}
+
+func buildRefundRequest(refundRequest *sleet.RefundRequest, merchantAccount string) (*PostAuthRequest, error) {
+	request := &PostAuthRequest{
+		OriginalReference:  refundRequest.TransactionReference,
+		ModificationAmount: &ModificationAmount{Value: refundRequest.Amount.Amount, Currency: refundRequest.Amount.Currency},
 		MerchantAccount:    merchantAccount,
 	}
 	return request, nil
