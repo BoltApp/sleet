@@ -31,10 +31,10 @@ type CreditCard struct {
 }
 
 type AuthorizationRequest struct {
-	Amount     *Amount
-	CreditCard *CreditCard
+	Amount         *Amount
+	CreditCard     *CreditCard
 	BillingAddress *BillingAddress
-	Options    map[string]interface{}
+	Options        map[string]interface{}
 }
 
 type AuthorizationResponse struct {

@@ -1,12 +1,10 @@
 package adyen
 
-import "github.com/BoltApp/sleet"
-
 type AuthRequest struct {
-	Amount          *sleet.Amount `json:"amount"`
-	Card            *CreditCard   `json:"card"`
-	Reference       string        `json:"reference"`
-	MerchantAccount string        `json:"merchantAccount"`
+	Amount          ModificationAmount `json:"amount"` // kind of a weird name for authorize but lets share with capture
+	Card            *CreditCard        `json:"card"`
+	Reference       string             `json:"reference"`
+	MerchantAccount string             `json:"merchantAccount"`
 }
 
 type CreditCard struct {
@@ -19,9 +17,9 @@ type CreditCard struct {
 }
 
 type CaptureRequest struct {
-	OriginalReference  string `json:"originalReference"`
+	OriginalReference  string              `json:"originalReference"`
 	ModificationAmount *ModificationAmount `json:"modificationAmount"`
-	MerchantAccount string `json:"merchantAccount"`
+	MerchantAccount    string              `json:"merchantAccount"`
 }
 
 type ModificationAmount struct {
