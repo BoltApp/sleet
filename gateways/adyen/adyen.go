@@ -52,14 +52,17 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 		return nil, err
 	}
 	fmt.Println("NIRAJ PAYLOAD: ", string(payload))
-
 	code, resp, err := client.sendRequest("/authorise", payload)
 	fmt.Println(string(resp))
 	fmt.Println(code)
 	if code != 200 {
 		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: nil, CvvResult: "", ErrorCode: strconv.Itoa(code)}, nil
 	}
-	return nil, nil
+	var authReponse AuthResponse
+	if err := json.Unmarshal(resp, &authReponse); err != nil {
+		return nil, err
+	}
+	return &sleet.AuthorizationResponse{Success: false, TransactionReference: authReponse.Reference, AvsResult: nil, CvvResult: "", ErrorCode: strconv.Itoa(code)}, nil
 }
 
 func (client *AdyenClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {

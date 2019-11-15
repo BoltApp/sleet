@@ -26,3 +26,7 @@ type ModificationAmount struct {
 	Value    int64  `json:"value"`
 	Currency string `json:"currency"`
 }
+
+type AuthResponse struct {
+	Reference string `json:"pspReference"`
+}
