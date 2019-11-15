@@ -18,7 +18,7 @@ type CreditCard struct {
 
 type PostAuthRequest struct {
 	OriginalReference  string              `json:"originalReference"`
-	ModificationAmount *ModificationAmount `json:"modificationAmount"`
+	ModificationAmount *ModificationAmount `json:"modificationAmount,omitempty"`
 	MerchantAccount    string              `json:"merchantAccount"`
 }
 
