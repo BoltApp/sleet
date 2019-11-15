@@ -66,11 +66,11 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 }
 
 func (client *AdyenClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
-	captureAuthRequest, err := buildCaptureRequest(request, client.merchantAccount)
+	captureRequest, err := buildCaptureRequest(request, client.merchantAccount)
 	if err != nil {
 		return nil, err
 	}
-	payload, err := json.Marshal(captureAuthRequest)
+	payload, err := json.Marshal(captureRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,22 @@ func (client *AdyenClient) Capture(request *sleet.CaptureRequest) (*sleet.Captur
 }
 
 func (client *AdyenClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
-	return nil, nil
+	refundRequest, err := buildRefundRequest(request, client.merchantAccount)
+	if err != nil {
+		return nil, err
+	}
+	payload, err := json.Marshal(refundRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	code, resp, err := client.sendRequest("/refund", payload)
+	if err != nil {
+		return nil,err
+	}
+	convertedCode := strconv.Itoa(code)
+	fmt.Printf("response refund %s\n", string(resp)) // debug
+	return &sleet.RefundResponse{ErrorCode:&convertedCode}, nil
 }
 
 func (client *AdyenClient) sendRequest(path string, data []byte) (int, []byte, error) {

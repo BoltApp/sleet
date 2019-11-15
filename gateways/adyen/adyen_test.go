@@ -26,4 +26,5 @@ func TestAdyenAuthorize(t *testing.T) {
 	options["reference"] = randomdata.Letters(10) // so we don't collide with adyen
 	auth, _ := client.Authorize(&sleet.AuthorizationRequest{Amount: &amount, CreditCard: &card, BillingAddress: &address, Options: options})
 	client.Capture(&sleet.CaptureRequest{Amount: &amount, TransactionReference:auth.TransactionReference})
+	client.Refund(&sleet.RefundRequest{Amount: &amount, TransactionReference:auth.TransactionReference})
 }

@@ -16,7 +16,7 @@ type CreditCard struct {
 	HolderName  string `json:"holderName"`
 }
 
-type CaptureRequest struct {
+type PostAuthRequest struct {
 	OriginalReference  string              `json:"originalReference"`
 	ModificationAmount *ModificationAmount `json:"modificationAmount"`
 	MerchantAccount    string              `json:"merchantAccount"`
