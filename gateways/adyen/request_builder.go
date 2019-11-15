@@ -42,3 +42,12 @@ func buildRefundRequest(refundRequest *sleet.RefundRequest, merchantAccount stri
 	}
 	return request, nil
 }
+
+func buildVoidRequest(voidRequest *sleet.VoidRequest, merchantAccount string) (*PostAuthRequest, error) {
+	request := &PostAuthRequest{
+		OriginalReference:  voidRequest.TransactionReference,
+		ModificationAmount: nil,
+		MerchantAccount:    merchantAccount,
+	}
+	return request, nil
+}

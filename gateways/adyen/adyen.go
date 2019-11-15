@@ -103,6 +103,25 @@ func (client *AdyenClient) Refund(request *sleet.RefundRequest) (*sleet.RefundRe
 	return &sleet.RefundResponse{ErrorCode:&convertedCode}, nil
 }
 
+func (client *AdyenClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+	voidRequest, err := buildVoidRequest(request, client.merchantAccount)
+	if err != nil {
+		return nil, err
+	}
+	payload, err := json.Marshal(voidRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	code, resp, err := client.sendRequest("/cancel", payload)
+	if err != nil {
+		return nil,err
+	}
+	convertedCode := strconv.Itoa(code)
+	fmt.Printf("response void %s\n", string(resp)) // debug
+	return &sleet.VoidResponse{ErrorCode:&convertedCode}, nil
+}
+
 func (client *AdyenClient) sendRequest(path string, data []byte) (int, []byte, error) {
 	req, err := client.buildPOSTRequest(path, data)
 	if err != nil {
