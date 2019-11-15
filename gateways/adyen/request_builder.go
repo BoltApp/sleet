@@ -5,9 +5,12 @@ import (
 	"strconv"
 )
 
-func buildAuthRequest(authRequest *sleet.AuthorizationRequest, reference string, merchantAccount string) (*AuthRequest, error) {
+func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount string) (*AuthRequest, error) {
 	request := &AuthRequest{
-		Amount: authRequest.Amount,
+		Amount: Amount{
+			Value:    authRequest.Amount.Amount,
+			Currency: authRequest.Amount.Currency,
+		},
 		Card: &CreditCard{
 			Type:        "scheme",
 			ExpiryYear:  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
@@ -16,7 +19,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, reference string,
 			CVC:         authRequest.CreditCard.CVV,
 			HolderName:  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
 		},
-		Reference:       reference,
+		Reference:       authRequest.Options["reference"].(string),
 		MerchantAccount: merchantAccount,
 	}
 	return request, nil

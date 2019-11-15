@@ -43,7 +43,7 @@ func NewWithHTTPClient(apiKey string, merchantAccount string, httpClient *http.C
 }
 
 func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
-	adyenAuthRequest, err := buildAuthRequest(request, "PASS REFERENCE HERE", client.merchantAccount)
+	adyenAuthRequest, err := buildAuthRequest(request, client.merchantAccount)
 	if err != nil {
 		return nil, err
 	}
@@ -51,6 +51,7 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("NIRAJ PAYLOAD: ", string(payload))
 
 	code, resp, err := client.sendRequest("/authorise", payload)
 	fmt.Println(string(resp))
@@ -92,6 +93,7 @@ func (client *AdyenClient) sendRequest(path string, data []byte) (int, []byte, e
 
 func (client *AdyenClient) buildPOSTRequest(path string, data []byte) (*http.Request, error) {
 	url := baseURL + "/" + path
+	fmt.Println(string(data))
 
 	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(string(data)))
 	if err != nil {
@@ -100,7 +102,7 @@ func (client *AdyenClient) buildPOSTRequest(path string, data []byte) (*http.Req
 
 	authorization := client.apiKey
 	req.Header.Add("X-API-key", authorization)
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("User-Agent", "sleet")
 
 	return req, nil
