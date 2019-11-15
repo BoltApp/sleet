@@ -1,10 +1,10 @@
 package adyen
 
 type AuthRequest struct {
-	Amount          Amount      `json:"amount"`
-	Card            *CreditCard `json:"card"`
-	Reference       string      `json:"reference"`
-	MerchantAccount string      `json:"merchantAccount"`
+	Amount          ModificationAmount `json:"amount"` // kind of a weird name for authorize but lets share with capture
+	Card            *CreditCard        `json:"card"`
+	Reference       string             `json:"reference"`
+	MerchantAccount string             `json:"merchantAccount"`
 }
 
 type CreditCard struct {
@@ -17,15 +17,12 @@ type CreditCard struct {
 }
 
 type CaptureRequest struct {
-	OriginalReference  string `json:"originalReference"`
-	ModificationAmount struct {
-		Value    int64  `json:"value"`
-		Currency string `json:"currency"`
-	} `json:"modificationAmount"`
-	MerchantAccount string `json:"merchantAccount"`
+	OriginalReference  string              `json:"originalReference"`
+	ModificationAmount *ModificationAmount `json:"modificationAmount"`
+	MerchantAccount    string              `json:"merchantAccount"`
 }
 
-type Amount struct {
+type ModificationAmount struct {
 	Value    int64  `json:"value"`
 	Currency string `json:"currency"`
 }
