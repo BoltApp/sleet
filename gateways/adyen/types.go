@@ -20,9 +20,11 @@ type CreditCard struct {
 
 type CaptureRequest struct {
 	OriginalReference  string `json:"originalReference"`
-	ModificationAmount struct {
-		Value    int64  `json:"value"`
-		Currency string `json:"currency"`
-	} `json:"modificationAmount"`
+	ModificationAmount *ModificationAmount `json:"modificationAmount"`
 	MerchantAccount string `json:"merchantAccount"`
+}
+
+type ModificationAmount struct {
+	Value    int64  `json:"value"`
+	Currency string `json:"currency"`
 }
