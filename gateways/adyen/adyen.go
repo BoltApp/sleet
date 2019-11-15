@@ -62,7 +62,7 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 	if err := json.Unmarshal(resp, &authReponse); err != nil {
 		return nil, err
 	}
-	return &sleet.AuthorizationResponse{Success: false, TransactionReference: authReponse.Reference, AvsResult: nil, CvvResult: "", ErrorCode: strconv.Itoa(code)}, nil
+	return &sleet.AuthorizationResponse{Success: true, TransactionReference: authReponse.Reference, AvsResult: nil, CvvResult: "", ErrorCode: strconv.Itoa(code)}, nil
 }
 
 func (client *AdyenClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
