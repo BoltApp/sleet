@@ -23,5 +23,10 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, reference string,
 }
 
 func buildCaptureRequest(captureRequest *sleet.CaptureRequest, merchantAccount string) (*CaptureRequest, error) {
-	return nil, nil
+	request := &CaptureRequest{
+		OriginalReference: captureRequest.TransactionReference,
+		ModificationAmount: &ModificationAmount{Value:captureRequest.Amount.Amount, Currency:captureRequest.Amount.Currency,},
+		MerchantAccount: merchantAccount,
+	}
+	return request, nil
 }
