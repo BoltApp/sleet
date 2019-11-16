@@ -1,6 +1,7 @@
 package cybersource
 
 import (
+	"os"
 	"testing"
 
 	"github.com/AlekSi/pointer"
@@ -8,7 +9,7 @@ import (
 )
 
 func Test(t *testing.T) {
-	client := NewClient("bolt", "9b473fca-d9dc-4daf-baae-121e20af43ce", "2Ji1F/9mIYCJtdc2Enr5WvD8VBZ6sb0YS14asKinwQo=") // don't care if it leaks
+	client := NewClient(os.Getenv("CYBERSOURCE_ACCOUNT"), os.Getenv("CYBERSOURCE_API_KEY"), os.Getenv("CYBERSOURCE_SHARED_SECRET"))
 	amount := &sleet.Amount{
 		Amount:   100,
 		Currency: "USD",
