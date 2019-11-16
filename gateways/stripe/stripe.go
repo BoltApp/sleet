@@ -59,7 +59,7 @@ func (client *StripeClient) Authorize(request *sleet.AuthorizationRequest) (*sle
 	}
 	var tokenResponse TokenResponse
 	if code != 200 {
-		return &sleet.AuthorizationResponse{Success:false, TransactionReference:"", AvsResult:nil, CvvResult:"",ErrorCode:strconv.Itoa(code)}, nil
+		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: nil, CvvResult: "", ErrorCode: strconv.Itoa(code)}, nil
 	}
 	if err := json.Unmarshal(resp, &tokenResponse); err != nil {
 		return nil, err
@@ -78,16 +78,16 @@ func (client *StripeClient) Authorize(request *sleet.AuthorizationRequest) (*sle
 		return nil, err
 	}
 	if code != 200 {
-		return &sleet.AuthorizationResponse{Success:false, TransactionReference:"", AvsResult:nil, CvvResult:"",ErrorCode:strconv.Itoa(code)}, nil
+		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: nil, CvvResult: "", ErrorCode: strconv.Itoa(code)}, nil
 	}
 	var chargeResponse ChargeResponse
 	if err := json.Unmarshal(resp, &chargeResponse); err != nil {
 		return nil, err
 	}
-	fmt.Printf("response %s\n", chargeResponse.ID) // debug
+	fmt.Printf("response %s\n", chargeResponse.ID)           // debug
 	fmt.Printf("response %s\n", tokenResponse.Card.CVCCheck) // debug
 
-	return &sleet.AuthorizationResponse{Success:true, TransactionReference:chargeResponse.ID, AvsResult:tokenResponse.Card.AddressZipCheck, CvvResult:tokenResponse.Card.CVCCheck,ErrorCode:strconv.Itoa(code)}, nil
+	return &sleet.AuthorizationResponse{Success: true, TransactionReference: chargeResponse.ID, AvsResult: tokenResponse.Card.AddressZipCheck, CvvResult: tokenResponse.Card.CVCCheck, ErrorCode: strconv.Itoa(code)}, nil
 }
 
 func (client *StripeClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
@@ -103,11 +103,11 @@ func (client *StripeClient) Capture(request *sleet.CaptureRequest) (*sleet.Captu
 	}
 	code, resp, err := client.sendRequest(capturePath, form)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	convertedCode := strconv.Itoa(code)
 	fmt.Printf("response capture %s\n", string(resp)) // debug
-	return &sleet.CaptureResponse{ErrorCode:&convertedCode}, nil
+	return &sleet.CaptureResponse{ErrorCode: &convertedCode}, nil
 }
 
 func (client *StripeClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
@@ -122,11 +122,11 @@ func (client *StripeClient) Refund(request *sleet.RefundRequest) (*sleet.RefundR
 	}
 	code, resp, err := client.sendRequest("v1/refunds", form)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	convertedCode := strconv.Itoa(code)
 	fmt.Printf("response refund %s\n", string(resp)) // debug
-	return &sleet.RefundResponse{ErrorCode:&convertedCode}, nil
+	return &sleet.RefundResponse{ErrorCode: &convertedCode}, nil
 }
 
 func (client *StripeClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
@@ -141,11 +141,11 @@ func (client *StripeClient) Void(request *sleet.VoidRequest) (*sleet.VoidRespons
 	}
 	code, resp, err := client.sendRequest("v1/refunds", form)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	convertedCode := strconv.Itoa(code)
 	fmt.Printf("response void %s\n", string(resp)) // debug
-	return &sleet.VoidResponse{ErrorCode:&convertedCode}, nil
+	return &sleet.VoidResponse{ErrorCode: &convertedCode}, nil
 }
 
 func (client *StripeClient) sendRequest(path string, data net_url.Values) (int, []byte, error) {

@@ -40,8 +40,8 @@ type Payment struct {
 }
 
 type CreditCard struct {
-	CardNumber     string `json:"cardNumber"`
-	ExpirationDate string `json:"expirationDate"`
+	CardNumber     string  `json:"cardNumber"`
+	ExpirationDate string  `json:"expirationDate"`
 	CardCode       *string `json:"cardCode,omitempty"`
 }
 

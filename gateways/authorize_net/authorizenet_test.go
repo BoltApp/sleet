@@ -43,7 +43,7 @@ func Test(t *testing.T) {
 	refundResp, err := client.Refund(&sleet.RefundRequest{
 		Amount:               &amount,
 		TransactionReference: resp.TransactionReference,
-		Options:   options,
+		Options:              options,
 	})
 	fmt.Printf("refundResp: [%+v] err [%s]\n", refundResp, err)
 }

@@ -11,7 +11,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*TokenRequest, e
 		ExpMonth: strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
 		Number:   authRequest.CreditCard.Number,
 		CVC:      authRequest.CreditCard.CVV,
-		Name: authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
+		Name:     authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
 	}
 
 	if authRequest.BillingAddress.StreetAddress1 != nil {
@@ -38,10 +38,10 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*TokenRequest, e
 
 func buildChargeRequest(authRequest *sleet.AuthorizationRequest, chargeID string) (*ChargeRequest, error) {
 	request := &ChargeRequest{
-		Amount: strconv.FormatInt(authRequest.Amount.Amount, 10),
+		Amount:   strconv.FormatInt(authRequest.Amount.Amount, 10),
 		Currency: authRequest.Amount.Currency,
-		Source: chargeID,
-		Capture: "false",
+		Source:   chargeID,
+		Capture:  "false",
 	}
 	return request, nil
 }

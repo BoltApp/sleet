@@ -13,7 +13,7 @@ func Test(t *testing.T) {
 		Currency: "USD",
 	}
 	postalCode := "94103"
-	address := sleet.BillingAddress{PostalCode:&postalCode}
+	address := sleet.BillingAddress{PostalCode: &postalCode}
 	card := sleet.CreditCard{
 		FirstName:       "Bolt",
 		LastName:        "Checkout",
@@ -23,8 +23,8 @@ func Test(t *testing.T) {
 		CVV:             "111",
 	}
 	auth, _ := client.Authorize(&sleet.AuthorizationRequest{Amount: &amount, CreditCard: &card, BillingAddress: &address})
-	client.Void(&sleet.VoidRequest{TransactionReference:auth.TransactionReference})
+	client.Void(&sleet.VoidRequest{TransactionReference: auth.TransactionReference})
 	auth2, _ := client.Authorize(&sleet.AuthorizationRequest{Amount: &amount, CreditCard: &card, BillingAddress: &address})
-	client.Capture(&sleet.CaptureRequest{TransactionReference:auth2.TransactionReference, Amount:&amount})
-	client.Refund(&sleet.RefundRequest{TransactionReference:auth2.TransactionReference, Amount:&amount})
+	client.Capture(&sleet.CaptureRequest{TransactionReference: auth2.TransactionReference, Amount: &amount})
+	client.Refund(&sleet.RefundRequest{TransactionReference: auth2.TransactionReference, Amount: &amount})
 }
