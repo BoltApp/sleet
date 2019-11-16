@@ -1,15 +1,14 @@
-package cybersource
+package test
 
 import (
-	"os"
-	"testing"
-
 	"github.com/AlekSi/pointer"
 	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/gateways/cybersource"
+	"testing"
 )
 
-func Test(t *testing.T) {
-	client := NewClient(os.Getenv("CYBERSOURCE_ACCOUNT"), os.Getenv("CYBERSOURCE_API_KEY"), os.Getenv("CYBERSOURCE_SHARED_SECRET"))
+func TestCybersource(t *testing.T) {
+	client := cybersource.NewClient(getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
 	amount := &sleet.Amount{
 		Amount:   100,
 		Currency: "USD",

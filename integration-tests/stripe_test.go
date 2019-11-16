@@ -1,14 +1,14 @@
-package stripe
+package test
 
 import (
-	"os"
+	"github.com/BoltApp/sleet/gateways/stripe"
 	"testing"
 
 	"github.com/BoltApp/sleet"
 )
 
-func Test(t *testing.T) {
-	client := NewClient(os.Getenv("STRIPE_TEST_KEY"))
+func TestStripe(t *testing.T) {
+	client := stripe.NewClient(getEnv("STRIPE_TEST_KEY"))
 	amount := sleet.Amount{
 		Amount:   100,
 		Currency: "USD",

@@ -1,14 +1,14 @@
-package adyen
+package test
 
 import (
 	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/gateways/adyen"
 	"github.com/Pallinder/go-randomdata"
-	"os"
 	"testing"
 )
 
 func TestAdyenAuthorize(t *testing.T) {
-	client := NewClient(os.Getenv("ADYEN_KEY"), os.Getenv("ADYEN_ACCOUNT"))
+	client := adyen.NewClient(getEnv("ADYEN_KEY"), getEnv("ADYEN_ACCOUNT"))
 	amount := sleet.Amount{
 		Amount:   100,
 		Currency: "USD",

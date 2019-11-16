@@ -1,17 +1,17 @@
-package authorize_net
+package test
 
 import (
 	"fmt"
+	"github.com/BoltApp/sleet/gateways/authorize_net"
 	"math/rand"
-	"os"
 	"testing"
 	"time"
 
 	"github.com/BoltApp/sleet"
 )
 
-func Test(t *testing.T) {
-	client := NewClient(os.Getenv("AUTH_NET_LOGIN_ID"), os.Getenv("AUTH_NET_TXN_KEY"))
+func TestAuthNet(t *testing.T) {
+	client := authorize_net.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"))
 	rand.Seed(time.Now().Unix())
 	randAmount := rand.Int63n(1000000)
 	amount := sleet.Amount{
