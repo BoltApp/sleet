@@ -1,7 +1,6 @@
 package test
 
 import (
-	"github.com/AlekSi/pointer"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/gateways/cybersource"
 	"testing"
@@ -21,12 +20,12 @@ func TestCybersource(t *testing.T) {
 		CVV:             "000",
 	}
 	authRequest.BillingAddress = &sleet.BillingAddress{
-		StreetAddress1: pointer.ToString("77 Geary St"),
-		StreetAddress2: pointer.ToString("Floor 4"),
-		Locality:       pointer.ToString("San Francisco"),
-		RegionCode:     pointer.ToString("CA"),
-		PostalCode:     pointer.ToString("94108"),
-		CountryCode:    pointer.ToString("US"),
+		StreetAddress1: sPtr("77 Geary St"),
+		StreetAddress2: sPtr("Floor 4"),
+		Locality:       sPtr("San Francisco"),
+		RegionCode:     sPtr("CA"),
+		PostalCode:     sPtr("94108"),
+		CountryCode:    sPtr("US"),
 	}
 	authRequest.Options = options
 	resp, err := client.Authorize(authRequest)
