@@ -3,6 +3,7 @@ package test
 import (
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/gateways/cybersource"
+	sleet_testing "github.com/BoltApp/sleet/testing"
 	"testing"
 )
 
@@ -10,7 +11,7 @@ func TestCybersource(t *testing.T) {
 	client := cybersource.NewClient(getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
 	options := make(map[string]interface{})
 	options["email"] = "test@bolt.com"
-	authRequest := baseAuthorizationRequest()
+	authRequest := sleet_testing.BaseAuthorizationRequest()
 	authRequest.CreditCard = &sleet.CreditCard{
 		FirstName:       "Bolt",
 		LastName:        "Checkout",

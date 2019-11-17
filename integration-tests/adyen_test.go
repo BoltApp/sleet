@@ -3,14 +3,15 @@ package test
 import (
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/gateways/adyen"
+	sleet_testing "github.com/BoltApp/sleet/testing"
 	"github.com/Pallinder/go-randomdata"
 	"testing"
 )
 
 func TestAdyenAuthorize(t *testing.T) {
 	client := adyen.NewClient(getEnv("ADYEN_KEY"), getEnv("ADYEN_ACCOUNT"))
-	authRequest1 := baseAuthorizationRequest()
-	authRequest2 := baseAuthorizationRequest()
+	authRequest1 := sleet_testing.BaseAuthorizationRequest()
+	authRequest2 := sleet_testing.BaseAuthorizationRequest()
 	options := make(map[string]interface{})
 	options2 := make(map[string]interface{})
 	options["reference"] = randomdata.Letters(10) // so we don't collide with adyen

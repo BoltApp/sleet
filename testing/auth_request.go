@@ -1,10 +1,10 @@
-package test
+package testing
 
 import (
 	"github.com/BoltApp/sleet"
 )
 
-func baseAuthorizationRequest() *sleet.AuthorizationRequest {
+func BaseAuthorizationRequest() *sleet.AuthorizationRequest {
 	amount := sleet.Amount{
 		Amount:   100,
 		Currency: "USD",
