@@ -84,8 +84,6 @@ func (client *StripeClient) Authorize(request *sleet.AuthorizationRequest) (*sle
 	if err := json.Unmarshal(resp, &chargeResponse); err != nil {
 		return nil, err
 	}
-	fmt.Printf("response %s\n", chargeResponse.ID)           // debug
-	fmt.Printf("response %s\n", tokenResponse.Card.CVCCheck) // debug
 
 	return &sleet.AuthorizationResponse{Success: true, TransactionReference: chargeResponse.ID, AvsResult: tokenResponse.Card.AddressZipCheck, CvvResult: tokenResponse.Card.CVCCheck, ErrorCode: strconv.Itoa(code)}, nil
 }
@@ -166,6 +164,7 @@ func (client *StripeClient) sendRequest(path string, data net_url.Values) (int, 
 
 	fmt.Printf("status %s\n", resp.Status) // debug
 	body, err := ioutil.ReadAll(resp.Body)
+	fmt.Printf("body %s\n", body) // debug
 	return resp.StatusCode, body, err
 }
 
