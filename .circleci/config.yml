@@ -16,6 +16,10 @@ jobs:
           command: |
             go build -v ./...
       - run:
+          name: Unit Test
+          command: |
+            go test -v ./integration-tests/*.go
+      - run:
           name: Integration Test
           command: |
             go test -v ./integration-tests/*.go
