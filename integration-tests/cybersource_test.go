@@ -12,14 +12,6 @@ func TestCybersource(t *testing.T) {
 	options := make(map[string]interface{})
 	options["email"] = "test@bolt.com"
 	authRequest := sleet_testing.BaseAuthorizationRequest()
-	authRequest.CreditCard = &sleet.CreditCard{
-		FirstName:       "Bolt",
-		LastName:        "Checkout",
-		Number:          "4111111111111111",
-		ExpirationMonth: 8,
-		ExpirationYear:  2024,
-		CVV:             "000",
-	}
 	authRequest.BillingAddress = &sleet.BillingAddress{
 		StreetAddress1: sPtr("77 Geary St"),
 		StreetAddress2: sPtr("Floor 4"),

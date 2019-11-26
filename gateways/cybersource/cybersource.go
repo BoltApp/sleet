@@ -29,26 +29,32 @@ var defaultHttpClient = &http.Client{
 	},
 }
 
+// CybersourceClient represents an HTTP client and the associated authentication information required for making an API request.
 type CybersourceClient struct {
-	merchantID      string
-	apiKey          string
-	sharedSecretKey string
-	httpClient      *http.Client
+	merchantID        string
+	sharedSecretKeyID string
+	sharedSecretKey   string
+	httpClient        *http.Client
 }
 
-func NewClient(merchantID string, apiKey string, sharedSecretKey string) *CybersourceClient {
-	return NewWithHttpClient(merchantID, apiKey, sharedSecretKey, defaultHttpClient)
+// NewClient returns a new client for making CyberSource API requests for a given merchant using a specified authentication key.
+func NewClient(merchantID string, sharedSecretKeyID string, sharedSecretKey string) *CybersourceClient {
+	return NewWithHTTPClient(merchantID, sharedSecretKeyID, sharedSecretKey, defaultHttpClient)
 }
 
-func NewWithHttpClient(merchantID string, apiKey string, sharedSecretKey string, httpClient *http.Client) *CybersourceClient {
+// NewWithHTTPClient returns a client for making CyberSource API requests for a given merchant using a specified authentication key.
+// The given HTTP client will be used to make the requests.
+func NewWithHTTPClient(merchantID string, sharedSecretKeyID string, sharedSecretKey string, httpClient *http.Client) *CybersourceClient {
 	return &CybersourceClient{
-		merchantID:      merchantID,
-		apiKey:          apiKey,
-		sharedSecretKey: sharedSecretKey,
-		httpClient:      httpClient,
+		merchantID:        merchantID,
+		sharedSecretKeyID: sharedSecretKeyID,
+		sharedSecretKey:   sharedSecretKey,
+		httpClient:        httpClient,
 	}
 }
 
+// Authorize make a payment authorization request to CyberSource for the given payment details. If successful, the
+// authorization response will be returned.
 func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	cybersourceAuthRequest, err := buildAuthRequest(request)
 	if err != nil {
@@ -74,6 +80,9 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 	}, nil
 }
 
+// Capture captures an authorized payment through CyberSource. If successful, the capture response will be returned.
+// Multiple captures can be made on the same authorization, but the total amount captured should not exceed the
+// total authorized amount.
 func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	cybersourceCaptureRequest, err := buildCaptureRequest(request)
 	if err != nil {
@@ -93,6 +102,8 @@ func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.
 	return &sleet.CaptureResponse{}, nil
 }
 
+// Void cancels a CyberSource payment. If successful, the void response will be returned. A previously voided
+// payment or one that has already been settled cannot be voided.
 func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
 	cybersourceVoidRequest, err := buildVoidRequest(request)
 	if err != nil {
@@ -112,6 +123,8 @@ func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidRe
 	return &sleet.VoidResponse{}, nil
 }
 
+// Refund refunds a CyberSource payment. If successful, the refund response will be returned. Multiple
+// refunds can be made on the same payment, but the total amount refunded should not exceed the payment total.
 func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
 	cybersourceRefundRequest, err := buildRefundRequest(request)
 	if err != nil {
@@ -131,6 +144,8 @@ func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 	return &sleet.RefundResponse{}, nil
 }
 
+// sendRequest sends an API request with the give payload to the specified CyberSource endpoint.
+// If the request is successfully sent, its response message will be returned.
 func (client *CybersourceClient) sendRequest(path string, data *Request) (*Response, error) {
 	payload, err := json.Marshal(data)
 	if err != nil {
@@ -164,10 +179,13 @@ func (client *CybersourceClient) sendRequest(path string, data *Request) (*Respo
 	return &cybersourceResponse, nil
 }
 
-// POST requests have to generate a digest as well to sign
+// buildPOSTRequest creates an HTTP request for a given payload destined for a specified endpoint.
+// The HTTP request will be returned signed and ready to send, and its body and existing headers
+// should not be modified.
 func (client *CybersourceClient) buildPOSTRequest(path string, data []byte) (*http.Request, error) {
 	url := baseURL + path // weird thing where we need path to include forward /
 
+	// Create request digest and signature
 	payloadHash := sha256.Sum256(data)
 	digest := "SHA-256=" + base64.StdEncoding.EncodeToString(payloadHash[:])
 	now := time.Now().UTC().Format(time.RFC1123)
@@ -178,7 +196,8 @@ func (client *CybersourceClient) buildPOSTRequest(path string, data []byte) (*ht
 	hmacSha256.Write(sigBytes)
 	signature := base64.StdEncoding.EncodeToString(hmacSha256.Sum(nil))
 
-	keyID := client.apiKey
+	// Create signature header
+	keyID := client.sharedSecretKeyID
 	algorithm := "HmacSHA256"
 	headers := "host date (request-target) digest v-c-merchant-id"
 	signatureHeader := fmt.Sprintf(`keyid="%s",algorithm="%s",headers="%s",signature="%s"`, keyID, algorithm, headers, signature)
@@ -188,7 +207,7 @@ func (client *CybersourceClient) buildPOSTRequest(path string, data []byte) (*ht
 		return nil, err
 	}
 
-	req.Header.Add("v-c-merchant-id", "bolt")
+	req.Header.Add("v-c-merchant-id", client.merchantID)
 	req.Header.Add("Host", "apitest.cybersource.com")
 	req.Header.Add("Date", now)
 	req.Header.Add("Digest", digest)
