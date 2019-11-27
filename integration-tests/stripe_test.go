@@ -13,6 +13,6 @@ func TestStripe(t *testing.T) {
 	auth, _ := client.Authorize(authRequest)
 	client.Void(&sleet.VoidRequest{TransactionReference: auth.TransactionReference})
 	auth2, _ := client.Authorize(authRequest)
-	client.Capture(&sleet.CaptureRequest{TransactionReference: auth2.TransactionReference, Amount: authRequest.Amount})
-	client.Refund(&sleet.RefundRequest{TransactionReference: auth2.TransactionReference, Amount: authRequest.Amount})
+	client.Capture(&sleet.CaptureRequest{TransactionReference: auth2.TransactionReference, Amount: &authRequest.Amount})
+	client.Refund(&sleet.RefundRequest{TransactionReference: auth2.TransactionReference, Amount: &authRequest.Amount})
 }

@@ -7,7 +7,7 @@ import (
 )
 
 func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error) {
-	amountStr := sleet.AmountToString(authRequest.Amount)
+	amountStr := sleet.AmountToString(&authRequest.Amount)
 	request := &Request{
 		ProcessingInformation: &ProcessingInformation{
 			Capture:           false, // no autocapture for now

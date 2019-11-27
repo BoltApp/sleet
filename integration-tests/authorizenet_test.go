@@ -15,7 +15,7 @@ func TestAuthNet(t *testing.T) {
 	fmt.Printf("resp: [%+v] err [%s]\n", resp, err)
 
 	capResp, err := client.Capture(&sleet.CaptureRequest{
-		Amount:               authRequest.Amount,
+		Amount:               &authRequest.Amount,
 		TransactionReference: resp.TransactionReference,
 	})
 	fmt.Printf("capResp: [%+v] err [%s]\n", capResp, err)
@@ -24,7 +24,7 @@ func TestAuthNet(t *testing.T) {
 	options := make(map[string]interface{})
 	options["credit_card"] = lastFour
 	refundResp, err := client.Refund(&sleet.RefundRequest{
-		Amount:               authRequest.Amount,
+		Amount:               &authRequest.Amount,
 		TransactionReference: resp.TransactionReference,
 		Options:              options,
 	})

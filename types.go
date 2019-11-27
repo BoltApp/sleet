@@ -53,7 +53,7 @@ type Level3Data struct {
 }
 
 type AuthorizationRequest struct {
-	Amount         *Amount
+	Amount         Amount
 	CreditCard     *CreditCard
 	BillingAddress *BillingAddress
 	Level3Data     *Level3Data
