@@ -30,10 +30,33 @@ type CreditCard struct {
 	CVV             string
 }
 
+type LineItem struct {
+	Description        string
+	ProductCode        string
+	UnitPrice          int64
+	Quantity           int64
+	TotalAmount        int64
+	ItemTaxAmount      int64
+	ItemDiscountAmount int64
+	UnitOfMeasure      string
+	CommodityCode      string
+}
+
+type Level3Data struct {
+	CustomerReference      string
+	TaxAmount              int64
+	DiscountAmount         int64
+	ShippingAmount         int64
+	DestinationPostalCode  string
+	DestinationCountryCode string
+	LineItems              []LineItem
+}
+
 type AuthorizationRequest struct {
 	Amount         *Amount
 	CreditCard     *CreditCard
 	BillingAddress *BillingAddress
+	Level3Data     *Level3Data
 	Options        map[string]interface{}
 }
 
