@@ -145,6 +145,7 @@ func (client *AuthorizeNetClient) sendRequest(data Request) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
+	request.Header.Add("User-Agent", common.UserAgent())
 
 	resp, err := client.httpClient.Do(request)
 	if err != nil {

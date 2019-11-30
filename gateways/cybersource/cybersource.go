@@ -131,6 +131,7 @@ func (client *CybersourceClient) sendRequest(path string, data *Request) (*Respo
 	if err != nil {
 		return nil, err
 	}
+	req.Header.Add("User-Agent", common.UserAgent())
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
 		return nil, err

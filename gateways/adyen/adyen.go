@@ -116,6 +116,7 @@ func (client *AdyenClient) sendRequest(path string, data []byte) (int, []byte, e
 	if err != nil {
 		return -1, nil, err
 	}
+	req.Header.Add("User-Agent", common.UserAgent())
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
 		return -1, nil, err
