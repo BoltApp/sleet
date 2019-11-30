@@ -3,10 +3,10 @@ package cybersource
 import (
 	"crypto/hmac"
 	"crypto/sha256"
-	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/BoltApp/sleet/gateways/common"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -20,15 +20,6 @@ const (
 	authPath = "/pts/v2/payments"
 )
 
-var defaultHttpClient = &http.Client{
-	Timeout: 60 * time.Second,
-
-	// Disable HTTP2 by default (see stripe-go library - https://github.com/stripe/stripe-go/blob/d1d103ec32297246e5b086c867f3c18a166bf8bd/stripe.go#L1050 )
-	Transport: &http.Transport{
-		TLSNextProto: make(map[string]func(string, *tls.Conn) http.RoundTripper),
-	},
-}
-
 type CybersourceClient struct {
 	merchantID      string
 	apiKey          string
@@ -37,7 +28,7 @@ type CybersourceClient struct {
 }
 
 func NewClient(merchantID string, apiKey string, sharedSecretKey string) *CybersourceClient {
-	return NewWithHttpClient(merchantID, apiKey, sharedSecretKey, defaultHttpClient)
+	return NewWithHttpClient(merchantID, apiKey, sharedSecretKey, common.DefaultHttpClient())
 }
 
 func NewWithHttpClient(merchantID string, apiKey string, sharedSecretKey string, httpClient *http.Client) *CybersourceClient {
