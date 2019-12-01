@@ -18,7 +18,7 @@ type BillingAddress struct {
 	Locality       *string
 	RegionCode     *string
 	PostalCode     *string
-	CountryCode    *string
+	CountryCode    *string // ISO 2-digit code
 }
 
 type CreditCard struct {
