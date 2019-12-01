@@ -1,10 +1,10 @@
 package test
 
 import (
+	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/gateways/stripe"
 	sleet_testing "github.com/BoltApp/sleet/testing"
 	"testing"
-	"github.com/BoltApp/sleet"
 )
 
 func TestStripe(t *testing.T) {
