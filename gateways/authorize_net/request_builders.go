@@ -7,7 +7,7 @@ import (
 )
 
 func buildAuthRequest(merchantName string, transactionKey string, authRequest *sleet.AuthorizationRequest) (*Request, error) {
-	amountStr := sleet.AmountToString(authRequest.Amount)
+	amountStr := sleet.AmountToString(&authRequest.Amount)
 	billingAddress := authRequest.BillingAddress
 	authorizeRequest := CreateTransactionRequest{
 		MerchantAuthentication: authentication(merchantName, transactionKey),

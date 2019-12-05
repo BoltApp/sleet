@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/BoltApp/sleet/gateways/common"
 	"io/ioutil"
 	"net/http"
 	net_url "net/url"
@@ -151,6 +152,7 @@ func (client *StripeClient) sendRequest(path string, data net_url.Values) (int, 
 	if err != nil {
 		return -1, nil, err
 	}
+	req.Header.Add("User-Agent", common.UserAgent())
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
 		return -1, nil, err

@@ -30,7 +30,7 @@ func TestCybersource(t *testing.T) {
 	}
 
 	capResp, err := client.Capture(&sleet.CaptureRequest{
-		Amount:               authRequest.Amount,
+		Amount:               &authRequest.Amount,
 		TransactionReference: resp.TransactionReference,
 	})
 	if err != nil {
@@ -41,7 +41,7 @@ func TestCybersource(t *testing.T) {
 	}
 
 	refundResp, err := client.Refund(&sleet.RefundRequest{
-		Amount:               authRequest.Amount,
+		Amount:               &authRequest.Amount,
 		TransactionReference: resp.TransactionReference,
 	})
 	if err != nil {

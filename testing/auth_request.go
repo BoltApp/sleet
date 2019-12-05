@@ -19,5 +19,5 @@ func BaseAuthorizationRequest() *sleet.AuthorizationRequest {
 		ExpirationYear:  2020,
 		CVV:             "737",
 	}
-	return &sleet.AuthorizationRequest{Amount: &amount, CreditCard: &card, BillingAddress: &address}
+	return &sleet.AuthorizationRequest{Amount: amount, CreditCard: &card, BillingAddress: &address}
 }

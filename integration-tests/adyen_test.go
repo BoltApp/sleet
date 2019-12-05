@@ -19,8 +19,8 @@ func TestAdyenAuthorize(t *testing.T) {
 	authRequest1.Options = options
 	authRequest2.Options = options2
 	auth, _ := client.Authorize(authRequest1)
-	client.Capture(&sleet.CaptureRequest{Amount: authRequest1.Amount, TransactionReference: auth.TransactionReference})
-	client.Refund(&sleet.RefundRequest{Amount: authRequest1.Amount, TransactionReference: auth.TransactionReference})
+	client.Capture(&sleet.CaptureRequest{Amount: &authRequest1.Amount, TransactionReference: auth.TransactionReference})
+	client.Refund(&sleet.RefundRequest{Amount: &authRequest1.Amount, TransactionReference: auth.TransactionReference})
 	auth2, _ := client.Authorize(authRequest2)
 	client.Void(&sleet.VoidRequest{TransactionReference: auth2.TransactionReference})
 }

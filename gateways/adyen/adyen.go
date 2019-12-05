@@ -1,16 +1,14 @@
 package adyen
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/gateways/common"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
-
-	"github.com/BoltApp/sleet"
 )
 
 var baseURL = "https://pal-test.adyen.com/pal/servlet/Payment/v51"
@@ -21,17 +19,8 @@ type AdyenClient struct {
 	httpClient      *http.Client
 }
 
-var defaultHttpClient = &http.Client{
-	Timeout: 60 * time.Second,
-
-	// Disable HTTP2 by default (see stripe-go library - https://github.com/stripe/stripe-go/blob/d1d103ec32297246e5b086c867f3c18a166bf8bd/stripe.go#L1050 )
-	Transport: &http.Transport{
-		TLSNextProto: make(map[string]func(string, *tls.Conn) http.RoundTripper),
-	},
-}
-
 func NewClient(apiKey string, merchantAccount string) *AdyenClient {
-	return NewWithHTTPClient(apiKey, merchantAccount, defaultHttpClient)
+	return NewWithHTTPClient(apiKey, merchantAccount, common.DefaultHttpClient())
 }
 
 func NewWithHTTPClient(apiKey string, merchantAccount string, httpClient *http.Client) *AdyenClient {
@@ -127,6 +116,7 @@ func (client *AdyenClient) sendRequest(path string, data []byte) (int, []byte, e
 	if err != nil {
 		return -1, nil, err
 	}
+	req.Header.Add("User-Agent", common.UserAgent())
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
 		return -1, nil, err

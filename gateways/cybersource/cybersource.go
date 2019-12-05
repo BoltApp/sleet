@@ -3,10 +3,10 @@ package cybersource
 import (
 	"crypto/hmac"
 	"crypto/sha256"
-	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/BoltApp/sleet/gateways/common"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -20,15 +20,6 @@ const (
 	authPath = "/pts/v2/payments"
 )
 
-var defaultHttpClient = &http.Client{
-	Timeout: 60 * time.Second,
-
-	// Disable HTTP2 by default (see stripe-go library - https://github.com/stripe/stripe-go/blob/d1d103ec32297246e5b086c867f3c18a166bf8bd/stripe.go#L1050 )
-	Transport: &http.Transport{
-		TLSNextProto: make(map[string]func(string, *tls.Conn) http.RoundTripper),
-	},
-}
-
 // CybersourceClient represents an HTTP client and the associated authentication information required for making an API request.
 type CybersourceClient struct {
 	merchantID        string
@@ -39,12 +30,12 @@ type CybersourceClient struct {
 
 // NewClient returns a new client for making CyberSource API requests for a given merchant using a specified authentication key.
 func NewClient(merchantID string, sharedSecretKeyID string, sharedSecretKey string) *CybersourceClient {
-	return NewWithHTTPClient(merchantID, sharedSecretKeyID, sharedSecretKey, defaultHttpClient)
+	return NewWithHttpClient(merchantID, sharedSecretKeyID, sharedSecretKey, common.DefaultHttpClient())
 }
 
-// NewWithHTTPClient returns a client for making CyberSource API requests for a given merchant using a specified authentication key.
+// NewWithHttpClient returns a client for making CyberSource API requests for a given merchant using a specified authentication key.
 // The given HTTP client will be used to make the requests.
-func NewWithHTTPClient(merchantID string, sharedSecretKeyID string, sharedSecretKey string, httpClient *http.Client) *CybersourceClient {
+func NewWithHttpClient(merchantID string, sharedSecretKeyID string, sharedSecretKey string, httpClient *http.Client) *CybersourceClient {
 	return &CybersourceClient{
 		merchantID:        merchantID,
 		sharedSecretKeyID: sharedSecretKeyID,
@@ -155,6 +146,7 @@ func (client *CybersourceClient) sendRequest(path string, data *Request) (*Respo
 	if err != nil {
 		return nil, err
 	}
+	req.Header.Add("User-Agent", common.UserAgent())
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
 		return nil, err
