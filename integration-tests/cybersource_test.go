@@ -8,7 +8,7 @@ import (
 )
 
 func TestCybersource(t *testing.T) {
-	client := cybersource.NewClient(getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
+	client := cybersource.NewClient(cybersource.Sandbox, getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
 	options := make(map[string]interface{})
 	options["email"] = "test@bolt.com"
 	authRequest := sleet_testing.BaseAuthorizationRequest()

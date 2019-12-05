@@ -16,12 +16,19 @@ import (
 )
 
 const (
-	baseURL  = "https://apitest.cybersource.com"
 	authPath = "/pts/v2/payments"
+)
+
+var (
+	// Sandbox is the CyberSource test environment for testing API requests.
+	Sandbox = NewEnvironment("apitest.cybersource.com")
+	// Production is the CyberSource live environment for executing real payments.
+	Production = NewEnvironment("api.cybersource.com")
 )
 
 // CybersourceClient represents an HTTP client and the associated authentication information required for making an API request.
 type CybersourceClient struct {
+	host              string
 	merchantID        string
 	sharedSecretKeyID string
 	sharedSecretKey   string
@@ -29,14 +36,15 @@ type CybersourceClient struct {
 }
 
 // NewClient returns a new client for making CyberSource API requests for a given merchant using a specified authentication key.
-func NewClient(merchantID string, sharedSecretKeyID string, sharedSecretKey string) *CybersourceClient {
-	return NewWithHttpClient(merchantID, sharedSecretKeyID, sharedSecretKey, common.DefaultHttpClient())
+func NewClient(env Environment, merchantID string, sharedSecretKeyID string, sharedSecretKey string) *CybersourceClient {
+	return NewWithHttpClient(env, merchantID, sharedSecretKeyID, sharedSecretKey, common.DefaultHttpClient())
 }
 
 // NewWithHttpClient returns a client for making CyberSource API requests for a given merchant using a specified authentication key.
 // The given HTTP client will be used to make the requests.
-func NewWithHttpClient(merchantID string, sharedSecretKeyID string, sharedSecretKey string, httpClient *http.Client) *CybersourceClient {
+func NewWithHttpClient(env Environment, merchantID string, sharedSecretKeyID string, sharedSecretKey string, httpClient *http.Client) *CybersourceClient {
 	return &CybersourceClient{
+		host:              env.Host(),
 		merchantID:        merchantID,
 		sharedSecretKeyID: sharedSecretKeyID,
 		sharedSecretKey:   sharedSecretKey,
@@ -175,13 +183,13 @@ func (client *CybersourceClient) sendRequest(path string, data *Request) (*Respo
 // The HTTP request will be returned signed and ready to send, and its body and existing headers
 // should not be modified.
 func (client *CybersourceClient) buildPOSTRequest(path string, data []byte) (*http.Request, error) {
-	url := baseURL + path // weird thing where we need path to include forward /
+	url := "https://" + client.host + path // weird thing where we need path to include forward /
 
 	// Create request digest and signature
 	payloadHash := sha256.Sum256(data)
 	digest := "SHA-256=" + base64.StdEncoding.EncodeToString(payloadHash[:])
 	now := time.Now().UTC().Format(time.RFC1123)
-	sig := "host: apitest.cybersource.com\ndate: " + now + "\n(request-target): post " + path + "\ndigest: " + digest + "\nv-c-merchant-id: " + client.merchantID
+	sig := "host: " + client.host + "\ndate: " + now + "\n(request-target): post " + path + "\ndigest: " + digest + "\nv-c-merchant-id: " + client.merchantID
 	sigBytes := []byte(sig)
 	decodedSecret, err := base64.StdEncoding.DecodeString(client.sharedSecretKey)
 	hmacSha256 := hmac.New(sha256.New, decodedSecret)
@@ -200,7 +208,7 @@ func (client *CybersourceClient) buildPOSTRequest(path string, data []byte) (*ht
 	}
 
 	req.Header.Add("v-c-merchant-id", client.merchantID)
-	req.Header.Add("Host", "apitest.cybersource.com")
+	req.Header.Add("Host", client.host)
 	req.Header.Add("Date", now)
 	req.Header.Add("Digest", digest)
 	req.Header.Add("Signature", signatureHeader)
