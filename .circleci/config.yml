@@ -40,7 +40,7 @@ workflows:
   build-and-test:
     jobs:
       - build-and-test
-      - github-release-test:
+      - github-release-step:
           requires:
             - build-and-test
           filters:
