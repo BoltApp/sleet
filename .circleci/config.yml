@@ -38,7 +38,7 @@ workflows:
   build-and-test:
     jobs:
       - build-and-test
-      - github/release:
+      - github-release/release:
           tag: v1.0.0-$CIRCLE_BUILD_NUM
           title: Release v1.0.0-$CIRCLE_BUILD_NUM
           filters:
