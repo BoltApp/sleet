@@ -32,6 +32,8 @@ jobs:
       - github-release/create:
           tag: v1.0.0-$CIRCLE_BUILD_NUM
           title: Version V1.0.0-$CIRCLE_BUILD_NUM
+          description: Upgrading version
+
 
 workflows:
   version: 2
