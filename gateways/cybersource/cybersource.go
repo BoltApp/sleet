@@ -76,6 +76,7 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 		AvsResult:            &cybersourceResponse.ProcessorInformation.AVS.Code,
 		CvvResult:            cybersourceResponse.ProcessorInformation.ApprovalCode,
 		ErrorCode:            "",
+		Response:             cybersourceResponse.ProcessorInformation.ResponseCode,
 	}, nil
 }
 

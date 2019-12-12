@@ -19,6 +19,7 @@ func TestCybersource(t *testing.T) {
 		RegionCode:     sPtr("CA"),
 		PostalCode:     sPtr("94108"),
 		CountryCode:    sPtr("US"),
+		Company:        sPtr("Bolt"),
 	}
 	authRequest.Options = options
 	resp, err := client.Authorize(authRequest)
