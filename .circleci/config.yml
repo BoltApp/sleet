@@ -30,6 +30,8 @@ jobs:
           paths:
             - "/go/pkg"
   release-github:
+    docker:
+      - image: circleci/golang:1.13
     steps:
       - swissknife/publish-github-release:
           tag: v1.0.3-$CIRCLE_BUILD_NUM
