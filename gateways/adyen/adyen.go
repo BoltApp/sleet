@@ -63,7 +63,7 @@ func (client *AdyenClient) Capture(request *sleet.CaptureRequest) (*sleet.Captur
 		return nil, err
 	}
 
-	code, resp, err := client.sendRequest("/capture", payload)
+	code, _, err := client.sendRequest("/capture", payload)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func (client *AdyenClient) Refund(request *sleet.RefundRequest) (*sleet.RefundRe
 		return nil, err
 	}
 
-	code, resp, err := client.sendRequest("/refund", payload)
+	code, _, err := client.sendRequest("/refund", payload)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (client *AdyenClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse
 		return nil, err
 	}
 
-	code, resp, err := client.sendRequest("/cancel", payload)
+	code, _, err := client.sendRequest("/cancel", payload)
 	if err != nil {
 		return nil, err
 	}
