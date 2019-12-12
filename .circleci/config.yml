@@ -41,7 +41,7 @@ workflows:
   build-and-test:
     jobs:
       - build-and-test
-      - github-release/release:
+      - release-github:
           filters:
             branches:
               only: master
