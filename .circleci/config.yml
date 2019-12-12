@@ -1,10 +1,6 @@
 version: 2.1
 orbs:
-<<<<<<< HEAD
   swissknife: roopakv/swissknife@0.15.0
-=======
-  github-release: haskell-works/github-release@1.3.3
->>>>>>> 37356c053b8ae44b342aaa8f17587d28ce03d987
 jobs:
   build-and-test:
     docker:
