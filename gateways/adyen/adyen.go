@@ -40,7 +40,6 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("NIRAJ PAYLOAD: ", string(payload))
 	code, resp, err := client.sendRequest("/authorise", payload)
 	fmt.Println(string(resp))
 	fmt.Println(code)
@@ -69,7 +68,6 @@ func (client *AdyenClient) Capture(request *sleet.CaptureRequest) (*sleet.Captur
 		return nil, err
 	}
 	convertedCode := strconv.Itoa(code)
-	fmt.Printf("response capture %s\n", string(resp)) // debug
 	return &sleet.CaptureResponse{ErrorCode: &convertedCode}, nil
 }
 
@@ -88,7 +86,6 @@ func (client *AdyenClient) Refund(request *sleet.RefundRequest) (*sleet.RefundRe
 		return nil, err
 	}
 	convertedCode := strconv.Itoa(code)
-	fmt.Printf("response refund %s\n", string(resp)) // debug
 	return &sleet.RefundResponse{ErrorCode: &convertedCode}, nil
 }
 
@@ -107,7 +104,6 @@ func (client *AdyenClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse
 		return nil, err
 	}
 	convertedCode := strconv.Itoa(code)
-	fmt.Printf("response void %s\n", string(resp)) // debug
 	return &sleet.VoidResponse{ErrorCode: &convertedCode}, nil
 }
 
@@ -128,7 +124,6 @@ func (client *AdyenClient) sendRequest(path string, data []byte) (int, []byte, e
 		}
 	}()
 
-	fmt.Printf("status %s\n", resp.Status) // debug
 	body, err := ioutil.ReadAll(resp.Body)
 	return resp.StatusCode, body, err
 }
