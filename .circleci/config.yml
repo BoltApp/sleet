@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-s  swissknife: roopakv/swissknife@dev:alpha
+  swissknife: roopakv/swissknife@dev:alpha
 jobs:
   build-and-test:
     docker:
