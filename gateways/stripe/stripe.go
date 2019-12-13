@@ -60,7 +60,7 @@ func (client *StripeClient) Authorize(request *sleet.AuthorizationRequest) (*sle
 	}
 	var tokenResponse TokenResponse
 	if code != 200 {
-		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: nil, CvvResult: "", ErrorCode: strconv.Itoa(code)}, nil
+		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: "", CvvResult: "", ErrorCode: strconv.Itoa(code)}, nil
 	}
 	if err := json.Unmarshal(resp, &tokenResponse); err != nil {
 		return nil, err
@@ -79,14 +79,14 @@ func (client *StripeClient) Authorize(request *sleet.AuthorizationRequest) (*sle
 		return nil, err
 	}
 	if code != 200 {
-		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: nil, CvvResult: "", ErrorCode: strconv.Itoa(code)}, nil
+		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: "", CvvResult: "", ErrorCode: strconv.Itoa(code)}, nil
 	}
 	var chargeResponse ChargeResponse
 	if err := json.Unmarshal(resp, &chargeResponse); err != nil {
 		return nil, err
 	}
 
-	return &sleet.AuthorizationResponse{Success: true, TransactionReference: chargeResponse.ID, AvsResult: tokenResponse.Card.AddressZipCheck, CvvResult: tokenResponse.Card.CVCCheck, ErrorCode: strconv.Itoa(code)}, nil
+	return &sleet.AuthorizationResponse{Success: true, TransactionReference: chargeResponse.ID, AvsResult: *tokenResponse.Card.AddressZipCheck, CvvResult: tokenResponse.Card.CVCCheck, ErrorCode: strconv.Itoa(code)}, nil
 }
 
 func (client *StripeClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {

@@ -63,7 +63,7 @@ type AuthorizationRequest struct {
 type AuthorizationResponse struct {
 	Success              bool
 	TransactionReference string
-	AvsResult            *string
+	AvsResult            string
 	CvvResult            string
 	ErrorCode            string
 }
