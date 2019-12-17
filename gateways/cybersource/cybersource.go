@@ -138,10 +138,10 @@ func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 
 	if cybersourceResponse.ErrorReason != nil {
 		// return error
-		response := sleet.RefundResponse{ErrorCode: cybersourceResponse.ErrorReason}
+		response := sleet.RefundResponse{ErrorCode: cybersourceResponse.ErrorReason, Success:false}
 		return &response, nil
 	}
-	return &sleet.RefundResponse{Success: true}, nil
+	return &sleet.RefundResponse{Success: true, TransactionReference: *cybersourceResponse.ID}, nil
 }
 
 // sendRequest sends an API request with the give payload to the specified CyberSource endpoint.

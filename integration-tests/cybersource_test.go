@@ -43,7 +43,7 @@ func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
 
 	refundResp, err := client.Refund(&sleet.RefundRequest{
 		Amount:               &authRequest.Amount,
-		TransactionReference: resp.TransactionReference,
+		TransactionReference: capResp.TransactionReference,
 	})
 	if err != nil {
 		t.Errorf("Expected no error: received: %s", err)
