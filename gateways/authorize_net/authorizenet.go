@@ -82,7 +82,7 @@ func (client *AuthorizeNetClient) Capture(request *sleet.CaptureRequest) (*sleet
 		response := sleet.CaptureResponse{ErrorCode: &errorCode}
 		return &response, nil
 	}
-	return &sleet.CaptureResponse{}, nil
+	return &sleet.CaptureResponse{Success: true}, nil
 }
 
 func (client *AuthorizeNetClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
@@ -106,7 +106,7 @@ func (client *AuthorizeNetClient) Void(request *sleet.VoidRequest) (*sleet.VoidR
 		response := sleet.VoidResponse{ErrorCode: &errorCode}
 		return &response, nil
 	}
-	return &sleet.VoidResponse{}, nil
+	return &sleet.VoidResponse{Success: true}, nil
 }
 
 func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
@@ -131,7 +131,7 @@ func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.R
 		response := sleet.RefundResponse{ErrorCode: &errorCode}
 		return &response, nil
 	}
-	return &sleet.RefundResponse{}, nil
+	return &sleet.RefundResponse{Success: true}, nil
 }
 
 func (client *AuthorizeNetClient) sendRequest(data Request) (*Response, error) {
