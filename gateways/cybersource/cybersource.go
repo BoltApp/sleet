@@ -94,12 +94,12 @@ func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.
 		return nil, err
 	}
 
-	if cybersourceResponse.ErrorReason != nil {
+	if cybersourceResponse.ErrorReason != nil || cybersourceResponse.ID == nil {
 		// return error
 		response := sleet.CaptureResponse{ErrorCode: cybersourceResponse.ErrorReason}
 		return &response, nil
 	}
-	return &sleet.CaptureResponse{}, nil
+	return &sleet.CaptureResponse{Success: true, TransactionReference: *cybersourceResponse.ID}, nil
 }
 
 // Void cancels a CyberSource payment. If successful, the void response will be returned. A previously voided
@@ -120,7 +120,7 @@ func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidRe
 		response := sleet.VoidResponse{ErrorCode: cybersourceResponse.ErrorReason}
 		return &response, nil
 	}
-	return &sleet.VoidResponse{}, nil
+	return &sleet.VoidResponse{Success: true}, nil
 }
 
 // Refund refunds a CyberSource payment. If successful, the refund response will be returned. Multiple
@@ -141,7 +141,7 @@ func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 		response := sleet.RefundResponse{ErrorCode: cybersourceResponse.ErrorReason}
 		return &response, nil
 	}
-	return &sleet.RefundResponse{}, nil
+	return &sleet.RefundResponse{Success: true}, nil
 }
 
 // sendRequest sends an API request with the give payload to the specified CyberSource endpoint.

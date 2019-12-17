@@ -76,7 +76,9 @@ type CaptureRequest struct {
 }
 
 type CaptureResponse struct {
-	ErrorCode *string
+	Success              bool
+	TransactionReference string
+	ErrorCode            *string
 }
 
 type VoidRequest struct {
@@ -84,7 +86,9 @@ type VoidRequest struct {
 }
 
 type VoidResponse struct {
-	ErrorCode *string
+	Success              bool
+	TransactionReference string
+	ErrorCode            *string
 }
 
 type RefundRequest struct {
@@ -94,5 +98,7 @@ type RefundRequest struct {
 }
 
 type RefundResponse struct {
-	ErrorCode *string
+	Success              bool
+	TransactionReference string
+	ErrorCode            *string
 }

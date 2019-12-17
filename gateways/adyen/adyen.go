@@ -68,7 +68,7 @@ func (client *AdyenClient) Capture(request *sleet.CaptureRequest) (*sleet.Captur
 		return nil, err
 	}
 	convertedCode := strconv.Itoa(code)
-	return &sleet.CaptureResponse{ErrorCode: &convertedCode}, nil
+	return &sleet.CaptureResponse{Success: true, ErrorCode: &convertedCode}, nil
 }
 
 func (client *AdyenClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
@@ -86,7 +86,7 @@ func (client *AdyenClient) Refund(request *sleet.RefundRequest) (*sleet.RefundRe
 		return nil, err
 	}
 	convertedCode := strconv.Itoa(code)
-	return &sleet.RefundResponse{ErrorCode: &convertedCode}, nil
+	return &sleet.RefundResponse{Success: true, ErrorCode: &convertedCode}, nil
 }
 
 func (client *AdyenClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
@@ -104,7 +104,7 @@ func (client *AdyenClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse
 		return nil, err
 	}
 	convertedCode := strconv.Itoa(code)
-	return &sleet.VoidResponse{ErrorCode: &convertedCode}, nil
+	return &sleet.VoidResponse{Success: true, ErrorCode: &convertedCode}, nil
 }
 
 func (client *AdyenClient) sendRequest(path string, data []byte) (int, []byte, error) {

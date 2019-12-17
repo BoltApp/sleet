@@ -106,7 +106,7 @@ func (client *StripeClient) Capture(request *sleet.CaptureRequest) (*sleet.Captu
 	}
 	convertedCode := strconv.Itoa(code)
 	fmt.Printf("response capture %s\n", string(resp)) // debug
-	return &sleet.CaptureResponse{ErrorCode: &convertedCode}, nil
+	return &sleet.CaptureResponse{Success: true, ErrorCode: &convertedCode}, nil
 }
 
 func (client *StripeClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
@@ -125,7 +125,7 @@ func (client *StripeClient) Refund(request *sleet.RefundRequest) (*sleet.RefundR
 	}
 	convertedCode := strconv.Itoa(code)
 	fmt.Printf("response refund %s\n", string(resp)) // debug
-	return &sleet.RefundResponse{ErrorCode: &convertedCode}, nil
+	return &sleet.RefundResponse{Success: true, ErrorCode: &convertedCode}, nil
 }
 
 func (client *StripeClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
@@ -144,7 +144,7 @@ func (client *StripeClient) Void(request *sleet.VoidRequest) (*sleet.VoidRespons
 	}
 	convertedCode := strconv.Itoa(code)
 	fmt.Printf("response void %s\n", string(resp)) // debug
-	return &sleet.VoidResponse{ErrorCode: &convertedCode}, nil
+	return &sleet.VoidResponse{Success: true, ErrorCode: &convertedCode}, nil
 }
 
 func (client *StripeClient) sendRequest(path string, data net_url.Values) (int, []byte, error) {
