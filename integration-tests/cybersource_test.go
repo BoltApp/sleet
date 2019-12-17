@@ -8,18 +8,10 @@ import (
 )
 
 func TestCybersource(t *testing.T) {
-	client := cybersource.NewClient(getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
+	client := cybersource.NewClient(cybersource.Sandbox, getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
 	options := make(map[string]interface{})
 	options["email"] = "test@bolt.com"
 	authRequest := sleet_testing.BaseAuthorizationRequest()
-	authRequest.CreditCard = &sleet.CreditCard{
-		FirstName:       "Bolt",
-		LastName:        "Checkout",
-		Number:          "4111111111111111",
-		ExpirationMonth: 8,
-		ExpirationYear:  2024,
-		CVV:             "000",
-	}
 	authRequest.BillingAddress = &sleet.BillingAddress{
 		StreetAddress1: sPtr("77 Geary St"),
 		StreetAddress2: sPtr("Floor 4"),
@@ -27,6 +19,7 @@ func TestCybersource(t *testing.T) {
 		RegionCode:     sPtr("CA"),
 		PostalCode:     sPtr("94108"),
 		CountryCode:    sPtr("US"),
+		Company:        sPtr("Bolt"),
 	}
 	authRequest.Options = options
 	resp, err := client.Authorize(authRequest)

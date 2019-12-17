@@ -22,7 +22,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 			},
 		},
 		OrderInformation: &OrderInformation{
-			BillingAmount: BillingAmount{
+			AmountDetails: AmountDetails{
 				Amount:   amountStr,
 				Currency: authRequest.Amount.Currency,
 			},
@@ -30,11 +30,13 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 				FirstName:  authRequest.CreditCard.FirstName,
 				LastName:   authRequest.CreditCard.LastName,
 				Address1:   *authRequest.BillingAddress.StreetAddress1,
+				Address2:   *authRequest.BillingAddress.StreetAddress2,
 				PostalCode: *authRequest.BillingAddress.PostalCode,
 				Locality:   *authRequest.BillingAddress.Locality,
 				AdminArea:  *authRequest.BillingAddress.RegionCode,
 				Country:    *authRequest.BillingAddress.CountryCode,
 				Email:      authRequest.Options["email"].(string),
+				Company:    *authRequest.BillingAddress.Company,
 			},
 		},
 	}
@@ -45,7 +47,7 @@ func buildCaptureRequest(captureRequest *sleet.CaptureRequest) (*Request, error)
 	amountStr := sleet.AmountToString(captureRequest.Amount)
 	request := &Request{
 		OrderInformation: &OrderInformation{
-			BillingAmount: BillingAmount{
+			AmountDetails: AmountDetails{
 				Amount:   amountStr,
 				Currency: captureRequest.Amount.Currency,
 			},
@@ -64,7 +66,7 @@ func buildRefundRequest(refundRequest *sleet.RefundRequest) (*Request, error) {
 	amountStr := sleet.AmountToString(refundRequest.Amount)
 	request := &Request{
 		OrderInformation: &OrderInformation{
-			BillingAmount: BillingAmount{
+			AmountDetails: AmountDetails{
 				Amount:   amountStr,
 				Currency: refundRequest.Amount.Currency,
 			},

@@ -40,18 +40,17 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("NIRAJ PAYLOAD: ", string(payload))
 	code, resp, err := client.sendRequest("/authorise", payload)
 	fmt.Println(string(resp))
 	fmt.Println(code)
 	if code != 200 {
-		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: nil, CvvResult: "", ErrorCode: strconv.Itoa(code)}, nil
+		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: "", CvvResult: "", ErrorCode: strconv.Itoa(code)}, nil
 	}
 	var authReponse AuthResponse
 	if err := json.Unmarshal(resp, &authReponse); err != nil {
 		return nil, err
 	}
-	return &sleet.AuthorizationResponse{Success: true, TransactionReference: authReponse.Reference, AvsResult: nil, CvvResult: "", ErrorCode: strconv.Itoa(code)}, nil
+	return &sleet.AuthorizationResponse{Success: true, TransactionReference: authReponse.Reference, AvsResult: "", CvvResult: "", ErrorCode: strconv.Itoa(code)}, nil
 }
 
 func (client *AdyenClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
@@ -64,13 +63,12 @@ func (client *AdyenClient) Capture(request *sleet.CaptureRequest) (*sleet.Captur
 		return nil, err
 	}
 
-	code, resp, err := client.sendRequest("/capture", payload)
+	code, _, err := client.sendRequest("/capture", payload)
 	if err != nil {
 		return nil, err
 	}
 	convertedCode := strconv.Itoa(code)
-	fmt.Printf("response capture %s\n", string(resp)) // debug
-	return &sleet.CaptureResponse{ErrorCode: &convertedCode}, nil
+	return &sleet.CaptureResponse{Success: true, ErrorCode: &convertedCode}, nil
 }
 
 func (client *AdyenClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
@@ -83,13 +81,12 @@ func (client *AdyenClient) Refund(request *sleet.RefundRequest) (*sleet.RefundRe
 		return nil, err
 	}
 
-	code, resp, err := client.sendRequest("/refund", payload)
+	code, _, err := client.sendRequest("/refund", payload)
 	if err != nil {
 		return nil, err
 	}
 	convertedCode := strconv.Itoa(code)
-	fmt.Printf("response refund %s\n", string(resp)) // debug
-	return &sleet.RefundResponse{ErrorCode: &convertedCode}, nil
+	return &sleet.RefundResponse{Success: true, ErrorCode: &convertedCode}, nil
 }
 
 func (client *AdyenClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
@@ -102,13 +99,12 @@ func (client *AdyenClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse
 		return nil, err
 	}
 
-	code, resp, err := client.sendRequest("/cancel", payload)
+	code, _, err := client.sendRequest("/cancel", payload)
 	if err != nil {
 		return nil, err
 	}
 	convertedCode := strconv.Itoa(code)
-	fmt.Printf("response void %s\n", string(resp)) // debug
-	return &sleet.VoidResponse{ErrorCode: &convertedCode}, nil
+	return &sleet.VoidResponse{Success: true, ErrorCode: &convertedCode}, nil
 }
 
 func (client *AdyenClient) sendRequest(path string, data []byte) (int, []byte, error) {
@@ -128,7 +124,6 @@ func (client *AdyenClient) sendRequest(path string, data []byte) (int, []byte, e
 		}
 	}()
 
-	fmt.Printf("status %s\n", resp.Status) // debug
 	body, err := ioutil.ReadAll(resp.Body)
 	return resp.StatusCode, body, err
 }

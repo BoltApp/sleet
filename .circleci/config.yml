@@ -1,4 +1,6 @@
-version: 2
+version: 2.1
+orbs:
+  swissknife: roopakv/swissknife@0.16.0 
 jobs:
   build-and-test:
     docker:
@@ -27,9 +29,19 @@ jobs:
           key: v1-pkg-cache
           paths:
             - "/go/pkg"
+  release-github:
+    docker:
+      - image: circleci/golang:1.13
+    steps:
+      - swissknife/publish_github_release:
+          tag: v1.0.$CIRCLE_BUILD_NUM
 
 workflows:
-  version: 2
+  version: 2.1
   build-and-test:
     jobs:
       - build-and-test
+      - release-github:
+          filters:
+            branches:
+              only: master

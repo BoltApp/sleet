@@ -1,5 +1,7 @@
 package cybersource
 
+// TODO add ClientReferenceInformation.Code to Sleet request
+
 // Should we just combine these to one Request and have pointers?
 type Request struct {
 	ClientReferenceInformation *ClientReferenceInformation `json:"clientReferenceInformation,omitempty"`
@@ -9,18 +11,38 @@ type Request struct {
 }
 
 type Response struct {
+	Links                      *Links                      `json:"_links,omitempty"`
+	ID                         *string                     `json:"id,omitempty"`
 	SubmitTimeUTC              string                      `json:"submitTimeUtc"`
 	Status                     string                      `json:"status"` // TODO: Make into enum
-	ClientReferenceInformation *ClientReferenceInformation `json:"clientReferenceInformation,omitempty"`
-	ID                         *string                     `json:"id,omitempty"`
-	OrderInformation           *OrderInformation           `json:"orderInformation,omitempty"`
 	ReconciliationID           *string                     `json:"reconciliationId,omitempty"`
-	Links                      *Links                      `json:"_links,omitempty"`
+	ErrorInformation           *ErrorInformation           `json:"errorInformation,omitempty"`
+	ClientReferenceInformation *ClientReferenceInformation `json:"clientReferenceInformation,omitempty"`
+	ProcessorInformation       *ProcessorInformation       `json:"processorInformation,omitempty"`
+	OrderInformation           *OrderInformation           `json:"orderInformation,omitempty"`
 	ErrorReason                *string                     `json:"reason,omitempty"`
 	ErrorMessage               *string                     `json:"message,omitempty"`
-	ProcessorInformation       *ProcessorInformation       `json:"processorInformation,omitempty"`
 	// TODO: Add payment additional response info
 }
+
+// ErrorInformation holds error information from an otherwise successful authorization request.
+type ErrorInformation struct {
+	Reason  string    `json:"reason"`
+	Message string    `json:"message"`
+	Details *[]Detail `json:"details,omitempty"`
+}
+
+// Detail holds information about an error.
+type Detail struct {
+	Field  string `json:"field"`
+	Reason string `json:"reason"`
+}
+
+type ClientReferenceInformation struct {
+	Code          string `json:"code"`
+	TransactionID string `json:"transactionID"`
+}
+
 type ProcessorInformation struct {
 	ApprovalCode     string `json:"approvalCode"`
 	CardVerification struct {
@@ -33,11 +55,6 @@ type ProcessorInformation struct {
 	} `json:"avs"`
 }
 
-type ClientReferenceInformation struct {
-	Code          string `json:"code"`
-	TransactionID string `json:"transactionID"`
-}
-
 type ProcessingInformation struct {
 	Capture           bool   `json:"capture,omitempty"`
 	CommerceIndicator string `json:"commerceIndicator"` // typically internet
@@ -46,25 +63,27 @@ type ProcessingInformation struct {
 
 type OrderInformation struct {
 	BillTo        BillingInformation `json:"billTo"`
-	BillingAmount BillingAmount      `json:"amountDetails"`
+	AmountDetails AmountDetails      `json:"amountDetails"`
 }
 
 type BillingInformation struct {
 	FirstName  string `json:"firstName"`
 	LastName   string `json:"lastName"`
 	Address1   string `json:"address1"`
+	Address2   string `json:"address2,omitempty"`
 	PostalCode string `json:"postalCode"`
 	Locality   string `json:"locality"`
 	AdminArea  string `json:"administrativeArea"`
 	Country    string `json:"country"`
 	Phone      string `json:"phoneNumber"`
-	Company    string `json:"company"`
+	Company    string `json:"company,omitempty"`
 	Email      string `json:"email"`
 }
 
-type BillingAmount struct {
-	Amount   string `json:"totalAmount"`
-	Currency string `json:"currency"`
+type AmountDetails struct {
+	AuthorizedAmount string `json:"authorizedAmount,omitempty"`
+	Amount           string `json:"totalAmount,omitempty"`
+	Currency         string `json:"currency"`
 }
 
 type PaymentInformation struct {

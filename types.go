@@ -19,6 +19,7 @@ type BillingAddress struct {
 	RegionCode     *string
 	PostalCode     *string
 	CountryCode    *string // ISO 2-digit code
+	Company        *string
 }
 
 type CreditCard struct {
@@ -63,9 +64,10 @@ type AuthorizationRequest struct {
 type AuthorizationResponse struct {
 	Success              bool
 	TransactionReference string
-	AvsResult            *string
+	AvsResult            string
 	CvvResult            string
 	ErrorCode            string
+	Response             string
 }
 
 type CaptureRequest struct {
@@ -74,7 +76,9 @@ type CaptureRequest struct {
 }
 
 type CaptureResponse struct {
-	ErrorCode *string
+	Success              bool
+	TransactionReference string
+	ErrorCode            *string
 }
 
 type VoidRequest struct {
@@ -82,8 +86,9 @@ type VoidRequest struct {
 }
 
 type VoidResponse struct {
-	TransactionReference *string
-	ErrorCode *string
+	Success              bool
+	TransactionReference string
+	ErrorCode            *string
 }
 
 type RefundRequest struct {
@@ -93,5 +98,7 @@ type RefundRequest struct {
 }
 
 type RefundResponse struct {
-	ErrorCode *string
+	Success              bool
+	TransactionReference string
+	ErrorCode            *string
 }

@@ -26,11 +26,10 @@ func TestSuccessfulAuth(t *testing.T) {
 	response, err := client.Authorize(authRequest)
 
 	assert.Nil(t, err)
-	avsResult := "unchecked"
 	expectedResponse := &sleet.AuthorizationResponse{
 		Success:              true,
 		TransactionReference: "ch_1FfpIZFSEDlaFyqYGbP2DpkI",
-		AvsResult:            &avsResult,
+		AvsResult:            "unchecked",
 		CvvResult:            "unchecked",
 		ErrorCode:            "200",
 	}

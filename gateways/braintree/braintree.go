@@ -75,7 +75,7 @@ func (client *BraintreeClient) Authorize(request *sleet.AuthorizationRequest) (*
 	return &sleet.AuthorizationResponse{
 		Success:              responseCode/100 == 2,
 		TransactionReference: transaction.ID,
-		AvsResult:            &avsResult,
+		AvsResult:            avsResult,
 		CvvResult:            transaction.CVVResponseCode,
 	}, nil
 }
