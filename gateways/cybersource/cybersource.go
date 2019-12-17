@@ -100,7 +100,7 @@ func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidRe
 		response := sleet.VoidResponse{ErrorCode: cybersourceResponse.ErrorReason}
 		return &response, nil
 	}
-	return &sleet.VoidResponse{}, nil
+	return &sleet.VoidResponse{TransactionReference: cybersourceResponse.ID}, nil
 }
 
 func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {

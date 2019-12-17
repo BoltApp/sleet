@@ -82,6 +82,7 @@ type VoidRequest struct {
 }
 
 type VoidResponse struct {
+	TransactionReference *string
 	ErrorCode *string
 }
 
