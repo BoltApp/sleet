@@ -120,7 +120,7 @@ func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidRe
 		response := sleet.VoidResponse{ErrorCode: cybersourceResponse.ErrorReason}
 		return &response, nil
 	}
-	return &sleet.VoidResponse{Success: true}, nil
+	return &sleet.VoidResponse{TransactionReference: *cybersourceResponse.ID, Success: true}, nil
 }
 
 // Refund refunds a CyberSource payment. If successful, the refund response will be returned. Multiple
