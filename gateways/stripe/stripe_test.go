@@ -29,8 +29,10 @@ func TestSuccessfulAuth(t *testing.T) {
 	expectedResponse := &sleet.AuthorizationResponse{
 		Success:              true,
 		TransactionReference: "ch_1FfpIZFSEDlaFyqYGbP2DpkI",
-		AvsResult:            "unchecked",
-		CvvResult:            "unchecked",
+		AvsResult:            sleet.AVSresponseZipMatchAddressMatch, // TODO: Add translator
+		CvvResult:            sleet.CVVResponseMatch,                // TODO: Add translator
+		AvsResultRaw:         "unchecked",
+		CvvResultRaw:         "unchecked",
 		ErrorCode:            "200",
 	}
 	assert.Equal(t, expectedResponse, response)

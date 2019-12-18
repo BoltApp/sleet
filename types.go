@@ -64,8 +64,10 @@ type AuthorizationRequest struct {
 type AuthorizationResponse struct {
 	Success              bool
 	TransactionReference string
-	AvsResult            string
-	CvvResult            string
+	AvsResult            AVSResponse
+	CvvResult            CVVResponse
+	AvsResultRaw         string // Raw processor response, untranslated
+	CvvResultRaw         string // Raw processor response, untranslated
 	ErrorCode            string
 	Response             string
 }
