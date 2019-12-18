@@ -15,12 +15,19 @@ const (
 	AVSResponseZip5MatchAddressNoMatch // 5-digit ZIP matches, street address doesn't match.
 	AVSresponseZipMatchAddressMatch    // 5 or 9 digit ZIP matches, street address matches.
 	AVSResponseZipNoMatchAddressMatch  // ZIP doesn't match, street address matches.
+	AVSResponseMatch                   // Everything matches
+	AVSResponseNoMatch                 // Nothing matches
 
 	AVSResponseZipMatchAddressUnverified // ZIP matches, street address not verified.
 	AVSResponseZipUnverifiedAddressMatch // ZIP not verified, street address matches.
 
-	// AVSResponseIntlZipMatchAddressMatch // (International) ZIP matches, street address matches.
-	// AVSResponseIntlZipMatchAddressMatch // (International) ZIP matches, street address matches.
-	// AVSResponseIntlZipMatchAddressMatch // (International) ZIP matches, street address matches.
-	// AVSResponseIntlZipMatchAddressMatch // (International) ZIP matches, street address matches.
+	AVSResponseNonUsZipMatchAddressMatch      // (Non U.S. cards) ZIP matches, street address matches.
+	AVSResponseNonUsZipNoMatchAddressNoMatch  // (Non U.S. cards) ZIP and street address don't match.
+	AVSResponseNonUsZipUnverifiedAddressMatch // (Non U.S. cards) ZIP unverified, street address matches.
+
+	AVSResponseNameNoMatch                       // Cardholder's name doesn't match.
+	AVSResponseNameNoMatchAddressMatch           // Cardholder's name doesn't match, street address matches.
+	AVSResponseNameMatchZipMatchAddressNoMatch   // Cardholder's name and ZIP match, street address doesn't match.
+	AVSResponseNameMatchZipNoMatchAddressMatch   // Cardholder's name and street address match, ZIP doesn't match.
+	AVSResponseNameMatchZipNoMatchAddressNoMatch // Cardholder's name matches, ZIP and street address don't match.
 )
