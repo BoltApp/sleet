@@ -62,14 +62,18 @@ type AuthorizationRequest struct {
 }
 
 type AuthorizationResponse struct {
+	// Raw fields contain the untranslated responses from processors, while
+	// the non-raw fields are the best parsings to a single standard, with
+	// loss of granularity minimized. The latter should be preferred when
+	// treating Sleet as a black box.
 	Success              bool
 	TransactionReference string
 	AvsResult            AVSResponse
 	CvvResult            CVVResponse
-	AvsResultRaw         string // Raw processor response, untranslated
-	CvvResultRaw         string // Raw processor response, untranslated
-	ErrorCode            string
 	Response             string
+	ErrorCode            string
+	AvsResultRaw         string
+	CvvResultRaw         string
 }
 
 type CaptureRequest struct {

@@ -65,20 +65,31 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 		return nil, err
 	}
 
+	// Status 400 or 502 - Failed
 	if cybersourceResponse.ErrorReason != nil {
-		// return error
-		response := sleet.AuthorizationResponse{ErrorCode: *cybersourceResponse.ErrorReason}
+		response := sleet.AuthorizationResponse{Success: false, ErrorCode: *cybersourceResponse.ErrorReason}
 		return &response, nil
 	}
+
+	// Status 201 - Succeeded or failed
+	errorCode := ""
+	if cybersourceResponse.ErrorInformation != nil {
+		errorCode = cybersourceResponse.ErrorInformation.Reason
+	}
+	success := false // DECLINED, INVALID_REQUEST
+	if cybersourceResponse.Status == "AUTHORIZED" || cybersourceResponse.Status == "PARTIAL_AUTHORIZED" || cybersourceResponse.Status == "AUTHORIZED_PENDING_REVIEW" {
+		success = true
+	}
+
 	return &sleet.AuthorizationResponse{
-		Success:              true,
+		Success:              success,
 		TransactionReference: *cybersourceResponse.ID,
 		AvsResult:            translateAvs(cybersourceResponse.ProcessorInformation.AVS.Code),
 		CvvResult:            translateCvv(cybersourceResponse.ProcessorInformation.CardVerification.ResultCode),
+		Response:             cybersourceResponse.Status,
 		AvsResultRaw:         cybersourceResponse.ProcessorInformation.AVS.Code,
 		CvvResultRaw:         cybersourceResponse.ProcessorInformation.CardVerification.ResultCode,
-		ErrorCode:            "",
-		Response:             cybersourceResponse.ProcessorInformation.ResponseCode,
+		ErrorCode:            errorCode,
 	}, nil
 }
 
@@ -140,7 +151,7 @@ func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 
 	if cybersourceResponse.ErrorReason != nil {
 		// return error
-		response := sleet.RefundResponse{ErrorCode: cybersourceResponse.ErrorReason, Success:false}
+		response := sleet.RefundResponse{ErrorCode: cybersourceResponse.ErrorReason, Success: false}
 		return &response, nil
 	}
 	return &sleet.RefundResponse{Success: true, TransactionReference: *cybersourceResponse.ID}, nil
