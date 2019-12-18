@@ -15,3 +15,21 @@ const (
 	CVVResponseSuspicious                            // The issuing bank determined this transaction to be suspicious
 	CVVResponseSkipped                               // Verification was not performed for this transaction
 )
+
+var cvvCodeToString = map[CVVResponse]string{
+	CVVResponseUnknown:            "CVVResponseUnknown",
+	CVVResponseNoResponse:         "CVVResponseNoResponse",
+	CVVResponseError:              "CVVResponseError",
+	CVVResponseUnsupported:        "CVVResponseUnsupported",
+	CVVResponseMatch:              "CVVResponseMatch",
+	CVVResponseNoMatch:            "CVVResponseNoMatch",
+	CVVResponseNotProcessed:       "CVVResponseNotProcessed",
+	CVVResponseRequiredButMissing: "CVVResponseRequiredButMissing",
+	CVVResponseSuspicious:         "CVVResponseSuspicious",
+	CVVResponseSkipped:            "CVVResponseSkipped",
+}
+
+// String returns a string representation of a CVV response code
+func (code CVVResponse) String() string {
+	return cvvCodeToString[code]
+}
