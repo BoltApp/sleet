@@ -44,13 +44,19 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 	fmt.Println(string(resp))
 	fmt.Println(code)
 	if code != 200 {
-		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: "", CvvResult: "", ErrorCode: strconv.Itoa(code)}, nil
+		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: sleet.AVSResponseUnknown, CvvResult: sleet.CVVResponseUnknown, ErrorCode: strconv.Itoa(code)}, nil
 	}
 	var authReponse AuthResponse
 	if err := json.Unmarshal(resp, &authReponse); err != nil {
 		return nil, err
 	}
-	return &sleet.AuthorizationResponse{Success: true, TransactionReference: authReponse.Reference, AvsResult: "", CvvResult: "", ErrorCode: strconv.Itoa(code)}, nil
+	return &sleet.AuthorizationResponse{
+		Success:              true,
+		TransactionReference: authReponse.Reference,
+		AvsResult:            sleet.AVSresponseZipMatchAddressMatch, // TODO: Add translator
+		CvvResult:            sleet.CVVResponseMatch,                // TODO: Add translator
+		ErrorCode:            strconv.Itoa(code),
+	}, nil
 }
 
 func (client *AdyenClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
