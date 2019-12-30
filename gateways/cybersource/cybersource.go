@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	authPath = "/pts/v2/payments"
+	authPath = "/pts/v2/payments/"
 )
 
 var (
