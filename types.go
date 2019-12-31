@@ -20,6 +20,7 @@ type BillingAddress struct {
 	PostalCode     *string
 	CountryCode    *string // ISO 2-digit code
 	Company        *string
+	Email          *string
 }
 
 type CreditCard struct {
