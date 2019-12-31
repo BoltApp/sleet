@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/BoltApp/sleet/gateways/common"
+	"github.com/BoltApp/sleet/common"
 	"io/ioutil"
 	"net/http"
 	net_url "net/url"

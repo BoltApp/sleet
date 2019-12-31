@@ -3,7 +3,7 @@ package cybersource
 import (
 	"strconv"
 
-	. "github.com/BoltApp/sleet/gateways/common"
+	. "github.com/BoltApp/sleet/common"
 
 	"github.com/BoltApp/sleet"
 )
