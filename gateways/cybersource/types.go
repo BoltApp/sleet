@@ -22,6 +22,7 @@ type Response struct {
 	OrderInformation           *OrderInformation           `json:"orderInformation,omitempty"`
 	ErrorReason                *string                     `json:"reason,omitempty"`
 	ErrorMessage               *string                     `json:"message,omitempty"`
+	Details                    *[]Detail                   `json:"details,omitempty"`
 	// TODO: Add payment additional response info
 }
 
@@ -77,7 +78,7 @@ type BillingInformation struct {
 	Country    string `json:"country"`
 	Phone      string `json:"phoneNumber"`
 	Company    string `json:"company,omitempty"`
-	Email      string `json:"email"`
+	Email      string `json:"email,omitempty"`
 }
 
 type AmountDetails struct {

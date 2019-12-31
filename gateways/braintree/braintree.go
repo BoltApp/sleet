@@ -7,7 +7,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/BoltApp/sleet"
-	"github.com/BoltApp/sleet/gateways/common"
+	"github.com/BoltApp/sleet/common"
 	"io/ioutil"
 	"net"
 	"net/http"

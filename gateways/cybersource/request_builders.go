@@ -3,6 +3,8 @@ package cybersource
 import (
 	"strconv"
 
+	. "github.com/BoltApp/sleet/common"
+
 	"github.com/BoltApp/sleet"
 )
 
@@ -30,13 +32,13 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 				FirstName:  authRequest.CreditCard.FirstName,
 				LastName:   authRequest.CreditCard.LastName,
 				Address1:   *authRequest.BillingAddress.StreetAddress1,
-				Address2:   *authRequest.BillingAddress.StreetAddress2,
+				Address2:   SafeStr(authRequest.BillingAddress.StreetAddress2),
 				PostalCode: *authRequest.BillingAddress.PostalCode,
 				Locality:   *authRequest.BillingAddress.Locality,
 				AdminArea:  *authRequest.BillingAddress.RegionCode,
-				Country:    *authRequest.BillingAddress.CountryCode,
-				Email:      authRequest.Options["email"].(string),
-				Company:    *authRequest.BillingAddress.Company,
+				Country:    SafeStr(authRequest.BillingAddress.CountryCode), 
+				Email:      SafeStr(authRequest.BillingAddress.Email),       
+				Company:    SafeStr(authRequest.BillingAddress.Company),
 			},
 		},
 	}

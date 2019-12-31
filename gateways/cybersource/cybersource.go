@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/BoltApp/sleet/gateways/common"
+	"github.com/BoltApp/sleet/common"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	authPath = "/pts/v2/payments"
+	authPath = "/pts/v2/payments/"
 )
 
 var (

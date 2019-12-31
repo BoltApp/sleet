@@ -9,8 +9,6 @@ import (
 
 func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
 	client := cybersource.NewClient(cybersource.Sandbox, getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
-	options := make(map[string]interface{})
-	options["email"] = "test@bolt.com"
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	authRequest.BillingAddress = &sleet.BillingAddress{
 		StreetAddress1: sPtr("77 Geary St"),
@@ -20,8 +18,8 @@ func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
 		PostalCode:     sPtr("94108"),
 		CountryCode:    sPtr("US"),
 		Company:        sPtr("Bolt"),
+		Email:          sPtr("test@bolt.com"),
 	}
-	authRequest.Options = options
 	resp, err := client.Authorize(authRequest)
 	if err != nil {
 		t.Errorf("Expected no error: received: %s", err)
@@ -55,8 +53,6 @@ func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
 
 func TestVoid(t *testing.T) {
 	client := cybersource.NewClient(cybersource.Sandbox, getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
-	options := make(map[string]interface{})
-	options["email"] = "test@bolt.com"
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	authRequest.BillingAddress = &sleet.BillingAddress{
 		StreetAddress1: sPtr("77 Geary St"),
@@ -66,8 +62,8 @@ func TestVoid(t *testing.T) {
 		PostalCode:     sPtr("94108"),
 		CountryCode:    sPtr("US"),
 		Company:        sPtr("Bolt"),
+		Email:          sPtr("test@bolt.com"),
 	}
-	authRequest.Options = options
 	resp, err := client.Authorize(authRequest)
 	if err != nil {
 		t.Errorf("Expected no error: received: %s", err)
