@@ -59,6 +59,7 @@ type AuthorizationRequest struct {
 	CreditCard     *CreditCard
 	BillingAddress *BillingAddress
 	Level3Data     *Level3Data
+	ClientTransactionReference *string
 	Options        map[string]interface{}
 }
 
