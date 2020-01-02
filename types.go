@@ -59,6 +59,7 @@ type AuthorizationRequest struct {
 	CreditCard     *CreditCard
 	BillingAddress *BillingAddress
 	Level3Data     *Level3Data
+	ClientTransactionReference *string // pass in an id of the transaction from any client
 	Options        map[string]interface{}
 }
 
