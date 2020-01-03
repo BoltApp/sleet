@@ -43,7 +43,9 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 		},
 	}
 	if authRequest.ClientTransactionReference != nil {
-		request.ClientReferenceInformation.Code = *authRequest.ClientTransactionReference
+		request.ClientReferenceInformation = &ClientReferenceInformation{
+			Code:          *authRequest.ClientTransactionReference,
+		}
 	}
 	return request, nil
 }
