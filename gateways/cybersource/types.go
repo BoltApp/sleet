@@ -8,6 +8,7 @@ type Request struct {
 	ProcessingInformation      *ProcessingInformation      `json:"processingInformation,omitempty"`
 	OrderInformation           *OrderInformation           `json:"orderInformation,omitempty"`
 	PaymentInformation         *PaymentInformation         `json:"paymentInformation,omitempty"`
+	PurchaseLevel              string                      `json:"purchaseLevel,omitempty"` // Specifies if level 2/3 data is being sent
 }
 
 type Response struct {
@@ -65,6 +66,8 @@ type ProcessingInformation struct {
 type OrderInformation struct {
 	BillTo        BillingInformation `json:"billTo"`
 	AmountDetails AmountDetails      `json:"amountDetails"`
+	LineItems     []LineItem         `json:"lineItems,omitempty"` // Level 3 field
+	ShipTo        ShippingDetails    `json:"shipTo,omitempty"`    // Level 3 field
 }
 
 type BillingInformation struct {
@@ -85,6 +88,46 @@ type AmountDetails struct {
 	AuthorizedAmount string `json:"authorizedAmount,omitempty"`
 	Amount           string `json:"totalAmount,omitempty"`
 	Currency         string `json:"currency"`
+	DiscountAmount   string `json:"discountAmount,omitempty"`
+	TaxAmount        string `json:"taxAmount,omitempty"`
+	FreightAmount    string `json:"freightAmount,omitempty"`
+}
+
+type LineItem struct {
+	ProductCode    string     `json:"productCode"`
+	ProductName    string     `json:"productName"`
+	Quantity       string     `json:"quantity"`
+	UnitPrice      string     `json:"unitPrice"`
+	TotalAmount    string     `json:"totalAmount"`
+	DiscountAmount string     `json:"discountAmount"`
+	UnitOfMeasure  string     `json:"unitOfMeasure"`
+	CommodityCode  string     `json:"commodityCode"`
+	TaxDetails     TaxDetails `json:"taxDetails"`
+}
+
+type TaxDetails struct {
+	Type          string `json:"type,omitempty"`
+	Amount        string `json:"amount,omitempty"`
+	Rate          string `json:"rate,omitempty"`
+	Code          string `json:"code,omitempty"`
+	TaxID         string `json:"taxId,omitempty"`
+	Applied       string `json:"applied,omitempty"`
+	ExemptionCode string `json:"exemptionCode,omitempty"`
+}
+
+type ShippingDetails struct {
+	FirstName      string `json:"firstName,omitempty"`
+	LastName       string `json:"lastName,omitempty"`
+	Address1       string `json:"address1,omitempty"`
+	Address2       string `json:"address2,omitempty"`
+	Locality       string `json:"locality,omitempty"`
+	AdminArea      string `json:"administrativeArea,omitempty"`
+	PostalCode     string `json:"postalCode,omitempty"`
+	Country        string `json:"country,omitempty"`
+	District       string `json:"district,omitempty"`
+	BuildingNumber string `json:"buildingNumber,omitempty"`
+	Phone          string `json:"phoneNumber,omitempty"`
+	Company        string `json:"company,omitempty"`
 }
 
 type PaymentInformation struct {
