@@ -49,11 +49,34 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 	}
 	if authRequest.Level3Data != nil {
 		level3 := authRequest.Level3Data
-		request.PurchaseLevel = "3" // Signify that this request contains level 3 data
+		request.ProcessingInformation.PurchaseLevel = "3" // Signify that this request contains level 3 data
 		if request.ClientReferenceInformation == nil {
 			request.ClientReferenceInformation = &ClientReferenceInformation{}
 		}
 		request.ClientReferenceInformation.Code = level3.CustomerReference
+
+		request.OrderInformation.ShipTo = ShippingDetails{
+			PostalCode: level3.DestinationPostalCode,
+			Country:    level3.DestinationCountryCode,
+			// TODO: Add administrative area
+		}
+		request.OrderInformation.AmountDetails.DiscountAmount = strconv.FormatInt(level3.DiscountAmount, 10)
+		request.OrderInformation.AmountDetails.TaxAmount = strconv.FormatInt(level3.TaxAmount, 10)
+		request.OrderInformation.AmountDetails.FreightAmount = strconv.FormatInt(level3.ShippingAmount, 10)
+		request.OrderInformation.AmountDetails.DutyAmount = "0" // TODO: Add DutyAmount to level3 data
+		for _, lineItem := range level3.LineItems {
+			request.OrderInformation.LineItems = append(request.OrderInformation.LineItems, LineItem{
+				ProductCode:    lineItem.ProductCode,
+				ProductName:    lineItem.Description, // TODO: Check if this is correct, add ProductName to level3 data?
+				Quantity:       strconv.FormatInt(lineItem.Quantity, 10),
+				UnitPrice:      strconv.FormatInt(lineItem.UnitPrice, 10),
+				TotalAmount:    strconv.FormatInt(lineItem.TotalAmount, 10),
+				DiscountAmount: strconv.FormatInt(lineItem.ItemDiscountAmount, 10),
+				UnitOfMeasure:  lineItem.UnitOfMeasure,
+				CommodityCode:  lineItem.CommodityCode,
+				TaxAmount:      strconv.FormatInt(lineItem.ItemTaxAmount, 10),
+			})
+		}
 	}
 	return request, nil
 }

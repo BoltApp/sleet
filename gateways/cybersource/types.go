@@ -8,7 +8,6 @@ type Request struct {
 	ProcessingInformation      *ProcessingInformation      `json:"processingInformation,omitempty"`
 	OrderInformation           *OrderInformation           `json:"orderInformation,omitempty"`
 	PaymentInformation         *PaymentInformation         `json:"paymentInformation,omitempty"`
-	PurchaseLevel              string                      `json:"purchaseLevel,omitempty"` // Specifies if level 2/3 data is being sent
 }
 
 type Response struct {
@@ -61,6 +60,7 @@ type ProcessingInformation struct {
 	Capture           bool   `json:"capture,omitempty"`
 	CommerceIndicator string `json:"commerceIndicator"` // typically internet
 	PaymentSolution   string `json:"paymentSolution"`
+	PurchaseLevel     string `json:"purchaseLevel,omitempty"` // Specifies if level 3 data is being sent
 }
 
 type OrderInformation struct {
@@ -88,31 +88,22 @@ type AmountDetails struct {
 	AuthorizedAmount string `json:"authorizedAmount,omitempty"`
 	Amount           string `json:"totalAmount,omitempty"`
 	Currency         string `json:"currency"`
-	DiscountAmount   string `json:"discountAmount,omitempty"`
-	TaxAmount        string `json:"taxAmount,omitempty"`
-	FreightAmount    string `json:"freightAmount,omitempty"`
+	DiscountAmount   string `json:"discountAmount,omitempty"` // Level 3 field
+	TaxAmount        string `json:"taxAmount,omitempty"`      // Level 3 field
+	FreightAmount    string `json:"freightAmount,omitempty"`  // Level 3 field - If set, "totalAmount" must also be included
+	DutyAmount       string `json:"dutyAmount,omitempty"`     // Level 3 field
 }
 
 type LineItem struct {
-	ProductCode    string     `json:"productCode"`
-	ProductName    string     `json:"productName"`
-	Quantity       string     `json:"quantity"`
-	UnitPrice      string     `json:"unitPrice"`
-	TotalAmount    string     `json:"totalAmount"`
-	DiscountAmount string     `json:"discountAmount"`
-	UnitOfMeasure  string     `json:"unitOfMeasure"`
-	CommodityCode  string     `json:"commodityCode"`
-	TaxDetails     TaxDetails `json:"taxDetails"`
-}
-
-type TaxDetails struct {
-	Type          string `json:"type,omitempty"`
-	Amount        string `json:"amount,omitempty"`
-	Rate          string `json:"rate,omitempty"`
-	Code          string `json:"code,omitempty"`
-	TaxID         string `json:"taxId,omitempty"`
-	Applied       string `json:"applied,omitempty"`
-	ExemptionCode string `json:"exemptionCode,omitempty"`
+	ProductCode    string `json:"productCode"`
+	ProductName    string `json:"productName"`
+	Quantity       string `json:"quantity"`
+	UnitPrice      string `json:"unitPrice"`
+	TotalAmount    string `json:"totalAmount"`
+	DiscountAmount string `json:"discountAmount"`
+	UnitOfMeasure  string `json:"unitOfMeasure"`
+	CommodityCode  string `json:"commodityCode"`
+	TaxAmount      string `json:"taxAmount"`
 }
 
 type ShippingDetails struct {
