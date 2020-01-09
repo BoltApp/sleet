@@ -36,16 +36,24 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 				PostalCode: *authRequest.BillingAddress.PostalCode,
 				Locality:   *authRequest.BillingAddress.Locality,
 				AdminArea:  *authRequest.BillingAddress.RegionCode,
-				Country:    SafeStr(authRequest.BillingAddress.CountryCode), 
-				Email:      SafeStr(authRequest.BillingAddress.Email),       
+				Country:    SafeStr(authRequest.BillingAddress.CountryCode),
+				Email:      SafeStr(authRequest.BillingAddress.Email),
 				Company:    SafeStr(authRequest.BillingAddress.Company),
 			},
 		},
 	}
 	if authRequest.ClientTransactionReference != nil {
 		request.ClientReferenceInformation = &ClientReferenceInformation{
-			Code:          *authRequest.ClientTransactionReference,
+			Code: *authRequest.ClientTransactionReference,
 		}
+	}
+	if authRequest.Level3Data != nil {
+		level3 := authRequest.Level3Data
+		request.PurchaseLevel = "3" // Signify that this request contains level 3 data
+		if request.ClientReferenceInformation == nil {
+			request.ClientReferenceInformation = &ClientReferenceInformation{}
+		}
+		request.ClientReferenceInformation.Code = level3.CustomerReference
 	}
 	return request, nil
 }
