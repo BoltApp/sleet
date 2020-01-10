@@ -58,16 +58,16 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 		request.OrderInformation.ShipTo = ShippingDetails{
 			PostalCode: level3.DestinationPostalCode,
 			Country:    level3.DestinationCountryCode,
-			// TODO: Add administrative area
+			AdminArea:  level3.DestinationAdminArea,
 		}
 		request.OrderInformation.AmountDetails.DiscountAmount = strconv.FormatInt(level3.DiscountAmount, 10)
 		request.OrderInformation.AmountDetails.TaxAmount = strconv.FormatInt(level3.TaxAmount, 10)
 		request.OrderInformation.AmountDetails.FreightAmount = strconv.FormatInt(level3.ShippingAmount, 10)
-		request.OrderInformation.AmountDetails.DutyAmount = "0" // TODO: Add DutyAmount to level3 data
+		request.OrderInformation.AmountDetails.DutyAmount = strconv.FormatInt(level3.DutyAmount, 10)
 		for _, lineItem := range level3.LineItems {
 			request.OrderInformation.LineItems = append(request.OrderInformation.LineItems, LineItem{
 				ProductCode:    lineItem.ProductCode,
-				ProductName:    lineItem.Description, // TODO: Check if this is correct, add ProductName to level3 data?
+				ProductName:    lineItem.Description,
 				Quantity:       strconv.FormatInt(lineItem.Quantity, 10),
 				UnitPrice:      strconv.FormatInt(lineItem.UnitPrice, 10),
 				TotalAmount:    strconv.FormatInt(lineItem.TotalAmount, 10),

@@ -49,18 +49,20 @@ type Level3Data struct {
 	TaxAmount              int64
 	DiscountAmount         int64
 	ShippingAmount         int64
+	DutyAmount             int64
 	DestinationPostalCode  string
 	DestinationCountryCode string
+	DestinationAdminArea   string
 	LineItems              []LineItem
 }
 
 type AuthorizationRequest struct {
-	Amount         Amount
-	CreditCard     *CreditCard
-	BillingAddress *BillingAddress
-	Level3Data     *Level3Data
+	Amount                     Amount
+	CreditCard                 *CreditCard
+	BillingAddress             *BillingAddress
+	Level3Data                 *Level3Data
 	ClientTransactionReference *string // pass in an id of the transaction from any client
-	Options        map[string]interface{}
+	Options                    map[string]interface{}
 }
 
 type AuthorizationResponse struct {
