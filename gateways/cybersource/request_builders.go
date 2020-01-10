@@ -60,21 +60,21 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 			Country:    level3.DestinationCountryCode,
 			AdminArea:  level3.DestinationAdminArea,
 		}
-		request.OrderInformation.AmountDetails.DiscountAmount = strconv.FormatInt(level3.DiscountAmount, 10)
-		request.OrderInformation.AmountDetails.TaxAmount = strconv.FormatInt(level3.TaxAmount, 10)
-		request.OrderInformation.AmountDetails.FreightAmount = strconv.FormatInt(level3.ShippingAmount, 10)
-		request.OrderInformation.AmountDetails.DutyAmount = strconv.FormatInt(level3.DutyAmount, 10)
+		request.OrderInformation.AmountDetails.DiscountAmount = sleet.AmountToString(&level3.DiscountAmount)
+		request.OrderInformation.AmountDetails.TaxAmount = sleet.AmountToString(&level3.TaxAmount)
+		request.OrderInformation.AmountDetails.FreightAmount = sleet.AmountToString(&level3.ShippingAmount)
+		request.OrderInformation.AmountDetails.DutyAmount = sleet.AmountToString(&level3.DutyAmount)
 		for _, lineItem := range level3.LineItems {
 			request.OrderInformation.LineItems = append(request.OrderInformation.LineItems, LineItem{
 				ProductCode:    lineItem.ProductCode,
 				ProductName:    lineItem.Description,
 				Quantity:       strconv.FormatInt(lineItem.Quantity, 10),
-				UnitPrice:      strconv.FormatInt(lineItem.UnitPrice, 10),
-				TotalAmount:    strconv.FormatInt(lineItem.TotalAmount, 10),
-				DiscountAmount: strconv.FormatInt(lineItem.ItemDiscountAmount, 10),
+				UnitPrice:      sleet.AmountToString(&lineItem.UnitPrice),
+				TotalAmount:    sleet.AmountToString(&lineItem.TotalAmount),
+				DiscountAmount: sleet.AmountToString(&lineItem.ItemDiscountAmount),
 				UnitOfMeasure:  lineItem.UnitOfMeasure,
 				CommodityCode:  lineItem.CommodityCode,
-				TaxAmount:      strconv.FormatInt(lineItem.ItemTaxAmount, 10),
+				TaxAmount:      sleet.AmountToString(&lineItem.ItemTaxAmount),
 			})
 		}
 	}

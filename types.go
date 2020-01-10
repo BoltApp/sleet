@@ -35,21 +35,21 @@ type CreditCard struct {
 type LineItem struct {
 	Description        string
 	ProductCode        string
-	UnitPrice          int64
+	UnitPrice          Amount
 	Quantity           int64
-	TotalAmount        int64
-	ItemTaxAmount      int64
-	ItemDiscountAmount int64
+	TotalAmount        Amount
+	ItemTaxAmount      Amount
+	ItemDiscountAmount Amount
 	UnitOfMeasure      string
 	CommodityCode      string
 }
 
 type Level3Data struct {
 	CustomerReference      string
-	TaxAmount              int64
-	DiscountAmount         int64
-	ShippingAmount         int64
-	DutyAmount             int64
+	TaxAmount              Amount
+	DiscountAmount         Amount
+	ShippingAmount         Amount
+	DutyAmount             Amount
 	DestinationPostalCode  string
 	DestinationCountryCode string
 	DestinationAdminArea   string
