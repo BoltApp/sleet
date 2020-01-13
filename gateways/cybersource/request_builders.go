@@ -36,15 +36,46 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 				PostalCode: *authRequest.BillingAddress.PostalCode,
 				Locality:   *authRequest.BillingAddress.Locality,
 				AdminArea:  *authRequest.BillingAddress.RegionCode,
-				Country:    SafeStr(authRequest.BillingAddress.CountryCode), 
-				Email:      SafeStr(authRequest.BillingAddress.Email),       
+				Country:    SafeStr(authRequest.BillingAddress.CountryCode),
+				Email:      SafeStr(authRequest.BillingAddress.Email),
 				Company:    SafeStr(authRequest.BillingAddress.Company),
 			},
 		},
 	}
 	if authRequest.ClientTransactionReference != nil {
 		request.ClientReferenceInformation = &ClientReferenceInformation{
-			Code:          *authRequest.ClientTransactionReference,
+			Code: *authRequest.ClientTransactionReference,
+		}
+	}
+	if authRequest.Level3Data != nil {
+		level3 := authRequest.Level3Data
+		request.ProcessingInformation.PurchaseLevel = "3" // Signify that this request contains level 3 data
+		if request.ClientReferenceInformation == nil {
+			request.ClientReferenceInformation = &ClientReferenceInformation{}
+		}
+		request.ClientReferenceInformation.Code = level3.CustomerReference
+
+		request.OrderInformation.ShipTo = ShippingDetails{
+			PostalCode: level3.DestinationPostalCode,
+			Country:    level3.DestinationCountryCode,
+			AdminArea:  level3.DestinationAdminArea,
+		}
+		request.OrderInformation.AmountDetails.DiscountAmount = sleet.AmountToString(&level3.DiscountAmount)
+		request.OrderInformation.AmountDetails.TaxAmount = sleet.AmountToString(&level3.TaxAmount)
+		request.OrderInformation.AmountDetails.FreightAmount = sleet.AmountToString(&level3.ShippingAmount)
+		request.OrderInformation.AmountDetails.DutyAmount = sleet.AmountToString(&level3.DutyAmount)
+		for _, lineItem := range level3.LineItems {
+			request.OrderInformation.LineItems = append(request.OrderInformation.LineItems, LineItem{
+				ProductCode:    lineItem.ProductCode,
+				ProductName:    lineItem.Description,
+				Quantity:       strconv.FormatInt(lineItem.Quantity, 10),
+				UnitPrice:      sleet.AmountToString(&lineItem.UnitPrice),
+				TotalAmount:    sleet.AmountToString(&lineItem.TotalAmount),
+				DiscountAmount: sleet.AmountToString(&lineItem.ItemDiscountAmount),
+				UnitOfMeasure:  lineItem.UnitOfMeasure,
+				CommodityCode:  lineItem.CommodityCode,
+				TaxAmount:      sleet.AmountToString(&lineItem.ItemTaxAmount),
+			})
 		}
 	}
 	return request, nil

@@ -8,6 +8,7 @@ import (
 )
 
 func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
+	testCurrency := "USD"
 	client := cybersource.NewClient(cybersource.Sandbox, getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	authRequest.BillingAddress = &sleet.BillingAddress{
@@ -19,6 +20,29 @@ func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
 		CountryCode:    sPtr("US"),
 		Company:        sPtr("Bolt"),
 		Email:          sPtr("test@bolt.com"),
+	}
+	authRequest.Level3Data = &sleet.Level3Data{
+		CustomerReference:      "CUSTOMER-REFERENCE-CODE",
+		TaxAmount:              sleet.Amount{Amount: 10, Currency: testCurrency},
+		DiscountAmount:         sleet.Amount{Amount: 0, Currency: testCurrency},
+		ShippingAmount:         sleet.Amount{Amount: 0, Currency: testCurrency},
+		DutyAmount:             sleet.Amount{Amount: 0, Currency: testCurrency},
+		DestinationPostalCode:  "94108",
+		DestinationCountryCode: "US",
+		DestinationAdminArea:   "CA",
+		LineItems: []sleet.LineItem{
+			sleet.LineItem{
+				Description:        "TestProduct",
+				ProductCode:        "1234",
+				UnitPrice:          sleet.Amount{Amount: 90, Currency: testCurrency},
+				Quantity:           1,
+				TotalAmount:        sleet.Amount{Amount: 90, Currency: testCurrency},
+				ItemTaxAmount:      sleet.Amount{Amount: 10, Currency: testCurrency},
+				ItemDiscountAmount: sleet.Amount{Amount: 0, Currency: testCurrency},
+				UnitOfMeasure:      "each",
+				CommodityCode:      "209-88",
+			},
+		},
 	}
 	resp, err := client.Authorize(authRequest)
 	if err != nil {

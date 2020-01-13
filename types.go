@@ -35,32 +35,34 @@ type CreditCard struct {
 type LineItem struct {
 	Description        string
 	ProductCode        string
-	UnitPrice          int64
+	UnitPrice          Amount
 	Quantity           int64
-	TotalAmount        int64
-	ItemTaxAmount      int64
-	ItemDiscountAmount int64
+	TotalAmount        Amount
+	ItemTaxAmount      Amount
+	ItemDiscountAmount Amount
 	UnitOfMeasure      string
 	CommodityCode      string
 }
 
 type Level3Data struct {
 	CustomerReference      string
-	TaxAmount              int64
-	DiscountAmount         int64
-	ShippingAmount         int64
+	TaxAmount              Amount
+	DiscountAmount         Amount
+	ShippingAmount         Amount
+	DutyAmount             Amount
 	DestinationPostalCode  string
 	DestinationCountryCode string
+	DestinationAdminArea   string
 	LineItems              []LineItem
 }
 
 type AuthorizationRequest struct {
-	Amount         Amount
-	CreditCard     *CreditCard
-	BillingAddress *BillingAddress
-	Level3Data     *Level3Data
+	Amount                     Amount
+	CreditCard                 *CreditCard
+	BillingAddress             *BillingAddress
+	Level3Data                 *Level3Data
 	ClientTransactionReference *string // pass in an id of the transaction from any client
-	Options        map[string]interface{}
+	Options                    map[string]interface{}
 }
 
 type AuthorizationResponse struct {

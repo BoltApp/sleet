@@ -60,11 +60,14 @@ type ProcessingInformation struct {
 	Capture           bool   `json:"capture,omitempty"`
 	CommerceIndicator string `json:"commerceIndicator"` // typically internet
 	PaymentSolution   string `json:"paymentSolution"`
+	PurchaseLevel     string `json:"purchaseLevel,omitempty"` // Specifies if level 3 data is being sent
 }
 
 type OrderInformation struct {
 	BillTo        BillingInformation `json:"billTo"`
 	AmountDetails AmountDetails      `json:"amountDetails"`
+	LineItems     []LineItem         `json:"lineItems,omitempty"` // Level 3 field
+	ShipTo        ShippingDetails    `json:"shipTo,omitempty"`    // Level 3 field
 }
 
 type BillingInformation struct {
@@ -85,6 +88,37 @@ type AmountDetails struct {
 	AuthorizedAmount string `json:"authorizedAmount,omitempty"`
 	Amount           string `json:"totalAmount,omitempty"`
 	Currency         string `json:"currency"`
+	DiscountAmount   string `json:"discountAmount,omitempty"` // Level 3 field
+	TaxAmount        string `json:"taxAmount,omitempty"`      // Level 3 field
+	FreightAmount    string `json:"freightAmount,omitempty"`  // Level 3 field - If set, "totalAmount" must also be included
+	DutyAmount       string `json:"dutyAmount,omitempty"`     // Level 3 field
+}
+
+type LineItem struct {
+	ProductCode    string `json:"productCode"`
+	ProductName    string `json:"productName"`
+	Quantity       string `json:"quantity"`
+	UnitPrice      string `json:"unitPrice"`
+	TotalAmount    string `json:"totalAmount"`
+	DiscountAmount string `json:"discountAmount"`
+	UnitOfMeasure  string `json:"unitOfMeasure"`
+	CommodityCode  string `json:"commodityCode"`
+	TaxAmount      string `json:"taxAmount"`
+}
+
+type ShippingDetails struct {
+	FirstName      string `json:"firstName,omitempty"`
+	LastName       string `json:"lastName,omitempty"`
+	Address1       string `json:"address1,omitempty"`
+	Address2       string `json:"address2,omitempty"`
+	Locality       string `json:"locality,omitempty"`
+	AdminArea      string `json:"administrativeArea,omitempty"`
+	PostalCode     string `json:"postalCode,omitempty"`
+	Country        string `json:"country,omitempty"`
+	District       string `json:"district,omitempty"`
+	BuildingNumber string `json:"buildingNumber,omitempty"`
+	Phone          string `json:"phoneNumber,omitempty"`
+	Company        string `json:"company,omitempty"`
 }
 
 type PaymentInformation struct {
