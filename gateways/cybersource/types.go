@@ -1,7 +1,5 @@
 package cybersource
 
-// TODO add ClientReferenceInformation.Code to Sleet request
-
 // Should we just combine these to one Request and have pointers?
 type Request struct {
 	ClientReferenceInformation *ClientReferenceInformation `json:"clientReferenceInformation,omitempty"`

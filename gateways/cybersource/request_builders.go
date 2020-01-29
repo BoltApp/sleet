@@ -42,6 +42,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 			},
 		},
 	}
+	// If level 3 data is present, and ClientReferenceInformation in that data exists, it will override this.
 	if authRequest.ClientTransactionReference != nil {
 		request.ClientReferenceInformation = &ClientReferenceInformation{
 			Code: *authRequest.ClientTransactionReference,
@@ -91,12 +92,22 @@ func buildCaptureRequest(captureRequest *sleet.CaptureRequest) (*Request, error)
 			},
 		},
 	}
+	if captureRequest.ClientTransactionReference != nil {
+		request.ClientReferenceInformation = &ClientReferenceInformation{
+			Code: *captureRequest.ClientTransactionReference,
+		}
+	}
 	return request, nil
 }
 
 func buildVoidRequest(voidRequest *sleet.VoidRequest) (*Request, error) {
 	// Maybe add reason / more details, but for now nothing
 	request := &Request{}
+	if voidRequest.ClientTransactionReference != nil {
+		request.ClientReferenceInformation = &ClientReferenceInformation{
+			Code: *voidRequest.ClientTransactionReference,
+		}
+	}
 	return request, nil
 }
 
@@ -109,6 +120,11 @@ func buildRefundRequest(refundRequest *sleet.RefundRequest) (*Request, error) {
 				Currency: refundRequest.Amount.Currency,
 			},
 		},
+	}
+	if refundRequest.ClientTransactionReference != nil {
+		request.ClientReferenceInformation = &ClientReferenceInformation{
+			Code: *refundRequest.ClientTransactionReference,
+		}
 	}
 	return request, nil
 }

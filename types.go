@@ -61,7 +61,7 @@ type AuthorizationRequest struct {
 	CreditCard                 *CreditCard
 	BillingAddress             *BillingAddress
 	Level3Data                 *Level3Data
-	ClientTransactionReference *string // pass in an id of the transaction from any client
+	ClientTransactionReference *string // Custom transaction reference metadata that will be associated with this request
 	Options                    map[string]interface{}
 }
 
@@ -81,8 +81,9 @@ type AuthorizationResponse struct {
 }
 
 type CaptureRequest struct {
-	Amount               *Amount
-	TransactionReference string
+	Amount                     *Amount
+	TransactionReference       string
+	ClientTransactionReference *string // Custom transaction reference metadata that will be associated with this request
 }
 
 type CaptureResponse struct {
@@ -92,7 +93,8 @@ type CaptureResponse struct {
 }
 
 type VoidRequest struct {
-	TransactionReference string
+	TransactionReference       string
+	ClientTransactionReference *string // Custom transaction reference metadata that will be associated with this request
 }
 
 type VoidResponse struct {
@@ -102,9 +104,10 @@ type VoidResponse struct {
 }
 
 type RefundRequest struct {
-	Amount               *Amount
-	TransactionReference string
-	Options              map[string]interface{}
+	Amount                     *Amount
+	TransactionReference       string
+	ClientTransactionReference *string // Custom transaction reference metadata that will be associated with this request
+	Options                    map[string]interface{}
 }
 
 type RefundResponse struct {
