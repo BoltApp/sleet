@@ -53,7 +53,9 @@ func NewWithHttpClient(env Environment, merchantID string, sharedSecretKeyID str
 }
 
 // Authorize make a payment authorization request to CyberSource for the given payment details. If successful, the
-// authorization response will be returned.
+// authorization response will be returned. If level 3 data is present in the authorization request and contains
+// a CustomerReference, the ClientReferenceInformation of this request will be overridden in order to to match the
+// level 3 data's CustomerReference.
 func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	cybersourceAuthRequest, err := buildAuthRequest(request)
 	if err != nil {
