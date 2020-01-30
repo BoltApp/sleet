@@ -11,6 +11,7 @@ func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
 	testCurrency := "USD"
 	client := cybersource.NewClient(cybersource.Sandbox, getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
 	authRequest := sleet_testing.BaseAuthorizationRequest()
+	authRequest.ClientTransactionReference = sPtr("[auth]-CUSTOMER-REFERENCE-CODE") // This will be overridden by the level 3 CustomerReference
 	authRequest.BillingAddress = &sleet.BillingAddress{
 		StreetAddress1: sPtr("77 Geary St"),
 		StreetAddress2: sPtr("Floor 4"),
@@ -22,7 +23,7 @@ func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
 		Email:          sPtr("test@bolt.com"),
 	}
 	authRequest.Level3Data = &sleet.Level3Data{
-		CustomerReference:      "CUSTOMER-REFERENCE-CODE",
+		CustomerReference:      "[auth][l3]-CUSTOMER-REFERENCE-CODE",
 		TaxAmount:              sleet.Amount{Amount: 10, Currency: testCurrency},
 		DiscountAmount:         sleet.Amount{Amount: 0, Currency: testCurrency},
 		ShippingAmount:         sleet.Amount{Amount: 0, Currency: testCurrency},
@@ -53,8 +54,9 @@ func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
 	}
 
 	capResp, err := client.Capture(&sleet.CaptureRequest{
-		Amount:               &authRequest.Amount,
-		TransactionReference: resp.TransactionReference,
+		Amount:                     &authRequest.Amount,
+		TransactionReference:       resp.TransactionReference,
+		ClientTransactionReference: sPtr("[capture]-CUSTOMER-REFERENCE-CODE"),
 	})
 	if err != nil {
 		t.Errorf("Expected no error: received: %s", err)
@@ -64,8 +66,9 @@ func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
 	}
 
 	refundResp, err := client.Refund(&sleet.RefundRequest{
-		Amount:               &authRequest.Amount,
-		TransactionReference: capResp.TransactionReference,
+		Amount:                     &authRequest.Amount,
+		TransactionReference:       capResp.TransactionReference,
+		ClientTransactionReference: sPtr("[refund]-CUSTOMER-REFERENCE-CODE"),
 	})
 	if err != nil {
 		t.Errorf("Expected no error: received: %s", err)
@@ -78,6 +81,7 @@ func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
 func TestVoid(t *testing.T) {
 	client := cybersource.NewClient(cybersource.Sandbox, getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
 	authRequest := sleet_testing.BaseAuthorizationRequest()
+	authRequest.ClientTransactionReference = sPtr("[auth]-CUSTOMER-REFERENCE-CODE")
 	authRequest.BillingAddress = &sleet.BillingAddress{
 		StreetAddress1: sPtr("77 Geary St"),
 		StreetAddress2: sPtr("Floor 4"),
@@ -98,7 +102,8 @@ func TestVoid(t *testing.T) {
 
 	// void
 	voidResp, err := client.Void(&sleet.VoidRequest{
-		TransactionReference: resp.TransactionReference,
+		TransactionReference:       resp.TransactionReference,
+		ClientTransactionReference: sPtr("[void]-CUSTOMER-REFERENCE-CODE"),
 	})
 	if err != nil {
 		t.Errorf("Expected no error: received: %s", err)
