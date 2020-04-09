@@ -6,10 +6,11 @@ import (
 	sleet_testing "github.com/BoltApp/sleet/testing"
 	"github.com/Pallinder/go-randomdata"
 	"testing"
+	adyen_go "github.com/zhutik/adyen-api-go"
 )
 
 func TestAdyenAuthorize(t *testing.T) {
-	client := adyen.NewClient(getEnv("ADYEN_KEY"), getEnv("ADYEN_ACCOUNT"))
+	client := adyen.NewClient(adyen_go.Testing, getEnv("ADYEN_USERNAME"), getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_PASSWORD"))
 	authRequest1 := sleet_testing.BaseAuthorizationRequest()
 	authRequest2 := sleet_testing.BaseAuthorizationRequest()
 	options := make(map[string]interface{})

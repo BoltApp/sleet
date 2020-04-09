@@ -1,152 +1,92 @@
 package adyen
 
 import (
-	"encoding/json"
-	"fmt"
+	"net/http"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
-	"io/ioutil"
-	"net/http"
-	"strconv"
-	"strings"
+	"github.com/zhutik/adyen-api-go"
 )
 
 var baseURL = "https://pal-test.adyen.com/pal/servlet/Payment/v51"
 
+// You can create new API user there: https://ca-test.adyen.com/ca/ca/config/users.shtml
 type AdyenClient struct {
 	merchantAccount string
-	apiKey          string
+	username        string
+	password        string
+	environment     adyen.Environment
 	httpClient      *http.Client
 }
 
-func NewClient(apiKey string, merchantAccount string) *AdyenClient {
-	return NewWithHTTPClient(apiKey, merchantAccount, common.DefaultHttpClient())
+func NewClient(env adyen.Environment, username string, merchantAccount string, password string) *AdyenClient {
+	return NewWithHTTPClient(env, username, merchantAccount, password, common.DefaultHttpClient())
 }
 
-func NewWithHTTPClient(apiKey string, merchantAccount string, httpClient *http.Client) *AdyenClient {
+func NewWithHTTPClient(env adyen.Environment, username string, merchantAccount string, password string, httpClient *http.Client) *AdyenClient {
 	return &AdyenClient{
-		apiKey:          apiKey,
+		environment:     env,
+		username:        username,
+		password:        password,
 		merchantAccount: merchantAccount,
 		httpClient:      httpClient,
 	}
 }
 
 func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
-	adyenAuthRequest, err := buildAuthRequest(request, client.merchantAccount)
+	paymentGateway := adyen.PaymentGateway{
+		adyen.New(client.environment, client.username, client.password, adyen.WithTransport(client.httpClient.Transport)),
+	}
+	auth, err := paymentGateway.Authorise(buildAuthRequest(request, client.merchantAccount))
 	if err != nil {
-		return nil, err
-	}
-	payload, err := json.Marshal(adyenAuthRequest)
-	if err != nil {
-		return nil, err
-	}
-	code, resp, err := client.sendRequest("/authorise", payload)
-	fmt.Println(string(resp))
-	fmt.Println(code)
-	if code != 200 {
-		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: sleet.AVSResponseUnknown, CvvResult: sleet.CVVResponseUnknown, ErrorCode: strconv.Itoa(code)}, nil
-	}
-	var authReponse AuthResponse
-	if err := json.Unmarshal(resp, &authReponse); err != nil {
-		return nil, err
+		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: sleet.AVSResponseUnknown, CvvResult: sleet.CVVResponseUnknown}, err
 	}
 	return &sleet.AuthorizationResponse{
 		Success:              true,
-		TransactionReference: authReponse.Reference,
+		TransactionReference: auth.AuthCode,
 		AvsResult:            sleet.AVSresponseZipMatchAddressMatch, // TODO: Add translator
 		CvvResult:            sleet.CVVResponseMatch,                // TODO: Add translator
-		ErrorCode:            strconv.Itoa(code),
 	}, nil
 }
 
 func (client *AdyenClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
-	captureRequest, err := buildCaptureRequest(request, client.merchantAccount)
-	if err != nil {
-		return nil, err
+	modificationGateway := adyen.ModificationGateway{
+		adyen.New(client.environment, client.username, client.password, adyen.WithTransport(client.httpClient.Transport)),
 	}
-	payload, err := json.Marshal(captureRequest)
+	capture, err := modificationGateway.Capture(buildCaptureRequest(request, client.merchantAccount))
 	if err != nil {
-		return nil, err
+		return &sleet.CaptureResponse{Success: false, TransactionReference: ""}, err
 	}
-
-	code, _, err := client.sendRequest("/capture", payload)
-	if err != nil {
-		return nil, err
-	}
-	convertedCode := strconv.Itoa(code)
-	return &sleet.CaptureResponse{Success: true, ErrorCode: &convertedCode}, nil
+	return &sleet.CaptureResponse{
+		Success:              true,
+		TransactionReference: capture.PspReference,
+	}, nil
 }
 
 func (client *AdyenClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
-	refundRequest, err := buildRefundRequest(request, client.merchantAccount)
-	if err != nil {
-		return nil, err
+	modificationGateway := adyen.ModificationGateway{
+		adyen.New(client.environment, client.username, client.password, adyen.WithTransport(client.httpClient.Transport)),
 	}
-	payload, err := json.Marshal(refundRequest)
+	refund, err := modificationGateway.Refund(buildRefundRequest(request, client.merchantAccount))
 	if err != nil {
-		return nil, err
+		return &sleet.RefundResponse{Success: false, TransactionReference: ""}, err
 	}
-
-	code, _, err := client.sendRequest("/refund", payload)
-	if err != nil {
-		return nil, err
-	}
-	convertedCode := strconv.Itoa(code)
-	return &sleet.RefundResponse{Success: true, ErrorCode: &convertedCode}, nil
+	return &sleet.RefundResponse{
+		Success:              true,
+		TransactionReference: refund.PspReference,
+	}, nil
 }
 
 func (client *AdyenClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
-	voidRequest, err := buildVoidRequest(request, client.merchantAccount)
-	if err != nil {
-		return nil, err
+	modificationGateway := adyen.ModificationGateway{
+		adyen.New(client.environment, client.username, client.password, adyen.WithTransport(client.httpClient.Transport)),
 	}
-	payload, err := json.Marshal(voidRequest)
+	void, err := modificationGateway.Cancel(buildVoidRequest(request, client.merchantAccount))
 	if err != nil {
-		return nil, err
+		return &sleet.VoidResponse{Success: false, TransactionReference: ""}, err
 	}
-
-	code, _, err := client.sendRequest("/cancel", payload)
-	if err != nil {
-		return nil, err
-	}
-	convertedCode := strconv.Itoa(code)
-	return &sleet.VoidResponse{Success: true, ErrorCode: &convertedCode}, nil
-}
-
-func (client *AdyenClient) sendRequest(path string, data []byte) (int, []byte, error) {
-	req, err := client.buildPOSTRequest(path, data)
-	if err != nil {
-		return -1, nil, err
-	}
-	req.Header.Add("User-Agent", common.UserAgent())
-	resp, err := client.httpClient.Do(req)
-	if err != nil {
-		return -1, nil, err
-	}
-	defer func() {
-		err := resp.Body.Close()
-		if err != nil {
-			// TODO log
-		}
-	}()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	return resp.StatusCode, body, err
-}
-
-func (client *AdyenClient) buildPOSTRequest(path string, data []byte) (*http.Request, error) {
-	url := baseURL + "/" + path
-	fmt.Println(string(data))
-
-	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(string(data)))
-	if err != nil {
-		return nil, err
-	}
-
-	authorization := client.apiKey
-	req.Header.Add("X-API-key", authorization)
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("User-Agent", "sleet")
-
-	return req, nil
+	return &sleet.VoidResponse{
+		Success:              true,
+		TransactionReference: void.PspReference,
+	}, nil
 }

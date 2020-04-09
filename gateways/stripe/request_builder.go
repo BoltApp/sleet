@@ -15,11 +15,11 @@ func buildChargeParams(authRequest *sleet.AuthorizationRequest) *stripe.ChargePa
 				Number:   stripe.String(authRequest.CreditCard.Number), // raw PAN as we're testing token creation
 				ExpMonth: stripe.String(strconv.Itoa(authRequest.CreditCard.ExpirationMonth)),
 				ExpYear:  stripe.String(strconv.Itoa(authRequest.CreditCard.ExpirationYear)),
-				CVC: stripe.String(authRequest.CreditCard.CVV),
-				Name: stripe.String(authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName),
+				CVC:      stripe.String(authRequest.CreditCard.CVV),
+				Name:     stripe.String(authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName),
 			},
 		},
-		Capture:  stripe.Bool(false),
+		Capture: stripe.Bool(false),
 	}
 }
 
