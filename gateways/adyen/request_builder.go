@@ -2,52 +2,56 @@ package adyen
 
 import (
 	"github.com/BoltApp/sleet"
+	"github.com/zhutik/adyen-api-go"
 	"strconv"
 )
 
-func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount string) (*AuthRequest, error) {
-	request := &AuthRequest{
-		Amount: ModificationAmount{
-			Value:    authRequest.Amount.Amount,
+func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount string) *adyen.Authorise {
+	request := &adyen.Authorise{
+		Amount: &adyen.Amount{
+			Value:    float32(authRequest.Amount.Amount),
 			Currency: authRequest.Amount.Currency,
 		},
-		Card: &CreditCard{
-			Type:        "scheme",
-			ExpiryYear:  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
-			ExpiryMonth: strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
+		Card: &adyen.Card{
+			ExpireYear:  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
+			ExpireMonth: strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
 			Number:      authRequest.CreditCard.Number,
-			CVC:         authRequest.CreditCard.CVV,
+			Cvc:         authRequest.CreditCard.CVV,
 			HolderName:  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
 		},
 		Reference:       authRequest.Options["reference"].(string),
 		MerchantAccount: merchantAccount,
 	}
-	return request, nil
+	return request
 }
 
-func buildCaptureRequest(captureRequest *sleet.CaptureRequest, merchantAccount string) (*PostAuthRequest, error) {
-	request := &PostAuthRequest{
+func buildCaptureRequest(captureRequest *sleet.CaptureRequest, merchantAccount string) *adyen.Capture {
+	request := &adyen.Capture{
 		OriginalReference:  captureRequest.TransactionReference,
-		ModificationAmount: &ModificationAmount{Value: captureRequest.Amount.Amount, Currency: captureRequest.Amount.Currency},
+		ModificationAmount: &adyen.Amount{
+			Value:    float32(captureRequest.Amount.Amount),
+			Currency: captureRequest.Amount.Currency,
+		},
 		MerchantAccount:    merchantAccount,
 	}
-	return request, nil
+	return request
 }
 
-func buildRefundRequest(refundRequest *sleet.RefundRequest, merchantAccount string) (*PostAuthRequest, error) {
-	request := &PostAuthRequest{
+func buildRefundRequest(refundRequest *sleet.RefundRequest, merchantAccount string) *adyen.Refund {
+	request := &adyen.Refund{
 		OriginalReference:  refundRequest.TransactionReference,
-		ModificationAmount: &ModificationAmount{Value: refundRequest.Amount.Amount, Currency: refundRequest.Amount.Currency},
-		MerchantAccount:    merchantAccount,
+		ModificationAmount: &adyen.Amount{
+			Value:    float32(refundRequest.Amount.Amount),
+			Currency: refundRequest.Amount.Currency,
+		},		MerchantAccount:    merchantAccount,
 	}
-	return request, nil
+	return request
 }
 
-func buildVoidRequest(voidRequest *sleet.VoidRequest, merchantAccount string) (*PostAuthRequest, error) {
-	request := &PostAuthRequest{
+func buildVoidRequest(voidRequest *sleet.VoidRequest, merchantAccount string) *adyen.Cancel {
+	request := &adyen.Cancel{
 		OriginalReference:  voidRequest.TransactionReference,
-		ModificationAmount: nil,
 		MerchantAccount:    merchantAccount,
 	}
-	return request, nil
+	return request
 }

@@ -2,6 +2,7 @@ package stripe
 
 import (
 	"github.com/BoltApp/sleet"
+<<<<<<< Updated upstream
 	"strconv"
 )
 
@@ -12,6 +13,26 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*TokenRequest, e
 		Number:   authRequest.CreditCard.Number,
 		CVC:      authRequest.CreditCard.CVV,
 		Name:     authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
+=======
+	"github.com/stripe/stripe-go"
+	"strconv"
+)
+
+func buildChargeParams(authRequest *sleet.AuthorizationRequest) *stripe.ChargeParams {
+	return &stripe.ChargeParams{
+		Amount:   stripe.Int64(authRequest.Amount.Amount),
+		Currency: stripe.String(authRequest.Amount.Currency),
+		Source: &stripe.SourceParams{
+			Card: &stripe.CardParams{
+				Number:   stripe.String(authRequest.CreditCard.Number), // raw PAN as we're testing token creation
+				ExpMonth: stripe.String(strconv.Itoa(authRequest.CreditCard.ExpirationMonth)),
+				ExpYear:  stripe.String(strconv.Itoa(authRequest.CreditCard.ExpirationYear)),
+				CVC:      stripe.String(authRequest.CreditCard.CVV),
+				Name:     stripe.String(authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName),
+			},
+		},
+		Capture: stripe.Bool(false),
+>>>>>>> Stashed changes
 	}
 
 	if authRequest.BillingAddress.StreetAddress1 != nil {
