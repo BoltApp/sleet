@@ -8,3 +8,7 @@ func SafeStr(s *string) string {
 	}
 	return *s
 }
+
+func SPtr(s string) *string {
+	return &s
+}
