@@ -1,9 +1,7 @@
 package adyen
 
 import (
-	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
