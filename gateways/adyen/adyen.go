@@ -59,7 +59,7 @@ func (client *AdyenClient) Capture(request *sleet.CaptureRequest) (*sleet.Captur
 	}
 	return &sleet.CaptureResponse{
 		Success:              true,
-		TransactionReference: capture.Response, // this might be wrong
+		TransactionReference: capture.PspReference,
 	}, nil
 }
 
@@ -73,7 +73,7 @@ func (client *AdyenClient) Refund(request *sleet.RefundRequest) (*sleet.RefundRe
 	}
 	return &sleet.RefundResponse{
 		Success:              true,
-		TransactionReference: refund.Response, // this might be wrong
+		TransactionReference: refund.PspReference,
 	}, nil
 }
 
@@ -87,6 +87,6 @@ func (client *AdyenClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse
 	}
 	return &sleet.VoidResponse{
 		Success:              true,
-		TransactionReference: void.Response, // this might be wrong
+		TransactionReference: void.PspReference,
 	}, nil
 }
