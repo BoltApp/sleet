@@ -12,6 +12,8 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 			Value:    float32(authRequest.Amount.Amount),
 			Currency: authRequest.Amount.Currency,
 		},
+		// Adyen requires a reference in request so this will panic if client doesn't pass it. Assuming this is good for now
+		Reference: *authRequest.ClientTransactionReference,
 		Card: &adyen.Card{
 			ExpireYear:  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
 			ExpireMonth: strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
@@ -19,7 +21,6 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 			Cvc:         authRequest.CreditCard.CVV,
 			HolderName:  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
 		},
-		Reference:       authRequest.Options["reference"].(string),
 		MerchantAccount: merchantAccount,
 	}
 	return request
