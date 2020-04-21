@@ -43,7 +43,7 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 	}
 	return &sleet.AuthorizationResponse{
 		Success:              true,
-		TransactionReference: auth.AuthCode,
+		TransactionReference: auth.PspReference,
 		AvsResult:            sleet.AVSresponseZipMatchAddressMatch, // TODO: Add translator
 		CvvResult:            sleet.CVVResponseMatch,                // TODO: Add translator
 	}, nil
