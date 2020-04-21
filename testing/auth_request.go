@@ -2,6 +2,7 @@ package testing
 
 import (
 	"github.com/BoltApp/sleet"
+	"github.com/Pallinder/go-randomdata"
 )
 
 func BaseAuthorizationRequest() *sleet.AuthorizationRequest {
@@ -19,5 +20,6 @@ func BaseAuthorizationRequest() *sleet.AuthorizationRequest {
 		ExpirationYear:  2020,
 		CVV:             "737",
 	}
-	return &sleet.AuthorizationRequest{Amount: amount, CreditCard: &card, BillingAddress: &address}
+	reference := randomdata.Letters(10)
+	return &sleet.AuthorizationRequest{Amount: amount, CreditCard: &card, BillingAddress: &address, ClientTransactionReference: &reference}
 }
