@@ -2,6 +2,7 @@
 
 [![CircleCI status](https://circleci.com/gh/BoltApp/sleet.png?circle-token=d60ceb64eb6ebdfd6a45a4703563c1752598db63 "CircleCI status")](https://circleci.com/gh/BoltApp/sleet)
 [![GoDoc](https://godoc.org/github.com/BoltApp/sleet?status.svg)](https://godoc.org/github.com/BoltApp/sleet)
+[![Go Report Card](https://goreportcard.com/badge/github.com/BoltApp/sleet)](https://goreportcard.com/report/github.com/BoltApp/sleet)
 
 Payment abstraction library - one interface for multiple payment processors 
 
