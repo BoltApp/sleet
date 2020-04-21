@@ -3,7 +3,7 @@
 [![CircleCI status](https://circleci.com/gh/BoltApp/sleet.png?circle-token=d60ceb64eb6ebdfd6a45a4703563c1752598db63 "CircleCI status")](https://circleci.com/gh/BoltApp/sleet)
 [![GoDoc](https://godoc.org/github.com/BoltApp/sleet?status.svg)](https://godoc.org/github.com/BoltApp/sleet)
 
-Payment abstraction library - interface with different Payment Service Providers with one unified interface.
+Payment abstraction library - interact with different Payment Service Providers with one unified interface.
 
 ## Installation
 `go get github.com/BoltApp/sleet`
