@@ -194,5 +194,5 @@ func TestAdyenAuthCaptureRefund(t *testing.T) {
 
 	if refund.Success == false {
 		t.Error("Resulting refund should have been successful")
-	}b
+	}
 }
