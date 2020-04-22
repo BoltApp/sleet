@@ -42,7 +42,7 @@ func TestAdyenExpiredCard(t *testing.T) {
 	if auth.Success == true {
 		t.Error("Resulting auth should not have been successful")
 	}
-
+	fmt.Prtinf("auth: %+v", auth)
 	if auth.Response != "Expired Card" {
 		t.Error("Response should have been Expired Card")
 	}
@@ -193,5 +193,5 @@ func TestAdyenAuthCaptureRefund(t *testing.T) {
 
 	if refund.Success == false {
 		t.Error("Resulting refund should have been successful")
-	}
+	}b
 }
