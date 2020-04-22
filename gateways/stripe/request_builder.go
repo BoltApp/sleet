@@ -2,8 +2,8 @@ package stripe
 
 import (
 	"github.com/BoltApp/sleet"
-	"strconv"
 	"github.com/stripe/stripe-go"
+	"strconv"
 )
 
 func buildChargeParams(authRequest *sleet.AuthorizationRequest) *stripe.ChargeParams {
