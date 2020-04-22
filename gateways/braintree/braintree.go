@@ -62,7 +62,7 @@ func NewClient(credentials *Credentials) *BraintreeClient {
 	return NewWithHttpClient(credentials, defaultClient)
 }
 
-// NewWithHTTPClient creates a Braintree client with creds and user specified http client for custom behavior
+// NewWithHttpClient creates a Braintree client with creds and user specified http client for custom behavior
 func NewWithHttpClient(credentials *Credentials, httpClient *http.Client) *BraintreeClient {
 	return &BraintreeClient{
 		credentials: credentials,
