@@ -44,7 +44,7 @@ func TestAdyenExpiredCard(t *testing.T) {
 		t.Error("Resulting auth should not have been successful")
 	}
 	fmt.Printf("auth: %+v", auth)
-	if auth.Response != "Expired Card" {
+	if auth.ErrorCode != "Expired Card" {
 		t.Error("Response should have been Expired Card")
 	}
 }
