@@ -6,9 +6,9 @@ type AVSResponse int
 const (
 	// AVSResponseUnknown an unknown AVS response was returned by the processor.
 	AVSResponseUnknown     AVSResponse = iota
-	AVSResponseError                          // The AVS is unavailable due to a system error.
-	AVSResponseUnsupported                    // The issuing bank does not support AVS.
-	AVSResponseSkipped                        // Verification was not performed for this transaction.
+	AVSResponseError                   // The AVS is unavailable due to a system error.
+	AVSResponseUnsupported             // The issuing bank does not support AVS.
+	AVSResponseSkipped                 // Verification was not performed for this transaction.
 
 	AVSResponseZip9MatchAddressMatch     // 9-digit ZIP matches, street address matches.
 	AVSResponseZip9MatchAddressNoMatch   // 9-digit ZIP matches, street address doesn't match.

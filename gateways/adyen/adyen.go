@@ -47,7 +47,7 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: sleet.AVSResponseUnknown, CvvResult: sleet.CVVResponseUnknown}, err
 	}
 	// Adyen can refuse the transaction and not return an err - check refusal code
-	if auth.ResultCode == "Refused" || auth.ResultCode == "Error "{
+	if auth.ResultCode == "Refused" || auth.ResultCode == "Error " {
 		return &sleet.AuthorizationResponse{Success: false, TransactionReference: auth.PspReference, ErrorCode: auth.RefusalReason}, nil
 	}
 

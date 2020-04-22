@@ -80,7 +80,7 @@ func TestAdyenAuthFullCapture(t *testing.T) {
 	}
 
 	captureRequest := &sleet.CaptureRequest{
-		Amount: &authRequest.Amount,
+		Amount:               &authRequest.Amount,
 		TransactionReference: auth.TransactionReference,
 	}
 	capture, err := client.Capture(captureRequest)
@@ -110,7 +110,7 @@ func TestAdyenAuthPartialCapture(t *testing.T) {
 
 	captureRequest := &sleet.CaptureRequest{
 		Amount: &sleet.Amount{
-			Amount: 50,
+			Amount:   50,
 			Currency: "USD",
 		},
 		TransactionReference: auth.TransactionReference,
@@ -169,7 +169,7 @@ func TestAdyenAuthCaptureRefund(t *testing.T) {
 	}
 
 	captureRequest := &sleet.CaptureRequest{
-		Amount: &authRequest.Amount,
+		Amount:               &authRequest.Amount,
 		TransactionReference: auth.TransactionReference,
 	}
 	capture, err := client.Capture(captureRequest)
@@ -182,7 +182,7 @@ func TestAdyenAuthCaptureRefund(t *testing.T) {
 	}
 
 	refundRequest := &sleet.RefundRequest{
-		Amount: &authRequest.Amount,
+		Amount:               &authRequest.Amount,
 		TransactionReference: capture.TransactionReference,
 	}
 

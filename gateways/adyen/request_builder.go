@@ -28,31 +28,31 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 
 func buildCaptureRequest(captureRequest *sleet.CaptureRequest, merchantAccount string) *adyen.Capture {
 	request := &adyen.Capture{
-		OriginalReference:  captureRequest.TransactionReference,
+		OriginalReference: captureRequest.TransactionReference,
 		ModificationAmount: &adyen.Amount{
 			Value:    float32(captureRequest.Amount.Amount),
 			Currency: captureRequest.Amount.Currency,
 		},
-		MerchantAccount:    merchantAccount,
+		MerchantAccount: merchantAccount,
 	}
 	return request
 }
 
 func buildRefundRequest(refundRequest *sleet.RefundRequest, merchantAccount string) *adyen.Refund {
 	request := &adyen.Refund{
-		OriginalReference:  refundRequest.TransactionReference,
+		OriginalReference: refundRequest.TransactionReference,
 		ModificationAmount: &adyen.Amount{
 			Value:    float32(refundRequest.Amount.Amount),
 			Currency: refundRequest.Amount.Currency,
-		},		MerchantAccount:    merchantAccount,
+		}, MerchantAccount: merchantAccount,
 	}
 	return request
 }
 
 func buildVoidRequest(voidRequest *sleet.VoidRequest, merchantAccount string) *adyen.Cancel {
 	request := &adyen.Cancel{
-		OriginalReference:  voidRequest.TransactionReference,
-		MerchantAccount:    merchantAccount,
+		OriginalReference: voidRequest.TransactionReference,
+		MerchantAccount:   merchantAccount,
 	}
 	return request
 }
