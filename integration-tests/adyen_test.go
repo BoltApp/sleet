@@ -1,7 +1,6 @@
 package test
 
 import (
-	"fmt"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/gateways/adyen"
 	sleet_testing "github.com/BoltApp/sleet/testing"
@@ -43,7 +42,7 @@ func TestAdyenExpiredCard(t *testing.T) {
 	if auth.Success == true {
 		t.Error("Resulting auth should not have been successful")
 	}
-	fmt.Printf("auth: %+v", auth)
+
 	if auth.ErrorCode != "Expired Card" {
 		t.Error("Response should have been Expired Card")
 	}
