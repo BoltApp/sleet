@@ -1,5 +1,8 @@
 package sleet
 
+// Client defines the Sleet interface which takes in a generic request and returns a generic response
+// The translations for each specific PsP takes place in the corresponding gateways/<PsP> folders
+// The four supported methods are Auth, Capture, Void, Refund
 type Client interface {
 	Authorize(request *AuthorizationRequest) (*AuthorizationResponse, error)
 	Capture(request *CaptureRequest) (*CaptureResponse, error)
@@ -7,11 +10,13 @@ type Client interface {
 	Refund(request *RefundRequest) (*RefundResponse, error)
 }
 
+// Amount specifies both quantity and currency
 type Amount struct {
 	Amount   int64
 	Currency string
 }
 
+// BillingAddress used for AVS checks for auth calls
 type BillingAddress struct {
 	StreetAddress1 *string
 	StreetAddress2 *string
@@ -23,6 +28,7 @@ type BillingAddress struct {
 	Email          *string
 }
 
+// CreditCard represents raw credit card information
 type CreditCard struct {
 	FirstName       string
 	LastName        string
@@ -32,6 +38,7 @@ type CreditCard struct {
 	CVV             string
 }
 
+// LineItem is used for Level3 Processing if enabled (not default). Specifies information per item in the order
 type LineItem struct {
 	Description        string
 	ProductCode        string
@@ -44,6 +51,7 @@ type LineItem struct {
 	CommodityCode      string
 }
 
+// Level3Data contains all of the information needed for Level3 processing including LineItems
 type Level3Data struct {
 	CustomerReference      string
 	TaxAmount              Amount
@@ -56,6 +64,9 @@ type Level3Data struct {
 	LineItems              []LineItem
 }
 
+// AuthorizationRequest specifies needed information for request to authorize by PsPs
+// Note: Only credit cards are supported
+// Note: Options is a generic key-value pair that can be used to provide additional information to PsP
 type AuthorizationRequest struct {
 	Amount                     Amount
 	CreditCard                 *CreditCard
@@ -65,6 +76,9 @@ type AuthorizationRequest struct {
 	Options                    map[string]interface{}
 }
 
+// AuthorizationResponse is a generic response returned back to client after data massaging from PsP Response
+// The raw AVS and CVV are included if applicable
+// Success is true if Auth went through successfully
 type AuthorizationResponse struct {
 	// Raw fields contain the untranslated responses from processors, while
 	// the non-raw fields are the best parsings to a single standard, with
@@ -80,29 +94,34 @@ type AuthorizationResponse struct {
 	CvvResultRaw         string
 }
 
+// CaptureRequest specifies the authorized transaction to capture and also an amount for partial capture use cases
 type CaptureRequest struct {
 	Amount                     *Amount
 	TransactionReference       string
 	ClientTransactionReference *string // Custom transaction reference metadata that will be associated with this request
 }
 
+// CaptureResponse will have Success be true if transaction is captured and also a reference to be used for subsequent operations
 type CaptureResponse struct {
 	Success              bool
 	TransactionReference string
 	ErrorCode            *string
 }
 
+// VoidRequest cancels an authorized transaction
 type VoidRequest struct {
 	TransactionReference       string
 	ClientTransactionReference *string // Custom transaction reference metadata that will be associated with this request
 }
 
+// VoidResponse also specifies a transaction reference if PsP uses different transaction references for different states
 type VoidResponse struct {
 	Success              bool
 	TransactionReference string
 	ErrorCode            *string
 }
 
+// RefundRequest for refunding a captured transaction with generic Options and amount to be refunded
 type RefundRequest struct {
 	Amount                     *Amount
 	TransactionReference       string
@@ -110,6 +129,7 @@ type RefundRequest struct {
 	Options                    map[string]interface{}
 }
 
+// RefundResponse indicating if request went through successfully
 type RefundResponse struct {
 	Success              bool
 	TransactionReference string

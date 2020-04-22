@@ -4,6 +4,7 @@ package sleet
 type CVVResponse int
 
 const (
+	// CVVResponseUnknown Unknown CVV code returned by processor
 	CVVResponseUnknown            CVVResponse = iota // Unknown CVV code returned by processor
 	CVVResponseNoResponse                            // No verification response was given
 	CVVResponseError                                 // An error prevented verification (e.g. data validation check failed)

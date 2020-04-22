@@ -4,7 +4,8 @@ package sleet
 type AVSResponse int
 
 const (
-	AVSResponseUnknown     AVSResponse = iota // An unknown AVS response was returned by the processor.
+	// AVSResponseUnknown an unknown AVS response was returned by the processor.
+	AVSResponseUnknown     AVSResponse = iota
 	AVSResponseError                          // The AVS is unavailable due to a system error.
 	AVSResponseUnsupported                    // The issuing bank does not support AVS.
 	AVSResponseSkipped                        // Verification was not performed for this transaction.

@@ -1,6 +1,6 @@
 package cybersource
 
-// Should we just combine these to one Request and have pointers?
+// Request contains the information needed for all request types (Auth, Capture, Void, Refund)
 type Request struct {
 	ClientReferenceInformation *ClientReferenceInformation `json:"clientReferenceInformation,omitempty"`
 	ProcessingInformation      *ProcessingInformation      `json:"processingInformation,omitempty"`
@@ -8,6 +8,7 @@ type Request struct {
 	PaymentInformation         *PaymentInformation         `json:"paymentInformation,omitempty"`
 }
 
+// Response contains all of the fields for all Cybersource API call responses
 type Response struct {
 	Links                      *Links                      `json:"_links,omitempty"`
 	ID                         *string                     `json:"id,omitempty"`
@@ -37,11 +38,13 @@ type Detail struct {
 	Reason string `json:"reason"`
 }
 
+// ClientReferenceInformation is used by the client to identify transactions on their side to tie with Cybersource transactions
 type ClientReferenceInformation struct {
 	Code          string `json:"code"`
 	TransactionID string `json:"transactionID"`
 }
 
+// ProcessorInformation contains processor specific responses sent back primarily through authorize call
 type ProcessorInformation struct {
 	ApprovalCode     string `json:"approvalCode"`
 	CardVerification struct {
@@ -54,6 +57,7 @@ type ProcessorInformation struct {
 	} `json:"avs"`
 }
 
+// ProcessingInformation specifies various fields for authorize for options (auto-capture, Level3 Data, etc)
 type ProcessingInformation struct {
 	Capture           bool   `json:"capture,omitempty"`
 	CommerceIndicator string `json:"commerceIndicator"` // typically internet
@@ -61,6 +65,7 @@ type ProcessingInformation struct {
 	PurchaseLevel     string `json:"purchaseLevel,omitempty"` // Specifies if level 3 data is being sent
 }
 
+// OrderInformation is also used for authorize mainly to specify billing details and other Level3 items
 type OrderInformation struct {
 	BillTo        BillingInformation `json:"billTo"`
 	AmountDetails AmountDetails      `json:"amountDetails"`
@@ -68,6 +73,7 @@ type OrderInformation struct {
 	ShipTo        ShippingDetails    `json:"shipTo,omitempty"`    // Level 3 field
 }
 
+// BillingInformation contains billing address for auth call
 type BillingInformation struct {
 	FirstName  string `json:"firstName"`
 	LastName   string `json:"lastName"`
@@ -82,6 +88,7 @@ type BillingInformation struct {
 	Email      string `json:"email,omitempty"`
 }
 
+// AmountDetails specifies various amount, currency information for auth calls
 type AmountDetails struct {
 	AuthorizedAmount string `json:"authorizedAmount,omitempty"`
 	Amount           string `json:"totalAmount,omitempty"`
@@ -92,6 +99,7 @@ type AmountDetails struct {
 	DutyAmount       string `json:"dutyAmount,omitempty"`     // Level 3 field
 }
 
+// LineItem is a Level3 data field to specify additional info per item for lower processing rates. This is not a default
 type LineItem struct {
 	ProductCode    string `json:"productCode"`
 	ProductName    string `json:"productName"`
@@ -104,6 +112,7 @@ type LineItem struct {
 	TaxAmount      string `json:"taxAmount"`
 }
 
+// ShippingDetails contains shipping information that can be used for Authorization signals
 type ShippingDetails struct {
 	FirstName      string `json:"firstName,omitempty"`
 	LastName       string `json:"lastName,omitempty"`
@@ -119,10 +128,12 @@ type ShippingDetails struct {
 	Company        string `json:"company,omitempty"`
 }
 
+// PaymentInformation just stores Card information (but can be extended to other payment types)
 type PaymentInformation struct {
 	Card CardInformation `json:"card"`
 }
 
+// CardInformation stores raw credit card details
 type CardInformation struct {
 	ExpYear  string `json:"expirationYear"`
 	ExpMonth string `json:"expirationMonth"`
@@ -130,6 +141,7 @@ type CardInformation struct {
 	CVV      string `json:"securityCode"`
 }
 
+// Links are part of the response which specify URLs to hit via REST to take follow-up actions (capture, void, etc)
 type Links struct {
 	Self         *Link `json:"self,omitempty"`
 	AuthReversal *Link `json:"authReversal,omitempty"`
@@ -138,6 +150,7 @@ type Links struct {
 	Void         *Link `json:"void,omitempty"`
 }
 
+// Link specifies the REST Method (POST, GET) and string URL to hit
 type Link struct {
 	Href   string `json:"href"`
 	Method string `json:"method"`

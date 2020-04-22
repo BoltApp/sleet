@@ -5,6 +5,7 @@ import (
 	"github.com/Pallinder/go-randomdata"
 )
 
+// BaseAuthorizationRequest is used as a testing helper method to standardize request calls for integration tests
 func BaseAuthorizationRequest() *sleet.AuthorizationRequest {
 	amount := sleet.Amount{
 		Amount:   100,
