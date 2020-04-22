@@ -3,13 +3,13 @@ package test
 import (
 	"fmt"
 	"github.com/BoltApp/sleet"
-	"github.com/BoltApp/sleet/gateways/authorize_net"
+	"github.com/BoltApp/sleet/gateways/authorizenet"
 	sleet_testing "github.com/BoltApp/sleet/testing"
 	"testing"
 )
 
 func TestAuthNet(t *testing.T) {
-	client := authorize_net.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"))
+	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"))
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	resp, err := client.Authorize(authRequest)
 	fmt.Printf("resp: [%+v] err [%s]\n", resp, err)

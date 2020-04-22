@@ -10,6 +10,8 @@ import (
 
 var baseURL = "https://pal-test.adyen.com/pal/servlet/Payment/v51"
 
+// AdyenClient represents the authentication fields needed to make API Requests for a given environment
+// Client functions return error for http error and will return Success=true if action is performed successfully
 // You can create new API user there: https://ca-test.adyen.com/ca/ca/config/users.shtml
 type AdyenClient struct {
 	merchantAccount string
@@ -19,10 +21,12 @@ type AdyenClient struct {
 	httpClient      *http.Client
 }
 
+// NewClient creates an Adyen client with creds and default http client
 func NewClient(env adyen.Environment, username string, merchantAccount string, password string) *AdyenClient {
 	return NewWithHTTPClient(env, username, merchantAccount, password, common.DefaultHttpClient())
 }
 
+// NewWithHTTPClient creates an Adyen client with creds and user specified http client for custom behavior
 func NewWithHTTPClient(env adyen.Environment, username string, merchantAccount string, password string, httpClient *http.Client) *AdyenClient {
 	return &AdyenClient{
 		environment:     env,
@@ -33,6 +37,7 @@ func NewWithHTTPClient(env adyen.Environment, username string, merchantAccount s
 	}
 }
 
+// Authorize through Adyen gateway. This transaction must be captured for funds to be received
 func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	paymentGateway := adyen.PaymentGateway{
 		adyen.New(client.environment, client.username, client.password, adyen.WithTransport(client.httpClient.Transport)),
@@ -54,6 +59,7 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 	}, nil
 }
 
+// Capture an existing transaction by reference
 func (client *AdyenClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	modificationGateway := adyen.ModificationGateway{
 		adyen.New(client.environment, client.username, client.password, adyen.WithTransport(client.httpClient.Transport)),
@@ -68,6 +74,7 @@ func (client *AdyenClient) Capture(request *sleet.CaptureRequest) (*sleet.Captur
 	}, nil
 }
 
+// Refund a captured transaction by reference with specified amount
 func (client *AdyenClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
 	modificationGateway := adyen.ModificationGateway{
 		adyen.New(client.environment, client.username, client.password, adyen.WithTransport(client.httpClient.Transport)),
@@ -82,6 +89,7 @@ func (client *AdyenClient) Refund(request *sleet.RefundRequest) (*sleet.RefundRe
 	}, nil
 }
 
+// Void an authorized transaction (cancels the authorization)
 func (client *AdyenClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
 	modificationGateway := adyen.ModificationGateway{
 		adyen.New(client.environment, client.username, client.password, adyen.WithTransport(client.httpClient.Transport)),

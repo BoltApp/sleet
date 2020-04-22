@@ -43,21 +43,26 @@ var (
 	}
 )
 
+// Credentials specifies account information needed to make API calls to Braintree
 type Credentials struct {
 	MerchantID string
 	PublicKey  string
 	PrivateKey string
 }
 
+// BraintreeClient uses creds and httpClient to make calls to Braintree service
+// Client functions return error for http error and will return Success=true if action is performed successfully
 type BraintreeClient struct {
 	credentials *Credentials
 	httpClient  *http.Client
 }
 
+// NewClient creates a Braintree client with creds and default http client
 func NewClient(credentials *Credentials) *BraintreeClient {
 	return NewWithHttpClient(credentials, defaultClient)
 }
 
+// NewWithHTTPClient creates a Braintree client with creds and user specified http client for custom behavior
 func NewWithHttpClient(credentials *Credentials, httpClient *http.Client) *BraintreeClient {
 	return &BraintreeClient{
 		credentials: credentials,
@@ -65,6 +70,7 @@ func NewWithHttpClient(credentials *Credentials, httpClient *http.Client) *Brain
 	}
 }
 
+// Authorize a transaction. This transaction must be captured to receive funds
 func (client *BraintreeClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	transaction, responseCode, err := client.sendRequest(*buildAuthRequest(request))
 	if err != nil {
@@ -82,16 +88,19 @@ func (client *BraintreeClient) Authorize(request *sleet.AuthorizationRequest) (*
 	}, nil
 }
 
+// Capture an authorized transaction with reference
 func (client *BraintreeClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	// TODO
 	return nil, nil
 }
 
+// Void an authorized transaction with reference (cancels void)
 func (client *BraintreeClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
 	// TODO
 	return nil, nil
 }
 
+// Refund a captured transaction with reference and specified amount
 func (client *BraintreeClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
 	// TODO
 	return nil, nil

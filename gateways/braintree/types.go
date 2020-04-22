@@ -3,15 +3,18 @@ package braintree
 import "time"
 
 const (
+	// TransactionTypeSale is for new, e-commerce transactions. This is the only transaction type supported
 	TransactionTypeSale = "sale"
 )
 
+// CreditCard represents raw CC in Braintree
 type CreditCard struct {
 	Number         string `xml:"number,omitempty"`
 	ExpirationDate string `xml:"expiration-date,omitempty"`
 	CVV            string `xml:"cvv,omitempty"`
 }
 
+// Address is used for Auth request
 type Address struct {
 	FirstName         string  `xml:"first-name,omitempty"`
 	LastName          string  `xml:"last-name,omitempty"`
@@ -22,6 +25,7 @@ type Address struct {
 	CountryCodeAlpha2 *string `xml:"country-code-alpha2,omitempty"`
 }
 
+// TransactionRequest is used to start an authorization request for BT
 type TransactionRequest struct {
 	XMLName        string      `xml:"transaction"`
 	Type           string      `xml:"type,omitempty"`
@@ -31,6 +35,7 @@ type TransactionRequest struct {
 	BillingAddress *Address    `xml:"billing,omitempty"`
 }
 
+// Transaction is the response object back from Braintree authorization call
 type Transaction struct {
 	ID                           string      `xml:"id"`
 	Status                       string      `xml:"status"`

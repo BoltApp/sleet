@@ -2,7 +2,7 @@ package sleet
 
 import "fmt"
 
-// Convert string with floating point eg 12.34.
+// AmountToString converts string with floating point eg 12.34.
 func AmountToString(amount *Amount) string {
 	switch amount.Currency {
 	case "USD":

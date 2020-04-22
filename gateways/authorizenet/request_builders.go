@@ -1,4 +1,4 @@
-package authorize_net
+package authorizenet
 
 import (
 	"errors"

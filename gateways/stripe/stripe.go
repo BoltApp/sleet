@@ -13,6 +13,7 @@ import (
 	"github.com/stripe/stripe-go/refund"
 )
 
+// StripeClient uses API-Key and custom http client to make http calls
 type StripeClient struct {
 	apiKey     string
 	httpClient *http.Client
@@ -27,10 +28,12 @@ var defaultHttpClient = &http.Client{
 	},
 }
 
+// NewClient uses default http client with provided Stripe API Key
 func NewClient(apiKey string) *StripeClient {
 	return NewWithHTTPClient(apiKey, defaultHttpClient)
 }
 
+// NewWithHTTPClient uses a custom http client for requests
 func NewWithHTTPClient(apiKey string, httpClient *http.Client) *StripeClient {
 	// set the Stripe global key for requests
 	stripe.Key = apiKey
@@ -40,6 +43,7 @@ func NewWithHTTPClient(apiKey string, httpClient *http.Client) *StripeClient {
 	}
 }
 
+// Authorize a transaction for specified amount using stripe-go library
 func (client *StripeClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	chargeClient := charge.Client{B: stripe.GetBackend(stripe.APIBackend), Key: client.apiKey}
 	charge, err := chargeClient.New(buildChargeParams(request))
@@ -55,6 +59,7 @@ func (client *StripeClient) Authorize(request *sleet.AuthorizationRequest) (*sle
 		CvvResultRaw:         string(charge.Source.Card.CVCCheck)}, nil
 }
 
+// Capture an authorized transaction by charge ID
 func (client *StripeClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	chargeClient := charge.Client{B: stripe.GetBackend(stripe.APIBackend), Key: client.apiKey}
 	capture, err := chargeClient.Capture(request.TransactionReference, buildCaptureParams(request))
@@ -64,6 +69,7 @@ func (client *StripeClient) Capture(request *sleet.CaptureRequest) (*sleet.Captu
 	return &sleet.CaptureResponse{Success: true, TransactionReference: capture.ID}, nil
 }
 
+// Refund a captured transaction with amount and charge ID
 func (client *StripeClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
 	refundClient := refund.Client{B: stripe.GetBackend(stripe.APIBackend), Key: client.apiKey}
 	refund, err := refundClient.New(buildRefundParams(request))
@@ -73,6 +79,7 @@ func (client *StripeClient) Refund(request *sleet.RefundRequest) (*sleet.RefundR
 	return &sleet.RefundResponse{Success: true, TransactionReference: refund.ID}, nil
 }
 
+// Void an authorized transaction with charge ID
 func (client *StripeClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
 	voidClient := refund.Client{B: stripe.GetBackend(stripe.APIBackend), Key: client.apiKey}
 	void, err := voidClient.New(buildVoidParams(request))

@@ -9,6 +9,7 @@ func SafeStr(s *string) string {
 	return *s
 }
 
+// SPtr returns a pointer to the string value s
 func SPtr(s string) *string {
 	return &s
 }
