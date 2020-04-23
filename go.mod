@@ -12,4 +12,4 @@ require (
 	golang.org/x/text v0.3.2 // indirect
 )
 
-replace github.com/zhutik/adyen-api-go => github.com/nirajjayantbolt/adyen-api-go latest
+replace github.com/zhutik/adyen-api-go => github.com/nirajjayantbolt/adyen-api-go v0.0.0-20200423184816-b6dcef6e5e54
