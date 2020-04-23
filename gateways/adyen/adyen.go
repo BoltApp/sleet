@@ -1,11 +1,11 @@
 package adyen
 
 import (
+	"github.com/zhutik/adyen-api-go"
 	"net/http"
 
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
-	"github.com/zhutik/adyen-api-go"
 )
 
 var baseURL = "https://pal-test.adyen.com/pal/servlet/Payment/v51"
