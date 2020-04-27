@@ -2,6 +2,7 @@ package test
 
 import (
 	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
 	"github.com/BoltApp/sleet/gateways/adyen"
 	sleet_testing "github.com/BoltApp/sleet/testing"
 	adyen_go "github.com/zhutik/adyen-api-go"
@@ -45,6 +46,74 @@ func TestAdyenExpiredCard(t *testing.T) {
 
 	if auth.ErrorCode != "Expired Card" {
 		t.Error("Response should have been Expired Card")
+	}
+}
+
+// TestAdyenAVSCode1
+//
+// This test should test for Adyen AVS Code: 1 Address matches, postal code doesn't
+// Test addresses found from here
+// https://docs.adyen.com/development-resources/test-cards/test-card-numbers#test-address-verification-system-avs
+func TestAdyenAVSCode1(t *testing.T) {
+	client := adyen.NewClient(adyen_go.Testing, getEnv("ADYEN_USERNAME"), getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_PASSWORD"))
+	avsRequest := sleet_testing.BaseAuthorizationRequest()
+	avsRequest.CreditCard.Number = "5500000000000004"
+	avsRequest.BillingAddress = &sleet.BillingAddress{
+		StreetAddress1: common.SPtr("1600 Pennsylvania Ave NE"),
+		Locality: common.SPtr("Washington"),
+		CountryCode: common.SPtr("US"),
+		RegionCode: common.SPtr("DC"),
+		PostalCode: common.SPtr("20501"),
+	}
+	auth, err := client.Authorize(avsRequest)
+	if err != nil {
+		t.Error("Authorize request should not have failed with wrong address info")
+	}
+
+	if auth.Success != true {
+		t.Error("Resulting auth should have been successful")
+	}
+
+	if auth.AvsResult != sleet.AVSResponseZipNoMatchAddressMatch {
+		t.Error("AVS Result should have been zip no match but address match")
+	}
+
+	if auth.AvsResultRaw != "1" {
+		t.Error("AVS Result Raw should have been code 1")
+	}
+}
+
+// TestAdyenAVSCode2
+//
+// This test should test for Adyen AVS Code: 2 Neither postal code nor address match
+// Test addresses found from here
+// https://docs.adyen.com/development-resources/test-cards/test-card-numbers#test-address-verification-system-avs
+func TestAdyenAVSCode2(t *testing.T) {
+	client := adyen.NewClient(adyen_go.Testing, getEnv("ADYEN_USERNAME"), getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_PASSWORD"))
+	avsRequest := sleet_testing.BaseAuthorizationRequest()
+	avsRequest.CreditCard.Number = "5500000000000004"
+	avsRequest.BillingAddress = &sleet.BillingAddress{
+		StreetAddress1: common.SPtr("1599 Pennsylvania Ave NE"),
+		Locality: common.SPtr("Washington"),
+		CountryCode: common.SPtr("US"),
+		RegionCode: common.SPtr("DC"),
+		PostalCode: common.SPtr("20501"),
+	}
+	auth, err := client.Authorize(avsRequest)
+	if err != nil {
+		t.Error("Authorize request should not have failed with wrong address info")
+	}
+
+	if auth.Success != true {
+		t.Error("Resulting auth should have been successful")
+	}
+
+	if auth.AvsResult != sleet.AVSResponseNoMatch {
+		t.Error("AVS Result should have been no match")
+	}
+
+	if auth.AvsResultRaw != "2" {
+		t.Error("AVS Result Raw should have been code 2")
 	}
 }
 

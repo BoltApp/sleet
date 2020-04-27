@@ -51,12 +51,18 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 		return &sleet.AuthorizationResponse{Success: false, TransactionReference: auth.PspReference, ErrorCode: auth.RefusalReason}, nil
 	}
 
-	return &sleet.AuthorizationResponse{
+	response := &sleet.AuthorizationResponse{
 		Success:              true,
 		TransactionReference: auth.PspReference,
-		AvsResult:            sleet.AVSresponseZipMatchAddressMatch, // TODO: Add translator
-		CvvResult:            sleet.CVVResponseMatch,                // TODO: Add translator
-	}, nil
+	}
+
+	if auth.AdditionalData != nil {
+		response.AvsResult = translateAvs(auth.AdditionalData.AVSResult)
+		response.CvvResult = translateCvv(auth.AdditionalData.CVCResult)
+		response.AvsResultRaw = auth.AdditionalData.AVSResultRaw
+		response.CvvResultRaw = auth.AdditionalData.CVCResultRaw
+	}
+	return response, nil
 }
 
 // Capture an existing transaction by reference

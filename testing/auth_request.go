@@ -2,6 +2,7 @@ package testing
 
 import (
 	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
 	"github.com/Pallinder/go-randomdata"
 )
 
@@ -11,8 +12,13 @@ func BaseAuthorizationRequest() *sleet.AuthorizationRequest {
 		Amount:   100,
 		Currency: "USD",
 	}
-	postalCode := "94103"
-	address := sleet.BillingAddress{PostalCode: &postalCode}
+	address := sleet.BillingAddress{
+		PostalCode: common.SPtr("94103"),
+		CountryCode: common.SPtr("US"),
+		StreetAddress1: common.SPtr("7683 Railroad Street"),
+		Locality: common.SPtr("Zion"),
+		RegionCode: common.SPtr("IL"),
+	}
 	card := sleet.CreditCard{
 		FirstName:       "Bolt",
 		LastName:        "Checkout",

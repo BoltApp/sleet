@@ -2,6 +2,7 @@ package adyen
 
 import (
 	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
 	"github.com/zhutik/adyen-api-go"
 	"strconv"
 )
@@ -22,6 +23,16 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 			HolderName:  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
 		},
 		MerchantAccount: merchantAccount,
+	}
+	if authRequest.BillingAddress != nil {
+		request.BillingAddress = &adyen.Address{
+			City:              common.SafeStr(authRequest.BillingAddress.Locality),
+			Country:           common.SafeStr(authRequest.BillingAddress.CountryCode),
+			HouseNumberOrName: common.SafeStr(authRequest.BillingAddress.StreetAddress2),
+			PostalCode:        common.SafeStr(authRequest.BillingAddress.PostalCode),
+			StateOrProvince:   common.SafeStr(authRequest.BillingAddress.RegionCode),
+			Street:            common.SafeStr(authRequest.BillingAddress.StreetAddress1),
+		}
 	}
 	return request
 }
