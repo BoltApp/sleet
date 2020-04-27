@@ -135,3 +135,8 @@ type RefundResponse struct {
 	TransactionReference string
 	ErrorCode            *string
 }
+
+type Currency struct {
+	Precision int
+	Symbol    string
+}
