@@ -55,10 +55,10 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 		Success:              true,
 		TransactionReference: auth.PspReference,
 	}
-
+	
 	if auth.AdditionalData != nil {
-		response.AvsResult = translateAvs(auth.AdditionalData.AVSResultRaw)
-		response.CvvResult = translateCvv(auth.AdditionalData.CVCResultRaw)
+		response.AvsResult = translateAvs(auth.AdditionalData.AVSResult)
+		response.CvvResult = translateCvv(auth.AdditionalData.CVCResult)
 		response.AvsResultRaw = auth.AdditionalData.AVSResultRaw
 		response.CvvResultRaw = auth.AdditionalData.CVCResultRaw
 	}

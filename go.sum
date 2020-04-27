@@ -8,8 +8,8 @@ github.com/jarcoal/httpmock v1.0.4 h1:jp+dy/+nonJE4g4xbVtl9QdrUNbn6/3hDT5R4nDIZn
 github.com/jarcoal/httpmock v1.0.4/go.mod h1:ATjnClrvW/3tijVmpL/va5Z3aAyGvqU3gCT8nX0Txik=
 github.com/joho/godotenv v1.3.0 h1:Zjp+RcGpHhGlrMbJzXTrZZPrWj+1vfm90La1wgB6Bhc=
 github.com/joho/godotenv v1.3.0/go.mod h1:7hK45KPybAkOC6peb+G5yklZfMxEjkZhHbwpqxOKXbg=
-github.com/nirajjayantbolt/adyen-api-go v0.0.0-20200423184816-b6dcef6e5e54 h1:xDYPk/Bo57R80RBmSew/Yw4RUvkNvHgwSx5HroYuWJo=
-github.com/nirajjayantbolt/adyen-api-go v0.0.0-20200423184816-b6dcef6e5e54/go.mod h1:nj1/4ToOYhxSkLmx0TCrWMSSoNhPSxdon+bf3FWpANs=
+github.com/nirajjayantbolt/adyen-api-go v0.0.0-20200427202302-d60958b1d31e h1:4DXAEnKnczqKvWUGDIsn4lX4V/VvmAlSqZNB7Br5Gqk=
+github.com/nirajjayantbolt/adyen-api-go v0.0.0-20200427202302-d60958b1d31e/go.mod h1:nj1/4ToOYhxSkLmx0TCrWMSSoNhPSxdon+bf3FWpANs=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
