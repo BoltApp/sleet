@@ -105,8 +105,8 @@ func TestBraintreeAuthPartialCapture(t *testing.T) {
 	}
 
 	captureRequest := &sleet.CaptureRequest{
-		Amount:               &sleet.Amount{
-			Amount: 50,
+		Amount: &sleet.Amount{
+			Amount:   50,
 			Currency: "USD",
 		},
 		TransactionReference: auth.TransactionReference,
@@ -188,7 +188,7 @@ func TestBraintreeAuthCaptureRefund(t *testing.T) {
 	}
 
 	// HACK - put the transaction in a settled state
-	testGateway := braintree_go.New(braintree_go.Sandbox, getEnv("BRAINTREE_MERCHANT_ID"), getEnv("BRAINTREE_PUBLIC_KEY"),getEnv("BRAINTREE_PRIVATE_KEY") )
+	testGateway := braintree_go.New(braintree_go.Sandbox, getEnv("BRAINTREE_MERCHANT_ID"), getEnv("BRAINTREE_PUBLIC_KEY"), getEnv("BRAINTREE_PRIVATE_KEY"))
 	testGateway.Testing().Settle(context.TODO(), capture.TransactionReference)
 
 	refundRequest := &sleet.RefundRequest{

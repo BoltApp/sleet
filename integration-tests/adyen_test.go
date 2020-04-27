@@ -60,10 +60,10 @@ func TestAdyenAVSCode1(t *testing.T) {
 	avsRequest.CreditCard.Number = "5500000000000004"
 	avsRequest.BillingAddress = &sleet.BillingAddress{
 		StreetAddress1: common.SPtr("1600 Pennsylvania Ave NE"),
-		Locality: common.SPtr("Washington"),
-		CountryCode: common.SPtr("US"),
-		RegionCode: common.SPtr("DC"),
-		PostalCode: common.SPtr("20501"),
+		Locality:       common.SPtr("Washington"),
+		CountryCode:    common.SPtr("US"),
+		RegionCode:     common.SPtr("DC"),
+		PostalCode:     common.SPtr("20501"),
 	}
 	auth, err := client.Authorize(avsRequest)
 	if err != nil {
@@ -94,10 +94,10 @@ func TestAdyenAVSCode2(t *testing.T) {
 	avsRequest.CreditCard.Number = "5500000000000004"
 	avsRequest.BillingAddress = &sleet.BillingAddress{
 		StreetAddress1: common.SPtr("1599 Pennsylvania Ave NE"),
-		Locality: common.SPtr("Washington"),
-		CountryCode: common.SPtr("US"),
-		RegionCode: common.SPtr("DC"),
-		PostalCode: common.SPtr("20501"),
+		Locality:       common.SPtr("Washington"),
+		CountryCode:    common.SPtr("US"),
+		RegionCode:     common.SPtr("DC"),
+		PostalCode:     common.SPtr("20501"),
 	}
 	auth, err := client.Authorize(avsRequest)
 	if err != nil {

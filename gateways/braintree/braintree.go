@@ -13,7 +13,6 @@ import (
 	braintree_go "github.com/braintree-go/braintree-go"
 )
 
-
 var (
 	// make sure to use TLS1.2
 	// https://github.com/braintree-go/braintree-go/blob/a7114170e0095deebe5202ddb07e1bfdb6fcf8d8/braintree.go#L28
@@ -82,7 +81,7 @@ func (client *BraintreeClient) Authorize(request *sleet.AuthorizationRequest) (*
 	return &sleet.AuthorizationResponse{
 		Success:              auth.Status == braintree_go.TransactionStatusAuthorized,
 		TransactionReference: auth.Id,
-		Response: auth.ProcessorAuthorizationCode,
+		Response:             auth.ProcessorAuthorizationCode,
 		AvsResult:            sleet.AVSresponseZipMatchAddressMatch, // TODO: Add translator
 		CvvResult:            sleet.CVVResponseMatch,                // TODO: Add translator
 		AvsResultRaw:         avsResult,
@@ -113,11 +112,11 @@ func (client *BraintreeClient) Void(request *sleet.VoidRequest) (*sleet.VoidResp
 	void, err := btClient.Transaction().Void(context.TODO(), request.TransactionReference)
 	if err != nil {
 		return &sleet.VoidResponse{
-			Success:              false,
+			Success: false,
 		}, err
 	}
 	return &sleet.VoidResponse{
-		Success: true,
+		Success:              true,
 		TransactionReference: void.Id,
 	}, nil
 }
@@ -136,7 +135,7 @@ func (client *BraintreeClient) Refund(request *sleet.RefundRequest) (*sleet.Refu
 		}, err
 	}
 	return &sleet.RefundResponse{
-		Success: true,
+		Success:              true,
 		TransactionReference: refund.Id,
 	}, nil
 }
