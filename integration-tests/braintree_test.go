@@ -81,7 +81,7 @@ func TestBraintreeAuthCapture(t *testing.T) {
 		t.Error("Capture request should not have failed")
 	}
 
-	if capture.Success == false {
+	if !capture.Success {
 		t.Error("Resulting capture should have been successful")
 	}
 }
@@ -116,7 +116,7 @@ func TestBraintreeAuthPartialCapture(t *testing.T) {
 		t.Error("Capture request should not have failed")
 	}
 
-	if capture.Success == false {
+	if !capture.Success {
 		t.Error("Resulting capture should have been successful")
 	}
 }
@@ -136,7 +136,7 @@ func TestBraintreeAuthVoid(t *testing.T) {
 		t.Error("Authorize request should not have failed")
 	}
 
-	if auth.Success == false {
+	if !auth.Success {
 		t.Error("Resulting auth should have been successful")
 	}
 
@@ -148,7 +148,7 @@ func TestBraintreeAuthVoid(t *testing.T) {
 		t.Error("Void request should not have failed")
 	}
 
-	if void.Success == false {
+	if !void.Success {
 		t.Error("Resulting void should have been successful")
 	}
 }
@@ -170,7 +170,7 @@ func TestBraintreeAuthCaptureRefund(t *testing.T) {
 		t.Error("Authorize request should not have failed")
 	}
 
-	if auth.Success == false {
+	if !auth.Success {
 		t.Error("Resulting auth should have been successful")
 	}
 
@@ -183,7 +183,7 @@ func TestBraintreeAuthCaptureRefund(t *testing.T) {
 		t.Error("Capture request should not have failed")
 	}
 
-	if capture.Success == false {
+	if !capture.Success {
 		t.Error("Resulting capture should have been successful")
 	}
 
@@ -201,7 +201,63 @@ func TestBraintreeAuthCaptureRefund(t *testing.T) {
 		t.Error("Refund request should not have failed")
 	}
 
-	if refund.Success == false {
+	if !refund.Success {
+		t.Error("Resulting refund should have been successful")
+	}
+}
+
+// TestBraintreeAuthCapturePartialRefund
+//
+// This should successfully create an authorization on Braintree then Capture for full amount, then refund for partial amount
+// Note: There is a hack in here to put the transaction in a settled state so the refund can occur because Braintree
+// does not allow refunds for "Submitted for Settlement"
+func TestBraintreeAuthCapturePartialRefund(t *testing.T) {
+	client := braintree.NewClient(&braintree.Credentials{
+		MerchantID: getEnv("BRAINTREE_MERCHANT_ID"),
+		PublicKey:  getEnv("BRAINTREE_PUBLIC_KEY"),
+		PrivateKey: getEnv("BRAINTREE_PRIVATE_KEY"),
+	})
+	authRequest := sleet_testing.BaseAuthorizationRequest()
+	auth, err := client.Authorize(authRequest)
+	if err != nil {
+		t.Error("Authorize request should not have failed")
+	}
+
+	if !auth.Success {
+		t.Error("Resulting auth should have been successful")
+	}
+
+	captureRequest := &sleet.CaptureRequest{
+		Amount:               &authRequest.Amount,
+		TransactionReference: auth.TransactionReference,
+	}
+	capture, err := client.Capture(captureRequest)
+	if err != nil {
+		t.Error("Capture request should not have failed")
+	}
+
+	if !capture.Success {
+		t.Error("Resulting capture should have been successful")
+	}
+
+	// HACK - put the transaction in a settled state
+	testGateway := braintree_go.New(braintree_go.Sandbox, getEnv("BRAINTREE_MERCHANT_ID"), getEnv("BRAINTREE_PUBLIC_KEY"), getEnv("BRAINTREE_PRIVATE_KEY"))
+	testGateway.Testing().Settle(context.TODO(), capture.TransactionReference)
+
+	refundRequest := &sleet.RefundRequest{
+		Amount: &sleet.Amount{
+			Amount:   50,
+			Currency: "USD",
+		},
+		TransactionReference: capture.TransactionReference,
+	}
+
+	refund, err := client.Refund(refundRequest)
+	if err != nil {
+		t.Error("Refund request should not have failed")
+	}
+
+	if !refund.Success {
 		t.Error("Resulting refund should have been successful")
 	}
 }

@@ -23,6 +23,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*braintree_go.Tr
 			ExpirationDate: fmt.Sprintf("%02d/%02d", card.ExpirationMonth, card.ExpirationMonth%100),
 			CVV:            card.CVV,
 		},
+		OrderId: common.SafeStr(authRequest.ClientTransactionReference),
 	}
 
 	if billingAddress != nil {
