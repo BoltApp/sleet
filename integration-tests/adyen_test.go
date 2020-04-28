@@ -60,10 +60,10 @@ func TestAdyenAVSCode1(t *testing.T) {
 	avsRequest.CreditCard.Number = "5500000000000004"
 	avsRequest.BillingAddress = &sleet.BillingAddress{
 		StreetAddress1: common.SPtr("1600 Pennsylvania Ave NE"),
-		Locality: common.SPtr("Washington"),
-		CountryCode: common.SPtr("US"),
-		RegionCode: common.SPtr("DC"),
-		PostalCode: common.SPtr("20501"),
+		Locality:       common.SPtr("Washington"),
+		CountryCode:    common.SPtr("US"),
+		RegionCode:     common.SPtr("DC"),
+		PostalCode:     common.SPtr("20501"),
 	}
 	auth, err := client.Authorize(avsRequest)
 	if err != nil {
@@ -94,10 +94,10 @@ func TestAdyenAVSCode2(t *testing.T) {
 	avsRequest.CreditCard.Number = "5500000000000004"
 	avsRequest.BillingAddress = &sleet.BillingAddress{
 		StreetAddress1: common.SPtr("1599 Pennsylvania Ave NE"),
-		Locality: common.SPtr("Washington"),
-		CountryCode: common.SPtr("US"),
-		RegionCode: common.SPtr("DC"),
-		PostalCode: common.SPtr("20501"),
+		Locality:       common.SPtr("Washington"),
+		CountryCode:    common.SPtr("US"),
+		RegionCode:     common.SPtr("DC"),
+		PostalCode:     common.SPtr("20501"),
 	}
 	auth, err := client.Authorize(avsRequest)
 	if err != nil {
@@ -128,7 +128,7 @@ func TestAdyenAuth(t *testing.T) {
 		t.Error("Authorize request should not have failed")
 	}
 
-	if auth.Success == false {
+	if !auth.Success {
 		t.Error("Resulting auth should have been successful")
 	}
 }
@@ -144,7 +144,7 @@ func TestAdyenAuthFullCapture(t *testing.T) {
 		t.Error("Authorize request should not have failed")
 	}
 
-	if auth.Success == false {
+	if !auth.Success {
 		t.Error("Resulting auth should have been successful")
 	}
 
@@ -157,7 +157,7 @@ func TestAdyenAuthFullCapture(t *testing.T) {
 		t.Error("Capture request should not have failed")
 	}
 
-	if capture.Success == false {
+	if !capture.Success {
 		t.Error("Resulting capture should have been successful")
 	}
 }
@@ -173,7 +173,7 @@ func TestAdyenAuthPartialCapture(t *testing.T) {
 		t.Error("Authorize request should not have failed")
 	}
 
-	if auth.Success == false {
+	if !auth.Success {
 		t.Error("Resulting auth should have been successful")
 	}
 
@@ -189,7 +189,7 @@ func TestAdyenAuthPartialCapture(t *testing.T) {
 		t.Error("Capture request should not have failed")
 	}
 
-	if capture.Success == false {
+	if !capture.Success {
 		t.Error("Resulting capture should have been successful")
 	}
 }
@@ -205,7 +205,7 @@ func TestAdyenAuthVoid(t *testing.T) {
 		t.Error("Authorize request should not have failed")
 	}
 
-	if auth.Success == false {
+	if !auth.Success {
 		t.Error("Resulting auth should have been successful")
 	}
 
@@ -217,7 +217,7 @@ func TestAdyenAuthVoid(t *testing.T) {
 		t.Error("Void request should not have failed")
 	}
 
-	if void.Success == false {
+	if !void.Success {
 		t.Error("Resulting void should have been successful")
 	}
 }
@@ -233,7 +233,7 @@ func TestAdyenAuthCaptureRefund(t *testing.T) {
 		t.Error("Authorize request should not have failed")
 	}
 
-	if auth.Success == false {
+	if !auth.Success {
 		t.Error("Resulting auth should have been successful")
 	}
 
@@ -246,7 +246,7 @@ func TestAdyenAuthCaptureRefund(t *testing.T) {
 		t.Error("Capture request should not have failed")
 	}
 
-	if capture.Success == false {
+	if !capture.Success {
 		t.Error("Resulting capture should have been successful")
 	}
 
@@ -260,7 +260,7 @@ func TestAdyenAuthCaptureRefund(t *testing.T) {
 		t.Error("Refund request should not have failed")
 	}
 
-	if refund.Success == false {
+	if !refund.Success {
 		t.Error("Resulting refund should have been successful")
 	}
 }

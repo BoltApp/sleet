@@ -1,22 +1,16 @@
 package braintree
 
 import (
-	"bytes"
+	"context"
 	"crypto/tls"
-	"encoding/base64"
-	"encoding/xml"
 	"fmt"
-	"github.com/BoltApp/sleet"
-	"github.com/BoltApp/sleet/common"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"time"
-)
 
-const (
-	baseURL    = "https://api.sandbox.braintreegateway.com:443" // sandbox
-	apiVersion = "3"
+	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
+	braintree_go "github.com/braintree-go/braintree-go"
 )
 
 var (
@@ -44,6 +38,7 @@ var (
 )
 
 // Credentials specifies account information needed to make API calls to Braintree
+// TODO: Support taking in production environments as well
 type Credentials struct {
 	MerchantID string
 	PublicKey  string
@@ -72,80 +67,75 @@ func NewWithHttpClient(credentials *Credentials, httpClient *http.Client) *Brain
 
 // Authorize a transaction. This transaction must be captured to receive funds
 func (client *BraintreeClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
-	transaction, responseCode, err := client.sendRequest(*buildAuthRequest(request))
+	authRequest, err := buildAuthRequest(request)
 	if err != nil {
 		return nil, err
 	}
+	btClient := braintree_go.NewWithHttpClient(braintree_go.Sandbox, client.credentials.MerchantID, client.credentials.PublicKey, client.credentials.PrivateKey, client.httpClient)
+	auth, err := btClient.Transaction().Create(context.TODO(), authRequest)
+	if err != nil {
+		return &sleet.AuthorizationResponse{Success: false}, err
+	}
 
-	avsResult := fmt.Sprintf("%s:%s:%s", transaction.AVSErrorResponseCode, transaction.AVSStreetAddressResponseCode, transaction.AVSStreetAddressResponseCode)
+	avsResult := fmt.Sprintf("%s:%s:%s", auth.AVSErrorResponseCode, auth.AVSStreetAddressResponseCode, auth.AVSStreetAddressResponseCode)
 	return &sleet.AuthorizationResponse{
-		Success:              responseCode/100 == 2,
-		TransactionReference: transaction.ID,
+		Success:              auth.Status == braintree_go.TransactionStatusAuthorized,
+		TransactionReference: auth.Id,
+		Response:             auth.ProcessorAuthorizationCode,
 		AvsResult:            sleet.AVSresponseZipMatchAddressMatch, // TODO: Add translator
 		CvvResult:            sleet.CVVResponseMatch,                // TODO: Add translator
 		AvsResultRaw:         avsResult,
-		CvvResultRaw:         transaction.CVVResponseCode,
+		CvvResultRaw:         string(auth.CVVResponseCode),
 	}, nil
 }
 
-// Capture an authorized transaction with reference
+// Capture an authorized transaction with reference and amount
 func (client *BraintreeClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
-	// TODO
-	return nil, nil
+	amount, err := convertToBraintreeDecimal(request.Amount.Amount, request.Amount.Currency)
+	if err != nil {
+		return nil, err
+	}
+	btClient := braintree_go.NewWithHttpClient(braintree_go.Sandbox, client.credentials.MerchantID, client.credentials.PublicKey, client.credentials.PrivateKey, client.httpClient)
+	capture, err := btClient.Transaction().SubmitForSettlement(context.TODO(), request.TransactionReference, amount)
+	if err != nil {
+		return &sleet.CaptureResponse{Success: false, TransactionReference: ""}, err
+	}
+	return &sleet.CaptureResponse{
+		Success:              true,
+		TransactionReference: capture.Id,
+	}, nil
 }
 
 // Void an authorized transaction with reference (cancels void)
 func (client *BraintreeClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
-	// TODO
-	return nil, nil
+	btClient := braintree_go.NewWithHttpClient(braintree_go.Sandbox, client.credentials.MerchantID, client.credentials.PublicKey, client.credentials.PrivateKey, client.httpClient)
+	void, err := btClient.Transaction().Void(context.TODO(), request.TransactionReference)
+	if err != nil {
+		return &sleet.VoidResponse{
+			Success: false,
+		}, err
+	}
+	return &sleet.VoidResponse{
+		Success:              true,
+		TransactionReference: void.Id,
+	}, nil
 }
 
 // Refund a captured transaction with reference and specified amount
 func (client *BraintreeClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
-	// TODO
-	return nil, nil
-}
-
-func (client *BraintreeClient) getAuthHeader() string {
-	c := client.credentials
-	return "Basic " + base64.StdEncoding.EncodeToString([]byte(c.PublicKey+":"+c.PrivateKey))
-}
-
-func (client *BraintreeClient) sendRequest(data interface{}) (*Transaction, int, error) {
-	xmlBody, err := xml.MarshalIndent(data, "", " ")
+	amount, err := convertToBraintreeDecimal(request.Amount.Amount, request.Amount.Currency)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
-
-	url := fmt.Sprintf("%s/merchants/%s/transactions", baseURL, client.credentials.MerchantID)
-	request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(xmlBody))
+	btClient := braintree_go.NewWithHttpClient(braintree_go.Sandbox, client.credentials.MerchantID, client.credentials.PublicKey, client.credentials.PrivateKey, client.httpClient)
+	refund, err := btClient.Transaction().Refund(context.TODO(), request.TransactionReference, amount)
 	if err != nil {
-		return nil, 0, err
+		return &sleet.RefundResponse{
+			Success: false,
+		}, err
 	}
-
-	request.Header.Set("Content-Type", "application/xml")
-	request.Header.Set("User-Agent", common.UserAgent())
-	request.Header.Set("X-ApiVersion", apiVersion)
-	request.Header.Set("Authorization", client.getAuthHeader())
-
-	resp, err := client.httpClient.Do(request)
-	if err != nil {
-		return nil, 0, err
-	}
-	defer func() {
-		err := resp.Body.Close()
-		if err != nil {
-			// TODO log
-		}
-	}()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	fmt.Printf("status %s\n", resp.Status) // debug
-	fmt.Printf("body %s\n", string(body))  // debug
-	if err != nil {
-		return nil, 0, err
-	}
-	var transaction Transaction
-	err = xml.Unmarshal(body, &transaction)
-	return &transaction, resp.StatusCode, err
+	return &sleet.RefundResponse{
+		Success:              true,
+		TransactionReference: refund.Id,
+	}, nil
 }

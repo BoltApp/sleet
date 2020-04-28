@@ -1,9 +1,9 @@
 package cybersource
 
 import (
-	"strconv"
-	"github.com/BoltApp/sleet/common"
 	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
+	"strconv"
 )
 
 func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error) {

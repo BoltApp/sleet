@@ -13,11 +13,11 @@ func BaseAuthorizationRequest() *sleet.AuthorizationRequest {
 		Currency: "USD",
 	}
 	address := sleet.BillingAddress{
-		PostalCode: common.SPtr("94103"),
-		CountryCode: common.SPtr("US"),
+		PostalCode:     common.SPtr("94103"),
+		CountryCode:    common.SPtr("US"),
 		StreetAddress1: common.SPtr("7683 Railroad Street"),
-		Locality: common.SPtr("Zion"),
-		RegionCode: common.SPtr("IL"),
+		Locality:       common.SPtr("Zion"),
+		RegionCode:     common.SPtr("IL"),
 	}
 	card := sleet.CreditCard{
 		FirstName:       "Bolt",

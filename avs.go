@@ -28,7 +28,7 @@ const (
 	AVSResponseNameNoMatch                       // Cardholder's name doesn't match.
 	AVSResponseNameNoMatchAddressMatch           // Cardholder's name doesn't match, street address matches.
 	AVSResponseNameNoMatchZipMatch               // Cardholder's name doesn't match but ZIP code matches
-	AVSResponseNameNoMatchZipMatchAddressMatch // Cardholder's name doesn't match but both zip/address do match
+	AVSResponseNameNoMatchZipMatchAddressMatch   // Cardholder's name doesn't match but both zip/address do match
 	AVSResponseNameMatchZipMatchAddressNoMatch   // Cardholder's name and ZIP match, street address doesn't match.
 	AVSResponseNameMatchZipNoMatchAddressMatch   // Cardholder's name and street address match, ZIP doesn't match.
 	AVSResponseNameMatchZipNoMatchAddressNoMatch // Cardholder's name matches, ZIP and street address don't match.

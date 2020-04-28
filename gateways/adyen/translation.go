@@ -53,7 +53,7 @@ func translateAvs(adyenAVS adyen.AVSResponse) sleet.AVSResponse {
 	case adyen.AVSResponse19:
 		return sleet.AVSResponseNameMatchZipMatchAddressNoMatch
 	case adyen.AVSResponse20:
-	return sleet.AVSResponseNameMatchZipMatchAddressMatch
+		return sleet.AVSResponseNameMatchZipMatchAddressMatch
 	case adyen.AVSResponse21:
 		return sleet.AVSResponseNameMatchZipNoMatchAddressMatch
 	case adyen.AVSResponse22:
