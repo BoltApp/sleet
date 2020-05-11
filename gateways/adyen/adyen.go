@@ -9,8 +9,6 @@ import (
 	adyen_common "github.com/adyen/adyen-go-api-library/src/common"
 )
 
-var baseURL = "https://pal-test.adyen.com/pal/servlet/Payment/v51"
-
 // AdyenClient represents the authentication fields needed to make API Requests for a given environment
 // Client functions return error for http error and will return Success=true if action is performed successfully
 // You can create new API user there: https://ca-test.adyen.com/ca/ca/config/users.shtml
