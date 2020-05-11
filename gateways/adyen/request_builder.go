@@ -3,21 +3,21 @@ package adyen
 import (
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
-	"github.com/zhutik/adyen-api-go"
 	"strconv"
+	"github.com/adyen/adyen-go-api-library/src/payments"
 )
 
-func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount string) *adyen.Authorise {
-	request := &adyen.Authorise{
-		Amount: &adyen.Amount{
-			Value:    float32(authRequest.Amount.Amount),
+func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount string) *payments.PaymentRequest {
+	request := &payments.PaymentRequest{
+		Amount: payments.Amount{
+			Value:    authRequest.Amount.Amount,
 			Currency: authRequest.Amount.Currency,
 		},
 		// Adyen requires a reference in request so this will panic if client doesn't pass it. Assuming this is good for now
 		Reference: *authRequest.ClientTransactionReference,
-		Card: &adyen.Card{
-			ExpireYear:  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
-			ExpireMonth: strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
+		Card: &payments.Card{
+			ExpiryYear:  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
+			ExpiryMonth: strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
 			Number:      authRequest.CreditCard.Number,
 			Cvc:         authRequest.CreditCard.CVV,
 			HolderName:  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
@@ -25,7 +25,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		MerchantAccount: merchantAccount,
 	}
 	if authRequest.BillingAddress != nil {
-		request.BillingAddress = &adyen.Address{
+		request.BillingAddress = &payments.Address{
 			City:              common.SafeStr(authRequest.BillingAddress.Locality),
 			Country:           common.SafeStr(authRequest.BillingAddress.CountryCode),
 			HouseNumberOrName: common.SafeStr(authRequest.BillingAddress.StreetAddress2),
@@ -37,11 +37,11 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 	return request
 }
 
-func buildCaptureRequest(captureRequest *sleet.CaptureRequest, merchantAccount string) *adyen.Capture {
-	request := &adyen.Capture{
+func buildCaptureRequest(captureRequest *sleet.CaptureRequest, merchantAccount string) *payments.ModificationRequest {
+	request := &payments.ModificationRequest{
 		OriginalReference: captureRequest.TransactionReference,
-		ModificationAmount: &adyen.Amount{
-			Value:    float32(captureRequest.Amount.Amount),
+		ModificationAmount: &payments.Amount{
+			Value:    captureRequest.Amount.Amount,
 			Currency: captureRequest.Amount.Currency,
 		},
 		MerchantAccount: merchantAccount,
@@ -49,19 +49,19 @@ func buildCaptureRequest(captureRequest *sleet.CaptureRequest, merchantAccount s
 	return request
 }
 
-func buildRefundRequest(refundRequest *sleet.RefundRequest, merchantAccount string) *adyen.Refund {
-	request := &adyen.Refund{
+func buildRefundRequest(refundRequest *sleet.RefundRequest, merchantAccount string) *payments.ModificationRequest {
+	request := &payments.ModificationRequest{
 		OriginalReference: refundRequest.TransactionReference,
-		ModificationAmount: &adyen.Amount{
-			Value:    float32(refundRequest.Amount.Amount),
+		ModificationAmount: &payments.Amount{
+			Value:    refundRequest.Amount.Amount,
 			Currency: refundRequest.Amount.Currency,
 		}, MerchantAccount: merchantAccount,
 	}
 	return request
 }
 
-func buildVoidRequest(voidRequest *sleet.VoidRequest, merchantAccount string) *adyen.Cancel {
-	request := &adyen.Cancel{
+func buildVoidRequest(voidRequest *sleet.VoidRequest, merchantAccount string) *payments.ModificationRequest {
+	request := &payments.ModificationRequest{
 		OriginalReference: voidRequest.TransactionReference,
 		MerchantAccount:   merchantAccount,
 	}
