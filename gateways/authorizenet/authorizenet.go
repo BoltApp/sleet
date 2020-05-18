@@ -45,7 +45,6 @@ func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("%+v\n", response)
 	txnResponse := response.TransactionResponse
 	var errorCode string
 	if txnResponse.ResponseCode != ResponseCodeApproved {
@@ -124,11 +123,8 @@ func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.R
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("%+v\n", authorizeNetRefundRequest.CreateTransactionRequest.TransactionRequest.Payment)
 
 	authorizeNetResponse, err := client.sendRequest(*authorizeNetRefundRequest)
-	fmt.Printf("%+v\n", err)
-	fmt.Printf("%+v\n", authorizeNetResponse)
 	if err != nil {
 		return nil, err
 	}
