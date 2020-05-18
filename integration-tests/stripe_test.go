@@ -4,7 +4,6 @@ import (
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/gateways/stripe"
 	sleet_testing "github.com/BoltApp/sleet/testing"
-	"os"
 	"strings"
 	"testing"
 )
@@ -18,7 +17,7 @@ import (
 // Stripe has test cards here: https://stripe.com/docs/testing#cards-responses
 // Using a rejected card number
 func TestStripeAuthorizeFailed(t *testing.T) {
-	client := stripe.NewClient(os.Getenv("STRIPE_TEST_KEY"))
+	client := stripe.NewClient(getEnv("STRIPE_TEST_KEY"))
 	failedRequest := sleet_testing.BaseAuthorizationRequest()
 	// set ClientTransactionReference to be empty
 	failedRequest.CreditCard.Number = "4000000000009995"
@@ -36,7 +35,7 @@ func TestStripeAuthorizeFailed(t *testing.T) {
 //
 // This should successfully create an authorization on Stripe
 func TestStripeAuth(t *testing.T) {
-	client := stripe.NewClient(os.Getenv("STRIPE_TEST_KEY"))
+	client := stripe.NewClient(getEnv("STRIPE_TEST_KEY"))
 	request := sleet_testing.BaseAuthorizationRequest()
 	auth, err := client.Authorize(request)
 	if err != nil {
@@ -52,7 +51,7 @@ func TestStripeAuth(t *testing.T) {
 //
 // This should successfully create an authorization on Stripe then Capture for full amount
 func TestStripeAuthFullCapture(t *testing.T) {
-	client := stripe.NewClient(os.Getenv("STRIPE_TEST_KEY"))
+	client := stripe.NewClient(getEnv("STRIPE_TEST_KEY"))
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	auth, err := client.Authorize(authRequest)
 	if err != nil {
@@ -82,7 +81,7 @@ func TestStripeAuthFullCapture(t *testing.T) {
 // This should successfully create an authorization on Stripe then Capture for a partial amount
 // Since we auth for 1.00USD, we will capture for $0.50
 func TestStripeAuthPartialCapture(t *testing.T) {
-	client := stripe.NewClient(os.Getenv("STRIPE_TEST_KEY"))
+	client := stripe.NewClient(getEnv("STRIPE_TEST_KEY"))
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	auth, err := client.Authorize(authRequest)
 	if err != nil {
@@ -113,7 +112,7 @@ func TestStripeAuthPartialCapture(t *testing.T) {
 //
 // This should successfully create an authorization on Stripe then Void/Cancel the Auth
 func TestStripeAuthVoid(t *testing.T) {
-	client := stripe.NewClient(os.Getenv("STRIPE_TEST_KEY"))
+	client := stripe.NewClient(getEnv("STRIPE_TEST_KEY"))
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	auth, err := client.Authorize(authRequest)
 	if err != nil {
@@ -141,7 +140,7 @@ func TestStripeAuthVoid(t *testing.T) {
 //
 // This should successfully create an authorization on Stripe then Capture for full amount, then refund for full amount
 func TestStripeAuthCaptureRefund(t *testing.T) {
-	client := stripe.NewClient(os.Getenv("STRIPE_TEST_KEY"))
+	client := stripe.NewClient(getEnv("STRIPE_TEST_KEY"))
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	auth, err := client.Authorize(authRequest)
 	if err != nil {
