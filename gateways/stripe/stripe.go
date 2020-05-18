@@ -48,7 +48,7 @@ func (client *StripeClient) Authorize(request *sleet.AuthorizationRequest) (*sle
 	chargeClient := charge.Client{B: stripe.GetBackend(stripe.APIBackend), Key: client.apiKey}
 	charge, err := chargeClient.New(buildChargeParams(request))
 	if err != nil {
-		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: sleet.AVSResponseUnknown, CvvResult: sleet.CVVResponseUnknown, ErrorCode: err.Error()}, nil
+		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: sleet.AVSResponseUnknown, CvvResult: sleet.CVVResponseUnknown, ErrorCode: err.Error()}, err
 	}
 	return &sleet.AuthorizationResponse{
 		Success:              true,
