@@ -13,6 +13,9 @@ import (
 	"testing"
 )
 
+// TestSuccessfulAuth is a unit test mocking Stripe calls
+// This was used for us to ensure that with successful responses, authorization performed correctly
+// Integration tests hitting Stripe's service can be found in the integration-tests folder
 func TestSuccessfulAuth(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
