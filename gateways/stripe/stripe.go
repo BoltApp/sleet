@@ -29,6 +29,7 @@ var defaultHttpClient = &http.Client{
 }
 
 // NewClient uses default http client with provided Stripe API Key
+// Note: the environment is kind of explicitly given to us by the apiKey
 func NewClient(apiKey string) *StripeClient {
 	return NewWithHTTPClient(apiKey, defaultHttpClient)
 }

@@ -2,6 +2,7 @@ package test
 
 import (
 	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
 	"github.com/BoltApp/sleet/gateways/authorizenet"
 	sleet_testing "github.com/BoltApp/sleet/testing"
 	"github.com/Pallinder/go-randomdata"
@@ -14,7 +15,7 @@ import (
 //
 // This should successfully create an authorization on Authorize.net
 func TestAuthNetAuth(t *testing.T) {
-	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"))
+	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	authRequest.Amount.Amount = int64(randomdata.Number(100))
 	auth, err := client.Authorize(authRequest)
@@ -31,7 +32,7 @@ func TestAuthNetAuth(t *testing.T) {
 //
 // This should successfully create an authorization on Authorize.net then Capture for full amount
 func TestAuthNetAuthFullCapture(t *testing.T) {
-	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"))
+	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	authRequest.Amount.Amount = int64(randomdata.Number(100))
 	auth, err := client.Authorize(authRequest)
@@ -62,7 +63,7 @@ func TestAuthNetAuthFullCapture(t *testing.T) {
 // This should successfully create an authorization on Authorize.net then Capture for a partial amount
 // Since we auth for 1.00USD, we will capture for $0.50
 func TestAuthNetAuthPartialCapture(t *testing.T) {
-	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"))
+	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	authRequest.Amount.Amount = int64(randomdata.Number(11, 100))
 	auth, err := client.Authorize(authRequest)
@@ -94,7 +95,7 @@ func TestAuthNetAuthPartialCapture(t *testing.T) {
 //
 // This should successfully create an authorization on Authorize.net then Void/Cancel the Auth
 func TestAuthNetAuthVoid(t *testing.T) {
-	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"))
+	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	authRequest.Amount.Amount = int64(randomdata.Number(100))
 	auth, err := client.Authorize(authRequest)

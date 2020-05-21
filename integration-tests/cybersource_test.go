@@ -2,6 +2,7 @@ package test
 
 import (
 	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
 	"github.com/BoltApp/sleet/gateways/cybersource"
 	sleet_testing "github.com/BoltApp/sleet/testing"
 	"testing"
@@ -9,7 +10,7 @@ import (
 
 func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
 	testCurrency := "USD"
-	client := cybersource.NewClient(cybersource.Sandbox, getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
+	client := cybersource.NewClient(common.Sandbox, getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	authRequest.ClientTransactionReference = sPtr("[auth]-CUSTOMER-REFERENCE-CODE") // This will be overridden by the level 3 CustomerReference
 	authRequest.BillingAddress = &sleet.BillingAddress{
@@ -79,7 +80,7 @@ func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
 }
 
 func TestVoid(t *testing.T) {
-	client := cybersource.NewClient(cybersource.Sandbox, getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
+	client := cybersource.NewClient(common.Sandbox, getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	authRequest.ClientTransactionReference = sPtr("[auth]-CUSTOMER-REFERENCE-CODE")
 	authRequest.BillingAddress = &sleet.BillingAddress{

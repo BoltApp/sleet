@@ -19,13 +19,6 @@ const (
 	authPath = "/pts/v2/payments/"
 )
 
-var (
-	// Sandbox is the CyberSource test environment for testing API requests.
-	Sandbox = NewEnvironment("apitest.cybersource.com")
-	// Production is the CyberSource live environment for executing real payments.
-	Production = NewEnvironment("api.cybersource.com")
-)
-
 // CybersourceClient represents an HTTP client and the associated authentication information required for making an API request.
 type CybersourceClient struct {
 	host              string
@@ -36,15 +29,15 @@ type CybersourceClient struct {
 }
 
 // NewClient returns a new client for making CyberSource API requests for a given merchant using a specified authentication key.
-func NewClient(env Environment, merchantID string, sharedSecretKeyID string, sharedSecretKey string) *CybersourceClient {
+func NewClient(env common.Environment, merchantID string, sharedSecretKeyID string, sharedSecretKey string) *CybersourceClient {
 	return NewWithHttpClient(env, merchantID, sharedSecretKeyID, sharedSecretKey, common.DefaultHttpClient())
 }
 
 // NewWithHttpClient returns a client for making CyberSource API requests for a given merchant using a specified authentication key.
 // The given HTTP client will be used to make the requests.
-func NewWithHttpClient(env Environment, merchantID string, sharedSecretKeyID string, sharedSecretKey string, httpClient *http.Client) *CybersourceClient {
+func NewWithHttpClient(env common.Environment, merchantID string, sharedSecretKeyID string, sharedSecretKey string, httpClient *http.Client) *CybersourceClient {
 	return &CybersourceClient{
-		host:              env.Host(),
+		host:              cybersourceHost(env),
 		merchantID:        merchantID,
 		sharedSecretKeyID: sharedSecretKeyID,
 		sharedSecretKey:   sharedSecretKey,

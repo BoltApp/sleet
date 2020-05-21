@@ -3,6 +3,7 @@ package test
 import (
 	"context"
 	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
 	"github.com/BoltApp/sleet/gateways/braintree"
 	sleet_testing "github.com/BoltApp/sleet/testing"
 	braintree_go "github.com/braintree-go/braintree-go"
@@ -20,7 +21,8 @@ func TestBraintreeAuthorizeFailed(t *testing.T) {
 		MerchantID: getEnv("BRAINTREE_MERCHANT_ID"),
 		PublicKey:  getEnv("BRAINTREE_PUBLIC_KEY"),
 		PrivateKey: getEnv("BRAINTREE_PRIVATE_KEY"),
-	})
+	},
+	common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	authRequest.Amount = sleet.Amount{
 		Amount:   201000,
@@ -43,7 +45,8 @@ func TestBraintreeAuth(t *testing.T) {
 		MerchantID: getEnv("BRAINTREE_MERCHANT_ID"),
 		PublicKey:  getEnv("BRAINTREE_PUBLIC_KEY"),
 		PrivateKey: getEnv("BRAINTREE_PRIVATE_KEY"),
-	})
+	},
+		common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	resp, err := client.Authorize(authRequest)
 	if err != nil {
@@ -62,7 +65,8 @@ func TestBraintreeAuthCapture(t *testing.T) {
 		MerchantID: getEnv("BRAINTREE_MERCHANT_ID"),
 		PublicKey:  getEnv("BRAINTREE_PUBLIC_KEY"),
 		PrivateKey: getEnv("BRAINTREE_PRIVATE_KEY"),
-	})
+	},
+		common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	auth, err := client.Authorize(authRequest)
 	if err != nil {
