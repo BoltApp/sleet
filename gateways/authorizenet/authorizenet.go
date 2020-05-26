@@ -10,28 +10,26 @@ import (
 	"net/http"
 )
 
-const (
-	baseURL = "https://apitest.authorize.net/xml/v1/request.api"
-)
-
 // AuthorizeNetClient uses merchant name and transaction key to process requests. Optionally can provide custom http clients
 type AuthorizeNetClient struct {
 	merchantName   string
 	transactionKey string
 	httpClient     *http.Client
+	url            string
 }
 
 // NewClient uses authentication above with a default http client
-func NewClient(merchantName string, transactionKey string) *AuthorizeNetClient {
-	return NewWithHttpClient(merchantName, transactionKey, common.DefaultHttpClient())
+func NewClient(merchantName string, transactionKey string, environment common.Environment) *AuthorizeNetClient {
+	return NewWithHttpClient(merchantName, transactionKey, environment, common.DefaultHttpClient())
 }
 
 // NewWithHttpClient uses authentication with custom http client
-func NewWithHttpClient(merchantName string, transactionKey string, httpClient *http.Client) *AuthorizeNetClient {
+func NewWithHttpClient(merchantName string, transactionKey string, environment common.Environment, httpClient *http.Client) *AuthorizeNetClient {
 	return &AuthorizeNetClient{
 		merchantName:   merchantName,
 		transactionKey: transactionKey,
 		httpClient:     httpClient,
+		url:            authorizeNetURL(environment),
 	}
 }
 
@@ -150,7 +148,7 @@ func (client *AuthorizeNetClient) sendRequest(data Request) (*Response, error) {
 	}
 
 	reader := bytes.NewReader(bodyJSON)
-	request, err := http.NewRequest(http.MethodPost, baseURL, reader)
+	request, err := http.NewRequest(http.MethodPost, client.url, reader)
 	if err != nil {
 		return nil, err
 	}
