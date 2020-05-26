@@ -4,7 +4,7 @@
 [![GoDoc](https://godoc.org/github.com/BoltApp/sleet?status.svg)](https://pkg.go.dev/github.com/BoltApp/sleet?tab=doc)
 [![Go Report Card](https://goreportcard.com/badge/github.com/BoltApp/sleet)](https://goreportcard.com/report/github.com/BoltApp/sleet)
 
-Payment abstraction library - interact with different Payment Service Providers with one unified interface.
+Payment abstraction library - interact with different Payment Service Providers (PsP) with one unified interface.
 
 ## Installation
 `go get github.com/BoltApp/sleet`
