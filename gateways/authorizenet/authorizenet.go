@@ -15,7 +15,7 @@ type AuthorizeNetClient struct {
 	merchantName   string
 	transactionKey string
 	httpClient     *http.Client
-	host string
+	url            string
 }
 
 // NewClient uses authentication above with a default http client
@@ -29,7 +29,7 @@ func NewWithHttpClient(merchantName string, transactionKey string, environment c
 		merchantName:   merchantName,
 		transactionKey: transactionKey,
 		httpClient:     httpClient,
-		host: authorizeNetHost(environment),
+		url:            authorizeNetURL(environment),
 	}
 }
 
@@ -148,7 +148,7 @@ func (client *AuthorizeNetClient) sendRequest(data Request) (*Response, error) {
 	}
 
 	reader := bytes.NewReader(bodyJSON)
-	request, err := http.NewRequest(http.MethodPost, client.host, reader)
+	request, err := http.NewRequest(http.MethodPost, client.url, reader)
 	if err != nil {
 		return nil, err
 	}
