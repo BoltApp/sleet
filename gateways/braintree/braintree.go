@@ -37,30 +37,28 @@ var (
 	}
 )
 
-// Credentials specifies account information needed to make API calls to Braintree
-type Credentials struct {
-	MerchantID string
-	PublicKey  string
-	PrivateKey string
-}
-
 // BraintreeClient uses creds and httpClient to make calls to Braintree service
 // Client functions return error for http error and will return Success=true if action is performed successfully
 type BraintreeClient struct {
-	credentials *Credentials
+	merchantID string
+	publicKey  string
+	privateKey string
 	environment braintree_go.Environment
 	httpClient  *http.Client
+
 }
 
 // NewClient creates a Braintree client with creds and default http client
-func NewClient(credentials *Credentials, environment common.Environment) *BraintreeClient {
-	return NewWithHttpClient(credentials, environment, defaultClient)
+func NewClient(merchantID string, publicKey string, privateKey string, environment common.Environment) *BraintreeClient {
+	return NewWithHttpClient(merchantID, publicKey, privateKey, environment, defaultClient)
 }
 
 // NewWithHttpClient creates a Braintree client with creds and user specified http client for custom behavior
-func NewWithHttpClient(credentials *Credentials, environment common.Environment, httpClient *http.Client) *BraintreeClient {
+func NewWithHttpClient(merchantID string, publicKey string, privateKey string, environment common.Environment, httpClient *http.Client) *BraintreeClient {
 	return &BraintreeClient{
-		credentials: credentials,
+		merchantID: merchantID,
+		publicKey: publicKey,
+		privateKey: privateKey,
 		environment: braintreeEnvironment(environment),
 		httpClient:  httpClient,
 	}
@@ -72,7 +70,7 @@ func (client *BraintreeClient) Authorize(request *sleet.AuthorizationRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	btClient := braintree_go.NewWithHttpClient(client.environment, client.credentials.MerchantID, client.credentials.PublicKey, client.credentials.PrivateKey, client.httpClient)
+	btClient := braintree_go.NewWithHttpClient(client.environment, client.merchantID, client.publicKey, client.privateKey, client.httpClient)
 	auth, err := btClient.Transaction().Create(context.TODO(), authRequest)
 	if err != nil {
 		return &sleet.AuthorizationResponse{Success: false}, err
@@ -96,7 +94,7 @@ func (client *BraintreeClient) Capture(request *sleet.CaptureRequest) (*sleet.Ca
 	if err != nil {
 		return nil, err
 	}
-	btClient := braintree_go.NewWithHttpClient(client.environment, client.credentials.MerchantID, client.credentials.PublicKey, client.credentials.PrivateKey, client.httpClient)
+	btClient := braintree_go.NewWithHttpClient(client.environment, client.merchantID, client.publicKey, client.privateKey, client.httpClient)
 	capture, err := btClient.Transaction().SubmitForSettlement(context.TODO(), request.TransactionReference, amount)
 	if err != nil {
 		return &sleet.CaptureResponse{Success: false, TransactionReference: ""}, err
@@ -109,7 +107,7 @@ func (client *BraintreeClient) Capture(request *sleet.CaptureRequest) (*sleet.Ca
 
 // Void an authorized transaction with reference (cancels void)
 func (client *BraintreeClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
-	btClient := braintree_go.NewWithHttpClient(client.environment, client.credentials.MerchantID, client.credentials.PublicKey, client.credentials.PrivateKey, client.httpClient)
+	btClient := braintree_go.NewWithHttpClient(client.environment, client.merchantID, client.publicKey, client.privateKey, client.httpClient)
 	void, err := btClient.Transaction().Void(context.TODO(), request.TransactionReference)
 	if err != nil {
 		return &sleet.VoidResponse{
@@ -128,7 +126,7 @@ func (client *BraintreeClient) Refund(request *sleet.RefundRequest) (*sleet.Refu
 	if err != nil {
 		return nil, err
 	}
-	btClient := braintree_go.NewWithHttpClient(client.environment, client.credentials.MerchantID, client.credentials.PublicKey, client.credentials.PrivateKey, client.httpClient)
+	btClient := braintree_go.NewWithHttpClient(client.environment, client.merchantID, client.publicKey, client.privateKey, client.httpClient)
 	refund, err := btClient.Transaction().Refund(context.TODO(), request.TransactionReference, amount)
 	if err != nil {
 		return &sleet.RefundResponse{
