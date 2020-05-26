@@ -17,11 +17,10 @@ import (
 //
 // Using amount over 2000 USD will fail it: https://developers.braintreepayments.com/reference/general/testing/php#avs-and-cvv/cid-responses
 func TestBraintreeAuthorizeFailed(t *testing.T) {
-	client := braintree.NewClient(&braintree.Credentials{
-		MerchantID: getEnv("BRAINTREE_MERCHANT_ID"),
-		PublicKey:  getEnv("BRAINTREE_PUBLIC_KEY"),
-		PrivateKey: getEnv("BRAINTREE_PRIVATE_KEY"),
-	},
+	client := braintree.NewClient(
+		getEnv("BRAINTREE_MERCHANT_ID"),
+		getEnv("BRAINTREE_PUBLIC_KEY"),
+		getEnv("BRAINTREE_PRIVATE_KEY"),
 		common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	authRequest.Amount = sleet.Amount{
@@ -41,11 +40,10 @@ func TestBraintreeAuthorizeFailed(t *testing.T) {
 //
 // Tests a successful authorization for Braintree
 func TestBraintreeAuth(t *testing.T) {
-	client := braintree.NewClient(&braintree.Credentials{
-		MerchantID: getEnv("BRAINTREE_MERCHANT_ID"),
-		PublicKey:  getEnv("BRAINTREE_PUBLIC_KEY"),
-		PrivateKey: getEnv("BRAINTREE_PRIVATE_KEY"),
-	},
+	client := braintree.NewClient(
+		getEnv("BRAINTREE_MERCHANT_ID"),
+		getEnv("BRAINTREE_PUBLIC_KEY"),
+		getEnv("BRAINTREE_PRIVATE_KEY"),
 		common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	resp, err := client.Authorize(authRequest)
@@ -61,11 +59,10 @@ func TestBraintreeAuth(t *testing.T) {
 //
 // Tests a Braintree authorization then full capture
 func TestBraintreeAuthCapture(t *testing.T) {
-	client := braintree.NewClient(&braintree.Credentials{
-		MerchantID: getEnv("BRAINTREE_MERCHANT_ID"),
-		PublicKey:  getEnv("BRAINTREE_PUBLIC_KEY"),
-		PrivateKey: getEnv("BRAINTREE_PRIVATE_KEY"),
-	},
+	client := braintree.NewClient(
+		getEnv("BRAINTREE_MERCHANT_ID"),
+		getEnv("BRAINTREE_PUBLIC_KEY"),
+		getEnv("BRAINTREE_PRIVATE_KEY"),
 		common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	auth, err := client.Authorize(authRequest)
@@ -94,11 +91,10 @@ func TestBraintreeAuthCapture(t *testing.T) {
 //
 // Tests a Braintree authorization then a partial capture
 func TestBraintreeAuthPartialCapture(t *testing.T) {
-	client := braintree.NewClient(&braintree.Credentials{
-		MerchantID: getEnv("BRAINTREE_MERCHANT_ID"),
-		PublicKey:  getEnv("BRAINTREE_PUBLIC_KEY"),
-		PrivateKey: getEnv("BRAINTREE_PRIVATE_KEY"),
-	},
+	client := braintree.NewClient(
+		getEnv("BRAINTREE_MERCHANT_ID"),
+		getEnv("BRAINTREE_PUBLIC_KEY"),
+		getEnv("BRAINTREE_PRIVATE_KEY"),
 		common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	auth, err := client.Authorize(authRequest)
@@ -130,11 +126,10 @@ func TestBraintreeAuthPartialCapture(t *testing.T) {
 //
 // This should successfully create an authorization on Braintree then Void/Cancel the Auth
 func TestBraintreeAuthVoid(t *testing.T) {
-	client := braintree.NewClient(&braintree.Credentials{
-		MerchantID: getEnv("BRAINTREE_MERCHANT_ID"),
-		PublicKey:  getEnv("BRAINTREE_PUBLIC_KEY"),
-		PrivateKey: getEnv("BRAINTREE_PRIVATE_KEY"),
-	},
+	client := braintree.NewClient(
+		getEnv("BRAINTREE_MERCHANT_ID"),
+		getEnv("BRAINTREE_PUBLIC_KEY"),
+		getEnv("BRAINTREE_PRIVATE_KEY"),
 		common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	auth, err := client.Authorize(authRequest)
@@ -165,11 +160,10 @@ func TestBraintreeAuthVoid(t *testing.T) {
 // Note: There is a hack in here to put the transaction in a settled state so the refund can occur because Braintree
 // does not allow refunds for "Submitted for Settlement"
 func TestBraintreeAuthCaptureRefund(t *testing.T) {
-	client := braintree.NewClient(&braintree.Credentials{
-		MerchantID: getEnv("BRAINTREE_MERCHANT_ID"),
-		PublicKey:  getEnv("BRAINTREE_PUBLIC_KEY"),
-		PrivateKey: getEnv("BRAINTREE_PRIVATE_KEY"),
-	},
+	client := braintree.NewClient(
+		getEnv("BRAINTREE_MERCHANT_ID"),
+		getEnv("BRAINTREE_PUBLIC_KEY"),
+		getEnv("BRAINTREE_PRIVATE_KEY"),
 		common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	auth, err := client.Authorize(authRequest)
@@ -219,11 +213,10 @@ func TestBraintreeAuthCaptureRefund(t *testing.T) {
 // Note: There is a hack in here to put the transaction in a settled state so the refund can occur because Braintree
 // does not allow refunds for "Submitted for Settlement"
 func TestBraintreeAuthCapturePartialRefund(t *testing.T) {
-	client := braintree.NewClient(&braintree.Credentials{
-		MerchantID: getEnv("BRAINTREE_MERCHANT_ID"),
-		PublicKey:  getEnv("BRAINTREE_PUBLIC_KEY"),
-		PrivateKey: getEnv("BRAINTREE_PRIVATE_KEY"),
-	},
+	client := braintree.NewClient(
+		getEnv("BRAINTREE_MERCHANT_ID"),
+		getEnv("BRAINTREE_PUBLIC_KEY"),
+		getEnv("BRAINTREE_PRIVATE_KEY"),
 		common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	auth, err := client.Authorize(authRequest)
