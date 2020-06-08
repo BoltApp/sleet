@@ -13,7 +13,7 @@ import (
 //
 // Adyen requires client transaction references, ensure that setting this to empty is an RPC failure
 func TestAdyenAuthorizeFailed(t *testing.T) {
-	client := adyen.NewClient(common.Sandbox, getEnv("ADYEN_USERNAME"), getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_PASSWORD"))
+	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
 	failedRequest := sleet_testing.BaseAuthorizationRequest()
 	// set ClientTransactionReference to be empty
 	failedRequest.ClientTransactionReference = sPtr("")
@@ -31,7 +31,7 @@ func TestAdyenAuthorizeFailed(t *testing.T) {
 //
 // This should not error but auth should be refused with Expired Card
 func TestAdyenExpiredCard(t *testing.T) {
-	client := adyen.NewClient(common.Sandbox, getEnv("ADYEN_USERNAME"), getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_PASSWORD"))
+	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
 	expiredRequest := sleet_testing.BaseAuthorizationRequest()
 	expiredRequest.CreditCard.ExpirationYear = 2010
 	auth, err := client.Authorize(expiredRequest)
@@ -54,7 +54,7 @@ func TestAdyenExpiredCard(t *testing.T) {
 // Test addresses found from here
 // https://docs.adyen.com/development-resources/test-cards/test-card-numbers#test-address-verification-system-avs
 func TestAdyenAVSCode1(t *testing.T) {
-	client := adyen.NewClient(common.Sandbox, getEnv("ADYEN_USERNAME"), getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_PASSWORD"))
+	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
 	avsRequest := sleet_testing.BaseAuthorizationRequest()
 	avsRequest.CreditCard.Number = "5500000000000004"
 	avsRequest.BillingAddress = &sleet.BillingAddress{
@@ -88,7 +88,7 @@ func TestAdyenAVSCode1(t *testing.T) {
 // Test addresses found from here
 // https://docs.adyen.com/development-resources/test-cards/test-card-numbers#test-address-verification-system-avs
 func TestAdyenAVSCode2(t *testing.T) {
-	client := adyen.NewClient(common.Sandbox, getEnv("ADYEN_USERNAME"), getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_PASSWORD"))
+	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
 	avsRequest := sleet_testing.BaseAuthorizationRequest()
 	avsRequest.CreditCard.Number = "5500000000000004"
 	avsRequest.BillingAddress = &sleet.BillingAddress{
@@ -120,7 +120,7 @@ func TestAdyenAVSCode2(t *testing.T) {
 //
 // This should successfully create an authorization on Adyen
 func TestAdyenAuth(t *testing.T) {
-	client := adyen.NewClient(common.Sandbox, getEnv("ADYEN_USERNAME"), getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_PASSWORD"))
+	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
 	request := sleet_testing.BaseAuthorizationRequest()
 	auth, err := client.Authorize(request)
 	if err != nil {
@@ -136,7 +136,7 @@ func TestAdyenAuth(t *testing.T) {
 //
 // This should successfully create an authorization on Adyen then Capture for full amount
 func TestAdyenAuthFullCapture(t *testing.T) {
-	client := adyen.NewClient(common.Sandbox, getEnv("ADYEN_USERNAME"), getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_PASSWORD"))
+	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	auth, err := client.Authorize(authRequest)
 	if err != nil {
@@ -165,7 +165,7 @@ func TestAdyenAuthFullCapture(t *testing.T) {
 //
 // This should successfully create an authorization on Adyen then Capture for partial amount
 func TestAdyenAuthPartialCapture(t *testing.T) {
-	client := adyen.NewClient(common.Sandbox, getEnv("ADYEN_USERNAME"), getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_PASSWORD"))
+	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	auth, err := client.Authorize(authRequest)
 	if err != nil {
@@ -197,7 +197,7 @@ func TestAdyenAuthPartialCapture(t *testing.T) {
 //
 // This should successfully create an authorization on Adyen then Void/Cancel the Auth
 func TestAdyenAuthVoid(t *testing.T) {
-	client := adyen.NewClient(common.Sandbox, getEnv("ADYEN_USERNAME"), getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_PASSWORD"))
+	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	auth, err := client.Authorize(authRequest)
 	if err != nil {
@@ -225,7 +225,7 @@ func TestAdyenAuthVoid(t *testing.T) {
 //
 // This should successfully create an authorization on Adyen then Capture for full amount, then refund for full amount
 func TestAdyenAuthCaptureRefund(t *testing.T) {
-	client := adyen.NewClient(common.Sandbox, getEnv("ADYEN_USERNAME"), getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_PASSWORD"))
+	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	auth, err := client.Authorize(authRequest)
 	if err != nil {

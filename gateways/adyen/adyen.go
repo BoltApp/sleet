@@ -14,23 +14,23 @@ import (
 // You can create new API user there: https://ca-test.adyen.com/ca/ca/config/users.shtml
 type AdyenClient struct {
 	merchantAccount string
-	username        string
-	password        string
+	apiKey          string
+	liveURLPrefix   string
 	environment     common.Environment
 	httpClient      *http.Client
 }
 
 // NewClient creates an Adyen client with creds and default http client
-func NewClient(env common.Environment, username string, merchantAccount string, password string) *AdyenClient {
-	return NewWithHTTPClient(env, username, merchantAccount, password, common.DefaultHttpClient())
+func NewClient(merchantAccount string, apiKey string, liveURLPrefix string, env common.Environment) *AdyenClient {
+	return NewWithHTTPClient(merchantAccount, apiKey, liveURLPrefix, env, common.DefaultHttpClient())
 }
 
 // NewWithHTTPClient creates an Adyen client with creds and user specified http client for custom behavior
-func NewWithHTTPClient(env common.Environment, username string, merchantAccount string, password string, httpClient *http.Client) *AdyenClient {
+func NewWithHTTPClient(merchantAccount string, apiKey string, liveURLPrefix string, env common.Environment, httpClient *http.Client) *AdyenClient {
 	return &AdyenClient{
-		environment:     env,
-		username:        username,
-		password:        password,
+		environment: env,
+		apiKey: apiKey,
+		liveURLPrefix: liveURLPrefix,
 		merchantAccount: merchantAccount,
 		httpClient:      httpClient,
 	}
@@ -38,12 +38,11 @@ func NewWithHTTPClient(env common.Environment, username string, merchantAccount 
 
 // Authorize through Adyen gateway. This transaction must be captured for funds to be received
 func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
-	adyenEnv := AdyenEnvironment(client.environment)
 	adyenClient := adyen.NewClient(&adyen_common.Config{
-		Username:        client.username,
-		Password:        client.password,
+		ApiKey: client.apiKey,
+		LiveEndpointURLPrefix: client.liveURLPrefix,
 		MerchantAccount: client.merchantAccount,
-		Environment:     adyenEnv,
+		Environment:     AdyenEnvironment(client.environment),
 		HTTPClient:      client.httpClient,
 	},
 	)
@@ -77,12 +76,11 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 
 // Capture an existing transaction by reference
 func (client *AdyenClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
-	adyenEnv := AdyenEnvironment(client.environment)
 	adyenClient := adyen.NewClient(&adyen_common.Config{
-		Username:        client.username,
-		Password:        client.password,
+		ApiKey: client.apiKey,
+		LiveEndpointURLPrefix: client.liveURLPrefix,
 		MerchantAccount: client.merchantAccount,
-		Environment:     adyenEnv,
+		Environment:     AdyenEnvironment(client.environment),
 		HTTPClient:      client.httpClient,
 	},
 	)
@@ -99,12 +97,11 @@ func (client *AdyenClient) Capture(request *sleet.CaptureRequest) (*sleet.Captur
 
 // Refund a captured transaction by reference with specified amount
 func (client *AdyenClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
-	adyenEnv := AdyenEnvironment(client.environment)
 	adyenClient := adyen.NewClient(&adyen_common.Config{
-		Username:        client.username,
-		Password:        client.password,
+		ApiKey: client.apiKey,
+		LiveEndpointURLPrefix: client.liveURLPrefix,
 		MerchantAccount: client.merchantAccount,
-		Environment:     adyenEnv,
+		Environment:     AdyenEnvironment(client.environment),
 		HTTPClient:      client.httpClient,
 	},
 	)
@@ -120,12 +117,11 @@ func (client *AdyenClient) Refund(request *sleet.RefundRequest) (*sleet.RefundRe
 
 // Void an authorized transaction (cancels the authorization)
 func (client *AdyenClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
-	adyenEnv := AdyenEnvironment(client.environment)
 	adyenClient := adyen.NewClient(&adyen_common.Config{
-		Username:        client.username,
-		Password:        client.password,
+		ApiKey: client.apiKey,
+		LiveEndpointURLPrefix: client.liveURLPrefix,
 		MerchantAccount: client.merchantAccount,
-		Environment:     adyenEnv,
+		Environment:     AdyenEnvironment(client.environment),
 		HTTPClient:      client.httpClient,
 	},
 	)
