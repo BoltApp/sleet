@@ -3,8 +3,8 @@ package adyen
 import (
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
-	"strconv"
 	"github.com/adyen/adyen-go-api-library/src/payments"
+	"strconv"
 )
 
 func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount string) *payments.PaymentRequest {

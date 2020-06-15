@@ -3,8 +3,8 @@ package sleet
 // CVVResponse represents a possible CVV/CVN verification response.
 type CVVResponse int
 
+// Enum representing general CVV responses that we have
 const (
-	// CVVResponseUnknown Unknown CVV code returned by processor
 	CVVResponseUnknown            CVVResponse = iota // Unknown CVV code returned by processor
 	CVVResponseNoResponse                            // No verification response was given
 	CVVResponseError                                 // An error prevented verification (e.g. data validation check failed)

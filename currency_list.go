@@ -1,5 +1,7 @@
 package sleet
 
+// CURRENCIES maps the precision to the currency symbol used for lookups for some PsP providers that rely on these values for amount calculation
+// One example is Braintree which uses its own amount structure requiring the precision of a currency
 var CURRENCIES = map[Code]Currency{
 	AED: {Precision: 2, Symbol: "AED"},
 	AFN: {Precision: 2, Symbol: "؋"},

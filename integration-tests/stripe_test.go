@@ -96,7 +96,7 @@ func TestStripeAuthPartialCapture(t *testing.T) {
 		Amount: &sleet.Amount{
 			Amount:   50,
 			Currency: "USD",
-		},		TransactionReference: auth.TransactionReference,
+		}, TransactionReference: auth.TransactionReference,
 	}
 	capture, err := client.Capture(captureRequest)
 	if err != nil {

@@ -5,7 +5,8 @@ import (
 	adyen_common "github.com/adyen/adyen-go-api-library/src/common"
 )
 
-func AdyenEnvironment(environment common.Environment) adyen_common.Environment {
+// Environment translates a Sleet common environment into the adyen specific environment for the library
+func Environment(environment common.Environment) adyen_common.Environment {
 	if environment == common.Sandbox {
 		return adyen_common.TestEnv
 	}

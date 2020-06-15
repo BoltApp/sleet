@@ -4,9 +4,11 @@ import (
 	"github.com/BoltApp/sleet"
 )
 
+// AVSResponse represents an AVS response code received from Adyen
+// Note: this does represent a translation from original issuing bank AVS
 type AVSResponse string
 
-// avsResponse hard-coded for easy comparison checking later
+// AVSResponse hard-coded for easy comparison checking later
 const (
 	AVSResponse0  AVSResponse = "0 Unknown"
 	AVSResponse1  AVSResponse = "1 Address matches, postal code doesn't"
@@ -40,6 +42,7 @@ const (
 // CVCResult represents the Adyen translation of CVC codes from issuer
 // https://docs.adyen.com/development-resources/test-cards/cvc-cvv-result-testing
 type CVCResult string
+
 // Constants represented by numerical code they are assigned
 const (
 	CVCResult0 CVCResult = "0 Unknown"

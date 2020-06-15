@@ -28,9 +28,9 @@ func NewClient(merchantAccount string, apiKey string, liveURLPrefix string, env 
 // NewWithHTTPClient creates an Adyen client with creds and user specified http client for custom behavior
 func NewWithHTTPClient(merchantAccount string, apiKey string, liveURLPrefix string, env common.Environment, httpClient *http.Client) *AdyenClient {
 	return &AdyenClient{
-		environment: env,
-		apiKey: apiKey,
-		liveURLPrefix: liveURLPrefix,
+		environment:     env,
+		apiKey:          apiKey,
+		liveURLPrefix:   liveURLPrefix,
 		merchantAccount: merchantAccount,
 		httpClient:      httpClient,
 	}
@@ -39,11 +39,11 @@ func NewWithHTTPClient(merchantAccount string, apiKey string, liveURLPrefix stri
 // Authorize through Adyen gateway. This transaction must be captured for funds to be received
 func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	adyenClient := adyen.NewClient(&adyen_common.Config{
-		ApiKey: client.apiKey,
+		ApiKey:                client.apiKey,
 		LiveEndpointURLPrefix: client.liveURLPrefix,
-		MerchantAccount: client.merchantAccount,
-		Environment:     AdyenEnvironment(client.environment),
-		HTTPClient:      client.httpClient,
+		MerchantAccount:       client.merchantAccount,
+		Environment:           Environment(client.environment),
+		HTTPClient:            client.httpClient,
 	},
 	)
 
@@ -77,11 +77,11 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 // Capture an existing transaction by reference
 func (client *AdyenClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	adyenClient := adyen.NewClient(&adyen_common.Config{
-		ApiKey: client.apiKey,
+		ApiKey:                client.apiKey,
 		LiveEndpointURLPrefix: client.liveURLPrefix,
-		MerchantAccount: client.merchantAccount,
-		Environment:     AdyenEnvironment(client.environment),
-		HTTPClient:      client.httpClient,
+		MerchantAccount:       client.merchantAccount,
+		Environment:           Environment(client.environment),
+		HTTPClient:            client.httpClient,
 	},
 	)
 
@@ -98,11 +98,11 @@ func (client *AdyenClient) Capture(request *sleet.CaptureRequest) (*sleet.Captur
 // Refund a captured transaction by reference with specified amount
 func (client *AdyenClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
 	adyenClient := adyen.NewClient(&adyen_common.Config{
-		ApiKey: client.apiKey,
+		ApiKey:                client.apiKey,
 		LiveEndpointURLPrefix: client.liveURLPrefix,
-		MerchantAccount: client.merchantAccount,
-		Environment:     AdyenEnvironment(client.environment),
-		HTTPClient:      client.httpClient,
+		MerchantAccount:       client.merchantAccount,
+		Environment:           Environment(client.environment),
+		HTTPClient:            client.httpClient,
 	},
 	)
 	refund, _, err := adyenClient.Payments.Refund(buildRefundRequest(request, client.merchantAccount))
@@ -118,11 +118,11 @@ func (client *AdyenClient) Refund(request *sleet.RefundRequest) (*sleet.RefundRe
 // Void an authorized transaction (cancels the authorization)
 func (client *AdyenClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
 	adyenClient := adyen.NewClient(&adyen_common.Config{
-		ApiKey: client.apiKey,
+		ApiKey:                client.apiKey,
 		LiveEndpointURLPrefix: client.liveURLPrefix,
-		MerchantAccount: client.merchantAccount,
-		Environment:     AdyenEnvironment(client.environment),
-		HTTPClient:      client.httpClient,
+		MerchantAccount:       client.merchantAccount,
+		Environment:           Environment(client.environment),
+		HTTPClient:            client.httpClient,
 	},
 	)
 	void, _, err := adyenClient.Payments.Cancel(buildVoidRequest(request, client.merchantAccount))
