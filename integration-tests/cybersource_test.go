@@ -33,7 +33,7 @@ func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
 		DestinationCountryCode: "US",
 		DestinationAdminArea:   "CA",
 		LineItems: []sleet.LineItem{
-			sleet.LineItem{
+			{
 				Description:        "TestProduct",
 				ProductCode:        "1234",
 				UnitPrice:          sleet.Amount{Amount: 90, Currency: testCurrency},

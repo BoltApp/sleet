@@ -136,6 +136,7 @@ type RefundResponse struct {
 	ErrorCode            *string
 }
 
+// Currency maps to the CURRENCIES list in currency.go specifying the symbol and precision for the currency
 type Currency struct {
 	Precision int
 	Symbol    string

@@ -201,6 +201,9 @@ func (client *CybersourceClient) buildPOSTRequest(path string, data []byte) (*ht
 	sig := "host: " + client.host + "\ndate: " + now + "\n(request-target): post " + path + "\ndigest: " + digest + "\nv-c-merchant-id: " + client.merchantID
 	sigBytes := []byte(sig)
 	decodedSecret, err := base64.StdEncoding.DecodeString(client.sharedSecretKey)
+	if err != nil {
+		return nil, err
+	}
 	hmacSha256 := hmac.New(sha256.New, decodedSecret)
 	hmacSha256.Write(sigBytes)
 	signature := base64.StdEncoding.EncodeToString(hmacSha256.Sum(nil))

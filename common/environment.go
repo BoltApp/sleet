@@ -5,6 +5,7 @@ package common
 // Done at the Sleet level to avoid clients having to import Payment specific data
 type Environment string
 
+// Only sandbox and production environments are supported
 const (
 	Sandbox    Environment = "sandbox"
 	Production Environment = "production"

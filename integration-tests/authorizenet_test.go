@@ -79,7 +79,7 @@ func TestAuthNetAuthPartialCapture(t *testing.T) {
 		Amount: &sleet.Amount{
 			Amount:   authRequest.Amount.Amount - 10,
 			Currency: "USD",
-		},		TransactionReference: auth.TransactionReference,
+		}, TransactionReference: auth.TransactionReference,
 	}
 	capture, err := client.Capture(captureRequest)
 	if err != nil {

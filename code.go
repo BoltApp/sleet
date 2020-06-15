@@ -8,6 +8,7 @@ import (
 // Code represents ISO 4217 Currency Codes
 type Code string
 
+// ISO 4217 Code List
 const (
 	AED Code = "AED"
 	AFN Code = "AFN"

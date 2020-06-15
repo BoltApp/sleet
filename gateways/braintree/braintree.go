@@ -40,12 +40,11 @@ var (
 // BraintreeClient uses creds and httpClient to make calls to Braintree service
 // Client functions return error for http error and will return Success=true if action is performed successfully
 type BraintreeClient struct {
-	merchantID string
-	publicKey  string
-	privateKey string
+	merchantID  string
+	publicKey   string
+	privateKey  string
 	environment braintree_go.Environment
 	httpClient  *http.Client
-
 }
 
 // NewClient creates a Braintree client with creds and default http client
@@ -56,9 +55,9 @@ func NewClient(merchantID string, publicKey string, privateKey string, environme
 // NewWithHttpClient creates a Braintree client with creds and user specified http client for custom behavior
 func NewWithHttpClient(merchantID string, publicKey string, privateKey string, environment common.Environment, httpClient *http.Client) *BraintreeClient {
 	return &BraintreeClient{
-		merchantID: merchantID,
-		publicKey: publicKey,
-		privateKey: privateKey,
+		merchantID:  merchantID,
+		publicKey:   publicKey,
+		privateKey:  privateKey,
 		environment: braintreeEnvironment(environment),
 		httpClient:  httpClient,
 	}
