@@ -195,6 +195,7 @@ func (c Code) String() string {
 	return string(c)
 }
 
+// GetCode converts a symbol string into the strongly typed Code
 func GetCode(code string) (Code, error) {
 	upper := strings.ToUpper(code)
 	for c := range CURRENCIES {
