@@ -24,6 +24,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*braintree_go.Tr
 			CVV:            card.CVV,
 		},
 		OrderId: common.SafeStr(authRequest.ClientTransactionReference),
+		Channel: authRequest.Channel,
 	}
 
 	if billingAddress != nil {

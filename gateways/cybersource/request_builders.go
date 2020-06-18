@@ -9,6 +9,11 @@ import (
 func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error) {
 	amountStr := sleet.AmountToString(&authRequest.Amount)
 	request := &Request{
+		ClientReferenceInformation: &ClientReferenceInformation{
+			Partner: Partner{
+				SolutionID: authRequest.Channel,
+			},
+		},
 		ProcessingInformation: &ProcessingInformation{
 			Capture:           false, // no autocapture for now
 			CommerceIndicator: "internet",
@@ -42,9 +47,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 	}
 	// If level 3 data is present, and ClientReferenceInformation in that data exists, it will override this.
 	if authRequest.ClientTransactionReference != nil {
-		request.ClientReferenceInformation = &ClientReferenceInformation{
-			Code: *authRequest.ClientTransactionReference,
-		}
+		request.ClientReferenceInformation.Code = *authRequest.ClientTransactionReference
 	}
 	if authRequest.Level3Data != nil {
 		level3 := authRequest.Level3Data

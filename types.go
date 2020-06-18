@@ -73,6 +73,7 @@ type AuthorizationRequest struct {
 	BillingAddress             *BillingAddress
 	Level3Data                 *Level3Data
 	ClientTransactionReference *string // Custom transaction reference metadata that will be associated with this request
+	Channel                    string // for Psps that track the sales channel
 	Options                    map[string]interface{}
 }
 
