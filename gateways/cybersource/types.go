@@ -40,8 +40,13 @@ type Detail struct {
 
 // ClientReferenceInformation is used by the client to identify transactions on their side to tie with Cybersource transactions
 type ClientReferenceInformation struct {
-	Code          string `json:"code"`
-	TransactionID string `json:"transactionID"`
+	Code          string  `json:"code"`
+	TransactionID string  `json:"transactionID"`
+	Partner       Partner `json:"partner,omitempty"`
+}
+
+type Partner struct {
+	SolutionID string `json:"solutionID,omitempty"`
 }
 
 // ProcessorInformation contains processor specific responses sent back primarily through authorize call
