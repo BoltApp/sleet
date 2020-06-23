@@ -7,19 +7,24 @@
 Payment abstraction library - interact with different Payment Service Providers (PsP) with one unified interface.
 
 ## Installation
+
 `go get github.com/BoltApp/sleet`
 
 ## Methodology
-Wherever possible, we try to use native Golang implementations of the PsP's API. We also assume that the caller can pass along raw credit card information (i.e. are PCI compliant) 
+
+Wherever possible, we try to use native Golang implementations of the PsP's API. We also assume that the caller can pass along raw credit card information (i.e. are PCI compliant)
 
 ### Supported API Calls
+
 1. Authorize
 2. Capture
 3. Void
 4. Refund
 
 ### To run tests
+
 The following environment variables are needed in order to run tests
+
 ```shell script
 $ export ADYEN_USERNAME="YOUR_ADYEN_WEBSERVICE_USERNAME"
 $ export ADYEN_ACCOUNT="YOUR_ADYEN_MERCHANT_ACCOUNT"
@@ -33,7 +38,8 @@ $ export BRAINTREE_PRIVATE_ID="YOUR_BRAINTREE_PRIVATE_KEY"
 $ export CYBERSOURCE_ACCOUNT="YOUR_CYBS_ACCOUNT"
 $ export CYBERSOURCE_API_KEY="YOUR_CYBS_KEY"
 $ export CYBERSOURCE_SHARED_SECRET="YOUR_CYBS_SECRET"
-``` 
+```
+
 Then run tests with: `go test ./integration-tests/`
 
 #### Code Example for Auth + Capture
@@ -75,7 +81,7 @@ authorizeRequest := sleet.AuthorizationRequest{
   CreditCard: &card,
   BillingAddress: &address,
 }
-authorizeResponse, _ := client.Authorize(&authorizeRequest) 
+authorizeResponse, _ := client.Authorize(&authorizeRequest)
 
 captureRequest := sleet.CaptureRequest{
   Amount:               &amount,
@@ -85,8 +91,10 @@ client.Capture(&captureRequest)
 ```
 
 #### Supported Gateways
-* [Authorize.Net](https://developer.authorize.net/api/reference/index.html#payment-transactions)
-* [CyberSource](https://developer.cybersource.com/api-reference-assets/index.html#payments)
-* [Stripe](https://stripe.com/docs/api)
-* [Adyen](https://docs.adyen.com/classic-integration/api-integration-ecommerce)
-* [Braintree](https://www.braintreepayments.com/)
+
+- [Authorize.Net](https://developer.authorize.net/api/reference/index.html#payment-transactions)
+- [CyberSource](https://developer.cybersource.com/api-reference-assets/index.html#payments)
+- [Stripe](https://stripe.com/docs/api)
+- [Adyen](https://docs.adyen.com/classic-integration/api-integration-ecommerce)
+- [Braintree](https://www.braintreepayments.com/)
+- [NMI](https://secure.networkmerchants.com/gw/merchants/resources/integration/integration_portal.php#methodology)
