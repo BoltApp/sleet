@@ -66,6 +66,8 @@ func (client *NMIClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.
 	}, nil
 }
 
+// Capture captures an authorized payment through NMI. If successful, the capture response will be returned.
+// Multiple captures cannot be made on the same authorization.
 func (client *NMIClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	nmiCaptureRequest := buildCaptureRequest(client.testMode, client.securityKey, request)
 

@@ -40,7 +40,7 @@ func TestNMIAuthorizeAndCapture(t *testing.T) {
 	}
 	if resp.TransactionReference != capResp.TransactionReference {
 		t.Errorf(
-			"Capture transaction ID [%s] not equal to auth transaction ID [%s]",
+			"Expected capture transaction ID [%s] to be equal to auth transaction ID [%s]",
 			capResp.TransactionReference,
 			resp.TransactionReference,
 		)
