@@ -63,7 +63,6 @@ func (client *NMIClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.
 		Response:             nmiResponse.Response,
 		AvsResultRaw:         nmiResponse.AVSResponseCode,
 		CvvResultRaw:         nmiResponse.CVVResponseCode,
-		ErrorCode:            "",
 	}, nil
 }
 
