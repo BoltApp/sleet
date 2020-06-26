@@ -39,9 +39,9 @@ func NewWithHttpClient(env common.Environment, securityKey string, httpClient *h
 // Authorize makes a payment authorization request to NMI for the given payment details. If successful, the
 // authorization response will be returned.
 func (client *NMIClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
-	nmiRequest := buildAuthRequest(client.testMode, client.securityKey, request)
+	nmiAuthRequest := buildAuthRequest(client.testMode, client.securityKey, request)
 
-	nmiResponse, err := client.sendRequest(nmiRequest)
+	nmiResponse, err := client.sendRequest(nmiAuthRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -63,6 +63,30 @@ func (client *NMIClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.
 		Response:             nmiResponse.Response,
 		AvsResultRaw:         nmiResponse.AVSResponseCode,
 		CvvResultRaw:         nmiResponse.CVVResponseCode,
+	}, nil
+}
+
+func (client *NMIClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
+	nmiCaptureRequest := buildCaptureRequest(client.testMode, client.securityKey, request)
+
+	nmiResponse, err := client.sendRequest(nmiCaptureRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	// "2" means declined and "3" means bad request
+	if nmiResponse.Response != "1" {
+		return &sleet.CaptureResponse{
+			Success: false,
+			// transactionid is not always returned for bad captures, and, when it is, it's the id of the original transaction
+			TransactionReference: request.TransactionReference,
+			ErrorCode:            &nmiResponse.ResponseCode,
+		}, nil
+	}
+
+	return &sleet.CaptureResponse{
+		Success:              true,
+		TransactionReference: nmiResponse.TransactionID,
 	}, nil
 }
 
