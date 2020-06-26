@@ -22,11 +22,11 @@ type Request struct {
 // Response contains all of the fields for all Cybersource API call responses
 type Response struct {
 	AuthCode        string `form:"authcode"`
-	AVSResponseCode string `form:"avsresponsecode"`
-	CVVResponseCode string `form:"cvvresponsecode"`
+	AVSResponseCode string `form:"avsresponse"`
+	CVVResponseCode string `form:"cvvresponse"`
 	OrderId         string `form:"orderid"`
-	Response        int    `form:"response"`
-	ResponseCode    int16  `form:"response_code"`
+	Response        string `form:"response"`
+	ResponseCode    string `form:"response_code"`
 	ResponseText    string `form:"responsetext"`
 	TransactionID   string `form:"transactionid"`
 	Type            string `form:"type"`

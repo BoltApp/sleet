@@ -9,7 +9,7 @@ import (
 // BaseAuthorizationRequest is used as a testing helper method to standardize request calls for integration tests
 func BaseAuthorizationRequest() *sleet.AuthorizationRequest {
 	amount := sleet.Amount{
-		Amount:   1000,
+		Amount:   100,
 		Currency: "USD",
 	}
 	address := sleet.BillingAddress{

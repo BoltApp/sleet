@@ -1,14 +1,13 @@
 package nmi
 
 import (
-	"fmt"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/go-playground/form"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	//"strings"
+	"strings"
 )
 
 const (
@@ -37,60 +36,58 @@ func NewWithHttpClient(env common.Environment, securityKey string, httpClient *h
 	}
 }
 
-// Authorize make a payment authorization request to NMI for the given payment details. If successful, the
+// Authorize makes a payment authorization request to NMI for the given payment details. If successful, the
 // authorization response will be returned.
 func (client *NMIClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	nmiRequest := buildAuthRequest(client.testMode, client.securityKey, request)
-	fmt.Println()
-	fmt.Printf("NMI request: [%+v]\n", nmiRequest)
 
-	nmiResponse, err := client.sendRequest(transactionEndpoint, nmiRequest)
+	nmiResponse, err := client.sendRequest(nmiRequest)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println()
-	fmt.Printf("NMI response: [%+v]\n", nmiResponse)
-	fmt.Println()
+
+	// "2" means declined and "3" means bad request
+	if nmiResponse.Response != "1" {
+		return &sleet.AuthorizationResponse{
+			Success:   false,
+			Response:  nmiResponse.Response,
+			ErrorCode: nmiResponse.ResponseCode,
+		}, nil
+	}
 
 	return &sleet.AuthorizationResponse{
 		Success:              true,
-		TransactionReference: "nmiResponse.TransactionID",
+		TransactionReference: nmiResponse.TransactionID,
 		AvsResult:            sleet.AVSResponseUnknown,
 		CvvResult:            sleet.CVVResponseUnknown,
-		Response:             "",
-		AvsResultRaw:         "",
-		CvvResultRaw:         "",
+		Response:             nmiResponse.Response,
+		AvsResultRaw:         nmiResponse.AVSResponseCode,
+		CvvResultRaw:         nmiResponse.CVVResponseCode,
 		ErrorCode:            "",
 	}, nil
 }
 
-func (client *NMIClient) sendRequest(path string, data *Request) (*Response, error) {
+// sendRequest sends an API request with the given payload to the NMI transaction endpoint.
+// If the request is successfully sent, its response message will be returned.
+func (client *NMIClient) sendRequest(data *Request) (*Response, error) {
 	encoder := form.NewEncoder()
 	formData, err := encoder.Encode(data)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println()
-	fmt.Printf("Encoded form data: [%s]\n", formData.Encode())
 
-	// Attempting to write form to body
-	//req, err := http.NewRequest(http.MethodPost, path, strings.NewReader(formData.Encode()))
-	//if err != nil {
-	//	return nil, err
-	//}
-
-	// Attempting to write form to requests PostForm field
-	req, err := http.NewRequest(http.MethodPost, path, nil)
+	req, err := http.NewRequest(http.MethodPost, transactionEndpoint, strings.NewReader(formData.Encode()))
 	if err != nil {
 		return nil, err
 	}
-	req.PostForm = formData
 
+	parsedUrl, err := url.Parse(transactionEndpoint)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Host", parsedUrl.Hostname())
 	req.Header.Add("User-Agent", common.UserAgent())
-	req.Header.Add("Host", "secure.networkmerchants.com")
-	req.Header.Add("Content-Type", "multipart/form-data")
-	fmt.Println()
-	fmt.Printf("Actual request: [%+v]\n", req)
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
@@ -102,9 +99,6 @@ func (client *NMIClient) sendRequest(path string, data *Request) (*Response, err
 			// TODO log
 		}
 	}()
-
-	fmt.Println()
-	fmt.Printf("status %s\n", resp.Status)
 
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
