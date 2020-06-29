@@ -195,3 +195,100 @@ func TestNMIVoidFailed(t *testing.T) {
 		t.Errorf("Expected void error code to be 300: recieved %s", *voidResp.ErrorCode)
 	}
 }
+
+func TestNMIRefund(t *testing.T) {
+	client := nmi.NewClient(common.Sandbox, getEnv("NMI_SECURITY_KEY"))
+	authRequest := sleet_testing.BaseAuthorizationRequest()
+
+	rand.Seed(time.Now().UnixNano())
+	minTransaction := 100    // Sending request under $1.00 in test mode causes a decline
+	maxTransaction := 100000 // arbitrary
+	authRequest.Amount.Amount = int64(rand.Intn(maxTransaction-minTransaction) + minTransaction)
+
+	authResp, err := client.Authorize(authRequest)
+
+	if err != nil {
+		t.Errorf("Expected no error: received: %s", err)
+	}
+	if authResp.Success != true {
+		t.Errorf("Expected Success: received: %s", authResp.ErrorCode)
+	}
+
+	capResp, err := client.Capture(&sleet.CaptureRequest{
+		Amount:               &authRequest.Amount,
+		TransactionReference: authResp.TransactionReference,
+	})
+
+	if err != nil {
+		t.Errorf("Expected no error: received: %s", err)
+	}
+	if capResp.ErrorCode != nil {
+		t.Errorf("Expected No Error Code: received: %s", *capResp.ErrorCode)
+	}
+
+	refundResp, err := client.Refund(&sleet.RefundRequest{
+		Amount:               &authRequest.Amount,
+		TransactionReference: authResp.TransactionReference,
+	})
+
+	if err != nil {
+		t.Errorf("Expected no error: received: %s", err)
+	}
+	if refundResp.Success != true {
+		t.Errorf("Expected Success: received: %s", *refundResp.ErrorCode)
+	}
+	if authResp.TransactionReference == refundResp.TransactionReference {
+		t.Errorf(
+			"Expected refund transaction ID [%s] to not equal auth transaction ID [%s]",
+			refundResp.TransactionReference,
+			authResp.TransactionReference,
+		)
+	}
+}
+
+func TestNMIRefundFailed(t *testing.T) {
+	client := nmi.NewClient(common.Sandbox, getEnv("NMI_SECURITY_KEY"))
+	authRequest := sleet_testing.BaseAuthorizationRequest()
+
+	rand.Seed(time.Now().UnixNano())
+	minTransaction := 100    // Sending request under $1.00 in test mode causes a decline
+	maxTransaction := 100000 // arbitrary
+	authRequest.Amount.Amount = int64(rand.Intn(maxTransaction-minTransaction) + minTransaction)
+
+	authResp, err := client.Authorize(authRequest)
+
+	if err != nil {
+		t.Errorf("Expected no error: received: %s", err)
+	}
+	if authResp.Success != true {
+		t.Errorf("Expected Success: received: %s", authResp.ErrorCode)
+	}
+
+	capResp, err := client.Capture(&sleet.CaptureRequest{
+		Amount:               &authRequest.Amount,
+		TransactionReference: authResp.TransactionReference,
+	})
+
+	if err != nil {
+		t.Errorf("Expected no error: received: %s", err)
+	}
+	if capResp.ErrorCode != nil {
+		t.Errorf("Expected No Error Code: received: %s", *capResp.ErrorCode)
+	}
+
+	authRequest.Amount.Amount += 100
+	refundResp, err := client.Refund(&sleet.RefundRequest{
+		Amount:               &authRequest.Amount,
+		TransactionReference: authResp.TransactionReference,
+	})
+
+	if err != nil {
+		t.Errorf("Expected no error: received: %s", err)
+	}
+	if refundResp.Success != false {
+		t.Error("Expected failure, refund succeeded")
+	}
+	if *refundResp.ErrorCode != "300" {
+		t.Errorf("Expected void error code to be 300: recieved %s", *refundResp.ErrorCode)
+	}
+}

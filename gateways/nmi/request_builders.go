@@ -10,6 +10,7 @@ import (
 const (
 	auth    = "auth"
 	capture = "capture"
+	refund  = "refund"
 	void    = "void"
 )
 
@@ -60,6 +61,16 @@ func buildVoidRequest(testMode bool, securityKey string, request *sleet.VoidRequ
 		TestMode:        enableTestMode(testMode),
 		TransactionID:   &request.TransactionReference,
 		TransactionType: void,
+	}
+}
+
+func buildRefundRequest(testMode bool, securityKey string, request *sleet.RefundRequest) *Request {
+	return &Request{
+		Amount:          formatAmount(request.Amount.Amount),
+		SecurityKey:     securityKey,
+		TestMode:        enableTestMode(testMode),
+		TransactionID:   &request.TransactionReference,
+		TransactionType: refund,
 	}
 }
 
