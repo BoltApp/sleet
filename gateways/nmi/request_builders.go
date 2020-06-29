@@ -47,6 +47,15 @@ func buildCaptureRequest(testMode bool, securityKey string, request *sleet.Captu
 	}
 }
 
+func buildVoidRequest(testMode bool, securityKey string, request *sleet.VoidRequest) *Request {
+	return &Request{
+		SecurityKey:     securityKey,
+		TestMode:        enableTestMode(testMode),
+		TransactionID:   &request.TransactionReference,
+		TransactionType: "void",
+	}
+}
+
 func enableTestMode(testMode bool) *string {
 	if testMode {
 		enabled := "enabled"

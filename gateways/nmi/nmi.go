@@ -92,6 +92,32 @@ func (client *NMIClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureR
 	}, nil
 }
 
+// Void cancels a NMI transaction. If successful, the void response will be returned. A previously voided
+// transaction or one that has already been settled cannot be voided.
+func (client *NMIClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+	nmiVoidRequest := buildVoidRequest(client.testMode, client.securityKey, request)
+
+	nmiResponse, err := client.sendRequest(nmiVoidRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	// "2" means declined and "3" means bad request
+	if nmiResponse.Response != "1" {
+		return &sleet.VoidResponse{
+			Success: false,
+			// transactionid is not always returned for bad captures, and, when it is, it's the id of the original transaction
+			TransactionReference: request.TransactionReference,
+			ErrorCode:            &nmiResponse.ResponseCode,
+		}, nil
+	}
+
+	return &sleet.VoidResponse{
+		Success:              true,
+		TransactionReference: nmiResponse.TransactionID,
+	}, nil
+}
+
 // sendRequest sends an API request with the given payload to the NMI transaction endpoint.
 // If the request is successfully sent, its response message will be returned.
 func (client *NMIClient) sendRequest(data *Request) (*Response, error) {
