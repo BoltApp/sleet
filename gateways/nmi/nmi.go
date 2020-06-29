@@ -118,8 +118,9 @@ func (client *NMIClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, 
 	}, nil
 }
 
-// Refund refunds a CyberSource payment. If successful, the refund response will be returned. Multiple
-// refunds can be made on the same payment, but the total amount refunded should not exceed the payment total.
+// Refund refunds a NMI transaction that has been captured or settled.
+// If successful, the refund response will be returned.
+// Multiple refunds can be made on the same payment, but the total amount refunded should not exceed the payment total.
 func (client *NMIClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
 	nmiRefundRequest := buildRefundRequest(client.testMode, client.securityKey, request)
 
