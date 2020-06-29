@@ -106,7 +106,7 @@ func (client *NMIClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, 
 	if nmiResponse.Response != "1" {
 		return &sleet.VoidResponse{
 			Success: false,
-			// transactionid is not always returned for bad captures, and, when it is, it's the id of the original transaction
+			// transactionid is not always returned for bad voids, and, when it is, it's the id of the original transaction
 			TransactionReference: request.TransactionReference,
 			ErrorCode:            &nmiResponse.ResponseCode,
 		}, nil

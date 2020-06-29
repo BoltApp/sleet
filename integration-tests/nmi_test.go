@@ -147,6 +147,7 @@ func TestNMIVoid(t *testing.T) {
 	voidResp, err := client.Void(&sleet.VoidRequest{
 		TransactionReference: authResp.TransactionReference,
 	})
+
 	if err != nil {
 		t.Errorf("Expected no error: received: %s", err)
 	}
@@ -183,6 +184,7 @@ func TestNMIVoidFailed(t *testing.T) {
 	voidResp, err := client.Void(&sleet.VoidRequest{
 		TransactionReference: "bad_reference",
 	})
+
 	if err != nil {
 		t.Errorf("Expected no error: received: %s", err)
 	}
