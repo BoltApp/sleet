@@ -118,6 +118,33 @@ func (client *NMIClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, 
 	}, nil
 }
 
+// Refund refunds a NMI transaction that has been captured or settled.
+// If successful, the refund response will be returned.
+// Multiple refunds can be made on the same payment, but the total amount refunded should not exceed the payment total.
+func (client *NMIClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	nmiRefundRequest := buildRefundRequest(client.testMode, client.securityKey, request)
+
+	nmiResponse, err := client.sendRequest(nmiRefundRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	// "2" means declined and "3" means bad request
+	if nmiResponse.Response != "1" {
+		return &sleet.RefundResponse{
+			Success: false,
+			// No transactionid is returned for unsuccessful refunds because refunds create new transactions
+			TransactionReference: request.TransactionReference,
+			ErrorCode:            &nmiResponse.ResponseCode,
+		}, nil
+	}
+
+	return &sleet.RefundResponse{
+		Success:              true,
+		TransactionReference: nmiResponse.TransactionID,
+	}, nil
+}
+
 // sendRequest sends an API request with the given payload to the NMI transaction endpoint.
 // If the request is successfully sent, its response message will be returned.
 func (client *NMIClient) sendRequest(data *Request) (*Response, error) {
