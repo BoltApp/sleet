@@ -6,6 +6,13 @@ import (
 	"strconv"
 )
 
+// NMI transaction types
+const (
+	auth    = "auth"
+	capture = "capture"
+	void    = "void"
+)
+
 func buildAuthRequest(testMode bool, securityKey string, request *sleet.AuthorizationRequest) *Request {
 	zeroPad := ""
 	if request.CreditCard.ExpirationMonth < 10 {
@@ -32,7 +39,7 @@ func buildAuthRequest(testMode bool, securityKey string, request *sleet.Authoriz
 		SecurityKey:     securityKey,
 		State:           request.BillingAddress.RegionCode,
 		TestMode:        enableTestMode(testMode),
-		TransactionType: "auth",
+		TransactionType: auth,
 		ZipCode:         request.BillingAddress.PostalCode,
 	}
 }
@@ -43,7 +50,7 @@ func buildCaptureRequest(testMode bool, securityKey string, request *sleet.Captu
 		SecurityKey:     securityKey,
 		TestMode:        enableTestMode(testMode),
 		TransactionID:   &request.TransactionReference,
-		TransactionType: "capture",
+		TransactionType: capture,
 	}
 }
 
@@ -52,7 +59,7 @@ func buildVoidRequest(testMode bool, securityKey string, request *sleet.VoidRequ
 		SecurityKey:     securityKey,
 		TestMode:        enableTestMode(testMode),
 		TransactionID:   &request.TransactionReference,
-		TransactionType: "void",
+		TransactionType: void,
 	}
 }
 
