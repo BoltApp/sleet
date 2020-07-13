@@ -153,7 +153,8 @@ func (client *FirstdataClient) TransactionInquiry(reqId, transactionRef string) 
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 
 	hashData := client.apiKey + reqId + timestamp
-	h := hmac.New(sha256.New, []byte("secret"))
+
+	h := hmac.New(sha256.New, []byte(client.apiSecret))
 	h.Write([]byte(hashData))
 
 	signature := base64.StdEncoding.EncodeToString((h.Sum(nil)))
