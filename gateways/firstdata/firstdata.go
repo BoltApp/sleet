@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	authPath = "/payments"
+	endpoint = "/payments"
 )
 
 type FirstdataClient struct {
@@ -35,7 +35,12 @@ func NewClient(env common.Environment, apiKey, apiSecret string) *FirstdataClien
 	return NewWithHttpClient(env, apiKey, apiSecret, GetHttpClient())
 }
 
-func NewWithHttpClient(env common.Environment, apiKey, apiSecret string, httpClient *http.Client) *FirstdataClient {
+func NewWithHttpClient(
+	env common.Environment,
+	apiKey,
+	apiSecret string,
+	httpClient *http.Client,
+) *FirstdataClient {
 	return &FirstdataClient{
 		host:       firstdataHost(env),
 		apiKey:     apiKey,
@@ -43,31 +48,35 @@ func NewWithHttpClient(env common.Environment, apiKey, apiSecret string, httpCli
 	}
 }
 
+func (client *FirstdataClient) primaryURL() string {
+	return "https://" + client.host + endpoint
+}
+
+func (client *FirstdataClient) secondaryURL(ref string) string {
+	return "https://" + client.host + endpoint + "/" + ref
+}
+
 func (client *FirstdataClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	firstdataAuthRequest, err := buildAuthRequest(request)
-
-	clientRequestId := request.ClientTransactionReference
 
 	if err != nil {
 		return nil, err
 	}
 
-	url := "https://" + client.host + authPath
-
-	firstdataResponse, err := client.sendRequest(*clientRequestId, url, *firstdataAuthRequest)
+	firstdataResponse, err := client.sendRequest(*request.ClientTransactionReference, client.primaryURL(), *firstdataAuthRequest)
 	if err != nil {
 		return nil, err
 	}
 
 	success := false
 
-	if firstdataResponse.TransactionStatus == "APPROVED" || firstdataResponse.TransactionStatus == "WAITING" {
-		success = true
-	}
-
 	if firstdataResponse.Error != nil {
 		response := sleet.AuthorizationResponse{Success: false, ErrorCode: firstdataResponse.Error.Code}
 		return &response, nil
+	}
+
+	if firstdataResponse.TransactionStatus == StatusApproved || firstdataResponse.TransactionStatus == StatusWaiting {
+		success = true
 	}
 
 	avsRaw, err := json.Marshal(firstdataResponse.Processor.AVSResponse)
@@ -80,10 +89,10 @@ func (client *FirstdataClient) Authorize(request *sleet.AuthorizationRequest) (*
 		Success:              success,
 		TransactionReference: firstdataResponse.IPGTransactionId,
 		AvsResult:            translateAvs(firstdataResponse.Processor.AVSResponse),
-		CvvResult:            translateCvv(firstdataResponse.SecurityCodeResponse),
-		Response:             firstdataResponse.TransactionState,
+		CvvResult:            translateCvv(firstdataResponse.Processor.SecurityCodeResponse),
+		Response:             string(firstdataResponse.TransactionState),
 		AvsResultRaw:         avsRawString,
-		CvvResultRaw:         firstdataResponse.SecurityCodeResponse,
+		CvvResultRaw:         string(firstdataResponse.Processor.SecurityCodeResponse),
 	}, nil
 }
 
@@ -93,9 +102,12 @@ func (client *FirstdataClient) Capture(request *sleet.CaptureRequest) (*sleet.Ca
 		return nil, err
 	}
 
-	url := "https://" + client.host + authPath + "/" + request.TransactionReference
+	firstdataResponse, err := client.sendRequest(
+		*request.ClientTransactionReference,
+		client.secondaryURL(request.TransactionReference),
+		*firstdataCaptureRequest,
+	)
 
-	firstdataResponse, err := client.sendRequest(*request.ClientTransactionReference, url, *firstdataCaptureRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -115,8 +127,12 @@ func (client *FirstdataClient) Void(request *sleet.VoidRequest) (*sleet.VoidResp
 	if err != nil {
 		return nil, err
 	}
-	url := "https://" + client.host + authPath + "/" + request.TransactionReference
-	firstdataResponse, err := client.sendRequest(*request.ClientTransactionReference, url, *firstdataVoidRequest)
+
+	firstdataResponse, err := client.sendRequest(
+		*request.ClientTransactionReference,
+		client.secondaryURL(request.TransactionReference),
+		*firstdataVoidRequest,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -128,15 +144,20 @@ func (client *FirstdataClient) Void(request *sleet.VoidRequest) (*sleet.VoidResp
 	return &sleet.VoidResponse{Success: true, TransactionReference: firstdataResponse.IPGTransactionId}, nil
 }
 
-// Refund refunds a Firstdata payment. If successful, the refund response will be returned. Multiple
-// refunds can be made on the same payment, but the total amount refunded should not exceed the payment total.
+// Refund refunds a Firstdata payment.
+// Multiple refunds can be made on the same payment, but the total amount refunded should not exceed the payment total.
 func (client *FirstdataClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
 	firstdataRefundRequest, err := buildRefundRequest(request)
 	if err != nil {
 		return nil, err
 	}
-	url := "https://" + client.host + authPath + "/" + request.TransactionReference
-	firstdataResponse, err := client.sendRequest(*request.ClientTransactionReference, url, *firstdataRefundRequest)
+
+	firstdataResponse, err := client.sendRequest(
+		*request.ClientTransactionReference,
+		client.secondaryURL(request.TransactionReference),
+		*firstdataRefundRequest,
+	)
+
 	if err != nil {
 		return nil, err
 	}
@@ -146,56 +167,6 @@ func (client *FirstdataClient) Refund(request *sleet.RefundRequest) (*sleet.Refu
 		return &response, nil
 	}
 	return &sleet.RefundResponse{Success: true, TransactionReference: firstdataResponse.IPGTransactionId}, nil
-}
-
-// reqId is our internally generated id,unique per request, tranasactionRef is firstdata's returned ref
-func (client *FirstdataClient) TransactionInquiry(reqId, transactionRef string) (*Response, error) {
-
-	url := "https://" + client.host + authPath + "/" + transactionRef
-
-	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-
-	hashData := client.apiKey + reqId + timestamp
-
-	h := hmac.New(sha256.New, []byte(client.apiSecret))
-	h.Write([]byte(hashData))
-
-	signature := base64.StdEncoding.EncodeToString((h.Sum(nil)))
-
-	request, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	request.Header.Add("User-Agent", common.UserAgent())
-
-	request.Header.Add("Api-Key", client.apiKey)
-	request.Header.Add("Client-Request-Id", reqId)
-	request.Header.Add("Timestamp", timestamp)
-	request.Header.Add("Message-Signature", signature)
-
-	resp, err := client.httpClient.Do(request)
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		err := resp.Body.Close()
-		if err != nil {
-			// TODO log
-		}
-	}()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	var firstdataResponse Response
-	err = json.Unmarshal(body, &firstdataResponse)
-	if err != nil {
-		return nil, err
-	}
-	return &firstdataResponse, nil
-
 }
 
 func makeSignature(timestamp, apiKey, apiSecret, reqId, body string) string {
@@ -215,13 +186,6 @@ func (client *FirstdataClient) sendRequest(reqId, url string, data Request) (*Re
 	}
 
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-
-	// hashData := client.apiKey + reqId + timestamp + string(bodyJSON)
-
-	// h := hmac.New(sha256.New, []byte(client.apiSecret))
-	// h.Write([]byte(hashData))
-
-	// signature := base64.StdEncoding.EncodeToString((h.Sum(nil)))
 	signature := makeSignature(timestamp, client.apiKey, client.apiSecret, reqId, string(bodyJSON))
 
 	reader := bytes.NewReader(bodyJSON)
@@ -230,10 +194,9 @@ func (client *FirstdataClient) sendRequest(reqId, url string, data Request) (*Re
 	if err != nil {
 		return nil, err
 	}
+
 	request.Header.Add("User-Agent", common.UserAgent())
-
 	request.Header.Add("Api-Key", client.apiKey)
-
 	request.Header.Add("Client-Request-Id", reqId)
 	request.Header.Add("Timestamp", timestamp)
 	request.Header.Add("Message-Signature", signature)
@@ -242,12 +205,8 @@ func (client *FirstdataClient) sendRequest(reqId, url string, data Request) (*Re
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		err := resp.Body.Close()
-		if err != nil {
-			// TODO log
-		}
-	}()
+
+	defer func() { resp.Body.Close() }()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

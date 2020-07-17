@@ -10,18 +10,18 @@ import (
 
 func TestTranslateCvv(t *testing.T) {
 	cases := []struct {
-		in   string
+		in   CVVResponseCode
 		want sleet.CVVResponse
 	}{
-		{"MATCHED", sleet.CVVResponseMatch},
-		{"NOT_MATCHED", sleet.CVVResponseNoMatch},
-		{"NOT_PROCESSED", sleet.CVVResponseNotProcessed},
-		{"NOT_PRESENT", sleet.CVVResponseRequiredButMissing},
-		{"NOT_CERTIFIED", sleet.CVVResponseNotProcessed},
+		{CVVResponseMatched, sleet.CVVResponseMatch},
+		{CVVResponseNotMatched, sleet.CVVResponseNoMatch},
+		{CVVResponseNotProcessed, sleet.CVVResponseNotProcessed},
+		{CVVResponseNotPresent, sleet.CVVResponseRequiredButMissing},
+		{CVVResponseNotCertified, sleet.CVVResponseNotProcessed},
 	}
 
 	for _, c := range cases {
-		t.Run(c.in, func(t *testing.T) {
+		t.Run(string(c.in), func(t *testing.T) {
 			got := translateCvv(c.in)
 			if got != c.want {
 				t.Errorf("Got %q, want %q", got, c.want)
@@ -57,7 +57,7 @@ func TestTranslateAvs(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		t.Run("Street:"+c.in.StreetMatch+"|Post:"+c.in.PostCodeMatch, func(t *testing.T) {
+		t.Run(string("Street:"+c.in.StreetMatch+"|Post:"+c.in.PostCodeMatch), func(t *testing.T) {
 			got := translateAvs(c.in)
 			if got != c.want {
 				t.Errorf("Got %q, want %q", got, c.want)

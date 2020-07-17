@@ -11,7 +11,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 	amountStr := sleet.AmountToString(&authRequest.Amount)
 
 	request := &Request{
-		RequestType: "PaymentCardPreAuthTransaction",
+		RequestType: RequestTypeAuth,
 		TransactionAmount: TransactionAmount{
 			Total:    amountStr,
 			Currency: authRequest.Amount.Currency,
@@ -33,7 +33,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 func buildCaptureRequest(captureRequest *sleet.CaptureRequest) (*Request, error) {
 	amountStr := sleet.AmountToString(captureRequest.Amount)
 	request := &Request{
-		RequestType: "PostAuthTransaction",
+		RequestType: RequestTypeCapture,
 		TransactionAmount: TransactionAmount{
 			Total:    amountStr,
 			Currency: captureRequest.Amount.Currency,
@@ -44,7 +44,7 @@ func buildCaptureRequest(captureRequest *sleet.CaptureRequest) (*Request, error)
 
 func buildVoidRequest(voidRequest *sleet.VoidRequest) (*Request, error) {
 	request := &Request{
-		RequestType: "VoidTransaction",
+		RequestType: RequestTypeVoid,
 	}
 	return request, nil
 }
@@ -52,7 +52,7 @@ func buildVoidRequest(voidRequest *sleet.VoidRequest) (*Request, error) {
 func buildRefundRequest(refundRequest *sleet.RefundRequest) (*Request, error) {
 	amountStr := sleet.AmountToString(refundRequest.Amount)
 	request := &Request{
-		RequestType: "ReturnTransaction",
+		RequestType: RequestTypeRefund,
 		TransactionAmount: TransactionAmount{
 			Total:    amountStr,
 			Currency: refundRequest.Amount.Currency,
