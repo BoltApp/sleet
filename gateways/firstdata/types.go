@@ -1,52 +1,91 @@
 package firstdata
 
+type RequestType string
+
+const (
+	RequestTypeAuth    RequestType = "PaymentCardPreAuthTransaction"
+	RequestTypeCapture RequestType = "PostAuthTransaction"
+	RequestTypeRefund  RequestType = "ReturnTransaction"
+	RequestTypeVoid    RequestType = "VoidTransaction"
+)
+
+type TransactionStatus string
+
+const (
+	StatusApproved         TransactionStatus = "APPROVED"
+	StatusWaiting          TransactionStatus = "WAITING"
+	StatusValidationFailed TransactionStatus = "VALIDATION_FAILED"
+	StatusProcessingFailed TransactionStatus = "PROCESSING_FAILED"
+	StatusDeclined         TransactionStatus = "DECLINED"
+)
+
+type TransactionState string
+
+const (
+	StateAuthorized   TransactionState = "AUTHORIZED"
+	StateCaptured     TransactionState = "CAPTURED"
+	StateDeclined     TransactionState = "DECLINED"
+	StateChecked      TransactionState = "CHECKED"
+	StateCompletedGet TransactionState = "COMPLETED_GET"
+	StateInitialized  TransactionState = "INITIALIZED"
+	StatePending      TransactionState = "PENDING"
+	StateReady        TransactionState = "READY"
+	StateTemplate     TransactionState = "TEMPLATE"
+	StateSettled      TransactionState = "SETTLED"
+	StateVoided       TransactionState = "VOIDED"
+	StateWaiting      TransactionState = "WAITING"
+)
+
+type CVVResponseCode string
+
+const (
+	CVVResponseMatched      CVVResponseCode = "MATCHED"
+	CVVResponseNotMatched   CVVResponseCode = "NOT_MATCHED"
+	CVVResponseNotProcessed CVVResponseCode = "NOT_PROCESSED"
+	CVVResponseNotCertified CVVResponseCode = "NOT_CERTIFIED"
+	CVVResponseNotChecked   CVVResponseCode = "NOT_CHECKED"
+	CVVResponseNotPresent   CVVResponseCode = "NOT_PRESENT"
+)
+
+type AVSResponseCode string
+
+const (
+	AVSResponseMatch      AVSResponseCode = "Y"
+	AVSResponseNotMatch   AVSResponseCode = "N"
+	AVSResponseNoInput    AVSResponseCode = "NO_INPUT_DATA"
+	AVSResponseNotChecked AVSResponseCode = "NOT_CHECKED"
+)
+
 type Request struct {
-	RequestType       string            `json:"requestType"`
+	RequestType       RequestType       `json:"requestType"`
 	TransactionAmount TransactionAmount `json:"transactionAmount"`
 	PaymentMethod     PaymentMethod     `json:"paymentMethod"`
-	// SplitShipment     *SplitShipment    `json:"splitShipment"`
 }
 
 type Response struct {
-	ClientRequestId      string         `json:"clientRequestId"`
-	ApiTraceId           string         `json:"apiTraceId"`
-	ResponseType         string         `json:"responseType"`
-	OrderId              *string        `json:"responseType"`
-	IPGTransactionId     string         `json:"ipgTransactionId"`
-	TransactionType      string         `json:"transactionType"`
-	TransactionOrigin    *string        `json:"transactionOrigin"`
-	TransactionTime      int            `json:"transactionTime"`
-	ApprovedAmount       ApprovedAmount `json:"approvedAmount"`
-	TransactionStatus    string         `json:"transactionStatus"` // Enum:[ APPROVED, WAITING, VALIDATION_FAILED, PROCESSING_FAILED, DECLINED ]
-	TransactionState     string         `json:"transactionState"`  // Enum:[ AUTHORIZED, CAPTURED, DECLINED, CHECKED, COMPLETED_GET, INITIALIZED, PENDING, READY, TEMPLATE, SETTLED, VOIDED, WAITING ]
-	SchemeTransactionId  string         `json:"schemeTransactionId"`
-	Processor            ProcessorData  `json:"processor"`
-	SecurityCodeResponse string         `json:"securityCodeResponse"` //Enum:[ MATCHED, NOT_MATCHED, NOT_PROCESSED, NOT_PRESENT, NOT_CERTIFIED ]
-	Error                *Error         `json:"error"`
-}
-
-type ErrorResponse struct {
-	ClientRequestId  string `json:"clientRequestId"`
-	ApiTraceID       string `json:"apiTraceId"`
-	ResponseType     string `json:"responseType"`
-	Error            Error  `json:"error"`
-	IpgTransactionId string `json:"ipgTransactionId"`
-	TransactionType  string `json:"transactionType"`
+	ClientRequestId     string            `json:"clientRequestId"`
+	ApiTraceId          string            `json:"apiTraceId"`
+	ResponseType        string            `json:"responseType"`
+	OrderId             *string           `json:"responseType"`
+	IPGTransactionId    string            `json:"ipgTransactionId"`
+	TransactionType     string            `json:"transactionType"`
+	TransactionOrigin   *string           `json:"transactionOrigin"`
+	TransactionTime     int               `json:"transactionTime"` //EPOCH seconds
+	ApprovedAmount      ApprovedAmount    `json:"approvedAmount"`
+	TransactionStatus   TransactionStatus `json:"transactionStatus"`
+	TransactionState    TransactionState  `json:"transactionState"`
+	SchemeTransactionId string            `json:"schemeTransactionId"`
+	Processor           ProcessorData     `json:"processor"`
+	Error               *Error            `json:"error"`
 }
 
 type Error struct {
-	Code    string   `json:"code"`
-	Message string   `json:"message"`
-	Details []Detail `json:"details"`
+	Code    string        `json:"code"`
+	Message string        `json:"message"`
+	Details []ErrorDetail `json:"details"`
 }
 
-type TransactionErrorResponse struct {
-	ClientRequestID string `json:"clientRequestID"`
-	ApiTraceID      string `json:"apiTraceId"`
-	ResponseType    string `json:"responseType"`
-	Ipg             string `json:"responseType"`
-}
-type Detail struct {
+type ErrorDetail struct {
 	Field   string `json:"field"`
 	Message string `json:"message"`
 }
@@ -68,12 +107,7 @@ type PaymentCard struct {
 
 type ExpiryDate struct {
 	Month string `json:"month"`
-	Year  string `json:"year"`
-}
-
-type SplitShipment struct {
-	TotalCount    int  `json:"totalCount"`
-	FinalShipment bool `json:"finalShipment"`
+	Year  string `json:"year"` // Last 2 digits of year. "21" if the year is "2021"
 }
 
 type ApprovedAmount struct {
@@ -82,19 +116,19 @@ type ApprovedAmount struct {
 }
 
 type ProcessorData struct {
-	ReferenceNumber         string      `json:"referenceNumber"`
-	AuthorizationCode       string      `json:"authorizationCode"`
-	ResponseCode            string      `json:"responseCode"`
-	ResponseMessage         string      `json:"responseMessage"`
-	Network                 string      `json:"network"`
-	associationResponseCode string      `json:"associationResponseCode"`
-	AVSResponse             AVSResponse `json:"acsResponse"`
+	ReferenceNumber         string          `json:"referenceNumber"`
+	AuthorizationCode       string          `json:"authorizationCode"`
+	ResponseCode            string          `json:"responseCode"`
+	ResponseMessage         string          `json:"responseMessage"`
+	Network                 string          `json:"network"`
+	associationResponseCode string          `json:"associationResponseCode"`
+	AVSResponse             AVSResponse     `json:"avsResponse"`
+	SecurityCodeResponse    CVVResponseCode `json:"securityCodeResponse"`
 }
 
 type AVSResponse struct {
-	StreetMatch   string `json:"streetMatch"`   //Enum:[ Y, N, NO_INPUT_DATA, NOT_CHECKED ]
-	PostCodeMatch string `json:"postCodeMatch"` //Enum:[ Y, N, NO_INPUT_DATA, NOT_CHECKED ]
-
+	StreetMatch   AVSResponseCode `json:"streetMatch"`
+	PostCodeMatch AVSResponseCode `json:"postCodeMatch"`
 }
 
 type CurrencyConversion struct {
