@@ -6,7 +6,6 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -28,8 +27,12 @@ type FirstdataClient struct {
 	httpClient      *http.Client
 }
 
+var GetHttpClient = func() *http.Client {
+	return common.DefaultHttpClient()
+}
+
 func NewClient(env common.Environment, apiKey, apiSecret string) *FirstdataClient {
-	return NewWithHttpClient(env, apiKey, apiSecret, common.DefaultHttpClient())
+	return NewWithHttpClient(env, apiKey, apiSecret, GetHttpClient())
 }
 
 func NewWithHttpClient(env common.Environment, apiKey, apiSecret string, httpClient *http.Client) *FirstdataClient {
@@ -195,6 +198,15 @@ func (client *FirstdataClient) TransactionInquiry(reqId, transactionRef string) 
 
 }
 
+func makeSignature(timestamp, apiKey, apiSecret, reqId, body string) string {
+	hashData := apiKey + reqId + timestamp + body
+
+	h := hmac.New(sha256.New, []byte(apiSecret))
+	h.Write([]byte(hashData))
+
+	return base64.StdEncoding.EncodeToString((h.Sum(nil)))
+}
+
 func (client *FirstdataClient) sendRequest(reqId, url string, data Request) (*Response, error) {
 
 	bodyJSON, err := json.Marshal(data)
@@ -204,17 +216,13 @@ func (client *FirstdataClient) sendRequest(reqId, url string, data Request) (*Re
 
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 
-	hashData := client.apiKey + reqId + timestamp + string(bodyJSON)
+	// hashData := client.apiKey + reqId + timestamp + string(bodyJSON)
 
-	h := hmac.New(sha256.New, []byte(client.apiSecret))
-	h.Write([]byte(hashData))
+	// h := hmac.New(sha256.New, []byte(client.apiSecret))
+	// h.Write([]byte(hashData))
 
-	signature := base64.StdEncoding.EncodeToString((h.Sum(nil)))
-
-	fmt.Println("Signature info :")
-	fmt.Println(client.apiSecret)
-	fmt.Println(hashData)
-	fmt.Println(signature)
+	// signature := base64.StdEncoding.EncodeToString((h.Sum(nil)))
+	signature := makeSignature(timestamp, client.apiKey, client.apiSecret, reqId, string(bodyJSON))
 
 	reader := bytes.NewReader(bodyJSON)
 
@@ -245,8 +253,6 @@ func (client *FirstdataClient) sendRequest(reqId, url string, data Request) (*Re
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println("%v", string(body))
 
 	var firstdataResponse Response
 	err = json.Unmarshal(body, &firstdataResponse)

@@ -30,3 +30,41 @@ func BaseAuthorizationRequest() *sleet.AuthorizationRequest {
 	reference := randomdata.Letters(10)
 	return &sleet.AuthorizationRequest{Amount: amount, CreditCard: &card, BillingAddress: &address, ClientTransactionReference: &reference}
 }
+
+func BaseCaptureRequest() *sleet.CaptureRequest {
+	clientRef := "222222"
+
+	amount := sleet.Amount{
+		Amount:   100,
+		Currency: "USD",
+	}
+	return &sleet.CaptureRequest{
+		Amount:                     &amount,
+		TransactionReference:       "111111",
+		ClientTransactionReference: &clientRef,
+	}
+}
+
+func BaseVoidRequest() *sleet.VoidRequest {
+	clientRef := "222222"
+
+	return &sleet.VoidRequest{
+		TransactionReference:       "111111",
+		ClientTransactionReference: &clientRef,
+	}
+}
+
+func BaseRefundRequest() *sleet.RefundRequest {
+	clientRef := "222222"
+
+	amount := sleet.Amount{
+		Amount:   100,
+		Currency: "USD",
+	}
+	return &sleet.RefundRequest{
+		Amount:                     &amount,
+		TransactionReference:       "111111",
+		ClientTransactionReference: &clientRef,
+		Options:                    nil,
+	}
+}
