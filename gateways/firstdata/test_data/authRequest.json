@@ -1,0 +1,1 @@
+{"requestType":"PaymentCardPreAuthTransaction","transactionAmount":{"total":"0.19","currency":"USD"},"paymentMethod":{"paymentCard":{"number":"4111111111111111","securityCode":"737","expiryDate":{"month":"10","year":"20"}}}}

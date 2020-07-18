@@ -13,6 +13,7 @@ import (
 
 func TestBuildAuthRequest(t *testing.T) {
 	base := sleet_testing.BaseAuthorizationRequest()
+	base.CreditCard.ExpirationYear = 1234
 
 	cases := []struct {
 		label string
@@ -34,7 +35,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						SecurityCode: "737",
 						ExpiryDate: ExpiryDate{
 							Month: "10",
-							Year:  "20",
+							Year:  "34",
 						},
 					},
 				},

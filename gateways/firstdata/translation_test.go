@@ -18,6 +18,7 @@ func TestTranslateCvv(t *testing.T) {
 		{CVVResponseNotProcessed, sleet.CVVResponseNotProcessed},
 		{CVVResponseNotPresent, sleet.CVVResponseRequiredButMissing},
 		{CVVResponseNotCertified, sleet.CVVResponseNotProcessed},
+		{"Fake Response", sleet.CVVResponseUnknown},
 	}
 
 	for _, c := range cases {

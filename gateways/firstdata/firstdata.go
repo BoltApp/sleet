@@ -20,31 +20,18 @@ const (
 )
 
 type FirstdataClient struct {
-	host            string
-	apiKey          string
-	apiSecret       string
-	clientRequestID string
-	httpClient      *http.Client
-}
-
-var GetHttpClient = func() *http.Client {
-	return common.DefaultHttpClient()
+	host       string
+	apiKey     string
+	apiSecret  string
+	httpClient common.HttpSender
 }
 
 func NewClient(env common.Environment, apiKey, apiSecret string) *FirstdataClient {
-	return NewWithHttpClient(env, apiKey, apiSecret, GetHttpClient())
-}
-
-func NewWithHttpClient(
-	env common.Environment,
-	apiKey,
-	apiSecret string,
-	httpClient *http.Client,
-) *FirstdataClient {
 	return &FirstdataClient{
 		host:       firstdataHost(env),
 		apiKey:     apiKey,
-		httpClient: httpClient,
+		apiSecret:  apiSecret,
+		httpClient: common.DefaultHttpClient(),
 	}
 }
 
@@ -58,7 +45,6 @@ func (client *FirstdataClient) secondaryURL(ref string) string {
 
 func (client *FirstdataClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	firstdataAuthRequest, err := buildAuthRequest(request)
-
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +93,6 @@ func (client *FirstdataClient) Capture(request *sleet.CaptureRequest) (*sleet.Ca
 		client.secondaryURL(request.TransactionReference),
 		*firstdataCaptureRequest,
 	)
-
 	if err != nil {
 		return nil, err
 	}
@@ -206,7 +191,7 @@ func (client *FirstdataClient) sendRequest(reqId, url string, data Request) (*Re
 		return nil, err
 	}
 
-	defer func() { resp.Body.Close() }()
+	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

@@ -16,6 +16,10 @@ func DefaultHttpClient() *http.Client {
 	}
 }
 
+type HttpSender interface {
+	Do(*http.Request) (*http.Response, error)
+}
+
 // UserAgent specifies the Sleet library and version for PsPs that require this header
 func UserAgent() string {
 	return fmt.Sprintf("Sleet/%s", LibraryVersion)

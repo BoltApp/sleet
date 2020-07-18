@@ -1,0 +1,8 @@
+{
+  "clientRequestId": "03b2b7bb-ad71-4569-a72d-59fd1dd81c7e",
+  "responseType": "Unauthenticated",
+    "error": {
+        "code":"403",
+        "message":"Message Signature has expired"
+    }
+}

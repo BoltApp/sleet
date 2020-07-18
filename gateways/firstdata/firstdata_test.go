@@ -7,86 +7,102 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
+	sleet_t "github.com/BoltApp/sleet/testing"
 	sleet_testing "github.com/BoltApp/sleet/testing"
-	"github.com/go-test/deep"
+	"github.com/google/go-cmp/cmp"
 )
 
-const apiKey string = "12345"
-const apiSecret string = "98765"
-const reqId string = "11111"
+const defaultApiKey string = "12345"
+const defaultApiSecret string = "98765"
+const defaultReqId string = "11111"
 
-const (
-	authResponseRaw string = "{\r\n  \"clientRequestId\": \"03b2b7bb-ad71-4569-a72d-59fd1dd81c7e\",\r\n  \"apiTraceId\": \"rrt-01550643f01a14a4e-b-ea-24733-175600086-1\",\r\n  \"ipgTransactionId\": \"84538652787\",\r\n  \"orderId\": \"R-866d4cca-22d1-476d-a681-682237fc7404\",\r\n  \"transactionType\": \"PREAUTH\",\r\n  \"transactionOrigin\": \"ECOM\",\r\n  \"paymentMethodDetails\": {\r\n    \"paymentCard\": {\r\n      \"expiryDate\": {\r\n        \"month\": \"10\",\r\n        \"year\": \"2020\"\r\n      },\r\n      \"bin\": \"411111\",\r\n      \"last4\": \"1111\",\r\n      \"brand\": \"VISA\"\r\n    },\r\n    \"paymentMethodType\": \"PAYMENT_CARD\"\r\n  },\r\n  \"terminalId\": \"1588390\",\r\n  \"merchantId\": \"939650001885\",\r\n  \"transactionTime\": 1594573266,\r\n  \"approvedAmount\": {\r\n    \"total\": 0.19,\r\n    \"currency\": \"USD\",\r\n    \"components\": {\r\n      \"subtotal\": 0.19\r\n    }\r\n  },\r\n  \"transactionStatus\": \"APPROVED\",\r\n  \"schemeTransactionId\": \"010194321391899\",\r\n  \"processor\": {\r\n    \"referenceNumber\": \"84538652787 \",\r\n    \"authorizationCode\": \"OK5922\",\r\n    \"responseCode\": \"00\",\r\n    \"network\": \"VISA\",\r\n    \"associationResponseCode\": \"000\",\r\n    \"responseMessage\": \"APPROVAL\",\r\n    \"avsResponse\": {\r\n      \"streetMatch\": \"NO_INPUT_DATA\",\r\n      \"postalCodeMatch\": \"NO_INPUT_DATA\"\r\n    },\r\n    \"securityCodeResponse\": \"NOT_CHECKED\"\r\n  }\r\n}\r\n"
-)
+func TestNewClient(t *testing.T) {
+	t.Run("Dev environment", func(t *testing.T) {
+		want := &FirstdataClient{
+			host:       "cert.api.firstdata.com/gateway/v2",
+			apiKey:     defaultApiKey,
+			apiSecret:  defaultApiSecret,
+			httpClient: common.DefaultHttpClient(),
+		}
 
-func TestAuthorize(t *testing.T) {
-	gotApiKey := ""
-	gotRequestId := ""
-	gotSignature := ""
-	// gotTimestamp := ""
+		got := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
 
-	testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-		gotApiKey = req.Header.Get("Api-Key")
-		gotRequestId = req.Header.Get("Client-Request-Id")
-		gotSignature = req.Header.Get("Message-Signature")
-		// gotTimestamp = req.Header.Get("Timestamp")
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Client does not match expected")
+			t.Error(cmp.Diff(want, got, sleet_t.CompareUnexported))
+		}
+	})
 
-		res.Write([]byte(authResponseRaw))
-	}))
+	t.Run("Production environment", func(t *testing.T) {
+		want := &FirstdataClient{
+			host:       "prod.api.firstdata.com/gateway/v2",
+			apiKey:     defaultApiKey,
+			apiSecret:  defaultApiSecret,
+			httpClient: common.DefaultHttpClient(),
+		}
 
-	// NOTE shadows the GetHttpClient method in firstdata.go to replace it with a mock
-	GetHttpClient = func() *http.Client {
-		return testServer.Client()
-	}
+		got := NewClient(common.Production, defaultApiKey, defaultApiSecret)
 
-	firstDataClient := NewClient(common.Sandbox, apiKey, apiSecret)
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Client does not match expected")
+			t.Error(cmp.Diff(want, got, sleet_t.CompareUnexported))
+		}
+	})
+}
 
-	base := sleet_testing.BaseAuthorizationRequest()
+func TestPrimaryURL(t *testing.T) {
 
-	got, err := firstDataClient.Authorize(base)
-	if err != nil {
-		t.Errorf("ERROR THROWN: Got %q, after calling Authorize", err)
-	}
+	t.Run("Dev environment", func(t *testing.T) {
+		client := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
 
-	avsRaw, _ := json.Marshal(AVSResponse{"NO_INPUT_DATA", "NO_INPUT_DATA"})
-	avsRawString := string(avsRaw)
+		want := "https://cert.api.firstdata.com/gateway/v2/payments"
+		got := client.primaryURL()
 
-	want := &sleet.AuthorizationResponse{
-		Success:              true,
-		TransactionReference: "84538652787",
-		AvsResult:            sleet.AVSResponseMatch,
-		CvvResult:            sleet.CVVResponseMatch,
-		AvsResultRaw:         avsRawString,
-		CvvResultRaw:         "NOT_CHECKED",
-	}
+		if got != want {
+			t.Errorf("Got %q, want %q", got, want)
+		}
+	})
 
-	if diff := deep.Equal(got, want); diff != nil {
-		t.Error(diff)
-	}
+	t.Run("Production environment", func(t *testing.T) {
+		client := NewClient(common.Production, defaultApiKey, defaultApiSecret)
 
-	header_cases := []struct {
-		label string
-		want  string
-		got   string
-	}{
-		{"apiKey", apiKey, gotApiKey},
-		{"RequestID", reqId, gotRequestId},
-		{"Signature", "", gotSignature},
-		// {"Timestamp", "", gotTimestamp},
-	}
+		want := "https://prod.api.firstdata.com/gateway/v2/payments"
+		got := client.primaryURL()
 
-	t.Run("Request Headers", func(t *testing.T) {
-		for _, c := range header_cases {
-			t.Run(c.label, func(t *testing.T) {
-				if c.got != c.want {
-					t.Errorf("Got %q, want %q", c.got, c.want)
-				}
-			})
+		if got != want {
+			t.Errorf("Got %q, want %q", got, want)
+		}
+	})
+}
+
+func TestSecondaryURL(t *testing.T) {
+	ref := "22222"
+
+	t.Run("Dev environment", func(t *testing.T) {
+		client := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+
+		want := "https://cert.api.firstdata.com/gateway/v2/payments/22222"
+		got := client.secondaryURL(ref)
+
+		if got != want {
+			t.Errorf("Got %q, want %q", got, want)
+		}
+	})
+
+	t.Run("Production environment", func(t *testing.T) {
+		client := NewClient(common.Production, defaultApiKey, defaultApiSecret)
+
+		want := "https://prod.api.firstdata.com/gateway/v2/payments/22222"
+		got := client.secondaryURL(ref)
+
+		if got != want {
+			t.Errorf("Got %q, want %q", got, want)
 		}
 	})
 }
@@ -96,8 +112,379 @@ func TestMakeSignature(t *testing.T) {
 	timestamp := strconv.FormatInt(time.Date(2020, time.April, 10, 20, 0, 0, 0, time.UTC).Unix(), 10)
 
 	want := "8mpr62l2i40Qmt6M8OuUzi0ydkxQxesbnh57BqMJc4w="
-	got := makeSignature(timestamp, apiKey, apiSecret, reqId, body)
+	got := makeSignature(timestamp, defaultApiKey, defaultApiSecret, defaultReqId, body)
 	if got != want {
 		t.Errorf("Got %q, wnat %q", got, want)
 	}
+}
+
+// TestSend tests that sendRequest sets appropriate headers and returns a Response struct according to the http response received
+func TestSend(t *testing.T) {
+
+	helper := sleet_t.NewTestHelper(t)
+	url := "https://cert.api.firstdata.com/gateway/v2/payments"
+
+	var gotHeader http.Header
+	var authRequestRaw, authResponseRaw, authErrorRaw []byte
+
+	authRequestRaw = helper.ReadFile("test_data/authRequest.json")
+	authResponseRaw = helper.ReadFile("test_data/authResponse.json")
+	authErrorRaw = helper.ReadFile("test_data/400Response.json")
+
+	var request *Request = new(Request)
+	helper.Unmarshal(authRequestRaw, request)
+
+	t.Run("With Successful Response", func(t *testing.T) {
+
+		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+			gotHeader = req.Header
+			res.Write(authResponseRaw)
+		}))
+		defer testServer.Close()
+
+		firstDataClient := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
+
+		var want *Response = new(Response)
+		helper.Unmarshal(authResponseRaw, want)
+
+		got, err := firstDataClient.sendRequest(defaultReqId, url, *request)
+
+		t.Run("Response Struct", func(t *testing.T) {
+			if err != nil {
+				t.Errorf("Error thrown after sending request %q", err)
+			}
+
+			if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+				t.Error("Response body does not match expected")
+				t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+			}
+		})
+
+		t.Run("Request Headers", func(t *testing.T) {
+			timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+
+			signature := makeSignature(
+				timestamp,
+				firstDataClient.apiKey,
+				firstDataClient.apiSecret,
+				defaultReqId,
+				strings.TrimSpace(string(authRequestRaw)),
+			)
+
+			header_cases := []struct {
+				label string
+				want  string
+				got   string
+			}{
+				{"defaultApiKey", defaultApiKey, gotHeader.Get("Api-Key")},
+				{"RequestID", defaultReqId, gotHeader.Get("Client-Request-Id")},
+				{"Signature", signature, gotHeader.Get("Message-Signature")},
+				{"Timestamp", timestamp, gotHeader.Get("Timestamp")},
+			}
+
+			for _, c := range header_cases {
+				t.Run(c.label, func(t *testing.T) {
+					if c.got != c.want {
+						t.Errorf("Got %q, want %q", c.got, c.want)
+					}
+				})
+			}
+		})
+	})
+
+	t.Run("With Error Response", func(t *testing.T) {
+
+		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+			gotHeader = req.Header
+			http.Error(res, string(authErrorRaw), http.StatusForbidden)
+		}))
+		defer testServer.Close()
+
+		firstDataClient := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
+
+		var want *Response = new(Response)
+		helper.Unmarshal(authErrorRaw, want)
+
+		got, err := firstDataClient.sendRequest(defaultReqId, url, *request)
+
+		t.Run("Response Struct", func(t *testing.T) {
+			if err != nil {
+				t.Errorf("Error thrown after sending request %q", err)
+			}
+
+			if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+				t.Error("Response body does not match expected")
+				t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+			}
+		})
+	})
+
+}
+
+func TestAuthorize(t *testing.T) {
+
+	helper := sleet_t.NewTestHelper(t)
+	url := "https://cert.api.firstdata.com/gateway/v2/payments"
+
+	var authResponseRaw, responseErrorRaw []byte
+	authResponseRaw = helper.ReadFile("test_data/authResponse.json")
+	responseErrorRaw = helper.ReadFile("test_data/400Response.json")
+
+	request := sleet_testing.BaseAuthorizationRequest()
+	t.Run("With Successful Response", func(t *testing.T) {
+
+		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+			res.Write(authResponseRaw)
+		}))
+		defer testServer.Close()
+
+		firstDataClient := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
+
+		got, err := firstDataClient.Authorize(request)
+		if err != nil {
+			t.Errorf("ERROR THROWN: Got %q, after calling Authorize", err)
+		}
+
+		avsRaw, _ := json.Marshal(AVSResponse{"NO_INPUT_DATA", "NO_INPUT_DATA"})
+		avsRawString := string(avsRaw)
+
+		want := &sleet.AuthorizationResponse{
+			Success:              true,
+			TransactionReference: "84538652787",
+			AvsResult:            sleet.AVSResponseSkipped,
+			CvvResult:            sleet.CVVResponseSkipped,
+			AvsResultRaw:         avsRawString,
+			CvvResultRaw:         "NOT_CHECKED",
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+
+	})
+
+	t.Run("With Error Response", func(t *testing.T) {
+
+		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+			res.Write(responseErrorRaw)
+		}))
+		defer testServer.Close()
+
+		firstDataClient := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
+
+		got, err := firstDataClient.Authorize(request)
+		if err != nil {
+			t.Errorf("ERROR THROWN: Got %q, after calling Authorize", err)
+		}
+
+		want := &sleet.AuthorizationResponse{
+			Success:   false,
+			ErrorCode: "403",
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+	})
+}
+
+func TestCapture(t *testing.T) {
+	helper := sleet_t.NewTestHelper(t)
+	url := "https://cert.api.firstdata.com/gateway/v2/payments/111111"
+
+	var capResponseRaw, responseErrorRaw []byte
+	capResponseRaw = helper.ReadFile("test_data/capResponse.json")
+	responseErrorRaw = helper.ReadFile("test_data/400Response.json")
+
+	request := sleet_testing.BaseCaptureRequest()
+
+	t.Run("With Successful Response", func(t *testing.T) {
+
+		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+			res.Write(capResponseRaw)
+		}))
+		defer testServer.Close()
+
+		firstDataClient := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
+
+		got, err := firstDataClient.Capture(request)
+		if err != nil {
+			t.Errorf("ERROR THROWN: Got %q, after calling Authorize", err)
+		}
+
+		want := &sleet.CaptureResponse{
+			Success:              true,
+			TransactionReference: "84538652787",
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+
+	})
+
+	t.Run("With Error Response", func(t *testing.T) {
+
+		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+			res.Write(responseErrorRaw)
+		}))
+		defer testServer.Close()
+
+		firstDataClient := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
+
+		got, err := firstDataClient.Capture(request)
+		if err != nil {
+			t.Errorf("ERROR THROWN: Got %q, after calling Authorize", err)
+		}
+
+		errorCode := "403"
+		want := &sleet.CaptureResponse{
+			Success:   false,
+			ErrorCode: &errorCode,
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+	})
+}
+
+func TestVoid(t *testing.T) {
+	helper := sleet_t.NewTestHelper(t)
+	url := "https://cert.api.firstdata.com/gateway/v2/payments/111111"
+
+	var voidResponseRaw, responseErrorRaw []byte
+	voidResponseRaw = helper.ReadFile("test_data/voidResponse.json")
+	responseErrorRaw = helper.ReadFile("test_data/400Response.json")
+
+	request := sleet_testing.BaseVoidRequest()
+
+	t.Run("With Successful Response", func(t *testing.T) {
+
+		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+			res.Write(voidResponseRaw)
+		}))
+		defer testServer.Close()
+
+		firstDataClient := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
+
+		got, err := firstDataClient.Void(request)
+		if err != nil {
+			t.Errorf("ERROR THROWN: Got %q, after calling Authorize", err)
+		}
+
+		want := &sleet.VoidResponse{
+			Success:              true,
+			TransactionReference: "84539110984",
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+
+	})
+
+	t.Run("With Error Response", func(t *testing.T) {
+
+		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+			res.Write(responseErrorRaw)
+		}))
+		defer testServer.Close()
+
+		firstDataClient := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
+
+		got, err := firstDataClient.Void(request)
+		if err != nil {
+			t.Errorf("ERROR THROWN: Got %q, after calling Authorize", err)
+		}
+
+		errorCode := "403"
+		want := &sleet.VoidResponse{
+			Success:   false,
+			ErrorCode: &errorCode,
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+	})
+}
+
+func TestRefund(t *testing.T) {
+	helper := sleet_t.NewTestHelper(t)
+	url := "https://cert.api.firstdata.com/gateway/v2/payments/111111"
+
+	var refundResponseRaw, responseErrorRaw []byte
+	refundResponseRaw = helper.ReadFile("test_data/refundResponse.json")
+	responseErrorRaw = helper.ReadFile("test_data/400Response.json")
+
+	request := sleet_testing.BaseRefundRequest()
+
+	t.Run("With Successful Response", func(t *testing.T) {
+
+		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+			res.Write(refundResponseRaw)
+		}))
+		defer testServer.Close()
+
+		firstDataClient := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
+
+		got, err := firstDataClient.Refund(request)
+		if err != nil {
+			t.Errorf("ERROR THROWN: Got %q, after calling Authorize", err)
+		}
+
+		want := &sleet.RefundResponse{
+			Success:              true,
+			TransactionReference: "84539111123",
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+
+	})
+
+	t.Run("With Error Response", func(t *testing.T) {
+
+		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+			res.Write(responseErrorRaw)
+		}))
+		defer testServer.Close()
+
+		firstDataClient := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
+
+		got, err := firstDataClient.Refund(request)
+		if err != nil {
+			t.Errorf("ERROR THROWN: Got %q, after calling Authorize", err)
+		}
+
+		errorCode := "403"
+		want := &sleet.RefundResponse{
+			Success:   false,
+			ErrorCode: &errorCode,
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+	})
 }

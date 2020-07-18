@@ -25,7 +25,7 @@ var avsMap = map[string]sleet.AVSResponse{
 	"Y|N":                         sleet.AVSResponseZipNoMatchAddressMatch,
 	"N|Y":                         sleet.AVSResponseNameMatchZipMatchAddressNoMatch,
 	"N|N":                         sleet.AVSResponseNoMatch,
-	"NOT_PROCESSED|NOT_PROCESSED": sleet.AVSResponseSkipped,
+	"NO_INPUT_DATA|NO_INPUT_DATA": sleet.AVSResponseSkipped,
 	"NOT_CHECKED|NOT_CHECKED":     sleet.AVSResponseSkipped,
 }
 

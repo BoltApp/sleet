@@ -66,7 +66,7 @@ type Response struct {
 	ClientRequestId     string            `json:"clientRequestId"`
 	ApiTraceId          string            `json:"apiTraceId"`
 	ResponseType        string            `json:"responseType"`
-	OrderId             *string           `json:"responseType"`
+	OrderId             *string           `json:"orderId"`
 	IPGTransactionId    string            `json:"ipgTransactionId"`
 	TransactionType     string            `json:"transactionType"`
 	TransactionOrigin   *string           `json:"transactionOrigin"`
@@ -121,14 +121,14 @@ type ProcessorData struct {
 	ResponseCode            string          `json:"responseCode"`
 	ResponseMessage         string          `json:"responseMessage"`
 	Network                 string          `json:"network"`
-	associationResponseCode string          `json:"associationResponseCode"`
+	AssociationResponseCode string          `json:"associationResponseCode"`
 	AVSResponse             AVSResponse     `json:"avsResponse"`
 	SecurityCodeResponse    CVVResponseCode `json:"securityCodeResponse"`
 }
 
 type AVSResponse struct {
 	StreetMatch   AVSResponseCode `json:"streetMatch"`
-	PostCodeMatch AVSResponseCode `json:"postCodeMatch"`
+	PostCodeMatch AVSResponseCode `json:"postalCodeMatch"`
 }
 
 type CurrencyConversion struct {

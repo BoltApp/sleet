@@ -8,6 +8,7 @@ require (
 	github.com/braintree-go/braintree-go v0.22.0
 	github.com/go-playground/form v3.1.4+incompatible
 	github.com/go-test/deep v1.0.7
+	github.com/google/go-cmp v0.5.0
 	github.com/google/uuid v1.1.1
 	github.com/stripe/stripe-go v70.11.0+incompatible
 	golang.org/x/net v0.0.0-20200421231249-e086a090c8fd // indirect
