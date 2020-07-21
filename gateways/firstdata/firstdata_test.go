@@ -3,7 +3,6 @@
 package firstdata
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -25,13 +24,12 @@ const defaultReqId string = "11111"
 func TestNewClient(t *testing.T) {
 	t.Run("Dev environment", func(t *testing.T) {
 		want := &FirstdataClient{
-			host:       "cert.api.firstdata.com/gateway/v2",
-			apiKey:     defaultApiKey,
-			apiSecret:  defaultApiSecret,
-			httpClient: common.DefaultHttpClient(),
+			host:        "cert.api.firstdata.com/gateway/v2",
+			credentials: Credentials{defaultApiKey, defaultApiSecret},
+			httpClient:  common.DefaultHttpClient(),
 		}
 
-		got := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		got := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
 
 		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
 			t.Error("Client does not match expected")
@@ -41,13 +39,12 @@ func TestNewClient(t *testing.T) {
 
 	t.Run("Production environment", func(t *testing.T) {
 		want := &FirstdataClient{
-			host:       "prod.api.firstdata.com/gateway/v2",
-			apiKey:     defaultApiKey,
-			apiSecret:  defaultApiSecret,
-			httpClient: common.DefaultHttpClient(),
+			host:        "prod.api.firstdata.com/gateway/v2",
+			credentials: Credentials{defaultApiKey, defaultApiSecret},
+			httpClient:  common.DefaultHttpClient(),
 		}
 
-		got := NewClient(common.Production, defaultApiKey, defaultApiSecret)
+		got := NewClient(common.Production, Credentials{defaultApiKey, defaultApiSecret})
 
 		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
 			t.Error("Client does not match expected")
@@ -59,7 +56,7 @@ func TestNewClient(t *testing.T) {
 func TestPrimaryURL(t *testing.T) {
 
 	t.Run("Dev environment", func(t *testing.T) {
-		client := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		client := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
 
 		want := "https://cert.api.firstdata.com/gateway/v2/payments"
 		got := client.primaryURL()
@@ -70,7 +67,7 @@ func TestPrimaryURL(t *testing.T) {
 	})
 
 	t.Run("Production environment", func(t *testing.T) {
-		client := NewClient(common.Production, defaultApiKey, defaultApiSecret)
+		client := NewClient(common.Production, Credentials{defaultApiKey, defaultApiSecret})
 
 		want := "https://prod.api.firstdata.com/gateway/v2/payments"
 		got := client.primaryURL()
@@ -85,7 +82,7 @@ func TestSecondaryURL(t *testing.T) {
 	ref := "22222"
 
 	t.Run("Dev environment", func(t *testing.T) {
-		client := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		client := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
 
 		want := "https://cert.api.firstdata.com/gateway/v2/payments/22222"
 		got := client.secondaryURL(ref)
@@ -96,7 +93,7 @@ func TestSecondaryURL(t *testing.T) {
 	})
 
 	t.Run("Production environment", func(t *testing.T) {
-		client := NewClient(common.Production, defaultApiKey, defaultApiSecret)
+		client := NewClient(common.Production, Credentials{defaultApiKey, defaultApiSecret})
 
 		want := "https://prod.api.firstdata.com/gateway/v2/payments/22222"
 		got := client.secondaryURL(ref)
@@ -142,7 +139,7 @@ func TestSend(t *testing.T) {
 		}))
 		defer testServer.Close()
 
-		firstDataClient := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
 		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
 
 		var want *Response = new(Response)
@@ -166,8 +163,8 @@ func TestSend(t *testing.T) {
 
 			signature := makeSignature(
 				timestamp,
-				firstDataClient.apiKey,
-				firstDataClient.apiSecret,
+				firstDataClient.credentials.ApiKey,
+				firstDataClient.credentials.ApiSecret,
 				defaultReqId,
 				strings.TrimSpace(string(authRequestRaw)),
 			)
@@ -201,7 +198,7 @@ func TestSend(t *testing.T) {
 		}))
 		defer testServer.Close()
 
-		firstDataClient := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
 		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
 
 		var want *Response = new(Response)
@@ -240,7 +237,7 @@ func TestAuthorize(t *testing.T) {
 		}))
 		defer testServer.Close()
 
-		firstDataClient := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
 		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
 
 		got, err := firstDataClient.Authorize(request)
@@ -248,15 +245,12 @@ func TestAuthorize(t *testing.T) {
 			t.Errorf("ERROR THROWN: Got %q, after calling Authorize", err)
 		}
 
-		avsRaw, _ := json.Marshal(AVSResponse{"NO_INPUT_DATA", "NO_INPUT_DATA"})
-		avsRawString := string(avsRaw)
-
 		want := &sleet.AuthorizationResponse{
 			Success:              true,
 			TransactionReference: "84538652787",
 			AvsResult:            sleet.AVSResponseSkipped,
 			CvvResult:            sleet.CVVResponseSkipped,
-			AvsResultRaw:         avsRawString,
+			AvsResultRaw:         "NO_INPUT_DATA:NO_INPUT_DATA",
 			CvvResultRaw:         "NOT_CHECKED",
 		}
 
@@ -274,7 +268,7 @@ func TestAuthorize(t *testing.T) {
 		}))
 		defer testServer.Close()
 
-		firstDataClient := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
 		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
 
 		got, err := firstDataClient.Authorize(request)
@@ -311,7 +305,7 @@ func TestCapture(t *testing.T) {
 		}))
 		defer testServer.Close()
 
-		firstDataClient := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
 		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
 
 		got, err := firstDataClient.Capture(request)
@@ -338,7 +332,7 @@ func TestCapture(t *testing.T) {
 		}))
 		defer testServer.Close()
 
-		firstDataClient := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
 		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
 
 		got, err := firstDataClient.Capture(request)
@@ -376,7 +370,7 @@ func TestVoid(t *testing.T) {
 		}))
 		defer testServer.Close()
 
-		firstDataClient := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
 		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
 
 		got, err := firstDataClient.Void(request)
@@ -403,7 +397,7 @@ func TestVoid(t *testing.T) {
 		}))
 		defer testServer.Close()
 
-		firstDataClient := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
 		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
 
 		got, err := firstDataClient.Void(request)
@@ -441,7 +435,7 @@ func TestRefund(t *testing.T) {
 		}))
 		defer testServer.Close()
 
-		firstDataClient := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
 		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
 
 		got, err := firstDataClient.Refund(request)
@@ -468,7 +462,7 @@ func TestRefund(t *testing.T) {
 		}))
 		defer testServer.Close()
 
-		firstDataClient := NewClient(common.Sandbox, defaultApiKey, defaultApiSecret)
+		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
 		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
 
 		got, err := firstDataClient.Refund(request)
