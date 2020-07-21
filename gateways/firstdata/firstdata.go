@@ -19,6 +19,7 @@ const (
 	endpoint = "/payments"
 )
 
+// FirstdataClient contains the endpoint and auth information for the firstdata api as well as a client to send requests
 type FirstdataClient struct {
 	host       string
 	apiKey     string
@@ -26,6 +27,7 @@ type FirstdataClient struct {
 	httpClient common.HttpSender
 }
 
+// NewClient creates a FirstdataClient with the given parameters and a default http client
 func NewClient(env common.Environment, apiKey, apiSecret string) *FirstdataClient {
 	return &FirstdataClient{
 		host:       firstdataHost(env),
@@ -35,14 +37,18 @@ func NewClient(env common.Environment, apiKey, apiSecret string) *FirstdataClien
 	}
 }
 
+// primaryURL returns the URL used for firstdata Primary Transaction Requests
 func (client *FirstdataClient) primaryURL() string {
 	return "https://" + client.host + endpoint
 }
 
+// secondaryURL takes a transaction reference and returns the URL used for firstdata Secondary Transaction Requests for that reference
 func (client *FirstdataClient) secondaryURL(ref string) string {
 	return "https://" + client.host + endpoint + "/" + ref
 }
 
+// Authorize make a payment authorization request to FirstData for the given payment details. If successful, the
+// authorization response will be returned.
 func (client *FirstdataClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	firstdataAuthRequest, err := buildAuthRequest(request)
 	if err != nil {
@@ -82,6 +88,9 @@ func (client *FirstdataClient) Authorize(request *sleet.AuthorizationRequest) (*
 	}, nil
 }
 
+// Capture captures an authorized payment through FirstData. If successful, the capture response will be returned.
+// Multiple captures can be made on the same authorization, but the total amount captured should not exceed the
+// total authorized amount.
 func (client *FirstdataClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	firstdataCaptureRequest, err := buildCaptureRequest(request)
 	if err != nil {
@@ -105,8 +114,8 @@ func (client *FirstdataClient) Capture(request *sleet.CaptureRequest) (*sleet.Ca
 	return &sleet.CaptureResponse{Success: true, TransactionReference: firstdataResponse.IPGTransactionId}, nil
 }
 
-// Void cancels a Firstdata payment. If successful, the void response will be returned. A previously voided
-// payment or one that has already been settled cannot be voided.
+// Void transforms a sleet void request into a first data VoidTransaction request and makes the request
+// A transaction that has not yet been capture or has already been settled cannot be voided
 func (client *FirstdataClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
 	firstdataVoidRequest, err := buildVoidRequest(request)
 	if err != nil {

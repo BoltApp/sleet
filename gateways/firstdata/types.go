@@ -69,7 +69,7 @@ type Response struct {
 	OrderId             *string           `json:"orderId"`
 	IPGTransactionId    string            `json:"ipgTransactionId"`
 	TransactionType     string            `json:"transactionType"`
-	TransactionOrigin   *string           `json:"transactionOrigin"`
+	TransactionOrigin   string            `json:"transactionOrigin"`
 	TransactionTime     int               `json:"transactionTime"` //EPOCH seconds
 	ApprovedAmount      ApprovedAmount    `json:"approvedAmount"`
 	TransactionStatus   TransactionStatus `json:"transactionStatus"`

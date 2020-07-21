@@ -24,8 +24,8 @@ import (
 const demoApiKey string = "csn5gVMfGgXh1cnFtimlHQOH1zNERw7Q" //key from the docs demo. This works but only if a previously used client reference id is used alongs ide it and will always return the response from that initial request
 
 // const apiKey string = "30e439b2-25a7-4d20-96a1-3d5c3fda98db"    //likely not valid for this api
-const apiKey string = demoApiKey
 const apiSecret string = "5736bda3-5bab-490b-91c4-48b790249298" // api secret for the above key ^
+const apiKey string = demoApiKey
 
 func TestFirstdataAuthCaptureRefund(t *testing.T) {
 	client := firstdata.NewClient(common.Sandbox, apiKey, apiSecret)
@@ -33,20 +33,20 @@ func TestFirstdataAuthCaptureRefund(t *testing.T) {
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 
 	*authRequest.ClientTransactionReference = uuid.New().String()
-
 	authRequest.Amount.Amount = 100
 
 	auth, err := client.Authorize(authRequest)
 
 	if err != nil {
-		t.Error("Authorize request should not have failed")
+		t.Fatalf("Got runtime error while running authorize %q", err)
 	}
 
 	if !auth.Success {
-		t.Error("Resulting auth should have been successful")
+		t.Fatalf("Auth request should have been successful : Error Code %q", auth.ErrorCode)
 	}
 
 	reqId := uuid.New().String()
+
 	capResp, err := client.Capture(&sleet.CaptureRequest{
 		Amount:                     &authRequest.Amount,
 		TransactionReference:       auth.TransactionReference,
@@ -54,17 +54,17 @@ func TestFirstdataAuthCaptureRefund(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Errorf("Expected no error: received: %s", err)
+		t.Errorf("Got runtime error while running capture %q", err)
 	}
 
 	if capResp.ErrorCode != nil {
-		t.Errorf("Expected No Error Code: received: %s", *capResp.ErrorCode)
+		t.Fatalf("Expected No Error Code: received: %s", *capResp.ErrorCode)
 	}
 
 	inq, err := transactionInquiry(uuid.New().String(), capResp.TransactionReference)
 
 	if err != nil {
-		t.Error("Inquiry request should not have failed")
+		t.Errorf("Got runtime error while running inquiry %q", err)
 	}
 
 	if inq.TransactionState != "CAPTURED" {
@@ -75,15 +75,62 @@ func TestFirstdataAuthCaptureRefund(t *testing.T) {
 
 	refundResp, err := client.Refund(&sleet.RefundRequest{
 		Amount:                     &authRequest.Amount,
-		TransactionReference:       capResp.TransactionReference, // TODO should this use the capture reference or the original auth reference
+		TransactionReference:       capResp.TransactionReference,
 		ClientTransactionReference: &reqId,
 	})
 
 	if err != nil {
-		t.Errorf("Expected no error: received: %s", err)
+		t.Errorf("Got runtime error while running refund %q", err)
 	}
 	if refundResp.ErrorCode != nil {
 		t.Errorf("Expected No Error Code: received: %s", *refundResp.ErrorCode)
+	}
+
+}
+
+func TestFirstdataPartialCapture(t *testing.T) {
+	client := firstdata.NewClient(common.Sandbox, apiKey, apiSecret)
+
+	authRequest := sleet_testing.BaseAuthorizationRequest()
+
+	*authRequest.ClientTransactionReference = uuid.New().String()
+	authRequest.Amount.Amount = 100
+
+	auth, err := client.Authorize(authRequest)
+
+	if err != nil {
+		t.Fatalf("Got runtime error while running authorize %q", err)
+	}
+
+	if !auth.Success {
+		t.Fatalf("Auth request should have been successful : Error Code %q", auth.ErrorCode)
+	}
+
+	reqId := uuid.New().String()
+
+	authRequest.Amount.Amount = 50
+	capResp, err := client.Capture(&sleet.CaptureRequest{
+		Amount:                     &authRequest.Amount,
+		TransactionReference:       auth.TransactionReference,
+		ClientTransactionReference: &reqId,
+	})
+
+	if err != nil {
+		t.Fatalf("Got runtime error while running capture %q", err)
+	}
+
+	if capResp.ErrorCode != nil {
+		t.Fatalf("Expected No Error Code: received: %s", *capResp.ErrorCode)
+	}
+
+	inq, err := transactionInquiry(uuid.New().String(), capResp.TransactionReference)
+
+	if err != nil {
+		t.Errorf("Got runtime error while running inquiry %q", err)
+	}
+
+	if inq.TransactionState != "CAPTURED" {
+		t.Error("Request failed to capture")
 	}
 }
 
@@ -99,11 +146,11 @@ func TestFirstdataVoid(t *testing.T) {
 	auth, err := client.Authorize(authRequest)
 
 	if err != nil {
-		t.Error("Authorize request should not have failed")
+		t.Fatal("Authorize request should not have failed")
 	}
 
 	if !auth.Success {
-		t.Error("Resulting auth should have been successful")
+		t.Fatalf("Auth request should have been successful : Error Code %q", auth.ErrorCode)
 	}
 	reqId := uuid.New().String()
 
@@ -132,7 +179,6 @@ func TestFirstdataVoid(t *testing.T) {
 }
 
 func transactionInquiry(reqId, transactionRef string) (*firstdata.Response, error) {
-	// reqId is our internally generated id,unique per request, tranasactionRef is firstdata's returned ref
 
 	httpClient := common.DefaultHttpClient()
 
@@ -164,12 +210,7 @@ func transactionInquiry(reqId, transactionRef string) (*firstdata.Response, erro
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		err := resp.Body.Close()
-		if err != nil {
-			// TODO log
-		}
-	}()
+	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -183,4 +224,105 @@ func transactionInquiry(reqId, transactionRef string) (*firstdata.Response, erro
 	}
 	return &firstdataResponse, nil
 
+}
+
+func TestFirstdataAuthFail(t *testing.T) {
+	client := firstdata.NewClient(common.Sandbox, apiKey, apiSecret)
+
+	authRequest := sleet_testing.BaseAuthorizationRequest()
+	*authRequest.ClientTransactionReference = ""
+
+	authRequest.Amount.Amount = 100
+
+	auth, err := client.Authorize(authRequest)
+
+	if err != nil {
+		t.Fatalf("Got runtime error while running authorize %q", err)
+	}
+
+	if auth.Success {
+		t.Error("Auth response should not have been successful")
+	}
+
+	if auth.ErrorCode == "" {
+		t.Error("Failed Auth error code should not be empty")
+	}
+}
+
+func TestFirstdataCaptureFail(t *testing.T) {
+	client := firstdata.NewClient(common.Sandbox, apiKey, apiSecret)
+
+	amount := sleet.Amount{
+		Amount:   100,
+		Currency: "USD",
+	}
+
+	clientRef := ""
+	cap, err := client.Capture(&sleet.CaptureRequest{
+		Amount:                     &amount,
+		TransactionReference:       "",
+		ClientTransactionReference: &clientRef,
+	})
+
+	if err != nil {
+		t.Fatalf("Got runtime error while running capture %q", err)
+	}
+
+	if cap.Success {
+		t.Error("Capture response should not have been successful")
+	}
+
+	if cap.ErrorCode == nil {
+		t.Error("Failed capture error code should not be empty")
+	}
+}
+
+func TestFirstdataRefundFail(t *testing.T) {
+	client := firstdata.NewClient(common.Sandbox, apiKey, apiSecret)
+
+	amount := sleet.Amount{
+		Amount:   100,
+		Currency: "USD",
+	}
+
+	clientRef := ""
+	refund, err := client.Refund(&sleet.RefundRequest{
+		Amount:                     &amount,
+		TransactionReference:       "",
+		ClientTransactionReference: &clientRef,
+	})
+
+	if err != nil {
+		t.Fatalf("Got runtime error while running capture %q", err)
+	}
+
+	if refund.Success {
+		t.Error("Refund response should not have been successful")
+	}
+
+	if refund.ErrorCode == nil {
+		t.Error("Failed refund error code should not be empty")
+	}
+}
+
+func TestFirstdataVoidFail(t *testing.T) {
+	client := firstdata.NewClient(common.Sandbox, apiKey, apiSecret)
+
+	clientRef := ""
+	void, err := client.Void(&sleet.VoidRequest{
+		TransactionReference:       "",
+		ClientTransactionReference: &clientRef,
+	})
+
+	if err != nil {
+		t.Fatalf("Got runtime error while running capture %q", err)
+	}
+
+	if void.Success {
+		t.Error("Void response should not have been successful")
+	}
+
+	if void.ErrorCode == nil {
+		t.Error("Failed void error code should not be empty")
+	}
 }
