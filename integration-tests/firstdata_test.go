@@ -28,7 +28,7 @@ const apiKey string = demoApiKey
 const apiSecret string = "5736bda3-5bab-490b-91c4-48b790249298" // api secret for the above key ^
 
 func TestFirstdataAuthCaptureRefund(t *testing.T) {
-	client := firstdata.NewClient(common.Sandbox, apiKey, apiSecret)
+	client := firstdata.NewClient(common.Sandbox, firstdata.Credentials{apiKey, apiSecret})
 
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 
@@ -88,7 +88,7 @@ func TestFirstdataAuthCaptureRefund(t *testing.T) {
 }
 
 func TestFirstdataVoid(t *testing.T) {
-	client := firstdata.NewClient(common.Sandbox, apiKey, apiSecret)
+	client := firstdata.NewClient(common.Sandbox, firstdata.Credentials{apiKey, apiSecret})
 
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 

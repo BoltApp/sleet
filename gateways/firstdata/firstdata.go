@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -19,39 +20,43 @@ const (
 	endpoint = "/payments"
 )
 
+// FirstdataClient contains the endpoint and credentials for the firstdata api as well as a client to send requests
 type FirstdataClient struct {
 	host            string
-	apiKey          string
-	apiSecret       string
+	credentials     Credentials
 	clientRequestID string
 	httpClient      *http.Client
 }
 
-func NewClient(env common.Environment, apiKey, apiSecret string) *FirstdataClient {
-	return NewWithHttpClient(env, apiKey, apiSecret, common.DefaultHttpClient())
+// Credentials contains the merchant api key and secret for the firstdata gateway
+type Credentials struct {
+	ApiKey    string
+	ApiSecret string
 }
 
-func NewWithHttpClient(
-	env common.Environment,
-	apiKey,
-	apiSecret string,
-	httpClient *http.Client,
-) *FirstdataClient {
+// NewClient creates a new firstdataClient with the given credentials and an httpClient
+func NewClient(env common.Environment, credentials Credentials) *FirstdataClient {
 	return &FirstdataClient{
-		host:       firstdataHost(env),
-		apiKey:     apiKey,
-		httpClient: httpClient,
+		host:        firstdataHost(env),
+		credentials: credentials,
+		httpClient:  common.DefaultHttpClient(),
 	}
 }
 
+// primaryURL returns the url used for firstdata Primary Transactions (Auth)
+// https://docs.firstdata.com/org/gateway/docs/api#create-primary-transaction
 func (client *FirstdataClient) primaryURL() string {
 	return "https://" + client.host + endpoint
 }
 
+// secondaryURL composes the url used for firstdata Seconday Transactions (Capture,Void,Refund) given a transaction reference
+// https://docs.firstdata.com/org/gateway/docs/api#secondary-transaction
 func (client *FirstdataClient) secondaryURL(ref string) string {
 	return "https://" + client.host + endpoint + "/" + ref
 }
 
+// Authorize make a payment authorization request to FirstData for the given payment details. If successful, the
+// authorization response will be returned.
 func (client *FirstdataClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	firstdataAuthRequest, err := buildAuthRequest(request)
 
@@ -75,11 +80,7 @@ func (client *FirstdataClient) Authorize(request *sleet.AuthorizationRequest) (*
 		success = true
 	}
 
-	avsRaw, err := json.Marshal(firstdataResponse.Processor.AVSResponse)
-	avsRawString := string(avsRaw)
-	if err != nil {
-		avsRawString = ""
-	}
+	avs := firstdataResponse.Processor.AVSResponse
 
 	return &sleet.AuthorizationResponse{
 		Success:              success,
@@ -87,11 +88,14 @@ func (client *FirstdataClient) Authorize(request *sleet.AuthorizationRequest) (*
 		AvsResult:            translateAvs(firstdataResponse.Processor.AVSResponse),
 		CvvResult:            translateCvv(firstdataResponse.Processor.SecurityCodeResponse),
 		Response:             string(firstdataResponse.TransactionState),
-		AvsResultRaw:         avsRawString,
+		AvsResultRaw:         fmt.Sprintf("%s:%s", avs.StreetMatch, avs.PostCodeMatch),
 		CvvResultRaw:         string(firstdataResponse.Processor.SecurityCodeResponse),
 	}, nil
 }
 
+// Capture captures an authorized payment through FirstData. If successful, the capture response will be returned.
+// Multiple captures can be made on the same authorization, but the total amount captured should not exceed the
+// total authorized amount.
 func (client *FirstdataClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	firstdataCaptureRequest, err := buildCaptureRequest(request)
 	if err != nil {
@@ -165,6 +169,8 @@ func (client *FirstdataClient) Refund(request *sleet.RefundRequest) (*sleet.Refu
 	return &sleet.RefundResponse{Success: true, TransactionReference: firstdataResponse.IPGTransactionId}, nil
 }
 
+// sendRequest sends an API request with the give payload and appropriate headers to the specified firstdata endpoint.
+// If the request is successfully sent, its response message will be returned.
 func (client *FirstdataClient) sendRequest(reqId, url string, data Request) (*Response, error) {
 
 	bodyJSON, err := json.Marshal(data)
@@ -174,9 +180,10 @@ func (client *FirstdataClient) sendRequest(reqId, url string, data Request) (*Re
 
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 
-	hashData := client.apiKey + reqId + timestamp + string(bodyJSON)
+	// Specification of how to generate signature https://docs.firstdata.com/org/gateway/node/394
+	hashData := client.credentials.ApiKey + reqId + timestamp + string(bodyJSON)
 
-	h := hmac.New(sha256.New, []byte(client.apiSecret))
+	h := hmac.New(sha256.New, []byte(client.credentials.ApiSecret))
 	h.Write([]byte(hashData))
 
 	signature := base64.StdEncoding.EncodeToString((h.Sum(nil)))
@@ -189,7 +196,7 @@ func (client *FirstdataClient) sendRequest(reqId, url string, data Request) (*Re
 	}
 
 	request.Header.Add("User-Agent", common.UserAgent())
-	request.Header.Add("Api-Key", client.apiKey)
+	request.Header.Add("Api-Key", client.credentials.ApiKey)
 	request.Header.Add("Client-Request-Id", reqId)
 	request.Header.Add("Timestamp", timestamp)
 	request.Header.Add("Message-Signature", signature)
