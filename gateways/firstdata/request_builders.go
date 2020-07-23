@@ -1,14 +1,19 @@
 package firstdata
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/BoltApp/sleet"
 )
 
 func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error) {
-
 	amountStr := sleet.AmountToString(&authRequest.Amount)
+	year := strconv.Itoa(authRequest.CreditCard.ExpirationYear)
+
+	if len(year) < 4 {
+		return nil, errors.New("AuthRequest has an invalid year")
+	}
 
 	request := &Request{
 		RequestType: RequestTypeAuth,
@@ -22,7 +27,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 				SecurityCode: authRequest.CreditCard.CVV,
 				ExpiryDate: ExpiryDate{
 					Month: strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
-					Year:  strconv.Itoa(authRequest.CreditCard.ExpirationYear)[2:],
+					Year:  year[2:],
 				},
 			},
 		},
@@ -30,33 +35,33 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 	return request, nil
 }
 
-func buildCaptureRequest(captureRequest *sleet.CaptureRequest) (*Request, error) {
+func buildCaptureRequest(captureRequest *sleet.CaptureRequest) Request {
 	amountStr := sleet.AmountToString(captureRequest.Amount)
-	request := &Request{
+	request := Request{
 		RequestType: RequestTypeCapture,
 		TransactionAmount: TransactionAmount{
 			Total:    amountStr,
 			Currency: captureRequest.Amount.Currency,
 		},
 	}
-	return request, nil
+	return request
 }
 
-func buildVoidRequest(voidRequest *sleet.VoidRequest) (*Request, error) {
-	request := &Request{
+func buildVoidRequest(voidRequest *sleet.VoidRequest) Request {
+	request := Request{
 		RequestType: RequestTypeVoid,
 	}
-	return request, nil
+	return request
 }
 
-func buildRefundRequest(refundRequest *sleet.RefundRequest) (*Request, error) {
+func buildRefundRequest(refundRequest *sleet.RefundRequest) Request {
 	amountStr := sleet.AmountToString(refundRequest.Amount)
-	request := &Request{
+	request := Request{
 		RequestType: RequestTypeRefund,
 		TransactionAmount: TransactionAmount{
 			Total:    amountStr,
 			Currency: refundRequest.Amount.Currency,
 		},
 	}
-	return request, nil
+	return request
 }

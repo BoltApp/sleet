@@ -15,6 +15,9 @@ func TestBuildAuthRequest(t *testing.T) {
 	base := sleet_testing.BaseAuthorizationRequest()
 	base.CreditCard.ExpirationYear = 1234
 
+	badYear := sleet_testing.BaseAuthorizationRequest()
+	badYear.CreditCard.ExpirationYear = 20
+
 	cases := []struct {
 		label string
 		in    *sleet.AuthorizationRequest
@@ -41,12 +44,17 @@ func TestBuildAuthRequest(t *testing.T) {
 				},
 			},
 		},
+		{
+			"Request with bad year format",
+			badYear,
+			nil,
+		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.label, func(t *testing.T) {
 			got, err := buildAuthRequest(c.in)
-			if err != nil {
+			if err != nil && c.in != badYear {
 				t.Errorf("ERROR THROWN: Got %q, want %q", err, c.want)
 			}
 			if diff := deep.Equal(got, c.want); diff != nil {
@@ -62,12 +70,12 @@ func TestBuildCaptureRequest(t *testing.T) {
 	cases := []struct {
 		label string
 		in    *sleet.CaptureRequest
-		want  *Request
+		want  Request
 	}{
 		{
 			"Basic Capture Request",
 			base,
-			&Request{
+			Request{
 				RequestType: "PostAuthTransaction",
 				TransactionAmount: TransactionAmount{
 					Total:    "100",
@@ -79,10 +87,7 @@ func TestBuildCaptureRequest(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.label, func(t *testing.T) {
-			got, err := buildCaptureRequest(c.in)
-			if err != nil {
-				t.Errorf("ERROR THROWN: Got %q, want %q", err, c.want)
-			}
+			got := buildCaptureRequest(c.in)
 			if diff := deep.Equal(got, c.want); diff != nil {
 				t.Error(diff)
 			}
@@ -96,12 +101,12 @@ func TestBuildVoidRequest(t *testing.T) {
 	cases := []struct {
 		label string
 		in    *sleet.VoidRequest
-		want  *Request
+		want  Request
 	}{
 		{
 			"Basic Void Request",
 			base,
-			&Request{
+			Request{
 				RequestType: "VoidTransaction",
 			},
 		},
@@ -109,10 +114,7 @@ func TestBuildVoidRequest(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.label, func(t *testing.T) {
-			got, err := buildVoidRequest(c.in)
-			if err != nil {
-				t.Errorf("ERROR THROWN: Got %q, want %q", err, c.want)
-			}
+			got := buildVoidRequest(c.in)
 			if diff := deep.Equal(got, c.want); diff != nil {
 				t.Error(diff)
 			}
@@ -126,12 +128,12 @@ func TestBuildRefundRequest(t *testing.T) {
 	cases := []struct {
 		label string
 		in    *sleet.RefundRequest
-		want  *Request
+		want  Request
 	}{
 		{
 			"Basic Refund Request",
 			base,
-			&Request{
+			Request{
 				RequestType: "ReturnTransaction",
 				TransactionAmount: TransactionAmount{
 					Total:    "100",
@@ -143,10 +145,7 @@ func TestBuildRefundRequest(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.label, func(t *testing.T) {
-			got, err := buildRefundRequest(c.in)
-			if err != nil {
-				t.Errorf("ERROR THROWN: Got %q, want %q", err, c.want)
-			}
+			got := buildRefundRequest(c.in)
 			if diff := deep.Equal(got, c.want); diff != nil {
 				t.Error(diff)
 			}
