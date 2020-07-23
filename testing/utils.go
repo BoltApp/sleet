@@ -6,8 +6,6 @@ import (
 	"reflect"
 	"testing"
 
-	"net/http/httptest"
-
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -40,15 +38,5 @@ func (h TestHelper) Unmarshal(data []byte, destination interface{}) {
 	err := json.Unmarshal(data, destination)
 	if err != nil {
 		h.t.Fatalf("Error unmarshaling json %q \n", err)
-	}
-}
-
-func (h TestHelper) NewMockHttpClient(server *httptest.Server, realURL string) MockHttpClient {
-
-	return MockHttpClient{
-		Client:        server.Client(),
-		TestServerURL: server.URL,
-		RealURL:       realURL,
-		T:             h.t,
 	}
 }

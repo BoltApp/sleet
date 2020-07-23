@@ -4,7 +4,6 @@ package firstdata
 
 import (
 	"net/http"
-	"net/http/httptest"
 	"strconv"
 	"strings"
 	"testing"
@@ -13,8 +12,8 @@ import (
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	sleet_t "github.com/BoltApp/sleet/testing"
-	sleet_testing "github.com/BoltApp/sleet/testing"
 	"github.com/google/go-cmp/cmp"
+	"github.com/jarcoal/httpmock"
 )
 
 const defaultApiKey string = "12345"
@@ -117,7 +116,6 @@ func TestMakeSignature(t *testing.T) {
 
 // TestSend tests that sendRequest sets appropriate headers and returns a Response struct according to the http response received
 func TestSend(t *testing.T) {
-
 	helper := sleet_t.NewTestHelper(t)
 	url := "https://cert.api.firstdata.com/gateway/v2/payments"
 
@@ -132,15 +130,16 @@ func TestSend(t *testing.T) {
 	helper.Unmarshal(authRequestRaw, request)
 
 	t.Run("With Successful Response", func(t *testing.T) {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
 
-		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
 			gotHeader = req.Header
-			res.Write(authResponseRaw)
-		}))
-		defer testServer.Close()
+			resp := httpmock.NewBytesResponse(http.StatusOK, authResponseRaw)
+			return resp, nil
+		})
 
 		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
-		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
 
 		var want *Response = new(Response)
 		helper.Unmarshal(authResponseRaw, want)
@@ -149,7 +148,7 @@ func TestSend(t *testing.T) {
 
 		t.Run("Response Struct", func(t *testing.T) {
 			if err != nil {
-				t.Errorf("Error thrown after sending request %q", err)
+				t.Fatalf("Error thrown after sending request %q", err)
 			}
 
 			if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
@@ -191,15 +190,16 @@ func TestSend(t *testing.T) {
 	})
 
 	t.Run("With Error Response", func(t *testing.T) {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
 
-		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
 			gotHeader = req.Header
-			http.Error(res, string(authErrorRaw), http.StatusForbidden)
-		}))
-		defer testServer.Close()
+			resp := httpmock.NewBytesResponse(http.StatusForbidden, authErrorRaw)
+			return resp, nil
+		})
 
 		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
-		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
 
 		var want *Response = new(Response)
 		helper.Unmarshal(authErrorRaw, want)
@@ -208,7 +208,7 @@ func TestSend(t *testing.T) {
 
 		t.Run("Response Struct", func(t *testing.T) {
 			if err != nil {
-				t.Errorf("Error thrown after sending request %q", err)
+				t.Fatalf("Error thrown after sending request %q", err)
 			}
 
 			if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
@@ -229,16 +229,18 @@ func TestAuthorize(t *testing.T) {
 	authResponseRaw = helper.ReadFile("test_data/authResponse.json")
 	responseErrorRaw = helper.ReadFile("test_data/400Response.json")
 
-	request := sleet_testing.BaseAuthorizationRequest()
+	request := sleet_t.BaseAuthorizationRequest()
 	t.Run("With Successful Response", func(t *testing.T) {
 
-		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-			res.Write(authResponseRaw)
-		}))
-		defer testServer.Close()
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			resp := httpmock.NewBytesResponse(http.StatusOK, authResponseRaw)
+			return resp, nil
+		})
 
 		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
-		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
 
 		got, err := firstDataClient.Authorize(request)
 		if err != nil {
@@ -263,13 +265,15 @@ func TestAuthorize(t *testing.T) {
 
 	t.Run("With Error Response", func(t *testing.T) {
 
-		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-			res.Write(responseErrorRaw)
-		}))
-		defer testServer.Close()
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			resp := httpmock.NewBytesResponse(http.StatusOK, responseErrorRaw)
+			return resp, nil
+		})
 
 		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
-		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
 
 		got, err := firstDataClient.Authorize(request)
 		if err != nil {
@@ -296,17 +300,19 @@ func TestCapture(t *testing.T) {
 	capResponseRaw = helper.ReadFile("test_data/capResponse.json")
 	responseErrorRaw = helper.ReadFile("test_data/400Response.json")
 
-	request := sleet_testing.BaseCaptureRequest()
+	request := sleet_t.BaseCaptureRequest()
 
 	t.Run("With Successful Response", func(t *testing.T) {
 
-		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-			res.Write(capResponseRaw)
-		}))
-		defer testServer.Close()
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			resp := httpmock.NewBytesResponse(http.StatusOK, capResponseRaw)
+			return resp, nil
+		})
 
 		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
-		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
 
 		got, err := firstDataClient.Capture(request)
 		if err != nil {
@@ -327,13 +333,15 @@ func TestCapture(t *testing.T) {
 
 	t.Run("With Error Response", func(t *testing.T) {
 
-		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-			res.Write(responseErrorRaw)
-		}))
-		defer testServer.Close()
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			resp := httpmock.NewBytesResponse(http.StatusOK, responseErrorRaw)
+			return resp, nil
+		})
 
 		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
-		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
 
 		got, err := firstDataClient.Capture(request)
 		if err != nil {
@@ -361,17 +369,19 @@ func TestVoid(t *testing.T) {
 	voidResponseRaw = helper.ReadFile("test_data/voidResponse.json")
 	responseErrorRaw = helper.ReadFile("test_data/400Response.json")
 
-	request := sleet_testing.BaseVoidRequest()
+	request := sleet_t.BaseVoidRequest()
 
 	t.Run("With Successful Response", func(t *testing.T) {
 
-		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-			res.Write(voidResponseRaw)
-		}))
-		defer testServer.Close()
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			resp := httpmock.NewBytesResponse(http.StatusOK, voidResponseRaw)
+			return resp, nil
+		})
 
 		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
-		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
 
 		got, err := firstDataClient.Void(request)
 		if err != nil {
@@ -391,14 +401,14 @@ func TestVoid(t *testing.T) {
 	})
 
 	t.Run("With Error Response", func(t *testing.T) {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
 
-		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-			res.Write(responseErrorRaw)
-		}))
-		defer testServer.Close()
-
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			resp := httpmock.NewBytesResponse(http.StatusOK, responseErrorRaw)
+			return resp, nil
+		})
 		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
-		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
 
 		got, err := firstDataClient.Void(request)
 		if err != nil {
@@ -426,17 +436,18 @@ func TestRefund(t *testing.T) {
 	refundResponseRaw = helper.ReadFile("test_data/refundResponse.json")
 	responseErrorRaw = helper.ReadFile("test_data/400Response.json")
 
-	request := sleet_testing.BaseRefundRequest()
+	request := sleet_t.BaseRefundRequest()
 
 	t.Run("With Successful Response", func(t *testing.T) {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
 
-		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-			res.Write(refundResponseRaw)
-		}))
-		defer testServer.Close()
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			resp := httpmock.NewBytesResponse(http.StatusOK, refundResponseRaw)
+			return resp, nil
+		})
 
 		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
-		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
 
 		got, err := firstDataClient.Refund(request)
 		if err != nil {
@@ -456,14 +467,15 @@ func TestRefund(t *testing.T) {
 	})
 
 	t.Run("With Error Response", func(t *testing.T) {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
 
-		testServer := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-			res.Write(responseErrorRaw)
-		}))
-		defer testServer.Close()
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			resp := httpmock.NewBytesResponse(http.StatusOK, responseErrorRaw)
+			return resp, nil
+		})
 
 		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
-		firstDataClient.httpClient = helper.NewMockHttpClient(testServer, url)
 
 		got, err := firstDataClient.Refund(request)
 		if err != nil {
