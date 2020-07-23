@@ -8,7 +8,7 @@ func AmountToString(amount *Amount) string {
 	case "USD":
 		fallthrough
 	case "CAN":
-		return fmt.Sprintf("%.2f", float64(amount.Amount)/100.0)
+		fallthrough
 	case "JPY":
 		fallthrough
 	default:
