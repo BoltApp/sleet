@@ -32,7 +32,7 @@ type Credentials struct {
 	ApiSecret string
 }
 
-// NewClient creates a new firstdataClient with the given credentials and an httpClient
+// NewClient creates a new firstdataClient with the given credentials and a default httpClient
 func NewClient(env common.Environment, credentials Credentials) *FirstdataClient {
 	return &FirstdataClient{
 		host:        firstdataHost(env),
