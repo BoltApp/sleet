@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	sleet_t "github.com/BoltApp/sleet/testing"
 	"github.com/google/go-cmp/cmp"
@@ -216,5 +217,147 @@ func TestSend(t *testing.T) {
 			}
 		})
 	})
+}
 
+// TestAuthorize tests that the Authorize method appropriately handles successful and failed firstdata responses and returns an appropriate sleet Response struct
+func TestAuthorize(t *testing.T) {
+
+	helper := sleet_t.NewTestHelper(t)
+	url := "https://cert.api.firstdata.com/gateway/v2/payments"
+
+	var authResponseRaw, responseErrorRaw []byte
+	authResponseRaw = helper.ReadFile("test_data/authResponse.json")
+	responseErrorRaw = helper.ReadFile("test_data/400Response.json")
+
+	request := sleet_t.BaseAuthorizationRequest()
+	t.Run("With Successful Response", func(t *testing.T) {
+
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			resp := httpmock.NewBytesResponse(http.StatusOK, authResponseRaw)
+			return resp, nil
+		})
+
+		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
+
+		got, err := firstDataClient.Authorize(request)
+		if err != nil {
+			t.Errorf("ERROR THROWN: Got %q, after calling Authorize", err)
+		}
+
+		want := &sleet.AuthorizationResponse{
+			Success:              true,
+			TransactionReference: "84538652787",
+			AvsResult:            sleet.AVSResponseSkipped,
+			CvvResult:            sleet.CVVResponseSkipped,
+			AvsResultRaw:         "NO_INPUT_DATA:NO_INPUT_DATA",
+			CvvResultRaw:         "NOT_CHECKED",
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+
+	})
+
+	t.Run("With Error Response", func(t *testing.T) {
+
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			resp := httpmock.NewBytesResponse(http.StatusOK, responseErrorRaw)
+			return resp, nil
+		})
+
+		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
+
+		got, err := firstDataClient.Authorize(request)
+		if err != nil {
+			t.Errorf("ERROR THROWN: Got %q, after calling Authorize", err)
+		}
+
+		want := &sleet.AuthorizationResponse{
+			Success:   false,
+			ErrorCode: "403",
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+	})
+}
+
+// TestCapture tests that the Capture method appropriately handles successful and failed firstdata responses and returns an appropriate sleet Response struct
+func TestCapture(t *testing.T) {
+	helper := sleet_t.NewTestHelper(t)
+	url := "https://cert.api.firstdata.com/gateway/v2/payments/111111"
+
+	var capResponseRaw, responseErrorRaw []byte
+	capResponseRaw = helper.ReadFile("test_data/capResponse.json")
+	responseErrorRaw = helper.ReadFile("test_data/400Response.json")
+
+	request := sleet_t.BaseCaptureRequest()
+
+	t.Run("With Successful Response", func(t *testing.T) {
+
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			resp := httpmock.NewBytesResponse(http.StatusOK, capResponseRaw)
+			return resp, nil
+		})
+
+		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
+
+		got, err := firstDataClient.Capture(request)
+		if err != nil {
+			t.Errorf("ERROR THROWN: Got %q, after calling Authorize", err)
+		}
+
+		want := &sleet.CaptureResponse{
+			Success:              true,
+			TransactionReference: "84538652787",
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+
+	})
+
+	t.Run("With Error Response", func(t *testing.T) {
+
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			resp := httpmock.NewBytesResponse(http.StatusOK, responseErrorRaw)
+			return resp, nil
+		})
+
+		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
+
+		got, err := firstDataClient.Capture(request)
+		if err != nil {
+			t.Errorf("ERROR THROWN: Got %q, after calling Authorize", err)
+		}
+
+		errorCode := "403"
+		want := &sleet.CaptureResponse{
+			Success:   false,
+			ErrorCode: &errorCode,
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+	})
 }
