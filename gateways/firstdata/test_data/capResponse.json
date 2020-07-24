@@ -1,0 +1,44 @@
+{
+  "clientRequestId": "3e18e5df-9422-4557-a948-aba640752831",
+  "apiTraceId": "rrt-0376b5dad157b2f74-c-ea-13061-180382744-1",
+  "ipgTransactionId": "84538652787",
+  "orderId": "R-866d4cca-22d1-476d-a681-682237fc7404",
+  "transactionType": "POSTAUTH",
+  "transactionOrigin": "ECOM",
+  "paymentMethodDetails": {
+    "paymentCard": {
+      "expiryDate": {
+        "month": "10",
+        "year": "2020"
+      },
+      "bin": "411111",
+      "last4": "1111",
+      "brand": "VISA"
+    },
+    "paymentMethodType": "PAYMENT_CARD"
+  },
+  "terminalId": "1588390",
+  "merchantId": "939650001885",
+  "transactionTime": 1594573676,
+  "approvedAmount": {
+    "total": 0.19,
+    "currency": "USD",
+    "components": {
+      "subtotal": 0.19
+    }
+  },
+  "transactionStatus": "APPROVED",
+  "schemeTransactionId": "010194321391899",
+  "processor": {
+    "referenceNumber": "84538652787 ",
+    "authorizationCode": "OK5922",
+    "responseCode": "00",
+    "network": "VISA",
+    "associationResponseCode": "   ",
+    "responseMessage": "APPROVAL",
+    "avsResponse": {
+      "streetMatch": "NO_INPUT_DATA",
+      "postalCodeMatch": "NO_INPUT_DATA"
+    }
+  }
+}

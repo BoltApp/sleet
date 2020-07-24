@@ -6,11 +6,13 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
 
+	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 )
 
@@ -51,6 +53,66 @@ func (client *FirstdataClient) primaryURL() string {
 // https://docs.firstdata.com/org/gateway/docs/api#secondary-transaction
 func (client *FirstdataClient) secondaryURL(ref string) string {
 	return "https://" + client.host + endpoint + "/" + ref
+}
+
+// Authorize make a payment authorization request to FirstData for the given payment details. If successful, the
+// authorization response will be returned.
+func (client *FirstdataClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
+	firstdataAuthRequest, err := buildAuthRequest(request)
+	if err != nil {
+		return nil, err
+	}
+
+	firstdataResponse, err := client.sendRequest(*request.ClientTransactionReference, client.primaryURL(), *firstdataAuthRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	success := false
+
+	if firstdataResponse.Error != nil {
+		response := sleet.AuthorizationResponse{Success: false, ErrorCode: firstdataResponse.Error.Code}
+		return &response, nil
+	}
+
+	if firstdataResponse.TransactionStatus == StatusApproved || firstdataResponse.TransactionStatus == StatusWaiting {
+		success = true
+	}
+
+	avs := firstdataResponse.Processor.AVSResponse
+
+	return &sleet.AuthorizationResponse{
+		Success:              success,
+		TransactionReference: firstdataResponse.IPGTransactionId,
+		AvsResult:            translateAvs(firstdataResponse.Processor.AVSResponse),
+		CvvResult:            translateCvv(firstdataResponse.Processor.SecurityCodeResponse),
+		Response:             string(firstdataResponse.TransactionState),
+		AvsResultRaw:         fmt.Sprintf("%s:%s", avs.StreetMatch, avs.PostCodeMatch),
+		CvvResultRaw:         string(firstdataResponse.Processor.SecurityCodeResponse),
+	}, nil
+}
+
+// Capture captures an authorized payment through FirstData. If successful, the capture response will be returned.
+// Multiple captures can be made on the same authorization, but the total amount captured should not exceed the
+// total authorized amount.
+func (client *FirstdataClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
+	firstdataCaptureRequest := buildCaptureRequest(request)
+
+	firstdataResponse, err := client.sendRequest(
+		*request.ClientTransactionReference,
+		client.secondaryURL(request.TransactionReference),
+		firstdataCaptureRequest,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if firstdataResponse.Error != nil {
+		response := sleet.CaptureResponse{Success: false, ErrorCode: &firstdataResponse.Error.Code}
+		return &response, nil
+	}
+
+	return &sleet.CaptureResponse{Success: true, TransactionReference: firstdataResponse.IPGTransactionId}, nil
 }
 
 // makeSignature generates a signature in accordance with the first data specification https://docs.firstdata.com/org/gateway/node/394
