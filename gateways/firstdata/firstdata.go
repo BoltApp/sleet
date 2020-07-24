@@ -93,8 +93,6 @@ func (client *FirstdataClient) Authorize(request *sleet.AuthorizationRequest) (*
 }
 
 // Capture captures an authorized payment through FirstData. If successful, the capture response will be returned.
-// Multiple captures can be made on the same authorization, but the total amount captured should not exceed the
-// total authorized amount.
 func (client *FirstdataClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	firstdataCaptureRequest := buildCaptureRequest(request)
 
