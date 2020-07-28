@@ -7,7 +7,7 @@ import (
 )
 
 func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error) {
-	amountStr := sleet.AmountToString(&authRequest.Amount)
+	amountStr := sleet.AmountToDecimalString(&authRequest.Amount)
 	request := &Request{
 		ClientReferenceInformation: &ClientReferenceInformation{
 			Partner: Partner{
