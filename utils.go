@@ -2,16 +2,12 @@ package sleet
 
 import "fmt"
 
-// AmountToString converts string with floating point eg 12.34.
+// AmountToString converts an integer amount to a string with no formatting
 func AmountToString(amount *Amount) string {
-	switch amount.Currency {
-	case "USD":
-		fallthrough
-	case "CAN":
-		fallthrough
-	case "JPY":
-		fallthrough
-	default:
-		return fmt.Sprintf("%d", amount.Amount)
-	}
+	return fmt.Sprintf("%d", amount.Amount)
+}
+
+// AmountToDecimalString converts an int64 amount in cents to a 2 decimal formatted string
+func AmountToDecimalString(amount *Amount) string {
+	return fmt.Sprintf("%.2f", float64(amount.Amount)/100.0)
 }
