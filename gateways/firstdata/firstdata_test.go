@@ -361,3 +361,136 @@ func TestCapture(t *testing.T) {
 		}
 	})
 }
+func TestVoid(t *testing.T) {
+	helper := sleet_t.NewTestHelper(t)
+	url := "https://cert.api.firstdata.com/gateway/v2/payments/111111"
+
+	var voidResponseRaw, responseErrorRaw []byte
+	voidResponseRaw = helper.ReadFile("test_data/voidResponse.json")
+	responseErrorRaw = helper.ReadFile("test_data/400Response.json")
+
+	request := sleet_t.BaseVoidRequest()
+
+	t.Run("With Successful Response", func(t *testing.T) {
+
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			resp := httpmock.NewBytesResponse(http.StatusOK, voidResponseRaw)
+			return resp, nil
+		})
+
+		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
+
+		got, err := firstDataClient.Void(request)
+		if err != nil {
+			t.Errorf("ERROR THROWN: Got %q, after calling Authorize", err)
+		}
+
+		want := &sleet.VoidResponse{
+			Success:              true,
+			TransactionReference: "84539110984",
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+
+	})
+
+	t.Run("With Error Response", func(t *testing.T) {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			resp := httpmock.NewBytesResponse(http.StatusOK, responseErrorRaw)
+			return resp, nil
+		})
+		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
+
+		got, err := firstDataClient.Void(request)
+		if err != nil {
+			t.Errorf("ERROR THROWN: Got %q, after calling Authorize", err)
+		}
+
+		errorCode := "403"
+		want := &sleet.VoidResponse{
+			Success:   false,
+			ErrorCode: &errorCode,
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+	})
+}
+
+func TestRefund(t *testing.T) {
+	helper := sleet_t.NewTestHelper(t)
+	url := "https://cert.api.firstdata.com/gateway/v2/payments/111111"
+
+	var refundResponseRaw, responseErrorRaw []byte
+	refundResponseRaw = helper.ReadFile("test_data/refundResponse.json")
+	responseErrorRaw = helper.ReadFile("test_data/400Response.json")
+
+	request := sleet_t.BaseRefundRequest()
+
+	t.Run("With Successful Response", func(t *testing.T) {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			resp := httpmock.NewBytesResponse(http.StatusOK, refundResponseRaw)
+			return resp, nil
+		})
+
+		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
+
+		got, err := firstDataClient.Refund(request)
+		if err != nil {
+			t.Errorf("ERROR THROWN: Got %q, after calling Authorize", err)
+		}
+
+		want := &sleet.RefundResponse{
+			Success:              true,
+			TransactionReference: "84539111123",
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+
+	})
+
+	t.Run("With Error Response", func(t *testing.T) {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			resp := httpmock.NewBytesResponse(http.StatusOK, responseErrorRaw)
+			return resp, nil
+		})
+
+		firstDataClient := NewClient(common.Sandbox, Credentials{defaultApiKey, defaultApiSecret})
+
+		got, err := firstDataClient.Refund(request)
+		if err != nil {
+			t.Errorf("ERROR THROWN: Got %q, after calling Authorize", err)
+		}
+
+		errorCode := "403"
+		want := &sleet.RefundResponse{
+			Success:   false,
+			ErrorCode: &errorCode,
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+	})
+}
