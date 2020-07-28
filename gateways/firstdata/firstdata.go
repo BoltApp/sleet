@@ -93,8 +93,6 @@ func (client *FirstdataClient) Authorize(request *sleet.AuthorizationRequest) (*
 }
 
 // Capture captures an authorized payment through FirstData. If successful, the capture response will be returned.
-// Multiple captures can be made on the same authorization, but the total amount captured should not exceed the
-// total authorized amount.
 func (client *FirstdataClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	firstdataCaptureRequest := buildCaptureRequest(request)
 
@@ -113,6 +111,49 @@ func (client *FirstdataClient) Capture(request *sleet.CaptureRequest) (*sleet.Ca
 	}
 
 	return &sleet.CaptureResponse{Success: true, TransactionReference: firstdataResponse.IPGTransactionId}, nil
+}
+
+// Void transforms a sleet void request into a first data VoidTransaction request and makes the request
+// A transaction that has not yet been capture or has already been settled cannot be voided
+func (client *FirstdataClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+	firstdataVoidRequest := buildVoidRequest(request)
+
+	firstdataResponse, err := client.sendRequest(
+		*request.ClientTransactionReference,
+		client.secondaryURL(request.TransactionReference),
+		firstdataVoidRequest,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if firstdataResponse.Error != nil {
+		response := sleet.VoidResponse{Success: false, ErrorCode: &firstdataResponse.Error.Code}
+		return &response, nil
+	}
+	return &sleet.VoidResponse{Success: true, TransactionReference: firstdataResponse.IPGTransactionId}, nil
+}
+
+// Refund refunds a Firstdata payment.
+// Multiple refunds can be made on the same payment, but the total amount refunded should not exceed the payment total.
+func (client *FirstdataClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	firstdataRefundRequest := buildRefundRequest(request)
+
+	firstdataResponse, err := client.sendRequest(
+		*request.ClientTransactionReference,
+		client.secondaryURL(request.TransactionReference),
+		firstdataRefundRequest,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if firstdataResponse.Error != nil {
+		response := sleet.RefundResponse{Success: false, ErrorCode: &firstdataResponse.Error.Code}
+		return &response, nil
+	}
+	return &sleet.RefundResponse{Success: true, TransactionReference: firstdataResponse.IPGTransactionId}, nil
 }
 
 // makeSignature generates a signature in accordance with the first data specification https://docs.firstdata.com/org/gateway/node/394
