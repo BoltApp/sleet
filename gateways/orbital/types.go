@@ -2,6 +2,15 @@ package orbital
 
 import "encoding/xml"
 
+type RequestType string
+
+const (
+	RequestTypeAuth    = "NewOrder"
+	RequestTypeCapture = "MarkForCapture"
+	RequestTypeVoid    = "Reversal"
+	RequestTypeRefund  = "Reversal"
+)
+
 type MessageType string
 
 const (
@@ -75,18 +84,18 @@ type RequestBody struct {
 	XMLName                   xml.Name      //set dynamically : NewOrder,Capture,Reversal
 	OrbitalConnectionUsername string        `xml:"OrbitalConnectionUsername"`
 	OrbitalConnectionPassword string        `xml:"OrbitalConnectionPassword"`
-	IndustryType              IndustryType  `xml:"IndustryType"`
-	MessageType               MessageType   `xml:"MessageType"`
 	BIN                       BIN           `xml:"BIN"`
-	MerchantID                int           `xml:"MerchantID"`
 	TerminalID                string        `xml:"TerminalID"` // usually 001, for PNS can be 001 - 999 but usually 001
-	AccountNum                string        `xml:"AccountNum"`
-	Exp                       int           `xml:"Exp"` //Format: MMYY or YYYYMM
-	CurrencyCode              int           `xml:"CurrencyCode"`
-	CurrencyExponent          string        `xml:"CurrencyExponent"`
-	CardSecValInd             CardSecValInd `xml:"CardSecValInd"`
-	CardSecVal                string        `xml:"CardSecVal"`
-	OrderID                   string        `xml:"OrderID"`               // generated id, max 22 chars
+	IndustryType              IndustryType  `xml:"IndustryType,omitempty"`
+	MessageType               MessageType   `xml:"MessageType,omitempty"`
+	MerchantID                int           `xml:"MerchantID,omitempty"`
+	AccountNum                string        `xml:"AccountNum,omitempty"`
+	Exp                       string        `xml:"Exp,omitempty"` //Format: MMYY or YYYYMM
+	CurrencyCode              int           `xml:"CurrencyCode,omitempty"`
+	CurrencyExponent          string        `xml:"CurrencyExponent,omitempty"`
+	CardSecValInd             CardSecValInd `xml:"CardSecValInd,omitempty"`
+	CardSecVal                string        `xml:"CardSecVal,omitempty"`
+	OrderID                   string        `xml:"OrderID,omitempty"`     // generated id, max 22 chars
 	Amount                    int64         `xml:"Amount,omitempty"`      //int with the last 2 digits being implied decimals ie 100.25 is sent as 10025, 90 is sent as 9000
 	AdjustedAmt               int64         `xml:"AdjustedAmt,omitempty"` //int with the last 2 digits being implied decimals ie 100.25 is sent as 10025, 90 is sent as 9000
 	TxRefNum                  string        `xml:"TxRefNum,omitempty"`

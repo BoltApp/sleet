@@ -31,6 +31,8 @@ func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sl
 	orbitalAuthRequest.Body.MerchantID = client.credentials.merchantID
 	orbitalAuthRequest.Body.OrderID = *request.ClientTransactionReference
 
+	orbitalAuthRequest.Body.XMLName = xml.Name{Local: RequestTypeAuth}
+
 	orbitalResponse, err := client.sendRequest(orbitalAuthRequest)
 	if err != nil {
 		return nil, err
@@ -52,6 +54,92 @@ func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sl
 	}, nil
 }
 
+func (client *OrbitalClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
+
+	orbitalAuthRequest := buildCaptureRequest(request)
+	orbitalAuthRequest.Body.OrbitalConnectionUsername = client.credentials.username
+	orbitalAuthRequest.Body.OrbitalConnectionPassword = client.credentials.password
+	orbitalAuthRequest.Body.MerchantID = client.credentials.merchantID
+	orbitalAuthRequest.Body.OrderID = *request.ClientTransactionReference
+
+	orbitalAuthRequest.Body.XMLName = xml.Name{Local: RequestTypeCapture}
+
+	orbitalResponse, err := client.sendRequest(orbitalAuthRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	if orbitalResponse.Body.ProcStatus != 0 {
+		errorCode := string(orbitalResponse.Body.ProcStatus)
+		return &sleet.CaptureResponse{
+			Success:   false,
+			ErrorCode: &errorCode,
+		}, nil
+	}
+
+	return &sleet.CaptureResponse{
+		Success:              true,
+		TransactionReference: string(orbitalResponse.Body.TxRefNum),
+	}, nil
+}
+
+func (client *OrbitalClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+
+	orbitalAuthRequest := buildVoidRequest(request)
+	orbitalAuthRequest.Body.OrbitalConnectionUsername = client.credentials.username
+	orbitalAuthRequest.Body.OrbitalConnectionPassword = client.credentials.password
+	orbitalAuthRequest.Body.MerchantID = client.credentials.merchantID
+	orbitalAuthRequest.Body.OrderID = *request.ClientTransactionReference
+
+	orbitalAuthRequest.Body.XMLName = xml.Name{Local: RequestTypeVoid}
+
+	orbitalResponse, err := client.sendRequest(orbitalAuthRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	if orbitalResponse.Body.ProcStatus != 0 {
+		errorCode := string(orbitalResponse.Body.ProcStatus)
+		return &sleet.VoidResponse{
+			Success:   false,
+			ErrorCode: &errorCode,
+		}, nil
+	}
+
+	return &sleet.VoidResponse{
+		Success:              true,
+		TransactionReference: string(orbitalResponse.Body.TxRefNum),
+	}, nil
+}
+
+func (client *OrbitalClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+
+	orbitalAuthRequest := buildRefundRequest(request)
+	orbitalAuthRequest.Body.OrbitalConnectionUsername = client.credentials.username
+	orbitalAuthRequest.Body.OrbitalConnectionPassword = client.credentials.password
+	orbitalAuthRequest.Body.MerchantID = client.credentials.merchantID
+	orbitalAuthRequest.Body.OrderID = *request.ClientTransactionReference
+
+	orbitalAuthRequest.Body.XMLName = xml.Name{Local: RequestTypeRefund}
+
+	orbitalResponse, err := client.sendRequest(orbitalAuthRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	if orbitalResponse.Body.ProcStatus != 0 {
+		errorCode := string(orbitalResponse.Body.ProcStatus)
+		return &sleet.RefundResponse{
+			Success:   false,
+			ErrorCode: &errorCode,
+		}, nil
+	}
+
+	return &sleet.RefundResponse{
+		Success:              true,
+		TransactionReference: string(orbitalResponse.Body.TxRefNum),
+	}, nil
+}
 func (client *OrbitalClient) sendRequest(data Request) (*Response, error) {
 
 	bodyXML, err := xml.Marshal(data)
