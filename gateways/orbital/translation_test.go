@@ -8,6 +8,27 @@ import (
 	"github.com/BoltApp/sleet"
 )
 
+func TestCurrencyMap(t *testing.T) {
+	cases := []struct {
+		in   string
+		want CurrencyCode
+	}{
+		{"USD", CurrencyCodeUSD},
+		{"GBP", CurrencyCodeGBP},
+		{"EUR", CurrencyCodeEUR},
+		{"CAD", CurrencyCodeCAD},
+	}
+
+	for _, c := range cases {
+		t.Run(string(c.in), func(t *testing.T) {
+			got := currencyMap[c.in]
+			if got != c.want {
+				t.Errorf("Got %q, want %q", got, c.want)
+			}
+		})
+	}
+}
+
 func TestTranslateCvv(t *testing.T) {
 	cases := []struct {
 		label string

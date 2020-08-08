@@ -2,6 +2,13 @@ package orbital
 
 import "github.com/BoltApp/sleet"
 
+var currencyMap = map[string]CurrencyCode{
+	"USD": CurrencyCodeUSD,
+	"CAD": CurrencyCodeCAD,
+	"GBP": CurrencyCodeGBP,
+	"EUR": CurrencyCodeEUR,
+}
+
 var cvvMap = map[CVVResponseCode]sleet.CVVResponse{
 	CVVResponseMatched:      sleet.CVVResponseMatch,
 	CVVResponseNotMatched:   sleet.CVVResponseNoMatch,

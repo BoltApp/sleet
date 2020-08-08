@@ -70,6 +70,15 @@ const (
 	AVSResponseZipNoMatchAddressMatch AVSResponseCode = "F"
 )
 
+type CurrencyCode string
+
+const (
+	CurrencyCodeUSD CurrencyCode = "840"
+	CurrencyCodeCAD CurrencyCode = "124"
+	CurrencyCodeGBP CurrencyCode = "826"
+	CurrencyCodeEUR CurrencyCode = "978"
+)
+
 type Request struct {
 	XMLName xml.Name `xml:"Request"`
 	Body    RequestBody
@@ -91,7 +100,7 @@ type RequestBody struct {
 	MerchantID                int           `xml:"MerchantID,omitempty"`
 	AccountNum                string        `xml:"AccountNum,omitempty"`
 	Exp                       string        `xml:"Exp,omitempty"` //Format: MMYY or YYYYMM
-	CurrencyCode              int           `xml:"CurrencyCode,omitempty"`
+	CurrencyCode              CurrencyCode  `xml:"CurrencyCode,omitempty"`
 	CurrencyExponent          string        `xml:"CurrencyExponent,omitempty"`
 	CardSecValInd             CardSecValInd `xml:"CardSecValInd,omitempty"`
 	CardSecVal                string        `xml:"CardSecVal,omitempty"`

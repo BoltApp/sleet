@@ -13,7 +13,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) Request {
 	amount := authRequest.Amount.Amount //convert to no decimals
 	exp := strconv.Itoa(authRequest.CreditCard.ExpirationYear) + strconv.Itoa(authRequest.CreditCard.ExpirationMonth)
 	// code := currencyCode(authRequest.Amount.Currency)
-	code := 840 //TODO should create map of all values ?
+	code := currencyMap[authRequest.Amount.Currency]
 
 	body := RequestBody{
 		IndustryType:     IndustryTypeEcomm,
@@ -42,9 +42,12 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) Request {
 }
 
 func buildCaptureRequest(captureRequest *sleet.CaptureRequest) Request {
+
+	code := currencyMap[captureRequest.Amount.Currency]
+
 	body := RequestBody{
 		Amount:       captureRequest.Amount.Amount,
-		CurrencyCode: 840,
+		CurrencyCode: code,
 		TerminalID:   "001",    // create consts for this
 		BIN:          "000001", // create consts for this
 		TxRefNum:     captureRequest.TransactionReference,
@@ -68,8 +71,10 @@ func buildVoidRequest(voidRequest *sleet.VoidRequest) Request {
 }
 
 func buildRefundRequest(refundRequest *sleet.RefundRequest) Request {
+
+	code := currencyMap[refundRequest.Amount.Currency]
 	body := RequestBody{
-		CurrencyCode: 840, // should this be here ?
+		CurrencyCode: code, // should this be here ?
 		AdjustedAmt:  refundRequest.Amount.Amount,
 		TerminalID:   "001",    // create consts for this
 		BIN:          "000001", // create consts for this
