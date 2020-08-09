@@ -30,11 +30,11 @@ type AVSResultCode string
 const (
 	AVSResultNotPresent                AVSResultCode = "B"
 	AVSResultError                     AVSResultCode = "E"
-	AVSResultNotApplicable             AVSResultCode = "P" // AVS was unavailable or timed out.
-	AVSResultRetry                     AVSResultCode = "R"
+	AVSResultNotApplicable             AVSResultCode = "P" // AVS is not applicable for this transaction.
+	AVSResultRetry                     AVSResultCode = "R" // AVS was unavailable or timed out.
 	AVSResultNotSupportedIssuer        AVSResultCode = "S"
 	AVSResultInfoUnavailable           AVSResultCode = "U" // Address information is unavailable.
-	AVSResultZipMatch                  AVSResultCode = "Y" // The street address and postal code matched.
+	AVSResultPostMatchAddressMatch     AVSResultCode = "Y" // The street address and postal code matched.
 	AVSResultNoMatch                   AVSResultCode = "N"
 	AVSResultPostNoMatchAddressMatch   AVSResultCode = "A"
 	AVSResultZipMatchAddressNoMatch    AVSResultCode = "W"
