@@ -3,6 +3,7 @@ package authorizenet
 import (
 	"errors"
 	"fmt"
+
 	"github.com/BoltApp/sleet"
 )
 
@@ -12,7 +13,7 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 	authorizeRequest := CreateTransactionRequest{
 		MerchantAuthentication: authentication(merchantName, transactionKey),
 		TransactionRequest: TransactionRequest{
-			TransactionType: transactionTypeAuthOnly,
+			TransactionType: TransactionTypeAuthOnly,
 			Amount:          &amountStr,
 			Payment: &Payment{
 				CreditCard: CreditCard{
@@ -41,7 +42,7 @@ func buildVoidRequest(merchantName string, transactionKey string, voidRequest *s
 		CreateTransactionRequest: CreateTransactionRequest{
 			MerchantAuthentication: authentication(merchantName, transactionKey),
 			TransactionRequest: TransactionRequest{
-				TransactionType:  transactionTypeVoid,
+				TransactionType:  TransactionTypeVoid,
 				RefTransactionID: &voidRequest.TransactionReference,
 			},
 		},
@@ -55,7 +56,7 @@ func buildCaptureRequest(merchantName string, transactionKey string, captureRequ
 		CreateTransactionRequest: CreateTransactionRequest{
 			MerchantAuthentication: authentication(merchantName, transactionKey),
 			TransactionRequest: TransactionRequest{
-				TransactionType:  transactionTypePriorAuthCapture,
+				TransactionType:  TransactionTypePriorAuthCapture,
 				Amount:           &amountStr,
 				RefTransactionID: &captureRequest.TransactionReference,
 			},
@@ -78,7 +79,7 @@ func buildRefundRequest(merchantName string, transactionKey string, refundReques
 		CreateTransactionRequest: CreateTransactionRequest{
 			MerchantAuthentication: authentication(merchantName, transactionKey),
 			TransactionRequest: TransactionRequest{
-				TransactionType:  transactionTypeRefund,
+				TransactionType:  TransactionTypeRefund,
 				Amount:           &amountStr,
 				RefTransactionID: &refundRequest.TransactionReference,
 				Payment: &Payment{

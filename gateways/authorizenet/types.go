@@ -1,16 +1,78 @@
 package authorizenet
 
+type TransactionType string
+
 const (
-	// ResponseCodeApproved indicates the successful response from authnet requests
-	ResponseCodeApproved = "1"
-
-	transactionTypeAuthOnly         = "authOnlyTransaction"
-	transactionTypeVoid             = "voidTransaction"
-	transactionTypePriorAuthCapture = "priorAuthCaptureTransaction"
-	transactionTypeRefund           = "refundTransaction"
-
-	expirationDateXXXX = "XXXX"
+	TransactionTypeAuthOnly         TransactionType = "authOnlyTransaction"
+	TransactionTypeVoid             TransactionType = "voidTransaction"
+	TransactionTypePriorAuthCapture TransactionType = "priorAuthCaptureTransaction"
+	TransactionTypeRefund           TransactionType = "refundTransaction"
 )
+
+type ResponseCode string
+
+const (
+	ResponseCodeApproved ResponseCode = "1"
+	ResponseCodeDeclined ResponseCode = "2"
+	ResponseCodeError    ResponseCode = "3"
+	ResponseCodeHeld     ResponseCode = "4"
+)
+
+type ResultCode string
+
+const (
+	ResultCodeOK    ResultCode = "Ok"
+	ResultCodeError ResultCode = "Error"
+)
+
+type AVSResultCode string
+
+const (
+	AVSResultNotPresent                AVSResultCode = "B"
+	AVSResultError                     AVSResultCode = "E"
+	AVSResultNotApplicable             AVSResultCode = "P" // AVS was unavailable or timed out.
+	AVSResultRetry                     AVSResultCode = "R"
+	AVSResultNotSupportedIssuer        AVSResultCode = "S"
+	AVSResultInfoUnavailable           AVSResultCode = "U" // Address information is unavailable.
+	AVSResultZipMatch                  AVSResultCode = "Y" // The street address and postal code matched.
+	AVSResultNoMatch                   AVSResultCode = "N"
+	AVSResultPostNoMatchAddressMatch   AVSResultCode = "A"
+	AVSResultZipMatchAddressNoMatch    AVSResultCode = "W"
+	AVSResultZipMatchAddressMatch      AVSResultCode = "X" // Both the street address and the US ZIP+4 code matched.
+	AVSResultPostMatchAddressNoMatch   AVSResultCode = "Z"
+	AVSResultNotSupportedInternational AVSResultCode = "G" // The card was issued by a bank outside the U.S. and does not support AVS.
+)
+
+type CVVResultCode string
+
+const (
+	CVVResultMatched         CVVResultCode = "M"
+	CVVResultNoMatch         CVVResultCode = "N"
+	CVVResultNotProcessed    CVVResultCode = "P"
+	CVVResultNotPresent      CVVResultCode = "S"
+	CVVResultUnableToProcess CVVResultCode = "U"
+)
+
+type CAVVResultCode string
+
+const (
+	CAVVResultBadRequest        CAVVResultCode = "0"
+	CAVVResultFailed            CAVVResultCode = "1"
+	CAVVResultPassed            CAVVResultCode = "2"
+	CAVVResultAttemptIncomplete CAVVResultCode = "3"
+	CAVVResultSytemError        CAVVResultCode = "4"
+
+// omitted
+// 5 -- N/A
+// 6 -- N/A
+// 7 -- CAVV failed validation, but the issuer is available. Valid for U.S.-issued card submitted to non-U.S acquirer.
+// 8 -- CAVV passed validation and the issuer is available. Valid for U.S.-issued card submitted to non-U.S. acquirer.
+// 9 -- CAVV failed validation and the issuer is unavailable. Valid for U.S.-issued card submitted to non-U.S acquirer.
+// A -- CAVV passed validation but the issuer unavailable. Valid for U.S.-issued card submitted to non-U.S acquirer.
+// B -- CAVV passed validation, information only, no liability shift.
+)
+
+const expirationDateXXXX = "XXXX"
 
 // Request contains a createTransactionRequest for authorizations
 type Request struct {
@@ -33,7 +95,7 @@ type MerchantAuthentication struct {
 
 // TransactionRequest has the raw credit card info as Payment and amount to authorize
 type TransactionRequest struct {
-	TransactionType  string          `json:"transactionType"`
+	TransactionType  TransactionType `json:"transactionType"`
 	Amount           *string         `json:"amount,omitempty"`
 	Payment          *Payment        `json:"payment,omitempty"`
 	BillingAddress   *BillingAddress `json:"billTo,omitempty"`
@@ -74,11 +136,11 @@ type Response struct {
 
 // TransactionResponse contains the information from issuer about AVS, CVV and whether or not authorization was successful
 type TransactionResponse struct {
-	ResponseCode   string                       `json:"responseCode"`
+	ResponseCode   ResponseCode                 `json:"responseCode"`
 	AuthCode       string                       `json:"authCode"`
-	AVSResultCode  string                       `json:"avsResultCode"`
-	CVVResultCode  string                       `json:"cvvResultCode"`
-	CAVVResultCode string                       `json:"cavvResultCode"`
+	AVSResultCode  AVSResultCode                `json:"avsResultCode"`
+	CVVResultCode  CVVResultCode                `json:"cvvResultCode"`
+	CAVVResultCode CAVVResultCode               `json:"cavvResultCode"`
 	TransID        string                       `json:"transId"`
 	RefTransID     string                       `json:"refTransID"`
 	TransHash      string                       `json:"transHash"`
@@ -102,8 +164,8 @@ type Error struct {
 
 // Messages is used to augment responses with codes and readable messages
 type Messages struct {
-	ResultCode string    `json:"resultCode"`
-	Message    []Message `json:"message"`
+	ResultCode ResultCode `json:"resultCode"`
+	Message    []Message  `json:"message"`
 }
 
 // Message is similar to Error with code that maps to Auth.net internals and text for human readability
