@@ -57,8 +57,8 @@ func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest)
 	return &sleet.AuthorizationResponse{
 		Success:              txnResponse.ResponseCode == ResponseCodeApproved,
 		TransactionReference: txnResponse.TransID,
-		AvsResult:            sleet.AVSresponseZipMatchAddressMatch, // TODO: Add translator
-		CvvResult:            sleet.CVVResponseMatch,                // TODO: Add translator
+		AvsResult:            translateAvs(txnResponse.AVSResultCode),
+		CvvResult:            translateCvv(txnResponse.CVVResultCode),
 		AvsResultRaw:         string(txnResponse.AVSResultCode),
 		CvvResultRaw:         string(txnResponse.CVVResultCode),
 		ErrorCode:            errorCode,
