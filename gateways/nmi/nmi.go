@@ -160,12 +160,21 @@ func (client *NMIClient) sendRequest(data *Request) (*Response, error) {
 	writer := multipart.NewWriter(body)
 
 	for key, values := range formData {
-		_ = writer.WriteField(key, values[0])
+		err = writer.WriteField(key, values[0])
+		if err != nil {
+			return nil, err
+		}
 	}
+	err = writer.Close()
+	if err != nil {
+		return nil, err
+	}
+
 	req, err := http.NewRequest(http.MethodPost, transactionEndpoint, body)
 	if err != nil {
 		return nil, err
 	}
+	req.Header.Add("Content-Type", writer.FormDataContentType())
 
 	parsedUrl, err := url.Parse(transactionEndpoint)
 	if err != nil {
@@ -173,8 +182,6 @@ func (client *NMIClient) sendRequest(data *Request) (*Response, error) {
 	}
 	req.Header.Add("Host", parsedUrl.Hostname())
 	req.Header.Add("User-Agent", common.UserAgent())
-	req.Header.Add("Content-Type", fmt.Sprintf("multipart/form-data; boundary=%s", writer.Boundary()))
-	_ = writer.Close()
 
 	fmt.Printf("Request: %+v\n", req)
 	resp, err := client.httpClient.Do(req)
