@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func TestNMIAuthorize(t *testing.T) {
+func TestNMIAuthorizeX(t *testing.T) {
 	client := nmi.NewClient(common.Sandbox, getEnv("NMI_SECURITY_KEY"))
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 
