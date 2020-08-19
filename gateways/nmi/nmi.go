@@ -1,6 +1,7 @@
 package nmi
 
 import (
+	"fmt"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/go-playground/form"
@@ -165,8 +166,8 @@ func (client *NMIClient) sendRequest(data *Request) (*Response, error) {
 	}
 	req.Header.Add("Host", parsedUrl.Hostname())
 	req.Header.Add("User-Agent", common.UserAgent())
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-
+	req.Header.Add("Content-Type", "multipart/form-data")
+	fmt.Printf("Request: %+v\n", req)
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -182,6 +183,7 @@ func (client *NMIClient) sendRequest(data *Request) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(string(respBody))
 	parsedFormData, err := url.ParseQuery(string(respBody))
 	if err != nil {
 		return nil, err
