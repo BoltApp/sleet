@@ -1,14 +1,15 @@
 package nmi
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/go-playground/form"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 const (
@@ -155,7 +156,13 @@ func (client *NMIClient) sendRequest(data *Request) (*Response, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, transactionEndpoint, strings.NewReader(formData.Encode()))
+	body := new(bytes.Buffer)
+	writer := multipart.NewWriter(body)
+
+	for key, values := range formData {
+		_ = writer.WriteField(key, values[0])
+	}
+	req, err := http.NewRequest(http.MethodPost, transactionEndpoint, body)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +173,9 @@ func (client *NMIClient) sendRequest(data *Request) (*Response, error) {
 	}
 	req.Header.Add("Host", parsedUrl.Hostname())
 	req.Header.Add("User-Agent", common.UserAgent())
-	req.Header.Add("Content-Type", "multipart/form-data")
+	req.Header.Add("Content-Type", fmt.Sprintf("multipart/form-data; boundary=%s", writer.Boundary()))
+	_ = writer.Close()
+
 	fmt.Printf("Request: %+v\n", req)
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
