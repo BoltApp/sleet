@@ -6,11 +6,12 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/BoltApp/sleet/common"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/BoltApp/sleet/common"
 
 	"github.com/BoltApp/sleet"
 )
@@ -76,16 +77,19 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 		success = true
 	}
 
-	return &sleet.AuthorizationResponse{
+	response := &sleet.AuthorizationResponse{
 		Success:              success,
 		TransactionReference: *cybersourceResponse.ID,
-		AvsResult:            translateAvs(cybersourceResponse.ProcessorInformation.AVS.Code),
-		CvvResult:            translateCvv(cybersourceResponse.ProcessorInformation.CardVerification.ResultCode),
 		Response:             cybersourceResponse.Status,
-		AvsResultRaw:         cybersourceResponse.ProcessorInformation.AVS.Code,
-		CvvResultRaw:         cybersourceResponse.ProcessorInformation.CardVerification.ResultCode,
 		ErrorCode:            errorCode,
-	}, nil
+	}
+	if cybersourceResponse.ProcessorInformation != nil {
+		response.AvsResult = translateAvs(cybersourceResponse.ProcessorInformation.AVS.Code)
+		response.AvsResultRaw = cybersourceResponse.ProcessorInformation.AVS.Code
+		response.CvvResult = translateCvv(cybersourceResponse.ProcessorInformation.CardVerification.ResultCode)
+		response.CvvResultRaw = cybersourceResponse.ProcessorInformation.CardVerification.ResultCode
+	}
+	return response, nil
 }
 
 // Capture captures an authorized payment through CyberSource. If successful, the capture response will be returned.
@@ -197,7 +201,7 @@ func (client *CybersourceClient) buildPOSTRequest(path string, data []byte) (*ht
 	// Create request digest and signature
 	payloadHash := sha256.Sum256(data)
 	digest := "SHA-256=" + base64.StdEncoding.EncodeToString(payloadHash[:])
-	now := time.Now().UTC().Format(time.RFC1123)
+	now := time.Now().UTC().Format(time.RFC1123Z)
 	sig := "host: " + client.host + "\ndate: " + now + "\n(request-target): post " + path + "\ndigest: " + digest + "\nv-c-merchant-id: " + client.merchantID
 	sigBytes := []byte(sig)
 	decodedSecret, err := base64.StdEncoding.DecodeString(client.sharedSecretKey)
