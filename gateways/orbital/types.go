@@ -94,7 +94,7 @@ type Response struct {
 }
 
 type RequestBody struct {
-	XMLName                   xml.Name      //set dynamically : NewOrder,Capture,Reversal
+	XMLName                   xml.Name
 	OrbitalConnectionUsername string        `xml:"OrbitalConnectionUsername"`
 	OrbitalConnectionPassword string        `xml:"OrbitalConnectionPassword"`
 	BIN                       BIN           `xml:"BIN"`
@@ -118,12 +118,12 @@ type RequestBody struct {
 	AVSstate                  string        `xml:"AVSstate,omitempty"`
 	AVScity                   string        `xml:"AVScity,omitempty"`
 	AVSname                   string        `xml:"AVSname,omitempty"`
-	AVScountryCode            string        `xml:"AVScountryCode,omitempty"` // TODO verify spelling
+	AVScountryCode            string        `xml:"AVScountryCode,omitempty"`
 	AVSphoneNum               string        `xml:"AVSphoneNum,omitempty"`
 }
 
 type ResponseBody struct {
-	XMLName        xml.Name        //set dynamically : NewOrder,Capture,Reversal
+	XMLName        xml.Name
 	IndustryType   string          `xml:"IndustryType"`
 	MessageType    string          `xml:"MessageType"`
 	MerchantID     int             `xml:"MerchantID"`
