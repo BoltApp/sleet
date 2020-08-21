@@ -23,7 +23,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) Request {
 		AccountNum:       authRequest.CreditCard.Number,
 		Exp:              exp,
 		CurrencyCode:     code,
-		CurrencyExponent: "2", //should we just deafault 2 or create a map for those with 0 ?
+		CurrencyExponent: CurrencyExponentDefault,
 		AVSzip:           *authRequest.BillingAddress.PostalCode,
 		AVSaddress1:      *authRequest.BillingAddress.StreetAddress1,
 		CardSecValInd:    CardSecPresent,

@@ -79,6 +79,10 @@ const (
 	CurrencyCodeEUR CurrencyCode = "978"
 )
 
+type CurrencyExponent string
+
+const CurrencyExponentDefault = "2"
+
 type Request struct {
 	XMLName xml.Name `xml:"Request"`
 	Body    RequestBody
