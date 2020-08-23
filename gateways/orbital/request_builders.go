@@ -8,11 +8,9 @@ import (
 )
 
 func buildAuthRequest(authRequest *sleet.AuthorizationRequest) Request {
-	// TODO NOTE why is amount in sleet an int, already in no decimals format ?
-	// amount := &authRequest.Amount.Amount * 100 //convert to no decimals
-	amount := authRequest.Amount.Amount //convert to no decimals
+
+	amount := authRequest.Amount.Amount
 	exp := strconv.Itoa(authRequest.CreditCard.ExpirationYear) + strconv.Itoa(authRequest.CreditCard.ExpirationMonth)
-	// code := currencyCode(authRequest.Amount.Currency)
 	code := currencyMap[authRequest.Amount.Currency]
 
 	body := RequestBody{
@@ -24,20 +22,19 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) Request {
 		Exp:              exp,
 		CurrencyCode:     code,
 		CurrencyExponent: CurrencyExponentDefault,
-		AVSzip:           *authRequest.BillingAddress.PostalCode,
-		AVSaddress1:      *authRequest.BillingAddress.StreetAddress1,
 		CardSecValInd:    CardSecPresent,
 		CardSecVal:       authRequest.CreditCard.CVV,
 		OrderID:          *authRequest.ClientTransactionReference,
 		Amount:           amount,
-		//AVSaddress2:      *authRequest.BillingAddress.StreetAddress2, // create consts for this
-		// AVSstate
-		// AVScity
-		// AVSname
-		// AVScountryCode
+		AVSzip:           *authRequest.BillingAddress.PostalCode,
+		AVSaddress1:      *authRequest.BillingAddress.StreetAddress1,
+		AVSaddress2:      authRequest.BillingAddress.StreetAddress2,
+		AVSstate:         *authRequest.BillingAddress.Locality,
+		AVScity:          *authRequest.BillingAddress.RegionCode,
+		AVScountryCode:   *authRequest.BillingAddress.CountryCode,
 	}
 
-	body.XMLName = xml.Name{Local: RequestTypeAuth}
+	body.XMLName = xml.Name{Local: RequestTypeNewOrder}
 	return Request{Body: body}
 }
 
@@ -72,16 +69,21 @@ func buildVoidRequest(voidRequest *sleet.VoidRequest) Request {
 
 func buildRefundRequest(refundRequest *sleet.RefundRequest) Request {
 
+	amount := refundRequest.Amount.Amount //convert to no decimals
 	code := currencyMap[refundRequest.Amount.Currency]
+
 	body := RequestBody{
-		CurrencyCode: code, // should this be here ?
-		AdjustedAmt:  refundRequest.Amount.Amount,
-		TerminalID:   "001",    // create consts for this
-		BIN:          "000001", // create consts for this
-		TxRefNum:     refundRequest.TransactionReference,
-		OrderID:      *refundRequest.ClientTransactionReference,
+		IndustryType:     IndustryTypeEcomm,
+		MessageType:      MessageTypeRefund,
+		BIN:              BINStratus,
+		TerminalID:       TerminalIDStratus,
+		CurrencyCode:     code,
+		CurrencyExponent: CurrencyExponentDefault,
+		OrderID:          *refundRequest.ClientTransactionReference,
+		Amount:           amount,
+		TxRefNum:         refundRequest.TransactionReference,
 	}
 
-	body.XMLName = xml.Name{Local: RequestTypeRefund}
+	body.XMLName = xml.Name{Local: RequestTypeNewOrder}
 	return Request{Body: body}
 }

@@ -25,15 +25,13 @@ type OrbitalClient struct {
 
 func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 
-	orbitalAuthRequest := buildAuthRequest(request)
-	orbitalAuthRequest.Body.OrbitalConnectionUsername = client.credentials.username
-	orbitalAuthRequest.Body.OrbitalConnectionPassword = client.credentials.password
-	orbitalAuthRequest.Body.MerchantID = client.credentials.merchantID
-	orbitalAuthRequest.Body.OrderID = *request.ClientTransactionReference
+	authRequest := buildAuthRequest(request)
+	authRequest.Body.OrbitalConnectionUsername = client.credentials.username
+	authRequest.Body.OrbitalConnectionPassword = client.credentials.password
+	authRequest.Body.MerchantID = client.credentials.merchantID
+	authRequest.Body.OrderID = *request.ClientTransactionReference
 
-	orbitalAuthRequest.Body.XMLName = xml.Name{Local: RequestTypeAuth}
-
-	orbitalResponse, err := client.sendRequest(orbitalAuthRequest)
+	orbitalResponse, err := client.sendRequest(authRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -56,15 +54,13 @@ func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sl
 
 func (client *OrbitalClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 
-	orbitalAuthRequest := buildCaptureRequest(request)
-	orbitalAuthRequest.Body.OrbitalConnectionUsername = client.credentials.username
-	orbitalAuthRequest.Body.OrbitalConnectionPassword = client.credentials.password
-	orbitalAuthRequest.Body.MerchantID = client.credentials.merchantID
-	orbitalAuthRequest.Body.OrderID = *request.ClientTransactionReference
+	captureRequest := buildCaptureRequest(request)
+	captureRequest.Body.OrbitalConnectionUsername = client.credentials.username
+	captureRequest.Body.OrbitalConnectionPassword = client.credentials.password
+	captureRequest.Body.MerchantID = client.credentials.merchantID
+	captureRequest.Body.OrderID = *request.ClientTransactionReference
 
-	orbitalAuthRequest.Body.XMLName = xml.Name{Local: RequestTypeCapture}
-
-	orbitalResponse, err := client.sendRequest(orbitalAuthRequest)
+	orbitalResponse, err := client.sendRequest(captureRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -85,15 +81,13 @@ func (client *OrbitalClient) Capture(request *sleet.CaptureRequest) (*sleet.Capt
 
 func (client *OrbitalClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
 
-	orbitalAuthRequest := buildVoidRequest(request)
-	orbitalAuthRequest.Body.OrbitalConnectionUsername = client.credentials.username
-	orbitalAuthRequest.Body.OrbitalConnectionPassword = client.credentials.password
-	orbitalAuthRequest.Body.MerchantID = client.credentials.merchantID
-	orbitalAuthRequest.Body.OrderID = *request.ClientTransactionReference
+	voidRequest := buildVoidRequest(request)
+	voidRequest.Body.OrbitalConnectionUsername = client.credentials.username
+	voidRequest.Body.OrbitalConnectionPassword = client.credentials.password
+	voidRequest.Body.MerchantID = client.credentials.merchantID
+	voidRequest.Body.OrderID = *request.ClientTransactionReference
 
-	orbitalAuthRequest.Body.XMLName = xml.Name{Local: RequestTypeVoid}
-
-	orbitalResponse, err := client.sendRequest(orbitalAuthRequest)
+	orbitalResponse, err := client.sendRequest(voidRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -114,15 +108,13 @@ func (client *OrbitalClient) Void(request *sleet.VoidRequest) (*sleet.VoidRespon
 
 func (client *OrbitalClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
 
-	orbitalAuthRequest := buildRefundRequest(request)
-	orbitalAuthRequest.Body.OrbitalConnectionUsername = client.credentials.username
-	orbitalAuthRequest.Body.OrbitalConnectionPassword = client.credentials.password
-	orbitalAuthRequest.Body.MerchantID = client.credentials.merchantID
-	orbitalAuthRequest.Body.OrderID = *request.ClientTransactionReference
+	refundRequest := buildRefundRequest(request)
+	refundRequest.Body.OrbitalConnectionUsername = client.credentials.username
+	refundRequest.Body.OrbitalConnectionPassword = client.credentials.password
+	refundRequest.Body.MerchantID = client.credentials.merchantID
+	refundRequest.Body.OrderID = *request.ClientTransactionReference
 
-	orbitalAuthRequest.Body.XMLName = xml.Name{Local: RequestTypeRefund}
-
-	orbitalResponse, err := client.sendRequest(orbitalAuthRequest)
+	orbitalResponse, err := client.sendRequest(refundRequest)
 	if err != nil {
 		return nil, err
 	}
