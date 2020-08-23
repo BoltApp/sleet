@@ -1,0 +1,31 @@
+<Response>
+ <NewOrderResp>
+  <IndustryType/>
+  <MessageType>R</MessageType>
+  <MerchantID>123456</MerchantID>
+  <TerminalID>001</TerminalID>
+  <CardBrand>MC</CardBrand>
+  <AccountNum>4111111111111111</AccountNum>
+  <OrderID>222222</OrderID>
+  <TxRefNum>11111</TxRefNum>
+  <TxRefIdx>1</TxRefIdx>
+  <ProcStatus>0</ProcStatus>
+  <ApprovalStatus>1</ApprovalStatus>
+  <RespCode>00</RespCode>
+  <AVSRespCode>H</AVSRespCode>
+  <CVV2RespCode>M</CVV2RespCode>
+  <AuthCode>191044</AuthCode>
+  <RecurringAdviceCd/>
+  <CAVVRespCode/>
+  <StatusMsg>Approved</StatusMsg>
+  <RespMsg/>
+  <HostRespCode>00</HostRespCode>
+  <HostAVSRespCode>Y</HostAVSRespCode>
+  <HostCVV2RespCode/>
+  <CustomerRefNum/>
+  <CustomerName/>
+  <ProfileProcStatus/>
+  <CustomerProfileMessage/>
+  <RespTime>102708</RespTime>
+ </NewOrderResp>
+</Response>

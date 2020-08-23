@@ -29,8 +29,8 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) Request {
 		AVSzip:           *authRequest.BillingAddress.PostalCode,
 		AVSaddress1:      *authRequest.BillingAddress.StreetAddress1,
 		AVSaddress2:      authRequest.BillingAddress.StreetAddress2,
-		AVSstate:         *authRequest.BillingAddress.Locality,
-		AVScity:          *authRequest.BillingAddress.RegionCode,
+		AVSstate:         *authRequest.BillingAddress.RegionCode,
+		AVScity:          *authRequest.BillingAddress.Locality,
 		AVScountryCode:   *authRequest.BillingAddress.CountryCode,
 	}
 
@@ -39,16 +39,12 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) Request {
 }
 
 func buildCaptureRequest(captureRequest *sleet.CaptureRequest) Request {
-
-	code := currencyMap[captureRequest.Amount.Currency]
-
 	body := RequestBody{
-		Amount:       captureRequest.Amount.Amount,
-		CurrencyCode: code,
-		TerminalID:   "001",    // create consts for this
-		BIN:          "000001", // create consts for this
-		TxRefNum:     captureRequest.TransactionReference,
-		OrderID:      *captureRequest.ClientTransactionReference,
+		Amount:     captureRequest.Amount.Amount,
+		TerminalID: "001",    // create consts for this
+		BIN:        "000001", // create consts for this
+		TxRefNum:   captureRequest.TransactionReference,
+		OrderID:    *captureRequest.ClientTransactionReference,
 	}
 
 	body.XMLName = xml.Name{Local: RequestTypeCapture}
@@ -68,7 +64,6 @@ func buildVoidRequest(voidRequest *sleet.VoidRequest) Request {
 }
 
 func buildRefundRequest(refundRequest *sleet.RefundRequest) Request {
-
 	amount := refundRequest.Amount.Amount //convert to no decimals
 	code := currencyMap[refundRequest.Amount.Currency]
 

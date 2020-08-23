@@ -46,6 +46,14 @@ const (
 	CardSecNotAvailable CardSecValInd = 9 // Cardholder states data not available
 )
 
+type ApprovalStatus int
+
+const (
+	ApprovalStatusDeclined ApprovalStatus = 0
+	ApprovalStatusApproved ApprovalStatus = 1
+	ApprovalStatusError    ApprovalStatus = 2
+)
+
 type CVVResponseCode string
 
 const (
@@ -89,8 +97,8 @@ type Request struct {
 }
 
 type Response struct {
-	XMLName xml.Name `xml:"Response"`
-	Body    ResponseBody
+	XMLName xml.Name     `xml:"Response"`
+	Body    ResponseBody `xml:",any"`
 }
 
 type RequestBody struct {
@@ -137,6 +145,6 @@ type ResponseBody struct {
 	ProcStatus     int             `xml:"ProcStatus"`
 	AVSRespCode    AVSResponseCode `xml:"AVSRespCode"`
 	CVV2RespCode   CVVResponseCode `xml:"CVV2RespCode"`
-	ApprovalStatus int             `xml:"ApprovalStatus"`
+	ApprovalStatus ApprovalStatus  `xml:"ApprovalStatus"`
 	RedeemedAmount int             `xml:"RedeemedAmount"`
 }

@@ -2,12 +2,13 @@ package orbital
 
 import (
 	"bytes"
-	"encoding/json"
 	"encoding/xml"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
 )
 
 type Credentials struct {
@@ -17,10 +18,17 @@ type Credentials struct {
 }
 
 type OrbitalClient struct {
-	host            string
-	credentials     Credentials
-	clientRequestID string
-	httpClient      *http.Client
+	host        string
+	credentials Credentials
+	httpClient  *http.Client
+}
+
+func NewClient(env common.Environment, credentials Credentials) *OrbitalClient {
+	return &OrbitalClient{
+		host:        orbitalHost(env),
+		credentials: credentials,
+		httpClient:  common.DefaultHttpClient(),
+	}
 }
 
 func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
@@ -29,7 +37,6 @@ func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sl
 	authRequest.Body.OrbitalConnectionUsername = client.credentials.username
 	authRequest.Body.OrbitalConnectionPassword = client.credentials.password
 	authRequest.Body.MerchantID = client.credentials.merchantID
-	authRequest.Body.OrderID = *request.ClientTransactionReference
 
 	orbitalResponse, err := client.sendRequest(authRequest)
 	if err != nil {
@@ -37,16 +44,16 @@ func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sl
 	}
 
 	if orbitalResponse.Body.ProcStatus != 0 {
-		response := sleet.AuthorizationResponse{Success: false, ErrorCode: string(orbitalResponse.Body.ProcStatus)}
+		response := sleet.AuthorizationResponse{Success: false, ErrorCode: strconv.Itoa(orbitalResponse.Body.ProcStatus)}
 		return &response, nil
 	}
 
 	return &sleet.AuthorizationResponse{
 		Success:              true,
-		TransactionReference: string(orbitalResponse.Body.TxRefNum),
+		TransactionReference: strconv.Itoa(orbitalResponse.Body.TxRefNum),
 		AvsResult:            translateAvs(orbitalResponse.Body.AVSRespCode),
 		CvvResult:            translateCvv(orbitalResponse.Body.CVV2RespCode),
-		Response:             string(orbitalResponse.Body.ApprovalStatus),
+		Response:             strconv.Itoa(int(orbitalResponse.Body.ApprovalStatus)),
 		AvsResultRaw:         string(orbitalResponse.Body.AVSRespCode),
 		CvvResultRaw:         string(orbitalResponse.Body.CVV2RespCode),
 	}, nil
@@ -58,7 +65,6 @@ func (client *OrbitalClient) Capture(request *sleet.CaptureRequest) (*sleet.Capt
 	captureRequest.Body.OrbitalConnectionUsername = client.credentials.username
 	captureRequest.Body.OrbitalConnectionPassword = client.credentials.password
 	captureRequest.Body.MerchantID = client.credentials.merchantID
-	captureRequest.Body.OrderID = *request.ClientTransactionReference
 
 	orbitalResponse, err := client.sendRequest(captureRequest)
 	if err != nil {
@@ -66,7 +72,7 @@ func (client *OrbitalClient) Capture(request *sleet.CaptureRequest) (*sleet.Capt
 	}
 
 	if orbitalResponse.Body.ProcStatus != 0 {
-		errorCode := string(orbitalResponse.Body.ProcStatus)
+		errorCode := strconv.Itoa(orbitalResponse.Body.ProcStatus)
 		return &sleet.CaptureResponse{
 			Success:   false,
 			ErrorCode: &errorCode,
@@ -75,7 +81,7 @@ func (client *OrbitalClient) Capture(request *sleet.CaptureRequest) (*sleet.Capt
 
 	return &sleet.CaptureResponse{
 		Success:              true,
-		TransactionReference: string(orbitalResponse.Body.TxRefNum),
+		TransactionReference: strconv.Itoa(orbitalResponse.Body.TxRefNum),
 	}, nil
 }
 
@@ -93,7 +99,7 @@ func (client *OrbitalClient) Void(request *sleet.VoidRequest) (*sleet.VoidRespon
 	}
 
 	if orbitalResponse.Body.ProcStatus != 0 {
-		errorCode := string(orbitalResponse.Body.ProcStatus)
+		errorCode := strconv.Itoa(orbitalResponse.Body.ProcStatus)
 		return &sleet.VoidResponse{
 			Success:   false,
 			ErrorCode: &errorCode,
@@ -102,7 +108,7 @@ func (client *OrbitalClient) Void(request *sleet.VoidRequest) (*sleet.VoidRespon
 
 	return &sleet.VoidResponse{
 		Success:              true,
-		TransactionReference: string(orbitalResponse.Body.TxRefNum),
+		TransactionReference: strconv.Itoa(orbitalResponse.Body.TxRefNum),
 	}, nil
 }
 
@@ -120,7 +126,7 @@ func (client *OrbitalClient) Refund(request *sleet.RefundRequest) (*sleet.Refund
 	}
 
 	if orbitalResponse.Body.ProcStatus != 0 {
-		errorCode := string(orbitalResponse.Body.ProcStatus)
+		errorCode := strconv.Itoa(orbitalResponse.Body.ProcStatus)
 		return &sleet.RefundResponse{
 			Success:   false,
 			ErrorCode: &errorCode,
@@ -129,7 +135,7 @@ func (client *OrbitalClient) Refund(request *sleet.RefundRequest) (*sleet.Refund
 
 	return &sleet.RefundResponse{
 		Success:              true,
-		TransactionReference: string(orbitalResponse.Body.TxRefNum),
+		TransactionReference: strconv.Itoa(orbitalResponse.Body.TxRefNum),
 	}, nil
 }
 func (client *OrbitalClient) sendRequest(data Request) (*Response, error) {
@@ -160,7 +166,7 @@ func (client *OrbitalClient) sendRequest(data Request) (*Response, error) {
 
 	var orbitalResponse Response
 
-	err = json.Unmarshal(body, &orbitalResponse)
+	err = xml.Unmarshal(body, &orbitalResponse)
 	if err != nil {
 		return nil, err
 	}

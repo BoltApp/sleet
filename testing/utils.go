@@ -2,6 +2,7 @@ package testing
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"io/ioutil"
 	"reflect"
 	"testing"
@@ -37,6 +38,15 @@ func (h TestHelper) Unmarshal(data []byte, destination interface{}) {
 	h.t.Helper()
 
 	err := json.Unmarshal(data, destination)
+	if err != nil {
+		h.t.Fatalf("Error unmarshaling json %q \n", err)
+	}
+}
+
+func (h TestHelper) XmlUnmarshal(data []byte, destination interface{}) {
+	h.t.Helper()
+
+	err := xml.Unmarshal(data, destination)
 	if err != nil {
 		h.t.Fatalf("Error unmarshaling json %q \n", err)
 	}
