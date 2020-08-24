@@ -13,10 +13,10 @@ const (
 type MessageType string
 
 const (
-	MessageTypeAuth           MessageType = "A"
-	MessageTypeAuthAndCapture MessageType = "AC"
-	MessageTypeCapture        MessageType = "FC"
-	MessageTypeRefund         MessageType = "R"
+	MessageTypeAuth            MessageType = "A"
+	MessageTypeAuthAndCapture  MessageType = "AC"
+	MessageTypeForceAndCapture MessageType = "FC"
+	MessageTypeRefund          MessageType = "R"
 )
 
 const TerminalIDStratus string = "001"
