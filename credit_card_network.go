@@ -1,13 +1,27 @@
 package sleet
 
-type CreditCardNetwork string
+type CreditCardNetwork int
 
 const (
-	CreditCardNetworkUnknown    CreditCardNetwork = "Unknown"
-	CreditCardNetworkVisa       CreditCardNetwork = "Visa"
-	CreditCardNetworkMastercard CreditCardNetwork = "Mastercard"
-	CreditCardNetworkAmex       CreditCardNetwork = "Amex"
-	CreditCardNetworkDiscover   CreditCardNetwork = "Discover"
-	CreditCardNetworkJcb        CreditCardNetwork = "Jcb"
-	CreditCardNetworkUnionpay   CreditCardNetwork = "Unionpay"
+	CreditCardNetworkUnknown CreditCardNetwork = iota
+	CreditCardNetworkVisa
+	CreditCardNetworkMastercard
+	CreditCardNetworkAmex
+	CreditCardNetworkDiscover
+	CreditCardNetworkJcb
+	CreditCardNetworkUnionpay
 )
+
+var creditCardNetworkToString = map[CreditCardNetwork]string{
+	CreditCardNetworkUnknown:    "Unknown",
+	CreditCardNetworkVisa:       "Visa",
+	CreditCardNetworkMastercard: "Mastercard",
+	CreditCardNetworkAmex:       "Amex",
+	CreditCardNetworkDiscover:   "Discover",
+	CreditCardNetworkJcb:        "Jcb",
+	CreditCardNetworkUnionpay:   "Unionpay",
+}
+
+func (code CreditCardNetwork) String() string {
+	return creditCardNetworkToString[code]
+}
