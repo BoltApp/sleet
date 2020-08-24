@@ -13,7 +13,16 @@ import (
 )
 
 func TestBuildAuthRequest(t *testing.T) {
-	base := sleet_testing.BaseAuthorizationRequest()
+	var visaBase, discoverBase, mastercardBase sleet.AuthorizationRequest
+
+	visaBase = *sleet_testing.BaseAuthorizationRequest()
+	visaBase.CreditCard.Network = sleet.CreditCardNetworkVisa
+
+	discoverBase = *sleet_testing.BaseAuthorizationRequest()
+	discoverBase.CreditCard.Network = sleet.CreditCardNetworkDiscover
+
+	mastercardBase = *sleet_testing.BaseAuthorizationRequest()
+	mastercardBase.CreditCard.Network = sleet.CreditCardNetworkMastercard
 
 	cases := []struct {
 		label string
@@ -21,8 +30,8 @@ func TestBuildAuthRequest(t *testing.T) {
 		want  Request
 	}{
 		{
-			"Basic Auth Request",
-			base,
+			"Auth with Visa",
+			&visaBase,
 			Request{
 				Body: RequestBody{
 					IndustryType:     IndustryTypeEcomm,
@@ -30,20 +39,73 @@ func TestBuildAuthRequest(t *testing.T) {
 					BIN:              BINStratus,
 					TerminalID:       TerminalIDStratus,
 					XMLName:          xml.Name{Local: RequestTypeNewOrder},
-					AccountNum:       base.CreditCard.Number,
+					AccountNum:       visaBase.CreditCard.Number,
 					Exp:              "202010",
-					CardSecVal:       base.CreditCard.CVV,
+					CardSecVal:       visaBase.CreditCard.CVV,
 					CurrencyCode:     CurrencyCodeUSD,
 					CurrencyExponent: CurrencyExponentDefault,
 					CardSecValInd:    CardSecPresent,
 					Amount:           100,
-					OrderID:          *base.ClientTransactionReference,
-					AVSzip:           *base.BillingAddress.PostalCode,
-					AVSaddress1:      *base.BillingAddress.StreetAddress1,
-					AVSaddress2:      base.BillingAddress.StreetAddress2,
-					AVSstate:         *base.BillingAddress.RegionCode,
-					AVScity:          *base.BillingAddress.Locality,
-					AVScountryCode:   *base.BillingAddress.CountryCode,
+					OrderID:          *visaBase.ClientTransactionReference,
+					AVSzip:           *visaBase.BillingAddress.PostalCode,
+					AVSaddress1:      *visaBase.BillingAddress.StreetAddress1,
+					AVSaddress2:      visaBase.BillingAddress.StreetAddress2,
+					AVSstate:         *visaBase.BillingAddress.RegionCode,
+					AVScity:          *visaBase.BillingAddress.Locality,
+					AVScountryCode:   *visaBase.BillingAddress.CountryCode,
+				},
+			},
+		},
+		{
+			"Auth with discover",
+			&discoverBase,
+			Request{
+				Body: RequestBody{
+					IndustryType:     IndustryTypeEcomm,
+					MessageType:      MessageTypeAuth,
+					BIN:              BINStratus,
+					TerminalID:       TerminalIDStratus,
+					XMLName:          xml.Name{Local: RequestTypeNewOrder},
+					AccountNum:       discoverBase.CreditCard.Number,
+					Exp:              "202010",
+					CardSecVal:       discoverBase.CreditCard.CVV,
+					CurrencyCode:     CurrencyCodeUSD,
+					CurrencyExponent: CurrencyExponentDefault,
+					CardSecValInd:    CardSecPresent,
+					Amount:           100,
+					OrderID:          *discoverBase.ClientTransactionReference,
+					AVSzip:           *discoverBase.BillingAddress.PostalCode,
+					AVSaddress1:      *discoverBase.BillingAddress.StreetAddress1,
+					AVSaddress2:      discoverBase.BillingAddress.StreetAddress2,
+					AVSstate:         *discoverBase.BillingAddress.RegionCode,
+					AVScity:          *discoverBase.BillingAddress.Locality,
+					AVScountryCode:   *discoverBase.BillingAddress.CountryCode,
+				},
+			},
+		},
+		{
+			"Auth with not visa nor discover",
+			&mastercardBase,
+			Request{
+				Body: RequestBody{
+					IndustryType:     IndustryTypeEcomm,
+					MessageType:      MessageTypeAuth,
+					BIN:              BINStratus,
+					TerminalID:       TerminalIDStratus,
+					XMLName:          xml.Name{Local: RequestTypeNewOrder},
+					AccountNum:       mastercardBase.CreditCard.Number,
+					Exp:              "202010",
+					CardSecVal:       mastercardBase.CreditCard.CVV,
+					CurrencyCode:     CurrencyCodeUSD,
+					CurrencyExponent: CurrencyExponentDefault,
+					Amount:           100,
+					OrderID:          *mastercardBase.ClientTransactionReference,
+					AVSzip:           *mastercardBase.BillingAddress.PostalCode,
+					AVSaddress1:      *mastercardBase.BillingAddress.StreetAddress1,
+					AVSaddress2:      mastercardBase.BillingAddress.StreetAddress2,
+					AVSstate:         *mastercardBase.BillingAddress.RegionCode,
+					AVScity:          *mastercardBase.BillingAddress.Locality,
+					AVScountryCode:   *mastercardBase.BillingAddress.CountryCode,
 				},
 			},
 		},

@@ -22,7 +22,6 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) Request {
 		Exp:              exp,
 		CurrencyCode:     code,
 		CurrencyExponent: CurrencyExponentDefault,
-		CardSecValInd:    CardSecPresent,
 		CardSecVal:       authRequest.CreditCard.CVV,
 		OrderID:          *authRequest.ClientTransactionReference,
 		Amount:           amount,
@@ -32,6 +31,10 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) Request {
 		AVSstate:         *authRequest.BillingAddress.RegionCode,
 		AVScity:          *authRequest.BillingAddress.Locality,
 		AVScountryCode:   *authRequest.BillingAddress.CountryCode,
+	}
+
+	if authRequest.CreditCard.Network == sleet.CreditCardNetworkVisa || authRequest.CreditCard.Network == sleet.CreditCardNetworkDiscover {
+		body.CardSecValInd = CardSecPresent
 	}
 
 	body.XMLName = xml.Name{Local: RequestTypeNewOrder}
