@@ -36,6 +36,7 @@ type CreditCard struct {
 	ExpirationMonth int
 	ExpirationYear  int
 	CVV             string
+	Network         CreditCardNetwork
 }
 
 // LineItem is used for Level3 Processing if enabled (not default). Specifies information per item in the order
@@ -73,7 +74,7 @@ type AuthorizationRequest struct {
 	BillingAddress             *BillingAddress
 	Level3Data                 *Level3Data
 	ClientTransactionReference *string // Custom transaction reference metadata that will be associated with this request
-	Channel                    string // for Psps that track the sales channel
+	Channel                    string  // for Psps that track the sales channel
 	Options                    map[string]interface{}
 }
 
