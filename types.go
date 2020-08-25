@@ -36,6 +36,7 @@ type CreditCard struct {
 	ExpirationMonth int
 	ExpirationYear  int
 	CVV             string
+	Network         CreditCardNetwork
 }
 
 // LineItem is used for Level3 Processing if enabled (not default). Specifies information per item in the order
