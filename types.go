@@ -73,8 +73,10 @@ type AuthorizationRequest struct {
 	BillingAddress             *BillingAddress
 	Level3Data                 *Level3Data
 	ClientTransactionReference *string // Custom transaction reference metadata that will be associated with this request
-	Channel                    string // for Psps that track the sales channel
-	Options                    map[string]interface{}
+	Channel                    string  // for Psps that track the sales channel
+	Cryptogram                 string  // for Network Tokenization methods
+	ECI                        string  // E-Commerce Indicator (can be used for Network Tokenization as well)
+	Options map[string]interface{}
 }
 
 // AuthorizationResponse is a generic response returned back to client after data massaging from PsP Response
