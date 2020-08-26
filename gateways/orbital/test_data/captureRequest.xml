@@ -1,0 +1,1 @@
+<Request><MarkForCapture><OrbitalConnectionUsername>username</OrbitalConnectionUsername><OrbitalConnectionPassword>password</OrbitalConnectionPassword><BIN>000001</BIN><TerminalID>001</TerminalID><MerchantID>1</MerchantID><OrderID>222222</OrderID><Amount>100</Amount><TxRefNum>111111</TxRefNum></MarkForCapture></Request>
