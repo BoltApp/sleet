@@ -111,7 +111,7 @@ func (client *OrbitalClient) Capture(request *sleet.CaptureRequest) (*sleet.Capt
 
 	return &sleet.CaptureResponse{
 		Success:              true,
-		TransactionReference: strconv.Itoa(orbitalResponse.Body.TxRefNum),
+		TransactionReference: orbitalResponse.Body.TxRefNum,
 	}, nil
 }
 
