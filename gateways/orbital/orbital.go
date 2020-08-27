@@ -129,12 +129,12 @@ func (client *OrbitalClient) sendRequest(data Request) (*Response, error) {
 		return nil, err
 	}
 
-	request.Header.Add("MIME-Version", "1.1")
-	request.Header.Add("Content-Type", "application/PTI80")
+	request.Header.Add("MIME-Version", MIMEVersion)
+	request.Header.Add("Content-Type", ContentType)
 	request.Header.Add("Content-length", strconv.Itoa(len(bodyXML)))
-	request.Header.Add("Content-transfer-encoding", "text")
-	request.Header.Add("Request-number", "1")
-	request.Header.Add("Document-type", "Request")
+	request.Header.Add("Content-transfer-encoding", ContentTransferEncoding)
+	request.Header.Add("Request-number", RequestNumber)
+	request.Header.Add("Document-type", DocumentType)
 
 	resp, err := client.httpClient.Do(request)
 	if err != nil {
