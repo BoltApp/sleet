@@ -68,7 +68,7 @@ func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sl
 
 	return &sleet.AuthorizationResponse{
 		Success:              true,
-		TransactionReference: strconv.Itoa(orbitalResponse.Body.TxRefNum),
+		TransactionReference: orbitalResponse.Body.TxRefNum,
 		AvsResult:            translateAvs(orbitalResponse.Body.AVSRespCode),
 		CvvResult:            translateCvv(orbitalResponse.Body.CVV2RespCode),
 		Response:             strconv.Itoa(int(orbitalResponse.Body.ApprovalStatus)),
