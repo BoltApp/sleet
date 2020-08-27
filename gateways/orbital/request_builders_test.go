@@ -24,6 +24,8 @@ func TestBuildAuthRequest(t *testing.T) {
 	mastercardBase = *sleet_testing.BaseAuthorizationRequest()
 	mastercardBase.CreditCard.Network = sleet.CreditCardNetworkMastercard
 
+	credentials := Credentials{"username", "password", 1}
+
 	cases := []struct {
 		label string
 		in    *sleet.AuthorizationRequest
@@ -34,25 +36,28 @@ func TestBuildAuthRequest(t *testing.T) {
 			&visaBase,
 			Request{
 				Body: RequestBody{
-					IndustryType:     IndustryTypeEcomm,
-					MessageType:      MessageTypeAuth,
-					BIN:              BINStratus,
-					TerminalID:       TerminalIDStratus,
-					XMLName:          xml.Name{Local: RequestTypeNewOrder},
-					AccountNum:       visaBase.CreditCard.Number,
-					Exp:              "202010",
-					CardSecVal:       visaBase.CreditCard.CVV,
-					CurrencyCode:     CurrencyCodeUSD,
-					CurrencyExponent: CurrencyExponentDefault,
-					CardSecValInd:    CardSecPresent,
-					Amount:           100,
-					OrderID:          *visaBase.ClientTransactionReference,
-					AVSzip:           *visaBase.BillingAddress.PostalCode,
-					AVSaddress1:      *visaBase.BillingAddress.StreetAddress1,
-					AVSaddress2:      visaBase.BillingAddress.StreetAddress2,
-					AVSstate:         *visaBase.BillingAddress.RegionCode,
-					AVScity:          *visaBase.BillingAddress.Locality,
-					AVScountryCode:   *visaBase.BillingAddress.CountryCode,
+					OrbitalConnectionUsername: "username",
+					OrbitalConnectionPassword: "password",
+					MerchantID:                1,
+					IndustryType:              IndustryTypeEcomm,
+					MessageType:               MessageTypeAuth,
+					BIN:                       BINStratus,
+					TerminalID:                TerminalIDStratus,
+					XMLName:                   xml.Name{Local: RequestTypeNewOrder},
+					AccountNum:                visaBase.CreditCard.Number,
+					Exp:                       "202010",
+					CardSecVal:                visaBase.CreditCard.CVV,
+					CurrencyCode:              CurrencyCodeUSD,
+					CurrencyExponent:          CurrencyExponentDefault,
+					CardSecValInd:             CardSecPresent,
+					Amount:                    100,
+					OrderID:                   *visaBase.ClientTransactionReference,
+					AVSzip:                    *visaBase.BillingAddress.PostalCode,
+					AVSaddress1:               *visaBase.BillingAddress.StreetAddress1,
+					AVSaddress2:               visaBase.BillingAddress.StreetAddress2,
+					AVSstate:                  *visaBase.BillingAddress.RegionCode,
+					AVScity:                   *visaBase.BillingAddress.Locality,
+					AVScountryCode:            *visaBase.BillingAddress.CountryCode,
 				},
 			},
 		},
@@ -61,25 +66,28 @@ func TestBuildAuthRequest(t *testing.T) {
 			&discoverBase,
 			Request{
 				Body: RequestBody{
-					IndustryType:     IndustryTypeEcomm,
-					MessageType:      MessageTypeAuth,
-					BIN:              BINStratus,
-					TerminalID:       TerminalIDStratus,
-					XMLName:          xml.Name{Local: RequestTypeNewOrder},
-					AccountNum:       discoverBase.CreditCard.Number,
-					Exp:              "202010",
-					CardSecVal:       discoverBase.CreditCard.CVV,
-					CurrencyCode:     CurrencyCodeUSD,
-					CurrencyExponent: CurrencyExponentDefault,
-					CardSecValInd:    CardSecPresent,
-					Amount:           100,
-					OrderID:          *discoverBase.ClientTransactionReference,
-					AVSzip:           *discoverBase.BillingAddress.PostalCode,
-					AVSaddress1:      *discoverBase.BillingAddress.StreetAddress1,
-					AVSaddress2:      discoverBase.BillingAddress.StreetAddress2,
-					AVSstate:         *discoverBase.BillingAddress.RegionCode,
-					AVScity:          *discoverBase.BillingAddress.Locality,
-					AVScountryCode:   *discoverBase.BillingAddress.CountryCode,
+					OrbitalConnectionUsername: "username",
+					OrbitalConnectionPassword: "password",
+					MerchantID:                1,
+					IndustryType:              IndustryTypeEcomm,
+					MessageType:               MessageTypeAuth,
+					BIN:                       BINStratus,
+					TerminalID:                TerminalIDStratus,
+					XMLName:                   xml.Name{Local: RequestTypeNewOrder},
+					AccountNum:                discoverBase.CreditCard.Number,
+					Exp:                       "202010",
+					CardSecVal:                discoverBase.CreditCard.CVV,
+					CurrencyCode:              CurrencyCodeUSD,
+					CurrencyExponent:          CurrencyExponentDefault,
+					CardSecValInd:             CardSecPresent,
+					Amount:                    100,
+					OrderID:                   *discoverBase.ClientTransactionReference,
+					AVSzip:                    *discoverBase.BillingAddress.PostalCode,
+					AVSaddress1:               *discoverBase.BillingAddress.StreetAddress1,
+					AVSaddress2:               discoverBase.BillingAddress.StreetAddress2,
+					AVSstate:                  *discoverBase.BillingAddress.RegionCode,
+					AVScity:                   *discoverBase.BillingAddress.Locality,
+					AVScountryCode:            *discoverBase.BillingAddress.CountryCode,
 				},
 			},
 		},
@@ -88,24 +96,27 @@ func TestBuildAuthRequest(t *testing.T) {
 			&mastercardBase,
 			Request{
 				Body: RequestBody{
-					IndustryType:     IndustryTypeEcomm,
-					MessageType:      MessageTypeAuth,
-					BIN:              BINStratus,
-					TerminalID:       TerminalIDStratus,
-					XMLName:          xml.Name{Local: RequestTypeNewOrder},
-					AccountNum:       mastercardBase.CreditCard.Number,
-					Exp:              "202010",
-					CardSecVal:       mastercardBase.CreditCard.CVV,
-					CurrencyCode:     CurrencyCodeUSD,
-					CurrencyExponent: CurrencyExponentDefault,
-					Amount:           100,
-					OrderID:          *mastercardBase.ClientTransactionReference,
-					AVSzip:           *mastercardBase.BillingAddress.PostalCode,
-					AVSaddress1:      *mastercardBase.BillingAddress.StreetAddress1,
-					AVSaddress2:      mastercardBase.BillingAddress.StreetAddress2,
-					AVSstate:         *mastercardBase.BillingAddress.RegionCode,
-					AVScity:          *mastercardBase.BillingAddress.Locality,
-					AVScountryCode:   *mastercardBase.BillingAddress.CountryCode,
+					OrbitalConnectionUsername: "username",
+					OrbitalConnectionPassword: "password",
+					MerchantID:                1,
+					IndustryType:              IndustryTypeEcomm,
+					MessageType:               MessageTypeAuth,
+					BIN:                       BINStratus,
+					TerminalID:                TerminalIDStratus,
+					XMLName:                   xml.Name{Local: RequestTypeNewOrder},
+					AccountNum:                mastercardBase.CreditCard.Number,
+					Exp:                       "202010",
+					CardSecVal:                mastercardBase.CreditCard.CVV,
+					CurrencyCode:              CurrencyCodeUSD,
+					CurrencyExponent:          CurrencyExponentDefault,
+					Amount:                    100,
+					OrderID:                   *mastercardBase.ClientTransactionReference,
+					AVSzip:                    *mastercardBase.BillingAddress.PostalCode,
+					AVSaddress1:               *mastercardBase.BillingAddress.StreetAddress1,
+					AVSaddress2:               mastercardBase.BillingAddress.StreetAddress2,
+					AVSstate:                  *mastercardBase.BillingAddress.RegionCode,
+					AVScity:                   *mastercardBase.BillingAddress.Locality,
+					AVScountryCode:            *mastercardBase.BillingAddress.CountryCode,
 				},
 			},
 		},
@@ -113,7 +124,7 @@ func TestBuildAuthRequest(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.label, func(t *testing.T) {
-			got := buildAuthRequest(c.in)
+			got := buildAuthRequest(c.in, credentials)
 			if diff := deep.Equal(got, c.want); diff != nil {
 				t.Error(diff)
 			}
@@ -123,6 +134,7 @@ func TestBuildAuthRequest(t *testing.T) {
 
 func TestBuildCaptureRequest(t *testing.T) {
 	base := sleet_testing.BaseCaptureRequest()
+	credentials := Credentials{"username", "password", 1}
 
 	cases := []struct {
 		label string
@@ -134,12 +146,15 @@ func TestBuildCaptureRequest(t *testing.T) {
 			base,
 			Request{
 				Body: RequestBody{
-					XMLName:    xml.Name{Local: RequestTypeCapture},
-					BIN:        BINStratus,
-					TerminalID: TerminalIDStratus,
-					Amount:     100,
-					TxRefNum:   base.TransactionReference,
-					OrderID:    *base.ClientTransactionReference,
+					OrbitalConnectionUsername: "username",
+					OrbitalConnectionPassword: "password",
+					MerchantID:                1,
+					XMLName:                   xml.Name{Local: RequestTypeCapture},
+					BIN:                       BINStratus,
+					TerminalID:                TerminalIDStratus,
+					Amount:                    100,
+					TxRefNum:                  base.TransactionReference,
+					OrderID:                   *base.ClientTransactionReference,
 				},
 			},
 		},
@@ -147,7 +162,7 @@ func TestBuildCaptureRequest(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.label, func(t *testing.T) {
-			got := buildCaptureRequest(c.in)
+			got := buildCaptureRequest(c.in, credentials)
 			if diff := deep.Equal(got, c.want); diff != nil {
 				t.Error(diff)
 			}
@@ -157,6 +172,7 @@ func TestBuildCaptureRequest(t *testing.T) {
 
 func TestBuildVoidRequest(t *testing.T) {
 	base := sleet_testing.BaseVoidRequest()
+	credentials := Credentials{"username", "password", 1}
 
 	cases := []struct {
 		label string
@@ -168,11 +184,14 @@ func TestBuildVoidRequest(t *testing.T) {
 			base,
 			Request{
 				Body: RequestBody{
-					XMLName:    xml.Name{Local: RequestTypeVoid},
-					BIN:        BINStratus,
-					TerminalID: TerminalIDStratus,
-					TxRefNum:   base.TransactionReference,
-					OrderID:    *base.ClientTransactionReference,
+					OrbitalConnectionUsername: "username",
+					OrbitalConnectionPassword: "password",
+					MerchantID:                1,
+					XMLName:                   xml.Name{Local: RequestTypeVoid},
+					BIN:                       BINStratus,
+					TerminalID:                TerminalIDStratus,
+					TxRefNum:                  base.TransactionReference,
+					OrderID:                   *base.ClientTransactionReference,
 				},
 			},
 		},
@@ -180,7 +199,7 @@ func TestBuildVoidRequest(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.label, func(t *testing.T) {
-			got := buildVoidRequest(c.in)
+			got := buildVoidRequest(c.in, credentials)
 			if diff := deep.Equal(got, c.want); diff != nil {
 				t.Error(diff)
 			}
@@ -190,6 +209,8 @@ func TestBuildVoidRequest(t *testing.T) {
 
 func TestBuildRefundRequest(t *testing.T) {
 	base := sleet_testing.BaseRefundRequest()
+
+	credentials := Credentials{"username", "password", 1}
 
 	cases := []struct {
 		label string
@@ -201,16 +222,19 @@ func TestBuildRefundRequest(t *testing.T) {
 			base,
 			Request{
 				Body: RequestBody{
-					XMLName:          xml.Name{Local: RequestTypeNewOrder},
-					BIN:              BINStratus,
-					TerminalID:       TerminalIDStratus,
-					IndustryType:     IndustryTypeEcomm,
-					MessageType:      MessageTypeRefund,
-					CurrencyCode:     CurrencyCodeUSD,
-					CurrencyExponent: CurrencyExponentDefault,
-					Amount:           100,
-					TxRefNum:         base.TransactionReference,
-					OrderID:          *base.ClientTransactionReference,
+					OrbitalConnectionUsername: "username",
+					OrbitalConnectionPassword: "password",
+					MerchantID:                1,
+					XMLName:                   xml.Name{Local: RequestTypeNewOrder},
+					BIN:                       BINStratus,
+					TerminalID:                TerminalIDStratus,
+					IndustryType:              IndustryTypeEcomm,
+					MessageType:               MessageTypeRefund,
+					CurrencyCode:              CurrencyCodeUSD,
+					CurrencyExponent:          CurrencyExponentDefault,
+					Amount:                    100,
+					TxRefNum:                  base.TransactionReference,
+					OrderID:                   *base.ClientTransactionReference,
 				},
 			},
 		},
@@ -218,7 +242,7 @@ func TestBuildRefundRequest(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.label, func(t *testing.T) {
-			got := buildRefundRequest(c.in)
+			got := buildRefundRequest(c.in, credentials)
 			if diff := deep.Equal(got, c.want); diff != nil {
 				t.Error(diff)
 			}

@@ -91,10 +91,26 @@ type CurrencyExponent string
 
 const CurrencyExponentDefault CurrencyExponent = "2"
 
+// Request header constants
+const (
+	MIMEVersion             = "1.1"
+	ContentType             = "application/PTI80"
+	ContentTransferEncoding = "text"
+	RequestNumber           = "1"
+	DocumentType            = "Request"
+)
+
 type Request struct {
 	XMLName xml.Name `xml:"Request"`
 	Body    RequestBody
 }
+
+// Response constants
+const (
+	ProcStatusSuccess  = 0
+	RespCodeApproved   = "00"
+	RespCodeNotPresent = "zz" // returned in place of RespCode when none is returned by the api
+)
 
 type Response struct {
 	XMLName xml.Name     `xml:"Response"`
