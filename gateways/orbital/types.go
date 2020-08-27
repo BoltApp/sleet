@@ -154,7 +154,7 @@ type ResponseBody struct {
 	TerminalID     int             `xml:"TerminalID"`
 	AccountNum     string          `xml:"AccountNum"`
 	OrderID        string          `xml:"OrderID"`
-	TxRefNum       int             `xml:"TxRefNum"`
+	TxRefNum       string             `xml:"TxRefNum"`
 	TxRefIdx       int             `xml:"TxRefIdx"`
 	RespCode       string          `xml:"RespCode"`
 	StatusMsg      string          `xml:"StatusMsg"`
