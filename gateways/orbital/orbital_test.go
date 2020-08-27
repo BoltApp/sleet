@@ -23,10 +23,10 @@ func TestNewClient(t *testing.T) {
 		want := &OrbitalClient{
 			host:        "https://orbitalvar1.chasepaymentech.com/authorize",
 			httpClient:  common.DefaultHttpClient(),
-			credentials: Credentials{"username", "password", 1},
+			credentials: Credentials{"Username", "Password", 1},
 		}
 
-		got := NewClient(common.Sandbox, Credentials{"username", "password", 1})
+		got := NewClient(common.Sandbox, Credentials{"Username", "Password", 1})
 
 		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
 			t.Error("Client does not match expected")
@@ -38,10 +38,10 @@ func TestNewClient(t *testing.T) {
 		want := &OrbitalClient{
 			host:        "https://orbital1.chasepaymentech.com/authorize",
 			httpClient:  common.DefaultHttpClient(),
-			credentials: Credentials{"username", "password", 1},
+			credentials: Credentials{"Username", "Password", 1},
 		}
 
-		got := NewClient(common.Production, Credentials{"username", "password", 1})
+		got := NewClient(common.Production, Credentials{"Username", "Password", 1})
 
 		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
 			t.Error("Client does not match expected")
@@ -63,8 +63,8 @@ func TestSend(t *testing.T) {
 	base := sleet_t.BaseCaptureRequest()
 	request := buildCaptureRequest(base)
 
-	request.Body.OrbitalConnectionUsername = "username"
-	request.Body.OrbitalConnectionPassword = "password"
+	request.Body.OrbitalConnectionUsername = "Username"
+	request.Body.OrbitalConnectionPassword = "Password"
 	request.Body.MerchantID = 1
 
 	t.Run("With Successful Response", func(t *testing.T) {
@@ -86,7 +86,7 @@ func TestSend(t *testing.T) {
 			return resp, nil
 		})
 
-		client := NewClient(common.Sandbox, Credentials{"username", "password", 1})
+		client := NewClient(common.Sandbox, Credentials{"Username", "Password", 1})
 
 		var want *Response = new(Response)
 		helper.XmlUnmarshal(responseRaw, want)
@@ -147,7 +147,7 @@ func TestAuthorize(t *testing.T) {
 			Response:             strconv.Itoa(int(ApprovalStatusApproved)),
 		}
 
-		client := NewClient(common.Sandbox, Credentials{"username", "password", 1})
+		client := NewClient(common.Sandbox, Credentials{"Username", "Password", 1})
 
 		got, err := client.Authorize(request)
 
@@ -198,7 +198,7 @@ func TestCapture(t *testing.T) {
 			TransactionReference: "11111",
 		}
 
-		client := NewClient(common.Sandbox, Credentials{"username", "password", 1})
+		client := NewClient(common.Sandbox, Credentials{"Username", "Password", 1})
 
 		got, err := client.Capture(request)
 

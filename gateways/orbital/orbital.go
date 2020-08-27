@@ -3,6 +3,7 @@ package orbital
 import (
 	"bytes"
 	"encoding/xml"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -12,9 +13,9 @@ import (
 )
 
 type Credentials struct {
-	username   string
-	password   string
-	merchantID int
+	Username   string
+	Password   string
+	MerchantID int
 }
 
 type OrbitalClient struct {
@@ -31,12 +32,17 @@ func NewClient(env common.Environment, credentials Credentials) *OrbitalClient {
 	}
 }
 
-func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
+func NewWithHttpClient(env common.Environment, credentials Credentials, httpClient *http.Client) *OrbitalClient {
+	return &OrbitalClient{
+		host:        orbitalHost(env),
+		credentials: credentials,
+		httpClient:  httpClient,
+	}
+}
 
-	authRequest := buildAuthRequest(request)
-	authRequest.Body.OrbitalConnectionUsername = client.credentials.username
-	authRequest.Body.OrbitalConnectionPassword = client.credentials.password
-	authRequest.Body.MerchantID = client.credentials.merchantID
+func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
+	fmt.Println("In here in here")
+	authRequest := buildAuthRequest(request, client.credentials)
 
 	orbitalResponse, err := client.sendRequest(authRequest)
 	if err != nil {
@@ -62,9 +68,9 @@ func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sl
 func (client *OrbitalClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 
 	captureRequest := buildCaptureRequest(request)
-	captureRequest.Body.OrbitalConnectionUsername = client.credentials.username
-	captureRequest.Body.OrbitalConnectionPassword = client.credentials.password
-	captureRequest.Body.MerchantID = client.credentials.merchantID
+	captureRequest.Body.OrbitalConnectionUsername = client.credentials.Username
+	captureRequest.Body.OrbitalConnectionPassword = client.credentials.Password
+	captureRequest.Body.MerchantID = client.credentials.MerchantID
 
 	orbitalResponse, err := client.sendRequest(captureRequest)
 	if err != nil {
@@ -97,7 +103,14 @@ func (client *OrbitalClient) sendRequest(data Request) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	request.Header.Add("Content-Type", "application/xml; charset=utf-8")
+	request.Header.Add("Content-Type", "application/pti80")
+	request.Header.Add("MIME-Version", "1.1")
+	request.Header.Add("Content-transfer-encoding", "application/xml")
+	request.Header.Add("Document-type", "request")
+
+	fmt.Println("NIRAJ NIRAJ REQUEST")
+	fmt.Printf("%+v\n", request)
+	fmt.Printf("%s\n", xml.Header + string(bodyXML))
 
 	resp, err := client.httpClient.Do(request)
 	if err != nil {

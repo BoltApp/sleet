@@ -7,30 +7,34 @@ import (
 	"github.com/BoltApp/sleet"
 )
 
-func buildAuthRequest(authRequest *sleet.AuthorizationRequest) Request {
+func buildAuthRequest(authRequest *sleet.AuthorizationRequest, creds Credentials) Request {
 
 	amount := authRequest.Amount.Amount
 	exp := strconv.Itoa(authRequest.CreditCard.ExpirationYear) + strconv.Itoa(authRequest.CreditCard.ExpirationMonth)
 	code := currencyMap[authRequest.Amount.Currency]
 
 	body := RequestBody{
-		IndustryType:     IndustryTypeEcomm,
-		MessageType:      MessageTypeAuth,
-		BIN:              BINStratus,
-		TerminalID:       TerminalIDStratus,
-		AccountNum:       authRequest.CreditCard.Number,
-		Exp:              exp,
-		CurrencyCode:     code,
-		CurrencyExponent: CurrencyExponentDefault,
-		CardSecVal:       authRequest.CreditCard.CVV,
-		OrderID:          *authRequest.ClientTransactionReference,
-		Amount:           amount,
-		AVSzip:           *authRequest.BillingAddress.PostalCode,
-		AVSaddress1:      *authRequest.BillingAddress.StreetAddress1,
-		AVSaddress2:      authRequest.BillingAddress.StreetAddress2,
-		AVSstate:         *authRequest.BillingAddress.RegionCode,
-		AVScity:          *authRequest.BillingAddress.Locality,
-		AVScountryCode:   *authRequest.BillingAddress.CountryCode,
+		OrbitalConnectionUsername: creds.Username,
+		OrbitalConnectionPassword: creds.Password,
+		IndustryType:              IndustryTypeEcomm,
+		MessageType:               MessageTypeAuth,
+		BIN:                       BINStratus,
+		MerchantID:                creds.MerchantID,
+		TerminalID:                TerminalIDStratus,
+		CardBrand:                 "VI",
+		AccountNum:                authRequest.CreditCard.Number,
+		Exp:                       exp,
+		CurrencyCode:              code,
+		CurrencyExponent:          CurrencyExponentDefault,
+		CardSecVal:                authRequest.CreditCard.CVV,
+		OrderID:                   *authRequest.ClientTransactionReference,
+		Amount:                    amount,
+		AVSzip:                    *authRequest.BillingAddress.PostalCode,
+		AVSaddress1:               *authRequest.BillingAddress.StreetAddress1,
+		AVSaddress2:               authRequest.BillingAddress.StreetAddress2,
+		AVScity:                   *authRequest.BillingAddress.Locality,
+		AVSstate:                  *authRequest.BillingAddress.RegionCode,
+		AVScountryCode:            *authRequest.BillingAddress.CountryCode,
 	}
 
 	if authRequest.CreditCard.Network == sleet.CreditCardNetworkVisa || authRequest.CreditCard.Network == sleet.CreditCardNetworkDiscover {
