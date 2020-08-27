@@ -122,7 +122,8 @@ func (client *OrbitalClient) sendRequest(data Request) (*Response, error) {
 		return nil, err
 	}
 
-	reader := bytes.NewReader(bodyXML)
+	bodyWithHeader := xml.Header + string(bodyXML)
+	reader := bytes.NewReader([]byte(bodyWithHeader))
 	request, err := http.NewRequest(http.MethodPost, client.host, reader)
 	if err != nil {
 		return nil, err
