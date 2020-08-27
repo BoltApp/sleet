@@ -12,9 +12,9 @@ import (
 )
 
 type Credentials struct {
-	username   string
-	password   string
-	merchantID int
+	Username   string
+	Password   string
+	MerchantID int
 }
 
 type OrbitalClient struct {

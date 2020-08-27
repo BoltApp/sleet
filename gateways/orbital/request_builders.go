@@ -39,9 +39,9 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, credentials Crede
 
 	body.XMLName = xml.Name{Local: RequestTypeNewOrder}
 
-	body.OrbitalConnectionUsername = credentials.username
-	body.OrbitalConnectionPassword = credentials.password
-	body.MerchantID = credentials.merchantID
+	body.OrbitalConnectionUsername = credentials.Username
+	body.OrbitalConnectionPassword = credentials.Password
+	body.MerchantID = credentials.MerchantID
 	return Request{Body: body}
 }
 
@@ -55,9 +55,9 @@ func buildCaptureRequest(captureRequest *sleet.CaptureRequest, credentials Crede
 	}
 
 	body.XMLName = xml.Name{Local: RequestTypeCapture}
-	body.OrbitalConnectionUsername = credentials.username
-	body.OrbitalConnectionPassword = credentials.password
-	body.MerchantID = credentials.merchantID
+	body.OrbitalConnectionUsername = credentials.Username
+	body.OrbitalConnectionPassword = credentials.Password
+	body.MerchantID = credentials.MerchantID
 	return Request{Body: body}
 }
 
@@ -70,9 +70,9 @@ func buildVoidRequest(voidRequest *sleet.VoidRequest, credentials Credentials) R
 	}
 
 	body.XMLName = xml.Name{Local: RequestTypeVoid}
-	body.OrbitalConnectionUsername = credentials.username
-	body.OrbitalConnectionPassword = credentials.password
-	body.MerchantID = credentials.merchantID
+	body.OrbitalConnectionUsername = credentials.Username
+	body.OrbitalConnectionPassword = credentials.Password
+	body.MerchantID = credentials.MerchantID
 	return Request{Body: body}
 }
 
@@ -93,8 +93,8 @@ func buildRefundRequest(refundRequest *sleet.RefundRequest, credentials Credenti
 	}
 
 	body.XMLName = xml.Name{Local: RequestTypeNewOrder}
-	body.OrbitalConnectionUsername = credentials.username
-	body.OrbitalConnectionPassword = credentials.password
-	body.MerchantID = credentials.merchantID
+	body.OrbitalConnectionUsername = credentials.Username
+	body.OrbitalConnectionPassword = credentials.Password
+	body.MerchantID = credentials.MerchantID
 	return Request{Body: body}
 }
