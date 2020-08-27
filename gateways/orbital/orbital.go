@@ -24,28 +24,46 @@ type OrbitalClient struct {
 }
 
 func NewClient(env common.Environment, credentials Credentials) *OrbitalClient {
+	return NewWithHttpClient(env, credentials, common.DefaultHttpClient())
+}
+
+func NewWithHttpClient(env common.Environment, credentials Credentials, httpClient *http.Client) *OrbitalClient {
 	return &OrbitalClient{
 		host:        orbitalHost(env),
 		credentials: credentials,
-		httpClient:  common.DefaultHttpClient(),
+		httpClient:  httpClient,
 	}
 }
 
 func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
-
-	authRequest := buildAuthRequest(request)
-	authRequest.Body.OrbitalConnectionUsername = client.credentials.username
-	authRequest.Body.OrbitalConnectionPassword = client.credentials.password
-	authRequest.Body.MerchantID = client.credentials.merchantID
+	authRequest := buildAuthRequest(request, client.credentials)
 
 	orbitalResponse, err := client.sendRequest(authRequest)
 	if err != nil {
 		return nil, err
 	}
 
-	if orbitalResponse.Body.ProcStatus != 0 {
-		response := sleet.AuthorizationResponse{Success: false, ErrorCode: strconv.Itoa(orbitalResponse.Body.ProcStatus)}
-		return &response, nil
+	if orbitalResponse.Body.ProcStatus != ProcStatusSuccess {
+		if orbitalResponse.Body.RespCode != "" {
+			errorCode := orbitalResponse.Body.RespCode
+			return &sleet.AuthorizationResponse{
+				Success:   false,
+				ErrorCode: errorCode,
+			}, nil
+		}
+
+		return &sleet.AuthorizationResponse{
+			Success:   false,
+			ErrorCode: RespCodeNotPresent,
+		}, nil
+	}
+
+	if orbitalResponse.Body.RespCode != RespCodeApproved {
+		errorCode := orbitalResponse.Body.RespCode
+		return &sleet.AuthorizationResponse{
+			Success:   false,
+			ErrorCode: errorCode,
+		}, nil
 	}
 
 	return &sleet.AuthorizationResponse{
@@ -60,19 +78,31 @@ func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sl
 }
 
 func (client *OrbitalClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
-
-	captureRequest := buildCaptureRequest(request)
-	captureRequest.Body.OrbitalConnectionUsername = client.credentials.username
-	captureRequest.Body.OrbitalConnectionPassword = client.credentials.password
-	captureRequest.Body.MerchantID = client.credentials.merchantID
+	captureRequest := buildCaptureRequest(request, client.credentials)
 
 	orbitalResponse, err := client.sendRequest(captureRequest)
 	if err != nil {
 		return nil, err
 	}
 
-	if orbitalResponse.Body.ProcStatus != 0 {
-		errorCode := strconv.Itoa(orbitalResponse.Body.ProcStatus)
+	if orbitalResponse.Body.ProcStatus != ProcStatusSuccess {
+		if orbitalResponse.Body.RespCode != "" {
+			errorCode := orbitalResponse.Body.RespCode
+			return &sleet.CaptureResponse{
+				Success:   false,
+				ErrorCode: &errorCode,
+			}, nil
+		}
+
+		errorCode := RespCodeNotPresent
+		return &sleet.CaptureResponse{
+			Success:   false,
+			ErrorCode: &errorCode,
+		}, nil
+	}
+
+	if orbitalResponse.Body.RespCode != RespCodeApproved {
+		errorCode := orbitalResponse.Body.RespCode
 		return &sleet.CaptureResponse{
 			Success:   false,
 			ErrorCode: &errorCode,
@@ -97,7 +127,13 @@ func (client *OrbitalClient) sendRequest(data Request) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	request.Header.Add("Content-Type", "application/xml; charset=utf-8")
+
+	request.Header.Add("MIME-Version", "1.1")
+	request.Header.Add("Content-Type", "application/PTI80")
+	request.Header.Add("Content-length", strconv.Itoa(len(bodyXML)))
+	request.Header.Add("Content-transfer-encoding", "text")
+	request.Header.Add("Request-number", "1")
+	request.Header.Add("Document-type", "Request")
 
 	resp, err := client.httpClient.Do(request)
 	if err != nil {

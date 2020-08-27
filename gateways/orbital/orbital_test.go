@@ -3,6 +3,7 @@
 package orbital
 
 import (
+	"bytes"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -17,6 +18,8 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/jarcoal/httpmock"
 )
+
+var credentials Credentials = Credentials{"username", "password", 1}
 
 func TestNewClient(t *testing.T) {
 	t.Run("Dev environment", func(t *testing.T) {
@@ -55,13 +58,16 @@ func TestSend(t *testing.T) {
 
 	url := "https://orbitalvar1.chasepaymentech.com/authorize"
 
+	var headerReceived http.Header
 	var requestRaw, responseRaw []byte
 
 	responseRaw = helper.ReadFile("test_data/captureResponse.xml")
 	requestRaw = helper.ReadFile("test_data/captureRequest.xml")
 
+	requestRaw = bytes.TrimSpace(requestRaw)
+
 	base := sleet_t.BaseCaptureRequest()
-	request := buildCaptureRequest(base)
+	request := buildCaptureRequest(base, credentials)
 
 	request.Body.OrbitalConnectionUsername = "username"
 	request.Body.OrbitalConnectionPassword = "password"
@@ -72,6 +78,7 @@ func TestSend(t *testing.T) {
 		defer httpmock.DeactivateAndReset()
 
 		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			headerReceived = req.Header
 			body, _ := ioutil.ReadAll(req.Body)
 
 			gotFmt := xmlfmt.FormatXML(string(body), "", "  ")
@@ -86,7 +93,7 @@ func TestSend(t *testing.T) {
 			return resp, nil
 		})
 
-		client := NewClient(common.Sandbox, Credentials{"username", "password", 1})
+		client := NewClient(common.Sandbox, credentials)
 
 		var want *Response = new(Response)
 		helper.XmlUnmarshal(responseRaw, want)
@@ -101,6 +108,30 @@ func TestSend(t *testing.T) {
 			t.Error("Response body does not match expected")
 			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
 		}
+
+		t.Run("Request Headers", func(t *testing.T) {
+
+			header_cases := []struct {
+				label string
+				want  string
+				got   string
+			}{
+				{"MIME-Version", "1.1", headerReceived.Get("MIME-Version")},
+				{"Content-Type", "application/PTI80", headerReceived.Get("Content-Type")},
+				{"Content-length", strconv.Itoa(len(requestRaw)), headerReceived.Get("Content-length")},
+				{"Content-transfer-encoding", "text", headerReceived.Get("Content-transfer-encoding")},
+				{"Request-number", "1", headerReceived.Get("Request-Number")},
+				{"Document-type", "Request", headerReceived.Get("Document-type")},
+			}
+
+			for _, c := range header_cases {
+				t.Run(c.label, func(t *testing.T) {
+					if c.got != c.want {
+						t.Errorf("Got %q, want %q", c.got, c.want)
+					}
+				})
+			}
+		})
 	})
 }
 
@@ -198,7 +229,7 @@ func TestCapture(t *testing.T) {
 			TransactionReference: "11111",
 		}
 
-		client := NewClient(common.Sandbox, Credentials{"username", "password", 1})
+		client := NewClient(common.Sandbox, credentials)
 
 		got, err := client.Capture(request)
 

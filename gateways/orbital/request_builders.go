@@ -7,7 +7,7 @@ import (
 	"github.com/BoltApp/sleet"
 )
 
-func buildAuthRequest(authRequest *sleet.AuthorizationRequest) Request {
+func buildAuthRequest(authRequest *sleet.AuthorizationRequest, credentials Credentials) Request {
 
 	amount := authRequest.Amount.Amount
 	exp := strconv.Itoa(authRequest.CreditCard.ExpirationYear) + strconv.Itoa(authRequest.CreditCard.ExpirationMonth)
@@ -38,10 +38,14 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) Request {
 	}
 
 	body.XMLName = xml.Name{Local: RequestTypeNewOrder}
+
+	body.OrbitalConnectionUsername = credentials.username
+	body.OrbitalConnectionPassword = credentials.password
+	body.MerchantID = credentials.merchantID
 	return Request{Body: body}
 }
 
-func buildCaptureRequest(captureRequest *sleet.CaptureRequest) Request {
+func buildCaptureRequest(captureRequest *sleet.CaptureRequest, credentials Credentials) Request {
 	body := RequestBody{
 		Amount:     captureRequest.Amount.Amount,
 		BIN:        BINStratus,
@@ -51,10 +55,13 @@ func buildCaptureRequest(captureRequest *sleet.CaptureRequest) Request {
 	}
 
 	body.XMLName = xml.Name{Local: RequestTypeCapture}
+	body.OrbitalConnectionUsername = credentials.username
+	body.OrbitalConnectionPassword = credentials.password
+	body.MerchantID = credentials.merchantID
 	return Request{Body: body}
 }
 
-func buildVoidRequest(voidRequest *sleet.VoidRequest) Request {
+func buildVoidRequest(voidRequest *sleet.VoidRequest, credentials Credentials) Request {
 	body := RequestBody{
 		BIN:        BINStratus,
 		TerminalID: TerminalIDStratus,
@@ -63,10 +70,13 @@ func buildVoidRequest(voidRequest *sleet.VoidRequest) Request {
 	}
 
 	body.XMLName = xml.Name{Local: RequestTypeVoid}
+	body.OrbitalConnectionUsername = credentials.username
+	body.OrbitalConnectionPassword = credentials.password
+	body.MerchantID = credentials.merchantID
 	return Request{Body: body}
 }
 
-func buildRefundRequest(refundRequest *sleet.RefundRequest) Request {
+func buildRefundRequest(refundRequest *sleet.RefundRequest, credentials Credentials) Request {
 	amount := refundRequest.Amount.Amount
 	code := currencyMap[refundRequest.Amount.Currency]
 
@@ -83,5 +93,8 @@ func buildRefundRequest(refundRequest *sleet.RefundRequest) Request {
 	}
 
 	body.XMLName = xml.Name{Local: RequestTypeNewOrder}
+	body.OrbitalConnectionUsername = credentials.username
+	body.OrbitalConnectionPassword = credentials.password
+	body.MerchantID = credentials.merchantID
 	return Request{Body: body}
 }

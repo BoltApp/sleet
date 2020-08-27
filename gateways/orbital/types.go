@@ -91,6 +91,10 @@ type CurrencyExponent string
 
 const CurrencyExponentDefault CurrencyExponent = "2"
 
+const ProcStatusSuccess = 0
+const RespCodeApproved = "00"
+const RespCodeNotPresent = "zz" // returned in place of RespCode when none is returned by the api
+
 type Request struct {
 	XMLName xml.Name `xml:"Request"`
 	Body    RequestBody
