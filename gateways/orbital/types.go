@@ -142,8 +142,10 @@ type RequestBody struct {
 	AVSname                   string           `xml:"AVSname,omitempty"`
 	AVScountryCode            string           `xml:"AVScountryCode,omitempty"`
 	AVSphoneNum               string           `xml:"AVSphoneNum,omitempty"`
-	OrderID                   string           `xml:"OrderID,omitempty"`     // generated id, max 22 chars
-	Amount                    int64            `xml:"Amount,omitempty"`      //int with the last 2 digits being implied decimals ie 100.25 is sent as 10025, 90 is sent as 9000
+	OrderID                   string           `xml:"OrderID,omitempty"`                // generated id, max 22 chars
+	Amount                    int64            `xml:"Amount,omitempty"`                 //int with the last 2 digits being implied decimals ie 100.25 is sent as 10025, 90 is sent as 9000
+	DPANInd                   string           `xml:"DPANInd,omitempty"`                // does this token represent a device based Primary Account Number (DPAN)
+	DigitalTokenCryptogram    string           `xml:"DigitalTokenCryptogram,omitempty"` // cryptogram for network tokenized cards (i.e. ApplePay)
 }
 
 type ResponseBody struct {
@@ -154,7 +156,7 @@ type ResponseBody struct {
 	TerminalID     int             `xml:"TerminalID"`
 	AccountNum     string          `xml:"AccountNum"`
 	OrderID        string          `xml:"OrderID"`
-	TxRefNum       string             `xml:"TxRefNum"`
+	TxRefNum       string          `xml:"TxRefNum"`
 	TxRefIdx       int             `xml:"TxRefIdx"`
 	RespCode       string          `xml:"RespCode"`
 	StatusMsg      string          `xml:"StatusMsg"`
