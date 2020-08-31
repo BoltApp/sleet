@@ -40,6 +40,11 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, credentials Crede
 		body.CardSecValInd = CardSecPresent
 	}
 
+	if authRequest.Cryptogram != "" && authRequest.ECI != "" {
+		body.DPANInd = "Y"
+		body.DigitalTokenCryptogram = authRequest.Cryptogram
+	}
+
 	body.XMLName = xml.Name{Local: RequestTypeNewOrder}
 	return Request{Body: body}
 }
