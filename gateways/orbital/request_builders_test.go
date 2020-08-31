@@ -13,7 +13,7 @@ import (
 )
 
 func TestBuildAuthRequest(t *testing.T) {
-	var visaBase, discoverBase, mastercardBase sleet.AuthorizationRequest
+	var visaBase, discoverBase, mastercardBase, applepayBase sleet.AuthorizationRequest
 
 	visaBase = *sleet_testing.BaseAuthorizationRequest()
 	visaBase.CreditCard.Network = sleet.CreditCardNetworkVisa
@@ -23,6 +23,10 @@ func TestBuildAuthRequest(t *testing.T) {
 
 	mastercardBase = *sleet_testing.BaseAuthorizationRequest()
 	mastercardBase.CreditCard.Network = sleet.CreditCardNetworkMastercard
+
+	applepayBase = *sleet_testing.BaseAuthorizationRequest()
+	applepayBase.ECI = "5"
+	applepayBase.Cryptogram = "crypto"
 
 	credentials := Credentials{"username", "password", 1}
 
@@ -117,6 +121,37 @@ func TestBuildAuthRequest(t *testing.T) {
 					AVSstate:                  *mastercardBase.BillingAddress.RegionCode,
 					AVScity:                   *mastercardBase.BillingAddress.Locality,
 					AVScountryCode:            *mastercardBase.BillingAddress.CountryCode,
+				},
+			},
+		},
+		{
+			"Auth with applepay",
+			&applepayBase,
+			Request{
+				Body: RequestBody{
+					OrbitalConnectionUsername: "username",
+					OrbitalConnectionPassword: "password",
+					MerchantID:                1,
+					IndustryType:              IndustryTypeEcomm,
+					MessageType:               MessageTypeAuth,
+					BIN:                       BINStratus,
+					TerminalID:                TerminalIDStratus,
+					XMLName:                   xml.Name{Local: RequestTypeNewOrder},
+					AccountNum:                applepayBase.CreditCard.Number,
+					Exp:                       "202010",
+					CardSecVal:                applepayBase.CreditCard.CVV,
+					CurrencyCode:              CurrencyCodeUSD,
+					CurrencyExponent:          CurrencyExponentDefault,
+					Amount:                    100,
+					OrderID:                   *applepayBase.ClientTransactionReference,
+					AVSzip:                    *applepayBase.BillingAddress.PostalCode,
+					AVSaddress1:               *applepayBase.BillingAddress.StreetAddress1,
+					AVSaddress2:               applepayBase.BillingAddress.StreetAddress2,
+					AVSstate:                  *applepayBase.BillingAddress.RegionCode,
+					AVScity:                   *applepayBase.BillingAddress.Locality,
+					AVScountryCode:            *applepayBase.BillingAddress.CountryCode,
+					DPANInd:                   "Y",
+					DigitalTokenCryptogram:    "crypto",
 				},
 			},
 		},
