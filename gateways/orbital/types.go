@@ -121,29 +121,29 @@ type RequestBody struct {
 	XMLName                   xml.Name
 	OrbitalConnectionUsername string           `xml:"OrbitalConnectionUsername"`
 	OrbitalConnectionPassword string           `xml:"OrbitalConnectionPassword"`
-	BIN                       BIN              `xml:"BIN"`
-	TerminalID                string           `xml:"TerminalID"` // usually 001, for PNS can be 001 - 999 but usually 001
 	IndustryType              IndustryType     `xml:"IndustryType,omitempty"`
 	MessageType               MessageType      `xml:"MessageType,omitempty"`
+	BIN                       BIN              `xml:"BIN"`
 	MerchantID                int              `xml:"MerchantID,omitempty"`
+	TerminalID                string           `xml:"TerminalID"` // usually 001, for PNS can be 001 - 999 but usually 001
 	AccountNum                string           `xml:"AccountNum,omitempty"`
 	Exp                       string           `xml:"Exp,omitempty"` //Format: MMYY or YYYYMM
 	CurrencyCode              CurrencyCode     `xml:"CurrencyCode,omitempty"`
 	CurrencyExponent          CurrencyExponent `xml:"CurrencyExponent,omitempty"`
 	CardSecValInd             CardSecValInd    `xml:"CardSecValInd,omitempty"`
 	CardSecVal                string           `xml:"CardSecVal,omitempty"`
-	OrderID                   string           `xml:"OrderID,omitempty"`     // generated id, max 22 chars
-	Amount                    int64            `xml:"Amount,omitempty"`      //int with the last 2 digits being implied decimals ie 100.25 is sent as 10025, 90 is sent as 9000
 	AdjustedAmt               int64            `xml:"AdjustedAmt,omitempty"` //int with the last 2 digits being implied decimals ie 100.25 is sent as 10025, 90 is sent as 9000
 	TxRefNum                  string           `xml:"TxRefNum,omitempty"`
 	AVSzip                    string           `xml:"AVSzip,omitempty"`
 	AVSaddress1               string           `xml:"AVSaddress1,omitempty"`
 	AVSaddress2               *string          `xml:"AVSaddress2,omitempty"`
-	AVSstate                  string           `xml:"AVSstate,omitempty"`
 	AVScity                   string           `xml:"AVScity,omitempty"`
+	AVSstate                  string           `xml:"AVSstate,omitempty"`
 	AVSname                   string           `xml:"AVSname,omitempty"`
 	AVScountryCode            string           `xml:"AVScountryCode,omitempty"`
 	AVSphoneNum               string           `xml:"AVSphoneNum,omitempty"`
+	OrderID                   string           `xml:"OrderID,omitempty"`     // generated id, max 22 chars
+	Amount                    int64            `xml:"Amount,omitempty"`      //int with the last 2 digits being implied decimals ie 100.25 is sent as 10025, 90 is sent as 9000
 }
 
 type ResponseBody struct {
