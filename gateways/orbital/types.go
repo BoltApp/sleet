@@ -144,7 +144,7 @@ type RequestBody struct {
 	AVSphoneNum               string           `xml:"AVSphoneNum,omitempty"`
 	OrderID                   string           `xml:"OrderID,omitempty"`                // generated id, max 22 chars
 	Amount                    int64            `xml:"Amount,omitempty"`                 //int with the last 2 digits being implied decimals ie 100.25 is sent as 10025, 90 is sent as 9000
-	DPANInd                   string           `xml:"DPANInd,omitempty"`                // does this token represent a device based Primary Account Number (DPAN)
+	DPANInd                   string           `xml:"DPANInd,omitempty"`                // does this token represent a device based Primary Account Number (DPAN). Y if yes, omit if not. Pan goes in AccountNum
 	DigitalTokenCryptogram    string           `xml:"DigitalTokenCryptogram,omitempty"` // cryptogram for network tokenized cards (i.e. ApplePay)
 }
 
