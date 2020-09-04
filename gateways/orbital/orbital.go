@@ -115,6 +115,58 @@ func (client *OrbitalClient) Capture(request *sleet.CaptureRequest) (*sleet.Capt
 	}, nil
 }
 
+func (client *OrbitalClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+	voidRequest := buildVoidRequest(request, client.credentials)
+
+	orbitalResponse, err := client.sendRequest(voidRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	if orbitalResponse.Body.ProcStatus != ProcStatusSuccess {
+		errorCode := RespCodeNotPresent
+		return &sleet.VoidResponse{
+			Success:   false,
+			ErrorCode: &errorCode,
+		}, nil
+	}
+
+	return &sleet.VoidResponse{
+		Success:              true,
+		TransactionReference: orbitalResponse.Body.TxRefNum,
+	}, nil
+}
+
+func (client *OrbitalClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	refundRequest := buildRefundRequest(request, client.credentials)
+
+	orbitalResponse, err := client.sendRequest(refundRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	if orbitalResponse.Body.ProcStatus != ProcStatusSuccess {
+		if orbitalResponse.Body.RespCode != "" {
+			errorCode := orbitalResponse.Body.RespCode
+			return &sleet.RefundResponse{
+				Success:   false,
+				ErrorCode: &errorCode,
+			}, nil
+		}
+
+		errorCode := RespCodeNotPresent
+		return &sleet.RefundResponse{
+			Success:   false,
+			ErrorCode: &errorCode,
+		}, nil
+	}
+
+	return &sleet.RefundResponse{
+		Success:              true,
+		TransactionReference: orbitalResponse.Body.TxRefNum,
+	}, nil
+}
+
 func (client *OrbitalClient) sendRequest(data Request) (*Response, error) {
 
 	bodyXML, err := xml.Marshal(data)
@@ -131,7 +183,7 @@ func (client *OrbitalClient) sendRequest(data Request) (*Response, error) {
 
 	request.Header.Add("MIME-Version", MIMEVersion)
 	request.Header.Add("Content-Type", ContentType)
-	request.Header.Add("Content-length", strconv.Itoa(len(bodyXML)))
+	request.Header.Add("Content-length", strconv.Itoa(len(bodyWithHeader)))
 	request.Header.Add("Content-transfer-encoding", ContentTransferEncoding)
 	request.Header.Add("Request-number", RequestNumber)
 	request.Header.Add("Document-type", DocumentType)
