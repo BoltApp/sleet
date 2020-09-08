@@ -7,7 +7,7 @@ type Request struct {
 	Amount          *string `form:"amount,omitempty"`
 	CardExpiration  *string `form:"ccexp,omitempty"`
 	CardNumber      *string `form:"ccnumber,omitempty"`
-	City            *string `form:"city,omitempty,omitempty"`
+	City            *string `form:"city,omitempty"`
 	Currency        *string `form:"currency,omitempty"`
 	CVV             *string `form:"cvv,omitempty"`
 	FirstName       *string `form:"first_name,omitempty"`

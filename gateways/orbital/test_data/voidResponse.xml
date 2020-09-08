@@ -1,0 +1,13 @@
+<Response>
+ <ReversalResp>
+  <MerchantID>123456</MerchantID>
+  <TerminalID>001</TerminalID>
+  <OrderID>22222</OrderID>
+  <TxRefNum>11111</TxRefNum>
+  <TxRefIdx>1</TxRefIdx>
+  <OutstandingAmt>1</OutstandingAmt>
+  <ProcStatus>0</ProcStatus>
+  <StatusMsg>Approved</StatusMsg>
+  <RespTime>102708</RespTime>
+ </ReversalResp>
+</Response>
