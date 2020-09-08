@@ -49,9 +49,11 @@ func (client *NMIClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.
 	// "2" means declined and "3" means bad request
 	if nmiResponse.Response != "1" {
 		return &sleet.AuthorizationResponse{
-			Success:   false,
-			Response:  nmiResponse.Response,
-			ErrorCode: nmiResponse.ResponseCode,
+			Success: false,
+			// transaction references are sometimes returned in ResponseText for error responses
+			TransactionReference: nmiResponse.ResponseText,
+			Response:             nmiResponse.Response,
+			ErrorCode:            nmiResponse.ResponseCode,
 		}, nil
 	}
 
