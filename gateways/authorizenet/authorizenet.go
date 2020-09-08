@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/BoltApp/sleet"
-	"github.com/BoltApp/sleet/common"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
 )
 
 // AuthorizeNetClient uses merchant name and transaction key to process requests. Optionally can provide custom http clients
@@ -49,17 +50,17 @@ func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest)
 		if len(txnResponse.Errors) > 0 {
 			errorCode = txnResponse.Errors[0].ErrorCode
 		} else {
-			errorCode = txnResponse.ResponseCode
+			errorCode = string(txnResponse.ResponseCode)
 		}
 	}
 
 	return &sleet.AuthorizationResponse{
 		Success:              txnResponse.ResponseCode == ResponseCodeApproved,
 		TransactionReference: txnResponse.TransID,
-		AvsResult:            sleet.AVSresponseZipMatchAddressMatch, // TODO: Add translator
-		CvvResult:            sleet.CVVResponseMatch,                // TODO: Add translator
-		AvsResultRaw:         txnResponse.AVSResultCode,
-		CvvResultRaw:         txnResponse.CVVResultCode,
+		AvsResult:            translateAvs(txnResponse.AVSResultCode),
+		CvvResult:            translateCvv(txnResponse.CVVResultCode),
+		AvsResultRaw:         string(txnResponse.AVSResultCode),
+		CvvResultRaw:         string(txnResponse.CVVResultCode),
 		ErrorCode:            errorCode,
 	}, nil
 }
@@ -82,7 +83,7 @@ func (client *AuthorizeNetClient) Capture(request *sleet.CaptureRequest) (*sleet
 		if len(authorizeNetResponse.TransactionResponse.Errors) > 0 {
 			errorCode = authorizeNetResponse.TransactionResponse.Errors[0].ErrorCode
 		} else {
-			errorCode = authorizeNetResponse.TransactionResponse.ResponseCode
+			errorCode = string(authorizeNetResponse.TransactionResponse.ResponseCode)
 		}
 		response := sleet.CaptureResponse{ErrorCode: &errorCode}
 		return &response, nil
@@ -107,7 +108,7 @@ func (client *AuthorizeNetClient) Void(request *sleet.VoidRequest) (*sleet.VoidR
 		if len(authorizeNetResponse.TransactionResponse.Errors) > 0 {
 			errorCode = authorizeNetResponse.TransactionResponse.Errors[0].ErrorCode
 		} else {
-			errorCode = authorizeNetResponse.TransactionResponse.ResponseCode
+			errorCode = string(authorizeNetResponse.TransactionResponse.ResponseCode)
 		}
 		response := sleet.VoidResponse{ErrorCode: &errorCode}
 		return &response, nil
@@ -133,7 +134,7 @@ func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.R
 		if len(authorizeNetResponse.TransactionResponse.Errors) > 0 {
 			errorCode = authorizeNetResponse.TransactionResponse.Errors[0].ErrorCode
 		} else {
-			errorCode = authorizeNetResponse.TransactionResponse.ResponseCode
+			errorCode = string(authorizeNetResponse.TransactionResponse.ResponseCode)
 		}
 		response := sleet.RefundResponse{ErrorCode: &errorCode}
 		return &response, nil

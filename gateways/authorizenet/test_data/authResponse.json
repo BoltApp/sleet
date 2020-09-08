@@ -1,0 +1,40 @@
+{
+    "transactionResponse": {
+        "responseCode": "1",
+        "authCode": "HH5414",
+        "avsResultCode": "Y",
+        "cvvResultCode": "S",
+        "cavvResultCode": "6",
+        "transId": "2149186848",
+        "refTransID": "",
+        "transHash": "FE3CE11E9F7670D3ECD606E455B7C222",
+        "accountNumber": "XXXX0015",
+        "accountType": "Mastercard",
+        "messages": [
+            {
+                "code": "1",
+                "description": "This transaction has been approved."
+            }
+        ],
+        "userFields": [
+            {
+                "name": "MerchantDefinedFieldName1",
+                "value": "MerchantDefinedFieldValue1"
+            },
+            {
+                "name": "favorite_color",
+                "value": "blue"
+            }
+        ]
+    },
+    "refId": "123456",
+    "messages": {
+        "resultCode": "Ok",
+        "message": [
+            {
+                "code": "I00001",
+                "text": "Successful."
+            }
+        ]
+    }
+}
