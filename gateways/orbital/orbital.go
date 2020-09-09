@@ -187,6 +187,7 @@ func (client *OrbitalClient) sendRequest(data Request) (*Response, error) {
 	request.Header.Add("Content-transfer-encoding", ContentTransferEncoding)
 	request.Header.Add("Request-number", RequestNumber)
 	request.Header.Add("Document-type", DocumentType)
+	request.Header.Add("Trace-number", data.Body.OrderID)
 
 	resp, err := client.httpClient.Do(request)
 	if err != nil {

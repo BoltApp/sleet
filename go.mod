@@ -10,6 +10,7 @@ require (
 	github.com/go-test/deep v1.0.7
 	github.com/go-xmlfmt/xmlfmt v0.0.0-20191208150333-d5b6f63a941b
 	github.com/google/go-cmp v0.5.1
+	github.com/google/uuid v1.1.2
 	github.com/jarcoal/httpmock v1.0.5
 	github.com/stripe/stripe-go v70.11.0+incompatible
 	golang.org/x/net v0.0.0-20200421231249-e086a090c8fd // indirect

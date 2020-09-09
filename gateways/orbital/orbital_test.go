@@ -122,6 +122,7 @@ func TestSend(t *testing.T) {
 				{"Content-transfer-encoding", "text", headerReceived.Get("Content-transfer-encoding")},
 				{"Request-number", "1", headerReceived.Get("Request-Number")},
 				{"Document-type", "Request", headerReceived.Get("Document-type")},
+				{"Trace-number", *base.ClientTransactionReference, headerReceived.Get("Trace-number")},
 			}
 
 			for _, c := range header_cases {
