@@ -34,6 +34,16 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 			Street:            common.SafeStr(authRequest.BillingAddress.StreetAddress1),
 		}
 	}
+
+	if authRequest.Cryptogram != "" && authRequest.ECI != "" {
+		request.MpiData = &payments.ThreeDSecureData{
+			AuthenticationResponse: "Y",
+			Cavv:                   authRequest.Cryptogram,
+			DirectoryResponse:      "Y",
+			Eci:                    authRequest.ECI,
+		}
+	}
+
 	return request
 }
 
