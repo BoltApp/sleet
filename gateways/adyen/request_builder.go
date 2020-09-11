@@ -3,29 +3,31 @@ package adyen
 import (
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
+	"github.com/adyen/adyen-go-api-library/v2/src/checkout"
 	"github.com/adyen/adyen-go-api-library/v2/src/payments"
 	"strconv"
 )
 
-func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount string) *payments.PaymentRequest {
-	request := &payments.PaymentRequest{
-		Amount: payments.Amount{
+func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount string) *checkout.PaymentRequest {
+	request := &checkout.PaymentRequest{
+		Amount: checkout.Amount{
 			Value:    authRequest.Amount.Amount,
 			Currency: authRequest.Amount.Currency,
 		},
 		// Adyen requires a reference in request so this will panic if client doesn't pass it. Assuming this is good for now
 		Reference: *authRequest.ClientTransactionReference,
-		Card: &payments.Card{
-			ExpiryYear:  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
-			ExpiryMonth: strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
-			Number:      authRequest.CreditCard.Number,
-			Cvc:         authRequest.CreditCard.CVV,
-			HolderName:  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
+		PaymentMethod: map[string]interface{}{
+			"type":        "scheme",
+			"number":      authRequest.CreditCard.Number,
+			"expiryMonth": strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
+			"expiryYear":  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
+			"holderName":  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
+			"cvc":         authRequest.CreditCard.CVV,
 		},
 		MerchantAccount: merchantAccount,
 	}
 	if authRequest.BillingAddress != nil {
-		request.BillingAddress = &payments.Address{
+		request.BillingAddress = &checkout.Address{
 			City:              common.SafeStr(authRequest.BillingAddress.Locality),
 			Country:           common.SafeStr(authRequest.BillingAddress.CountryCode),
 			HouseNumberOrName: common.SafeStr(authRequest.BillingAddress.StreetAddress2),
