@@ -48,7 +48,7 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 	)
 
 	// potentially do something with http response
-	result, _, err := adyenClient.Payments.Authorise(buildAuthRequest(request, client.merchantAccount))
+	result, _, err := adyenClient.Checkout.Payments(buildAuthRequest(request, client.merchantAccount))
 	if err != nil {
 		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: sleet.AVSResponseUnknown, CvvResult: sleet.CVVResponseUnknown}, err
 	}
