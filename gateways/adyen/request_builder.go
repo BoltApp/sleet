@@ -19,8 +19,8 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		PaymentMethod: map[string]interface{}{
 			"type":        "scheme",
 			"number":      authRequest.CreditCard.Number,
-			"expiryMonth": strconv.Itoa(authRequest.CreditCard.ExpirationYear),
-			"expiryYear":  strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
+			"expiryMonth": strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
+			"expiryYear":  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
 			"holderName":  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
 			"cvc":         authRequest.CreditCard.CVV,
 		},
