@@ -1,8 +1,8 @@
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/Pallinder/go-randomdata v1.2.0 h1:DZ41wBchNRb/0GfsePLiSwb0PHZmT67XY00lCDlaYPg=
 github.com/Pallinder/go-randomdata v1.2.0/go.mod h1:yHmJgulpD2Nfrm0cR9tI/+oAgRqCQQixsA8HyRZfV9Y=
-github.com/adyen/adyen-go-api-library v0.0.1 h1:4d/vTkFpIrZP9dvD0yE6QDSLX9KRCaUUMa0qEBJtBP0=
-github.com/adyen/adyen-go-api-library v0.0.1/go.mod h1:qS+/AZA/hcaoDqGjWGQljgLWZmIQPkgApQd7HUHwtHM=
+github.com/adyen/adyen-go-api-library/v2 v2.1.0 h1:Cjz1Y3l/9BcSArugIlWrujhgHyjhFKhvE0mLLiyVWL4=
+github.com/adyen/adyen-go-api-library/v2 v2.1.0/go.mod h1:6kIfULjVgGmibkVlfcMIS+rwd/ErYxM/lIcpMd3ivr4=
 github.com/braintree-go/braintree-go v0.22.0 h1:tSMs8IQ2I38RzOsQ/kn1lnL/XWQ/wCTa/XHdcb8760o=
 github.com/braintree-go/braintree-go v0.22.0/go.mod h1:KZOsgcN57OCLvNAegsEDssgYSsGbdL+msvex1SNmb0E=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
@@ -17,6 +17,7 @@ github.com/golang/protobuf v1.2.0 h1:P3YflyNX/ehuJFLhxviNdFxQPkGK5cDcApsge1SqnvM
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/google/go-cmp v0.5.1 h1:JFrFEBb2xKufg6XkJsJr+WbKb4FQlURi5RUcBveYu9k=
 github.com/google/go-cmp v0.5.1/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
+github.com/google/uuid v1.1.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/jarcoal/httpmock v1.0.5 h1:cHtVEcTxRSX4J0je7mWPfc9BpDpqzXSJ5HbymZmyHck=
 github.com/jarcoal/httpmock v1.0.5/go.mod h1:ATjnClrvW/3tijVmpL/va5Z3aAyGvqU3gCT8nX0Txik=
 github.com/joho/godotenv v1.3.0 h1:Zjp+RcGpHhGlrMbJzXTrZZPrWj+1vfm90La1wgB6Bhc=
