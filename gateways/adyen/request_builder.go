@@ -3,7 +3,7 @@ package adyen
 import (
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
-	"github.com/adyen/adyen-go-api-library/src/payments"
+	"github.com/adyen/adyen-go-api-library/v2/src/payments"
 	"strconv"
 )
 
