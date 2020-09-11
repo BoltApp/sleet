@@ -5,8 +5,8 @@ import (
 
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
-	"github.com/adyen/adyen-go-api-library/src/adyen"
-	adyen_common "github.com/adyen/adyen-go-api-library/src/common"
+	"github.com/adyen/adyen-go-api-library/v2/src/adyen"
+	adyen_common "github.com/adyen/adyen-go-api-library/v2/src/common"
 )
 
 // AdyenClient represents the authentication fields needed to make API Requests for a given environment
@@ -53,7 +53,7 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: sleet.AVSResponseUnknown, CvvResult: sleet.CVVResponseUnknown}, err
 	}
 
-	if result.ResultCode == "Refused" || result.ResultCode == "Error" {
+	if result.ResultCode == adyen_common.Refused || result.ResultCode == adyen_common.Error {
 		return &sleet.AuthorizationResponse{Success: false, TransactionReference: result.PspReference, ErrorCode: result.RefusalReason}, nil
 	}
 
