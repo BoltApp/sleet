@@ -22,7 +22,8 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 			"expiryYear":  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
 			"holderName":  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
 		},
-		MerchantAccount: merchantAccount,
+		MerchantAccount:          merchantAccount,
+		RecurringProcessingModel: "CardOnFile",
 	}
 
 	if authRequest.BillingAddress != nil {
@@ -46,12 +47,12 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 			DirectoryResponse:      "Y",
 			Eci:                    authRequest.ECI,
 		}
-		request.RecurringProcessingModel = "CardOnFile"
 		request.ShopperInteraction = "Ecommerce"
 	} else {
 		// Credit Card request
 		request.PaymentMethod["type"] = "scheme"
 		request.PaymentMethod["cvc"] = authRequest.CreditCard.CVV
+		request.ShopperInteraction = "ContAuth"
 	}
 
 	return request
