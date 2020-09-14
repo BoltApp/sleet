@@ -47,7 +47,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 			Eci:                    authRequest.ECI,
 		}
 		request.RecurringProcessingModel = "CardOnFile"
-		request.ShopperInteraction = "ECommerce"
+		request.ShopperInteraction = "Ecommerce"
 	} else {
 		// Credit Card request
 		request.PaymentMethod["type"] = "scheme"

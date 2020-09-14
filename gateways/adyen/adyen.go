@@ -65,10 +65,16 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 	if result.AdditionalData != nil {
 		values, ok := result.AdditionalData.(map[string]interface{})
 		if ok {
-			response.AvsResult = translateAvs(values["avsResult"].(string))
-			response.CvvResult = translateCvv(values["cvcResult"].(string))
-			response.AvsResultRaw = values["avsResultRaw"].(string)
-			response.CvvResultRaw = values["cvcResultRaw"].(string)
+			if avs, isPresent := values["avsResult"]; isPresent {
+				response.AvsResult = translateAvs(avs.(string))
+				response.AvsResultRaw = avs.(string)
+
+			}
+			if cvv, isPresent := values["cvcResult"]; isPresent {
+				response.AvsResult = translateAvs(cvv.(string))
+				response.AvsResultRaw = cvv.(string)
+
+			}
 		}
 	}
 	return response, nil
