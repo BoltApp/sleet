@@ -17,15 +17,14 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		// Adyen requires a reference in request so this will panic if client doesn't pass it. Assuming this is good for now
 		Reference: *authRequest.ClientTransactionReference,
 		PaymentMethod: map[string]interface{}{
-			"type":        "scheme",
 			"number":      authRequest.CreditCard.Number,
 			"expiryMonth": strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
 			"expiryYear":  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
 			"holderName":  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
-			"cvc":         authRequest.CreditCard.CVV,
 		},
 		MerchantAccount: merchantAccount,
 	}
+
 	if authRequest.BillingAddress != nil {
 		request.BillingAddress = &checkout.Address{
 			City:              common.SafeStr(authRequest.BillingAddress.Locality),
@@ -36,6 +35,25 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 			Street:            common.SafeStr(authRequest.BillingAddress.StreetAddress1),
 		}
 	}
+
+	if authRequest.Cryptogram != "" && authRequest.ECI != "" {
+		// Apple Pay request
+		request.PaymentMethod["type"] = "networkToken"
+		request.PaymentMethod["brand"] = authRequest.CreditCard.Network.String()
+		request.MpiData = &checkout.ThreeDSecureData{
+			AuthenticationResponse: "Y",
+			Cavv:                   authRequest.Cryptogram,
+			DirectoryResponse:      "Y",
+			Eci:                    authRequest.ECI,
+		}
+		request.RecurringProcessingModel = "CardOnFile"
+		request.ShopperInteraction = "Ecommerce"
+	} else {
+		// Credit Card request
+		request.PaymentMethod["type"] = "scheme"
+		request.PaymentMethod["cvc"] = authRequest.CreditCard.CVV
+	}
+
 	return request
 }
 
