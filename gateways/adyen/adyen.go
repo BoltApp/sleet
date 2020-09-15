@@ -37,6 +37,9 @@ func NewWithHTTPClient(merchantAccount string, apiKey string, liveURLPrefix stri
 }
 
 // Authorize through Adyen gateway. This transaction must be captured for funds to be received
+//
+// Note: In order to be compliant, a credit card CVV is required for all transactions where a customer did not agree
+// to have their card information saved or where a customer does not have a previous transaction with the caller.
 func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	adyenClient := adyen.NewClient(&adyen_common.Config{
 		ApiKey:                client.apiKey,
