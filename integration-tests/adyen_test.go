@@ -118,10 +118,27 @@ func TestAdyenAVSCode2(t *testing.T) {
 
 // TestAdyenAuth
 //
-// This should successfully create an authorization on Adyen
+// This should successfully create an authorization on Adyen for a new customer
 func TestAdyenAuth(t *testing.T) {
 	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
 	request := sleet_testing.BaseAuthorizationRequest()
+	auth, err := client.Authorize(request)
+	if err != nil {
+		t.Error("Authorize request should not have failed")
+	}
+
+	if !auth.Success {
+		t.Error("Resulting auth should have been successful")
+	}
+}
+
+// TestAdyenRechargeAuth
+//
+// This should successfully create an authorization on Adyen for an existing customer
+func TestAdyenRechargeAuth(t *testing.T) {
+	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
+	request := sleet_testing.BaseAuthorizationRequest()
+	request.CreditCard.CVV = ""
 	auth, err := client.Authorize(request)
 	if err != nil {
 		t.Error("Authorize request should not have failed")

@@ -39,19 +39,24 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 
 	if authRequest.Cryptogram != "" && authRequest.ECI != "" {
 		// Apple Pay request
-		request.PaymentMethod["type"] = "networkToken"
-		request.PaymentMethod["brand"] = authRequest.CreditCard.Network.String()
 		request.MpiData = &checkout.ThreeDSecureData{
 			AuthenticationResponse: "Y",
 			Cavv:                   authRequest.Cryptogram,
 			DirectoryResponse:      "Y",
 			Eci:                    authRequest.ECI,
 		}
+		request.PaymentMethod["brand"] = authRequest.CreditCard.Network.String()
+		request.PaymentMethod["type"] = "networkToken"
 		request.ShopperInteraction = "Ecommerce"
-	} else {
-		// Credit Card request
-		request.PaymentMethod["type"] = "scheme"
+	} else if authRequest.CreditCard.CVV != "" {
+		// New customer credit card request
 		request.PaymentMethod["cvc"] = authRequest.CreditCard.CVV
+		request.PaymentMethod["type"] = "scheme"
+		request.ShopperInteraction = "Ecommerce"
+		request.StorePaymentMethod = true
+	} else {
+		// Existing customer credit card request
+		request.PaymentMethod["type"] = "scheme"
 		request.ShopperInteraction = "ContAuth"
 	}
 
