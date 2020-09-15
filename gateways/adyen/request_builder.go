@@ -1,7 +1,6 @@
 package adyen
 
 import (
-	"fmt"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/adyen/adyen-go-api-library/v2/src/checkout"
@@ -60,7 +59,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		request.PaymentMethod["type"] = "scheme"
 		request.ShopperInteraction = "ContAuth"
 	}
-	fmt.Printf("Auth request: [%+v]\n", request)
+
 	return request
 }
 
