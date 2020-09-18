@@ -37,6 +37,7 @@ type CreditCard struct {
 	ExpirationYear  int
 	CVV             string
 	Network         CreditCardNetwork
+	Save            bool
 }
 
 // LineItem is used for Level3 Processing if enabled (not default). Specifies information per item in the order
@@ -69,14 +70,14 @@ type Level3Data struct {
 // Note: Only credit cards are supported
 // Note: Options is a generic key-value pair that can be used to provide additional information to PsP
 type AuthorizationRequest struct {
-	Amount                        Amount
-	CreditCard                    *CreditCard
-	BillingAddress                *BillingAddress
-	Level3Data                    *Level3Data
-	ClientTransactionReference    *string // Custom transaction reference metadata that will be associated with this request
-	Channel                       string  // for Psps that track the sales channel
-	Cryptogram                    string  // for Network Tokenization methods
-	ECI                           string  // E-Commerce Indicator (can be used for Network Tokenization as well)
+	Amount                     Amount
+	CreditCard                 *CreditCard
+	BillingAddress             *BillingAddress
+	Level3Data                 *Level3Data
+	ClientTransactionReference *string // Custom transaction reference metadata that will be associated with this request
+	Channel                    string  // for Psps that track the sales channel
+	Cryptogram                 string  // for Network Tokenization methods
+	ECI                        string  // E-Commerce Indicator (can be used for Network Tokenization as well)
 
 	// For Card on File transactions we want to store the various different types (initial cof, initial recurring, etc)
 	// If we are in a recurring situation, then we can use the PreviousExternalTransactionID as part of the auth request

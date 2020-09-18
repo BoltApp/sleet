@@ -26,6 +26,7 @@ func BaseAuthorizationRequest() *sleet.AuthorizationRequest {
 		ExpirationMonth: 10,
 		ExpirationYear:  2020,
 		CVV:             "737",
+		Save:            true,
 	}
 	reference := randomdata.Letters(10)
 	return &sleet.AuthorizationRequest{Amount: amount, CreditCard: &card, BillingAddress: &address, ClientTransactionReference: &reference}
