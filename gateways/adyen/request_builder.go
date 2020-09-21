@@ -22,8 +22,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 			"expiryYear":  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
 			"holderName":  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
 		},
-		MerchantAccount:          merchantAccount,
-		RecurringProcessingModel: "CardOnFile",
+		MerchantAccount: merchantAccount,
 	}
 
 	if authRequest.BillingAddress != nil {
@@ -47,16 +46,25 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		}
 		request.PaymentMethod["brand"] = authRequest.CreditCard.Network.String()
 		request.PaymentMethod["type"] = "networkToken"
+		request.RecurringProcessingModel = "CardOnFile"
 		request.ShopperInteraction = "Ecommerce"
 	} else if authRequest.CreditCard.CVV != "" {
 		// New customer credit card request
 		request.PaymentMethod["cvc"] = authRequest.CreditCard.CVV
 		request.PaymentMethod["type"] = "scheme"
 		request.ShopperInteraction = "Ecommerce"
-		request.StorePaymentMethod = true
+		if authRequest.CreditCard.Save {
+			// Customer opts in to saving card details
+			request.RecurringProcessingModel = "CardOnFile"
+			request.StorePaymentMethod = true
+		} else {
+			// Customer opts out of saving card details
+			request.StorePaymentMethod = false
+		}
 	} else {
 		// Existing customer credit card request
 		request.PaymentMethod["type"] = "scheme"
+		request.RecurringProcessingModel = "CardOnFile"
 		request.ShopperInteraction = "ContAuth"
 	}
 

@@ -149,6 +149,23 @@ func TestAdyenRechargeAuth(t *testing.T) {
 	}
 }
 
+// TestAdyenOneTimeAuth
+//
+// This should successfully create an authorization on Adyen for customer that does not want his/her card saved
+func TestAdyenOneTimeAuth(t *testing.T) {
+	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
+	request := sleet_testing.BaseAuthorizationRequest()
+	request.CreditCard.Save = false
+	auth, err := client.Authorize(request)
+	if err != nil {
+		t.Error("Authorize request should not have failed")
+	}
+
+	if !auth.Success {
+		t.Error("Resulting auth should have been successful")
+	}
+}
+
 // TestAdyenAuthFullCapture
 //
 // This should successfully create an authorization on Adyen then Capture for full amount
