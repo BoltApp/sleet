@@ -37,7 +37,7 @@ type CreditCard struct {
 	ExpirationYear  int
 	CVV             string
 	Network         CreditCardNetwork
-	Save            bool
+	Save            bool // indicates if customer wants to save their credit card details
 }
 
 // LineItem is used for Level3 Processing if enabled (not default). Specifies information per item in the order
