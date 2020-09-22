@@ -1,6 +1,7 @@
 package adyen
 
 import (
+	"fmt"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/adyen/adyen-go-api-library/v2/src/checkout"
@@ -66,6 +67,33 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		request.PaymentMethod["type"] = "scheme"
 		request.RecurringProcessingModel = "CardOnFile"
 		request.ShopperInteraction = "ContAuth"
+	}
+
+	level3 := authRequest.Level3Data
+	if level3 != nil {
+		additionalData := map[string]string{
+			"enhancedSchemeData.customerReference":            level3.CustomerReference,
+			"enhancedSchemeData.destinationCountryCode":       level3.DestinationCountryCode,
+			"enhancedSchemeData.destinationPostalCode":        level3.DestinationPostalCode,
+			"enhancedSchemeData.destinationStateProvinceCode": level3.DestinationAdminArea,
+			"enhancedSchemeData.dutyAmount":                   sleet.AmountToString(&level3.DutyAmount),
+			"enhancedSchemeData.freightAmount":                sleet.AmountToString(&level3.ShippingAmount),
+			"enhancedSchemeData.totalTaxAmount":               sleet.AmountToString(&level3.TaxAmount),
+		}
+
+		var keyBase string
+		for idx, lineItem := range level3.LineItems {
+			keyBase = fmt.Sprintf("enhancedSchemeData.itemDetailLine%d.", idx)
+			additionalData[keyBase+"commodityCode"] = lineItem.CommodityCode
+			additionalData[keyBase+"description"] = lineItem.Description
+			additionalData[keyBase+"discountAmount"] = sleet.AmountToString(&lineItem.ItemDiscountAmount)
+			additionalData[keyBase+"quantity"] = strconv.Itoa(int(lineItem.Quantity))
+			additionalData[keyBase+"totalAmount"] = sleet.AmountToString(&lineItem.TotalAmount)
+			additionalData[keyBase+"unitOfMeasure"] = lineItem.UnitOfMeasure
+			additionalData[keyBase+"unitPrice"] = sleet.AmountToString(&lineItem.UnitPrice)
+		}
+
+		request.AdditionalData = additionalData
 	}
 
 	return request
