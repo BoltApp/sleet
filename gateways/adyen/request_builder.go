@@ -86,6 +86,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 			keyBase = fmt.Sprintf("enhancedSchemeData.itemDetailLine%d.", idx)
 			additionalData[keyBase+"commodityCode"] = lineItem.CommodityCode
 			additionalData[keyBase+"description"] = lineItem.Description
+			additionalData[keyBase+"productCode"] = lineItem.ProductCode
 			additionalData[keyBase+"discountAmount"] = sleet.AmountToString(&lineItem.ItemDiscountAmount)
 			additionalData[keyBase+"quantity"] = strconv.Itoa(int(lineItem.Quantity))
 			additionalData[keyBase+"totalAmount"] = sleet.AmountToString(&lineItem.TotalAmount)
