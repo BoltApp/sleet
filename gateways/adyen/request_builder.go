@@ -7,7 +7,10 @@ import (
 	"github.com/adyen/adyen-go-api-library/v2/src/checkout"
 	"github.com/adyen/adyen-go-api-library/v2/src/payments"
 	"strconv"
+	"time"
 )
+
+const maxLineItemDescriptionLength = 26
 
 func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount string) *checkout.PaymentRequest {
 	request := &checkout.PaymentRequest{
@@ -72,25 +75,27 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 	level3 := authRequest.Level3Data
 	if level3 != nil {
 		additionalData := map[string]string{
-			"enhancedSchemeData.customerReference":            level3.CustomerReference,
-			"enhancedSchemeData.destinationCountryCode":       level3.DestinationCountryCode,
-			"enhancedSchemeData.destinationPostalCode":        level3.DestinationPostalCode,
-			"enhancedSchemeData.destinationStateProvinceCode": level3.DestinationAdminArea,
+			"enhancedSchemeData.customerReference":            NAifEmpty(level3.CustomerReference),
+			"enhancedSchemeData.destinationCountryCode":       NAifEmpty(level3.DestinationCountryCode),
+			"enhancedSchemeData.destinationPostalCode":        NAifEmpty(level3.DestinationPostalCode),
+			"enhancedSchemeData.destinationStateProvinceCode": NAifEmpty(level3.DestinationAdminArea),
 			"enhancedSchemeData.dutyAmount":                   sleet.AmountToString(&level3.DutyAmount),
 			"enhancedSchemeData.freightAmount":                sleet.AmountToString(&level3.ShippingAmount),
-			"enhancedSchemeData.totalTaxAmount":               sleet.AmountToString(&level3.TaxAmount),
+			// safest to use a default value for any level 2/3 fields, so assuming order is from today
+			"enhancedSchemeData.orderDate":      time.Now().Format("020106"),
+			"enhancedSchemeData.totalTaxAmount": sleet.AmountToString(&level3.TaxAmount),
 		}
 
 		var keyBase string
 		for idx, lineItem := range level3.LineItems {
-			keyBase = fmt.Sprintf("enhancedSchemeData.itemDetailLine%d.", idx)
-			additionalData[keyBase+"commodityCode"] = lineItem.CommodityCode
-			additionalData[keyBase+"description"] = lineItem.Description
-			additionalData[keyBase+"productCode"] = lineItem.ProductCode
+			keyBase = fmt.Sprintf("enhancedSchemeData.itemDetailLine%d.", idx+1)
+			additionalData[keyBase+"commodityCode"] = NAifEmpty(lineItem.CommodityCode)
+			additionalData[keyBase+"description"] = sleet.TruncateString(lineItem.Description, maxLineItemDescriptionLength)
+			additionalData[keyBase+"productCode"] = NAifEmpty(lineItem.ProductCode)
 			additionalData[keyBase+"discountAmount"] = sleet.AmountToString(&lineItem.ItemDiscountAmount)
 			additionalData[keyBase+"quantity"] = strconv.Itoa(int(lineItem.Quantity))
 			additionalData[keyBase+"totalAmount"] = sleet.AmountToString(&lineItem.TotalAmount)
-			additionalData[keyBase+"unitOfMeasure"] = lineItem.UnitOfMeasure
+			additionalData[keyBase+"unitOfMeasure"] = sleet.ConvertUnitOfMeasurementToCode(lineItem.UnitOfMeasure)
 			additionalData[keyBase+"unitPrice"] = sleet.AmountToString(&lineItem.UnitPrice)
 		}
 
@@ -129,4 +134,13 @@ func buildVoidRequest(voidRequest *sleet.VoidRequest, merchantAccount string) *p
 		MerchantAccount:   merchantAccount,
 	}
 	return request
+}
+
+// NAifEmpty returns "NA" if the parameter is an empty string. Adyen best practices
+// for Level 2/3 data are to set the value of any fields that are unknown to "NA"
+func NAifEmpty(str string) string {
+	if str == "" {
+		return "NA"
+	}
+	return str
 }
