@@ -10,7 +10,10 @@ import (
 	"time"
 )
 
-const maxLineItemDescriptionLength = 26
+const (
+	maxLineItemDescriptionLength = 26
+	timeFormatExample            = "020106"
+)
 
 func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount string) *checkout.PaymentRequest {
 	request := &checkout.PaymentRequest{
@@ -82,7 +85,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 			"enhancedSchemeData.dutyAmount":                   sleet.AmountToString(&level3.DutyAmount),
 			"enhancedSchemeData.freightAmount":                sleet.AmountToString(&level3.ShippingAmount),
 			// safest to use a default value for any level 2/3 fields, so assuming order is from today
-			"enhancedSchemeData.orderDate":      time.Now().Format("020106"),
+			"enhancedSchemeData.orderDate":      time.Now().Format(timeFormatExample),
 			"enhancedSchemeData.totalTaxAmount": sleet.AmountToString(&level3.TaxAmount),
 		}
 
