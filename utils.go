@@ -20,3 +20,11 @@ func TruncateString(str string, truncateLength int) string {
 	}
 	return str
 }
+
+// DefaultIfEmpty returns the fallback string if str is an empty string.
+func DefaultIfEmpty(str string, fallback string) string {
+	if str == "" {
+		return fallback
+	}
+	return str
+}

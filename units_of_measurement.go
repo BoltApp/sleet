@@ -3,7 +3,8 @@ package sleet
 import "strings"
 
 // ISO Units of Measure codes (http://t3.apptrix.com/syteline/Language/en-US/fields/i/iso_um_ums.htm)
-var unitOfMeasurementToCode = map[string]string{"115 kilogram drum": "16",
+var unitOfMeasurementToCode = map[string]string{
+	"115 kilogram drum": "16",
 	"100 pound drum":    "17",
 	"55 gallon drum":    "18",
 	"20 foot container": "20",
