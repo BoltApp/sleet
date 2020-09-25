@@ -105,8 +105,8 @@ func buildLevel3Data(level3Data *sleet.Level3Data) map[string]string {
 		keyBase = fmt.Sprintf("enhancedSchemeData.itemDetailLine%d.", idx+1)
 		additionalData[keyBase+"commodityCode"] = lineItem.CommodityCode
 		additionalData[keyBase+"description"] = sleet.TruncateString(lineItem.Description, maxLineItemDescriptionLength)
-		additionalData[keyBase+"productCode"] = lineItem.ProductCode
 		additionalData[keyBase+"discountAmount"] = sleet.AmountToString(&lineItem.ItemDiscountAmount)
+		additionalData[keyBase+"productCode"] = lineItem.ProductCode
 		additionalData[keyBase+"quantity"] = strconv.Itoa(int(lineItem.Quantity))
 		additionalData[keyBase+"totalAmount"] = sleet.AmountToString(&lineItem.TotalAmount)
 		additionalData[keyBase+"unitOfMeasure"] = sleet.ConvertUnitOfMeasurementToCode(lineItem.UnitOfMeasure)
