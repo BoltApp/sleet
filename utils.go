@@ -16,15 +16,15 @@ func AmountToDecimalString(amount *Amount) string {
 // str if truncateLength is greater than len(str)
 func TruncateString(str string, truncateLength int) string {
 	if len(str) > truncateLength {
-		return str[0:truncateLength]
+		return str[:truncateLength]
 	}
 	return str
 }
 
 // DefaultIfEmpty returns the fallback string if str is an empty string.
-func DefaultIfEmpty(str string, fallback string) string {
-	if str == "" {
+func DefaultIfEmpty(primary string, fallback string) string {
+	if primary == "" {
 		return fallback
 	}
-	return str
+	return primary
 }
