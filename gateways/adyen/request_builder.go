@@ -109,7 +109,7 @@ func buildLevel3Data(level3Data *sleet.Level3Data) map[string]string {
 		additionalData[keyBase+"productCode"] = lineItem.ProductCode
 		additionalData[keyBase+"quantity"] = strconv.Itoa(int(lineItem.Quantity))
 		additionalData[keyBase+"totalAmount"] = sleet.AmountToString(&lineItem.TotalAmount)
-		additionalData[keyBase+"unitOfMeasure"] = sleet.ConvertUnitOfMeasurementToCode(lineItem.UnitOfMeasure)
+		additionalData[keyBase+"unitOfMeasure"] = common.ConvertUnitOfMeasurementToCode(lineItem.UnitOfMeasure)
 		additionalData[keyBase+"unitPrice"] = sleet.AmountToString(&lineItem.UnitPrice)
 	}
 
