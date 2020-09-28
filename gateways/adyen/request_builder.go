@@ -9,6 +9,11 @@ import (
 	"strconv"
 )
 
+const (
+	maxLineItemDescriptionLength = 26
+	level3Default                = "NA"
+)
+
 func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount string) *checkout.PaymentRequest {
 	request := &checkout.PaymentRequest{
 		Amount: checkout.Amount{
@@ -37,6 +42,18 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		}
 	}
 
+	addPaymentSpecificFields(authRequest, request)
+
+	level3 := authRequest.Level3Data
+	if level3 != nil {
+		request.AdditionalData = buildLevel3Data(level3)
+	}
+
+	return request
+}
+
+// addPaymentSpecificFields adds fields to the Adyen Payment request that are dependent on the payment method
+func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
 	if authRequest.Cryptogram != "" && authRequest.ECI != "" {
 		// Apple Pay request
 		request.MpiData = &checkout.ThreeDSecureData{
@@ -68,36 +85,39 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		request.RecurringProcessingModel = "CardOnFile"
 		request.ShopperInteraction = "ContAuth"
 	}
+}
 
-	level3 := authRequest.Level3Data
-	if level3 != nil {
-		additionalData := map[string]string{
-			"enhancedSchemeData.customerReference":            level3.CustomerReference,
-			"enhancedSchemeData.destinationCountryCode":       level3.DestinationCountryCode,
-			"enhancedSchemeData.destinationPostalCode":        level3.DestinationPostalCode,
-			"enhancedSchemeData.destinationStateProvinceCode": level3.DestinationAdminArea,
-			"enhancedSchemeData.dutyAmount":                   sleet.AmountToString(&level3.DutyAmount),
-			"enhancedSchemeData.freightAmount":                sleet.AmountToString(&level3.ShippingAmount),
-			"enhancedSchemeData.totalTaxAmount":               sleet.AmountToString(&level3.TaxAmount),
-		}
-
-		var keyBase string
-		for idx, lineItem := range level3.LineItems {
-			keyBase = fmt.Sprintf("enhancedSchemeData.itemDetailLine%d.", idx)
-			additionalData[keyBase+"commodityCode"] = lineItem.CommodityCode
-			additionalData[keyBase+"description"] = lineItem.Description
-			additionalData[keyBase+"productCode"] = lineItem.ProductCode
-			additionalData[keyBase+"discountAmount"] = sleet.AmountToString(&lineItem.ItemDiscountAmount)
-			additionalData[keyBase+"quantity"] = strconv.Itoa(int(lineItem.Quantity))
-			additionalData[keyBase+"totalAmount"] = sleet.AmountToString(&lineItem.TotalAmount)
-			additionalData[keyBase+"unitOfMeasure"] = lineItem.UnitOfMeasure
-			additionalData[keyBase+"unitPrice"] = sleet.AmountToString(&lineItem.UnitPrice)
-		}
-
-		request.AdditionalData = additionalData
+func buildLevel3Data(level3Data *sleet.Level3Data) map[string]string {
+	additionalData := map[string]string{
+		"enhancedSchemeData.customerReference":     sleet.DefaultIfEmpty(level3Data.CustomerReference, level3Default),
+		"enhancedSchemeData.destinationPostalCode": level3Data.DestinationPostalCode,
+		"enhancedSchemeData.dutyAmount":            sleet.AmountToString(&level3Data.DutyAmount),
+		"enhancedSchemeData.freightAmount":         sleet.AmountToString(&level3Data.ShippingAmount),
+		"enhancedSchemeData.totalTaxAmount":        sleet.AmountToString(&level3Data.TaxAmount),
 	}
 
-	return request
+	var keyBase string
+	for idx, lineItem := range level3Data.LineItems {
+		// Maximum of 9 line items allowed in the request
+		if idx == 9 {
+			break
+		}
+		keyBase = fmt.Sprintf("enhancedSchemeData.itemDetailLine%d.", idx+1)
+		additionalData[keyBase+"commodityCode"] = lineItem.CommodityCode
+		additionalData[keyBase+"description"] = sleet.TruncateString(lineItem.Description, maxLineItemDescriptionLength)
+		additionalData[keyBase+"discountAmount"] = sleet.AmountToString(&lineItem.ItemDiscountAmount)
+		additionalData[keyBase+"productCode"] = lineItem.ProductCode
+		additionalData[keyBase+"quantity"] = strconv.Itoa(int(lineItem.Quantity))
+		additionalData[keyBase+"totalAmount"] = sleet.AmountToString(&lineItem.TotalAmount)
+		additionalData[keyBase+"unitOfMeasure"] = common.ConvertUnitOfMeasurementToCode(lineItem.UnitOfMeasure)
+		additionalData[keyBase+"unitPrice"] = sleet.AmountToString(&lineItem.UnitPrice)
+	}
+
+	// Omit optional fields if they are empty
+	addIfNonEmpty(level3Data.DestinationCountryCode, "enhancedSchemeData.destinationCountryCode", &additionalData)
+	addIfNonEmpty(level3Data.DestinationAdminArea, "enhancedSchemeData.destinationStateProvinceCode", &additionalData)
+
+	return additionalData
 }
 
 func buildCaptureRequest(captureRequest *sleet.CaptureRequest, merchantAccount string) *payments.ModificationRequest {
@@ -129,4 +149,10 @@ func buildVoidRequest(voidRequest *sleet.VoidRequest, merchantAccount string) *p
 		MerchantAccount:   merchantAccount,
 	}
 	return request
+}
+
+func addIfNonEmpty(value string, key string, data *map[string]string) {
+	if value != "" {
+		(*data)[key] = value
+	}
 }

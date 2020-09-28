@@ -11,3 +11,20 @@ func AmountToString(amount *Amount) string {
 func AmountToDecimalString(amount *Amount) string {
 	return fmt.Sprintf("%.2f", float64(amount.Amount)/100.0)
 }
+
+// TruncateString returns a prefix of str of length truncateLength or all of
+// str if truncateLength is greater than len(str)
+func TruncateString(str string, truncateLength int) string {
+	if len(str) > truncateLength {
+		return str[:truncateLength]
+	}
+	return str
+}
+
+// DefaultIfEmpty returns the fallback string if str is an empty string.
+func DefaultIfEmpty(primary string, fallback string) string {
+	if primary == "" {
+		return fallback
+	}
+	return primary
+}
