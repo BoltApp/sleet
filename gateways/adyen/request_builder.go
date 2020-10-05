@@ -52,6 +52,16 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 	return request
 }
 
+var creditCardNetworkToString = map[sleet.CreditCardNetwork]string{
+	sleet.CreditCardNetworkUnknown:    "unknown",
+	sleet.CreditCardNetworkVisa:       "visa",
+	sleet.CreditCardNetworkMastercard: "mc",
+	sleet.CreditCardNetworkAmex:       "amex",
+	sleet.CreditCardNetworkDiscover:   "discover",
+	sleet.CreditCardNetworkJcb:        "jcb",
+	sleet.CreditCardNetworkUnionpay:   "unionpay",
+}
+
 // addPaymentSpecificFields adds fields to the Adyen Payment request that are dependent on the payment method
 func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
 	if authRequest.Cryptogram != "" && authRequest.ECI != "" {
@@ -62,7 +72,10 @@ func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *
 			DirectoryResponse:      "Y",
 			Eci:                    authRequest.ECI,
 		}
-		request.PaymentMethod["brand"] = authRequest.CreditCard.Network.String()
+		brand, ok := creditCardNetworkToString[authRequest.CreditCard.Network]
+		if ok {
+			request.PaymentMethod["brand"] = brand
+		}
 		request.PaymentMethod["type"] = "networkToken"
 		request.RecurringProcessingModel = "CardOnFile"
 		request.ShopperInteraction = "Ecommerce"
