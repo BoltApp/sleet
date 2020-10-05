@@ -53,7 +53,6 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 }
 
 var creditCardNetworkToString = map[sleet.CreditCardNetwork]string{
-	sleet.CreditCardNetworkUnknown:    "unknown",
 	sleet.CreditCardNetworkVisa:       "visa",
 	sleet.CreditCardNetworkMastercard: "mc",
 	sleet.CreditCardNetworkAmex:       "amex",
