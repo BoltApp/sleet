@@ -23,10 +23,11 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		// Adyen requires a reference in request so this will panic if client doesn't pass it. Assuming this is good for now
 		Reference: *authRequest.ClientTransactionReference,
 		PaymentMethod: map[string]interface{}{
-			"number":      authRequest.CreditCard.Number,
 			"expiryMonth": strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
 			"expiryYear":  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
 			"holderName":  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
+			"number":      authRequest.CreditCard.Number,
+			"type":        "scheme",
 		},
 		MerchantAccount: merchantAccount,
 	}
@@ -52,15 +53,6 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 	return request
 }
 
-var creditCardNetworkToString = map[sleet.CreditCardNetwork]string{
-	sleet.CreditCardNetworkVisa:       "visa",
-	sleet.CreditCardNetworkMastercard: "mc",
-	sleet.CreditCardNetworkAmex:       "amex",
-	sleet.CreditCardNetworkDiscover:   "discover",
-	sleet.CreditCardNetworkJcb:        "jcb",
-	sleet.CreditCardNetworkUnionpay:   "unionpay",
-}
-
 // addPaymentSpecificFields adds fields to the Adyen Payment request that are dependent on the payment method
 func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
 	if authRequest.Cryptogram != "" && authRequest.ECI != "" {
@@ -71,17 +63,12 @@ func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *
 			DirectoryResponse:      "Y",
 			Eci:                    authRequest.ECI,
 		}
-		brand, ok := creditCardNetworkToString[authRequest.CreditCard.Network]
-		if ok {
-			request.PaymentMethod["brand"] = brand
-		}
-		request.PaymentMethod["type"] = "networkToken"
+		request.PaymentMethod["brand"] = "applepay"
 		request.RecurringProcessingModel = "CardOnFile"
 		request.ShopperInteraction = "Ecommerce"
 	} else if authRequest.CreditCard.CVV != "" {
 		// New customer credit card request
 		request.PaymentMethod["cvc"] = authRequest.CreditCard.CVV
-		request.PaymentMethod["type"] = "scheme"
 		request.ShopperInteraction = "Ecommerce"
 		if authRequest.CreditCard.Save {
 			// Customer opts in to saving card details
@@ -93,7 +80,6 @@ func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *
 		}
 	} else {
 		// Existing customer credit card request
-		request.PaymentMethod["type"] = "scheme"
 		request.RecurringProcessingModel = "CardOnFile"
 		request.ShopperInteraction = "ContAuth"
 	}
