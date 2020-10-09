@@ -30,6 +30,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 			"type":        "scheme",
 		},
 		MerchantAccount: merchantAccount,
+		MerchantOrderReference: authRequest.MerchantOrderReference,
 	}
 
 	if authRequest.BillingAddress != nil {
