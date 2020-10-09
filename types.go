@@ -78,6 +78,7 @@ type AuthorizationRequest struct {
 	Channel                    string  // for Psps that track the sales channel
 	Cryptogram                 string  // for Network Tokenization methods
 	ECI                        string  // E-Commerce Indicator (can be used for Network Tokenization as well)
+	MerchantOrderReference     string  // Similar to ClientTransactionReference but specifically if we want to store the shopping cart order id
 
 	// For Card on File transactions we want to store the various different types (initial cof, initial recurring, etc)
 	// If we are in a recurring situation, then we can use the PreviousExternalTransactionID as part of the auth request

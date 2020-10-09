@@ -29,6 +29,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 			"holderName":  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
 		},
 		MerchantAccount: merchantAccount,
+		MerchantOrderReference: authRequest.MerchantOrderReference,
 	}
 
 	if authRequest.BillingAddress != nil {
