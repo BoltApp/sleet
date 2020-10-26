@@ -14,7 +14,7 @@ import (
 func TestBuildAuthRequest(t *testing.T) {
 	base := sleet_testing.BaseAuthorizationRequest()
 
-	amount := "100"
+	amount := "1.00"
 	cases := []struct {
 		label string
 		in    *sleet.AuthorizationRequest
@@ -67,7 +67,7 @@ func TestBuildAuthRequest(t *testing.T) {
 func TestBuildCaptureRequest(t *testing.T) {
 	base := sleet_testing.BaseCaptureRequest()
 
-	amount := "100"
+	amount := "1.00"
 	cases := []struct {
 		label string
 		in    *sleet.CaptureRequest
@@ -146,7 +146,7 @@ func TestBuildRefundRequest(t *testing.T) {
 		// TODO without last four
 		// TODO wrong length last 4
 
-		amount := "100"
+		amount := "1.00"
 
 		cases := []struct {
 			label string
