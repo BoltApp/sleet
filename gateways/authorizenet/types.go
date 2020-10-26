@@ -9,6 +9,7 @@ const (
 	TransactionTypeRefund           TransactionType = "refundTransaction"
 )
 
+// ResponseCode response code representing information about the status of the payment request.
 type ResponseCode string
 
 const (
@@ -18,6 +19,7 @@ const (
 	ResponseCodeHeld     ResponseCode = "4"
 )
 
+// ResultCode result of request (ok/error)
 type ResultCode string
 
 const (
@@ -25,6 +27,7 @@ const (
 	ResultCodeError ResultCode = "Error"
 )
 
+// AVSResultCode result of AVS check
 type AVSResultCode string
 
 const (
@@ -43,6 +46,7 @@ const (
 	AVSResultNotSupportedInternational AVSResultCode = "G" // The card was issued by a bank outside the U.S. and does not support AVS.
 )
 
+// CVVResultCode result of cvv check
 type CVVResultCode string
 
 const (
@@ -53,6 +57,7 @@ const (
 	CVVResultUnableToProcess CVVResultCode = "U"
 )
 
+// CAVVResultCode The cardholder authentication verification value (CAVV) result code from the issuer.
 type CAVVResultCode string
 
 const (
