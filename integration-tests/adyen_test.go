@@ -43,7 +43,11 @@ func TestAdyenExpiredCard(t *testing.T) {
 		t.Error("Resulting auth should not have been successful")
 	}
 
-	if auth.ErrorCode != "Expired Card" {
+	if auth.ErrorCode != "6" {
+		t.Error("ErrorCode should have been 6")
+	}
+
+	if auth.Response != "Expired Card" {
 		t.Error("Response should have been Expired Card")
 	}
 }
