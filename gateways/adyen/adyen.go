@@ -57,7 +57,7 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 	}
 
 	if result.ResultCode == adyen_common.Refused || result.ResultCode == adyen_common.Error {
-		return &sleet.AuthorizationResponse{Success: false, TransactionReference: result.PspReference, ErrorCode: result.RefusalReason}, nil
+		return &sleet.AuthorizationResponse{Success: false, TransactionReference: result.PspReference, ErrorCode: result.RefusalReasonCode, Response: result.RefusalReason}, nil
 	}
 
 	response := &sleet.AuthorizationResponse{
