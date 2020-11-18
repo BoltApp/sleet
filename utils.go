@@ -8,6 +8,7 @@ func AmountToString(amount *Amount) string {
 }
 
 // AmountToDecimalString converts an int64 amount in cents to a 2 decimal formatted string
+// Note this function assumes 1 dollar = 100 cents (which is true for USD, CAD, etc but not true for some other currencies).
 func AmountToDecimalString(amount *Amount) string {
 	return fmt.Sprintf("%.2f", float64(amount.Amount)/100.0)
 }
