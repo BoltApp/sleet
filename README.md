@@ -23,6 +23,13 @@ Wherever possible, we try to use native Golang implementations of the PsP's API.
 
 ### To run tests
 
+####  Unit test
+
+```
+go test -v -tags=unit $(go list ./... | grep -v integration-tests)
+```
+
+#### Integration test
 The following environment variables are needed in order to run tests
 
 ```shell script

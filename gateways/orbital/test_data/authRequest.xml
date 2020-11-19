@@ -1,2 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Request><NewOrder><OrbitalConnectionUsername>username</OrbitalConnectionUsername><OrbitalConnectionPassword>password</OrbitalConnectionPassword><IndustryType>EC</IndustryType><MessageType>A</MessageType><BIN>000001</BIN><MerchantID>1</MerchantID><TerminalID>001</TerminalID><AccountNum>4111111111111111</AccountNum><Exp>202010</Exp><CurrencyCode>840</CurrencyCode><CurrencyExponent>2</CurrencyExponent><CardSecValInd>1</CardSecValInd><CardSecVal>737</CardSecVal><AVSzip>94103</AVSzip><AVSaddress1>7683 Railroad Street</AVSaddress1><AVScity>Zion</AVScity><AVSstate>IL</AVSstate><AVScountryCode>US</AVScountryCode><OrderID>22222</OrderID><Amount>100</Amount></NewOrder></Request>
+<Request>
+    <NewOrder>
+        <OrbitalConnectionUsername>username</OrbitalConnectionUsername>
+        <OrbitalConnectionPassword>password</OrbitalConnectionPassword>
+        <IndustryType>EC</IndustryType>
+        <MessageType>A</MessageType>
+        <BIN>000001</BIN>
+        <MerchantID>1</MerchantID>
+        <TerminalID>001</TerminalID>
+        <AccountNum>4111111111111111</AccountNum>
+        <Exp>202310</Exp>
+        <CurrencyCode>840</CurrencyCode>
+        <CurrencyExponent>2</CurrencyExponent>
+        <CardSecValInd>1</CardSecValInd>
+        <CardSecVal>737</CardSecVal>
+        <AVSzip>94103</AVSzip>
+        <AVSaddress1>7683 Railroad Street</AVSaddress1>
+        <AVScity>Zion</AVScity>
+        <AVSstate>IL</AVSstate>
+        <AVScountryCode>US</AVScountryCode>
+        <OrderID>22222</OrderID>
+        <Amount>100</Amount>
+    </NewOrder>
+</Request>

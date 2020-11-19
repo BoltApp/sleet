@@ -18,6 +18,10 @@ jobs:
           command: |
             go build -v ./...
       - run:
+          name: Unit Test
+          command: |
+            go test -v -tags=unit $(go list ./... | grep -v integration-tests)
+      - run:
           name: Integration Test
           command: |
             go test -v ./integration-tests/*.go
