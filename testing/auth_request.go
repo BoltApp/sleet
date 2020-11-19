@@ -24,7 +24,7 @@ func BaseAuthorizationRequest() *sleet.AuthorizationRequest {
 		LastName:        "Checkout",
 		Number:          "4111111111111111",
 		ExpirationMonth: 10,
-		ExpirationYear:  2020,
+		ExpirationYear:  2023,
 		CVV:             "737",
 		Save:            true,
 	}
