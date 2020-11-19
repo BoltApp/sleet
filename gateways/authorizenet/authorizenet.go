@@ -3,7 +3,6 @@ package authorizenet
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -166,7 +165,6 @@ func (client *AuthorizeNetClient) sendRequest(data Request) (*Response, error) {
 		}
 	}()
 
-	fmt.Printf("status %s\n", resp.Status) // debug
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
