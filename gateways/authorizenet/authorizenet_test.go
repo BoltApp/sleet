@@ -220,8 +220,11 @@ func TestRefund(t *testing.T) {
 	refundResponseRaw = helper.ReadFile("test_data/refundResponse.json")
 
 	request := sleet_t.BaseRefundRequest()
+	request.Options = map[string]interface{}{
+		"credit_card": "1234",
+	}
 
-	t.Run("With Successful Response", func(t *testing.T) {
+	t.Run("With Error Response", func(t *testing.T) {
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
 
@@ -231,7 +234,8 @@ func TestRefund(t *testing.T) {
 		})
 
 		want := &sleet.RefundResponse{
-			Success: true,
+			Success: false,
+			ErrorCode: common.SPtr("16"),
 		}
 
 		client := NewClient("MerchantName", "Key", common.Sandbox)
