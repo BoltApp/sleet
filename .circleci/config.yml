@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   swissknife: roopakv/swissknife@0.16.0 
+  codecov: codecov/codecov@1.1.1
 jobs:
   build-and-test:
     docker:
@@ -20,15 +21,24 @@ jobs:
       - run:
           name: Unit Test
           command: |
-            go test -v -tags=unit $(go list ./... | grep -v integration-tests)
+            go test -v -cover \
+              -coverpkg $(go list ./... | grep -v integration-tests | grep -v testing | tr '\n' ',' | sed -e 's/.$//') \
+              -coverprofile=unit_coverage.profile -tags=unit \
+              $(go list ./... | grep -v integration-tests)
       - run:
           name: Integration Test
           command: |
-            go test -v ./integration-tests/*.go
+            go test -v -cover \
+              -coverpkg $(go list ./... | grep -v integration-tests | grep -v testing | tr '\n' ',' | sed -e 's/.$//') \
+              -coverprofile=integration_coverage.profile ./integration-tests/*.go
       - save_cache:
           key: v1-pkg-cache
           paths:
             - "/go/pkg"
+      - codecov/upload:
+          file: unit_coverage.profile
+      - codecov/upload:
+          file: integration_coverage.profile
   release-github:
     docker:
       - image: circleci/golang:1.13
