@@ -45,25 +45,14 @@ func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sl
 
 	if orbitalResponse.Body.ProcStatus != ProcStatusSuccess {
 		if orbitalResponse.Body.RespCode != "" {
-			errorCode := orbitalResponse.Body.RespCode
-			return &sleet.AuthorizationResponse{
-				Success:   false,
-				ErrorCode: errorCode,
-			}, nil
+			return &sleet.AuthorizationResponse{ErrorCode: orbitalResponse.Body.RespCode}, nil
 		}
 
-		return &sleet.AuthorizationResponse{
-			Success:   false,
-			ErrorCode: RespCodeNotPresent,
-		}, nil
+		return &sleet.AuthorizationResponse{ErrorCode: RespCodeNotPresent}, nil
 	}
 
 	if orbitalResponse.Body.RespCode != RespCodeApproved {
-		errorCode := orbitalResponse.Body.RespCode
-		return &sleet.AuthorizationResponse{
-			Success:   false,
-			ErrorCode: errorCode,
-		}, nil
+		return &sleet.AuthorizationResponse{ErrorCode: orbitalResponse.Body.RespCode}, nil
 	}
 
 	return &sleet.AuthorizationResponse{
@@ -87,26 +76,15 @@ func (client *OrbitalClient) Capture(request *sleet.CaptureRequest) (*sleet.Capt
 
 	if orbitalResponse.Body.ProcStatus != ProcStatusSuccess {
 		if orbitalResponse.Body.RespCode != "" {
-			errorCode := orbitalResponse.Body.RespCode
-			return &sleet.CaptureResponse{
-				Success:   false,
-				ErrorCode: &errorCode,
-			}, nil
+			return &sleet.CaptureResponse{ErrorCode: &orbitalResponse.Body.RespCode}, nil
 		}
 
 		errorCode := RespCodeNotPresent
-		return &sleet.CaptureResponse{
-			Success:   false,
-			ErrorCode: &errorCode,
-		}, nil
+		return &sleet.CaptureResponse{ErrorCode: &errorCode}, nil
 	}
 
 	if orbitalResponse.Body.RespCode != RespCodeApproved {
-		errorCode := orbitalResponse.Body.RespCode
-		return &sleet.CaptureResponse{
-			Success:   false,
-			ErrorCode: &errorCode,
-		}, nil
+		return &sleet.CaptureResponse{ErrorCode: &orbitalResponse.Body.RespCode}, nil
 	}
 
 	return &sleet.CaptureResponse{
@@ -125,10 +103,7 @@ func (client *OrbitalClient) Void(request *sleet.VoidRequest) (*sleet.VoidRespon
 
 	if orbitalResponse.Body.ProcStatus != ProcStatusSuccess {
 		errorCode := RespCodeNotPresent
-		return &sleet.VoidResponse{
-			Success:   false,
-			ErrorCode: &errorCode,
-		}, nil
+		return &sleet.VoidResponse{ErrorCode: &errorCode}, nil
 	}
 
 	return &sleet.VoidResponse{
@@ -147,18 +122,11 @@ func (client *OrbitalClient) Refund(request *sleet.RefundRequest) (*sleet.Refund
 
 	if orbitalResponse.Body.ProcStatus != ProcStatusSuccess {
 		if orbitalResponse.Body.RespCode != "" {
-			errorCode := orbitalResponse.Body.RespCode
-			return &sleet.RefundResponse{
-				Success:   false,
-				ErrorCode: &errorCode,
-			}, nil
+			return &sleet.RefundResponse{ErrorCode: &orbitalResponse.Body.RespCode}, nil
 		}
 
 		errorCode := RespCodeNotPresent
-		return &sleet.RefundResponse{
-			Success:   false,
-			ErrorCode: &errorCode,
-		}, nil
+		return &sleet.RefundResponse{ErrorCode: &errorCode}, nil
 	}
 
 	return &sleet.RefundResponse{
