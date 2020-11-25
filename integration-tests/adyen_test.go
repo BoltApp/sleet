@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/BoltApp/sleet/gateways/adyen"
@@ -71,6 +72,9 @@ func TestAdyenAuthFailedAVSPresent(t *testing.T) {
 		t.Error("Authorize request should not have failed with expired card")
 	}
 
+	fmt.Println("NIRAJ NIRAJ NIRA")
+	fmt.Printf("%+v\n", auth)
+
 	if auth.Success == true {
 		t.Error("Resulting auth should not have been successful")
 	}
@@ -83,11 +87,11 @@ func TestAdyenAuthFailedAVSPresent(t *testing.T) {
 		t.Error("Response should have been Expired Card")
 	}
 
-	if auth.AvsResult != sleet.AVSResponseZipNoMatchAddressMatch {
+	if auth.AvsResult != sleet.AVSResponseNoMatch {
 		t.Error("AVS Result should have been zip no match but address match")
 	}
 
-	if auth.AvsResultRaw != "1" {
+	if auth.AvsResultRaw != "2" {
 		t.Error("AVS Result Raw should have been code 1")
 	}
 }
