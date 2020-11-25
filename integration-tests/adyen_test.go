@@ -1,7 +1,6 @@
 package test
 
 import (
-	"fmt"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/BoltApp/sleet/gateways/adyen"
@@ -71,9 +70,6 @@ func TestAdyenAuthFailedAVSPresent(t *testing.T) {
 	if err != nil {
 		t.Error("Authorize request should not have failed with expired card")
 	}
-
-	fmt.Println("NIRAJ NIRAJ NIRA")
-	fmt.Printf("%+v\n", auth)
 
 	if auth.Success == true {
 		t.Error("Resulting auth should not have been successful")
