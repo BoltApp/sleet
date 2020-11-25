@@ -56,12 +56,7 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: sleet.AVSResponseUnknown, CvvResult: sleet.CVVResponseUnknown}, err
 	}
 
-	if result.ResultCode == adyen_common.Refused || result.ResultCode == adyen_common.Error {
-		return &sleet.AuthorizationResponse{Success: false, TransactionReference: result.PspReference, ErrorCode: result.RefusalReasonCode, Response: result.RefusalReason}, nil
-	}
-
 	response := &sleet.AuthorizationResponse{
-		Success:              true,
 		TransactionReference: result.PspReference,
 	}
 
@@ -82,6 +77,15 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 			}
 		}
 	}
+
+	if result.ResultCode == adyen_common.Refused || result.ResultCode == adyen_common.Error {
+		response.Success = false
+		response.ErrorCode = result.RefusalReasonCode
+		response.Response = result.RefusalReason
+	} else {
+		response.Success = true
+	}
+
 	return response, nil
 }
 

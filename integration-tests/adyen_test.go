@@ -52,6 +52,46 @@ func TestAdyenExpiredCard(t *testing.T) {
 	}
 }
 
+// TestAdyenAuthFailedAVSPresent
+//
+// This should fail authorization but also include some AVS, CVV data
+func TestAdyenAuthFailedAVSPresent(t *testing.T) {
+	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
+	expiredRequest := adyenBaseAuthRequest()
+	expiredRequest.CreditCard.ExpirationYear = 2010
+	expiredRequest.BillingAddress = &sleet.BillingAddress{
+		StreetAddress1: common.SPtr("1600 Pennsylvania Ave NE"),
+		Locality:       common.SPtr("Washington"),
+		CountryCode:    common.SPtr("US"),
+		RegionCode:     common.SPtr("DC"),
+		PostalCode:     common.SPtr("20501"),
+	}
+	auth, err := client.Authorize(expiredRequest)
+	if err != nil {
+		t.Error("Authorize request should not have failed with expired card")
+	}
+
+	if auth.Success == true {
+		t.Error("Resulting auth should not have been successful")
+	}
+
+	if auth.ErrorCode != "6" {
+		t.Error("ErrorCode should have been 6")
+	}
+
+	if auth.Response != "Expired Card" {
+		t.Error("Response should have been Expired Card")
+	}
+
+	if auth.AvsResult != sleet.AVSResponseZipNoMatchAddressMatch {
+		t.Error("AVS Result should have been zip no match but address match")
+	}
+
+	if auth.AvsResultRaw != "1" {
+		t.Error("AVS Result Raw should have been code 1")
+	}
+}
+
 // TestAdyenAVSCode1
 //
 // This test should test for Adyen AVS Code: 1 Address matches, postal code doesn't
