@@ -5,8 +5,8 @@ import (
 
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
-	"github.com/adyen/adyen-go-api-library/v2/src/adyen"
-	adyen_common "github.com/adyen/adyen-go-api-library/v2/src/common"
+	"github.com/adyen/adyen-go-api-library/v4/src/adyen"
+	adyen_common "github.com/adyen/adyen-go-api-library/v4/src/common"
 )
 
 // AdyenClient represents the authentication fields needed to make API Requests for a given environment
