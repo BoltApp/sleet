@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
-	"github.com/adyen/adyen-go-api-library/v2/src/checkout"
-	"github.com/adyen/adyen-go-api-library/v2/src/payments"
+	"github.com/adyen/adyen-go-api-library/v4/src/checkout"
+	"github.com/adyen/adyen-go-api-library/v4/src/payments"
 	"strconv"
 )
 
