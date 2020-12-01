@@ -57,7 +57,7 @@ func TestSend(t *testing.T) {
 	authResponseRaw = helper.ReadFile("test_data/authResponse.json")
 
 	base := sleet_t.BaseAuthorizationRequest()
-	request, _ := buildAuthRequest("MerchantName", "Key", base)
+	request := buildAuthRequest("MerchantName", "Key", base)
 
 	t.Run("With Successful Response", func(t *testing.T) {
 		httpmock.Activate()
@@ -93,8 +93,6 @@ func TestAuthorize(t *testing.T) {
 
 	var authResponseRaw []byte
 
-	authResponseRaw = helper.ReadFile("test_data/authResponse.json")
-
 	request := sleet_t.BaseAuthorizationRequest()
 
 	t.Run("With Successful Response", func(t *testing.T) {
@@ -103,6 +101,7 @@ func TestAuthorize(t *testing.T) {
 
 		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
 			// TODO check if send json body matches test json body ?
+			authResponseRaw = helper.ReadFile("test_data/authResponse.json")
 			resp := httpmock.NewBytesResponse(http.StatusOK, authResponseRaw)
 			return resp, nil
 		})
@@ -114,6 +113,41 @@ func TestAuthorize(t *testing.T) {
 			CvvResult:            sleet.CVVResponseRequiredButMissing,
 			AvsResultRaw:         "Y",
 			CvvResultRaw:         "S",
+		}
+
+		client := NewClient("MerchantName", "Key", common.Sandbox)
+
+		got, err := client.Authorize(request)
+
+		if err != nil {
+			t.Fatalf("Error thrown after sending request %q", err)
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+	})
+
+	t.Run("With Decline Response", func(t *testing.T) {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			// TODO check if send json body matches test json body ?
+			authResponseRaw = helper.ReadFile("test_data/authDeclineResponse.json")
+			resp := httpmock.NewBytesResponse(http.StatusOK, authResponseRaw)
+			return resp, nil
+		})
+
+		want := &sleet.AuthorizationResponse{
+			Success:              false,
+			TransactionReference: "60157186288",
+			AvsResult:            sleet.AVSResponseMatch,
+			CvvResult:            sleet.CVVResponseNotProcessed,
+			ErrorCode: "2",
+			AvsResultRaw:         "Y",
+			CvvResultRaw:         "P",
 		}
 
 		client := NewClient("MerchantName", "Key", common.Sandbox)
