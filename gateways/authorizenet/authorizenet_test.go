@@ -3,14 +3,14 @@
 package authorizenet
 
 import (
-	"net/http"
-	"testing"
-
+	"fmt"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	sleet_t "github.com/BoltApp/sleet/testing"
 	"github.com/google/go-cmp/cmp"
 	"github.com/jarcoal/httpmock"
+	"net/http"
+	"testing"
 )
 
 func TestNewClient(t *testing.T) {
@@ -134,7 +134,6 @@ func TestAuthorize(t *testing.T) {
 		defer httpmock.DeactivateAndReset()
 
 		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
-			// TODO check if send json body matches test json body ?
 			authResponseRaw = helper.ReadFile("test_data/authDeclineResponse.json")
 			resp := httpmock.NewBytesResponse(http.StatusOK, authResponseRaw)
 			return resp, nil
@@ -161,6 +160,23 @@ func TestAuthorize(t *testing.T) {
 		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
 			t.Error("Response body does not match expected")
 			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+	})
+
+	t.Run("With Network Error", func(t *testing.T) {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			return nil, fmt.Errorf("timeout")
+		})
+
+		client := NewClient("MerchantName", "Key", common.Sandbox)
+
+		_, err := client.Authorize(request)
+
+		if err == nil {
+			t.Fatalf("Error has to be thrown")
 		}
 	})
 }
@@ -246,23 +262,50 @@ func TestVoid(t *testing.T) {
 
 func TestRefund(t *testing.T) {
 	helper := sleet_t.NewTestHelper(t)
-
 	url := "https://apitest.authorize.net/xml/v1/request.api"
 
-	var refundResponseRaw []byte
+	t.Run("With Success Response", func(t *testing.T) {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
 
-	refundResponseRaw = helper.ReadFile("test_data/refundResponse.json")
+		request := sleet_t.BaseRefundRequest()
+		request.Options = map[string]interface{}{
+			"credit_card": "1234",
+		}
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			refundResponseRaw := helper.ReadFile("test_data/refundSuccessResponse.json")
+			resp := httpmock.NewBytesResponse(http.StatusOK, refundResponseRaw)
+			return resp, nil
+		})
 
-	request := sleet_t.BaseRefundRequest()
-	request.Options = map[string]interface{}{
-		"credit_card": "1234",
-	}
+		want := &sleet.RefundResponse{
+			Success: true,
+		}
+
+		client := NewClient("MerchantName", "Key", common.Sandbox)
+
+		got, err := client.Refund(request)
+
+		if err != nil {
+			t.Fatalf("Error thrown after sending request %q", err)
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+	})
 
 	t.Run("With Error Response", func(t *testing.T) {
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
 
+		request := sleet_t.BaseRefundRequest()
+		request.Options = map[string]interface{}{
+			"credit_card": "1234",
+		}
 		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			refundResponseRaw := helper.ReadFile("test_data/refundErrorResponse.json")
 			resp := httpmock.NewBytesResponse(http.StatusOK, refundResponseRaw)
 			return resp, nil
 		})
@@ -283,6 +326,20 @@ func TestRefund(t *testing.T) {
 		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
 			t.Error("Response body does not match expected")
 			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+	})
+
+	t.Run("Request without credit_card results in error", func(t *testing.T) {
+		request := sleet_t.BaseRefundRequest()
+		client := NewClient("MerchantName", "Key", common.Sandbox)
+
+		_, err := client.Refund(request)
+
+		if err == nil {
+			t.Fatalf("Error must be thrown after sending request")
+		}
+		if err.Error() != "missing credit card last four digits" {
+			t.Fatalf("Unexpected error message: %s", err.Error())
 		}
 	})
 }

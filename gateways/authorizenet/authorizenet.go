@@ -67,8 +67,7 @@ func (client *AuthorizeNetClient) Capture(request *sleet.CaptureRequest) (*sleet
 
 	if authorizeNetResponse.TransactionResponse.ResponseCode != ResponseCodeApproved {
 		errorCode := getErrorCode(authorizeNetResponse.TransactionResponse)
-		response := sleet.CaptureResponse{ErrorCode: &errorCode}
-		return &response, nil
+		return &sleet.CaptureResponse{ErrorCode: &errorCode}, nil
 	}
 	return &sleet.CaptureResponse{Success: true}, nil
 }
@@ -83,8 +82,7 @@ func (client *AuthorizeNetClient) Void(request *sleet.VoidRequest) (*sleet.VoidR
 
 	if authorizeNetResponse.TransactionResponse.ResponseCode != ResponseCodeApproved {
 		errorCode := getErrorCode(authorizeNetResponse.TransactionResponse)
-		response := sleet.VoidResponse{ErrorCode: &errorCode}
-		return &response, nil
+		return &sleet.VoidResponse{ErrorCode: &errorCode}, nil
 	}
 	return &sleet.VoidResponse{Success: true}, nil
 }
