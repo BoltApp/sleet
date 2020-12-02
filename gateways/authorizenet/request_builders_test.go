@@ -53,10 +53,7 @@ func TestBuildAuthRequest(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.label, func(t *testing.T) {
-			got, err := buildAuthRequest("MerchantName", "Key", c.in)
-			if err != nil {
-				t.Errorf("ERROR THROWN: Got %q", err)
-			}
+			got := buildAuthRequest("MerchantName", "Key", c.in)
 			if diff := deep.Equal(got, c.want); diff != nil {
 				t.Error(diff)
 			}
@@ -91,10 +88,7 @@ func TestBuildCaptureRequest(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.label, func(t *testing.T) {
-			got, err := buildCaptureRequest("MerchantName", "Key", c.in)
-			if err != nil {
-				t.Errorf("ERROR THROWN: Got %q", err)
-			}
+			got := buildCaptureRequest("MerchantName", "Key", c.in)
 			if diff := deep.Equal(got, c.want); diff != nil {
 				t.Error(diff)
 			}
@@ -127,10 +121,7 @@ func TestBuildVoidRequest(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.label, func(t *testing.T) {
-			got, err := buildVoidRequest("MerchantName", "Key", c.in)
-			if err != nil {
-				t.Errorf("ERROR THROWN: Got %q", err)
-			}
+			got := buildVoidRequest("MerchantName", "Key", c.in)
 			if diff := deep.Equal(got, c.want); diff != nil {
 				t.Error(diff)
 			}

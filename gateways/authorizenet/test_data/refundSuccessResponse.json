@@ -1,0 +1,30 @@
+{
+    "transactionResponse": {
+        "responseCode": "1",
+        "authCode": "",
+        "avsResultCode": "P",
+        "cvvResultCode": "",
+        "cavvResultCode": "",
+        "transId": "1234569999",
+        "refTransID": "1234567890",
+        "transHash": "D04B060066BA442AFF73A31B97A4693F",
+        "accountNumber": "XXXX0015",
+        "accountType": "Mastercard",
+        "messages": [
+            {
+                "code": "1",
+                "description": "This transaction has been approved."
+            }
+        ]
+    },
+    "refId": "123456",
+    "messages": {
+        "resultCode": "Ok",
+        "message": [
+            {
+                "code": "I00001",
+                "text": "Successful."
+            }
+        ]
+    }
+}
