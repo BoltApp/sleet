@@ -219,6 +219,23 @@ func TestCapture(t *testing.T) {
 			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
 		}
 	})
+
+	t.Run("With Network Error", func(t *testing.T) {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			return nil, fmt.Errorf("timeout")
+		})
+
+		client := NewClient("MerchantName", "Key", common.Sandbox)
+
+		_, err := client.Capture(request)
+
+		if err == nil {
+			t.Fatalf("Error has to be thrown")
+		}
+	})
 }
 
 func TestVoid(t *testing.T) {
@@ -256,6 +273,23 @@ func TestVoid(t *testing.T) {
 		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
 			t.Error("Response body does not match expected")
 			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+	})
+
+	t.Run("With Network Error", func(t *testing.T) {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			return nil, fmt.Errorf("timeout")
+		})
+
+		client := NewClient("MerchantName", "Key", common.Sandbox)
+
+		_, err := client.Void(request)
+
+		if err == nil {
+			t.Fatalf("Error has to be thrown")
 		}
 	})
 }
@@ -340,6 +374,27 @@ func TestRefund(t *testing.T) {
 		}
 		if err.Error() != "missing credit card last four digits" {
 			t.Fatalf("Unexpected error message: %s", err.Error())
+		}
+	})
+
+	t.Run("With Network Error", func(t *testing.T) {
+		request := sleet_t.BaseRefundRequest()
+		request.Options = map[string]interface{}{
+			"credit_card": "1234",
+		}
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			return nil, fmt.Errorf("timeout")
+		})
+
+		client := NewClient("MerchantName", "Key", common.Sandbox)
+
+		_, err := client.Refund(request)
+
+		if err == nil {
+			t.Fatalf("Error has to be thrown")
 		}
 	})
 }
