@@ -1,0 +1,44 @@
+{
+    "transactionResponse": {
+        "responseCode": "2",
+        "authCode": "",
+        "avsResultCode": "Y",
+        "cvvResultCode": "P",
+        "cavvResultCode": "2",
+        "transId": "60157186288",
+        "refTransID": "",
+        "transHash": "",
+        "testRequest": "0",
+        "accountNumber": "XXXX0015",
+        "accountType": "MasterCard",
+        "errors": [
+            {
+                "errorCode": "2",
+                "errorText": "This transaction has been declined."
+            }
+        ],
+        "userFields": [
+            {
+                "name": "MerchantDefinedFieldName1",
+                "value": "MerchantDefinedFieldValue1"
+            },
+            {
+                "name": "favorite_color",
+                "value": "blue"
+            }
+        ],
+        "transHashSha2": "50AA6E64B1FD11FFEA805BE81F646B9232757E490575293E1EE7EE0C15A6F028EBF5E34B50232DCF4968FFCFD7380038E1A3AD054D44D85E63D7B3CE6F40A6BD",
+        "SupplementalDataQualificationIndicator": 3,
+        "networkTransId": "5P60JW9QQKGBWAMZ2PGRR0C"
+    },
+    "refId": "123456",
+    "messages": {
+        "resultCode": "Ok",
+        "message": [
+            {
+                "code": "I00001",
+                "text": "Successful."
+            }
+        ]
+    }
+}

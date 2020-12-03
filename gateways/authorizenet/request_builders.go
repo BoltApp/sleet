@@ -7,7 +7,7 @@ import (
 	"github.com/BoltApp/sleet"
 )
 
-func buildAuthRequest(merchantName string, transactionKey string, authRequest *sleet.AuthorizationRequest) (*Request, error) {
+func buildAuthRequest(merchantName string, transactionKey string, authRequest *sleet.AuthorizationRequest) *Request{
 	amountStr := sleet.AmountToDecimalString(&authRequest.Amount)
 	billingAddress := authRequest.BillingAddress
 	authorizeRequest := CreateTransactionRequest{
@@ -33,12 +33,11 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 			},
 		},
 	}
-	request := Request{CreateTransactionRequest: authorizeRequest}
-	return &request, nil
+	return &Request{CreateTransactionRequest: authorizeRequest}
 }
 
-func buildVoidRequest(merchantName string, transactionKey string, voidRequest *sleet.VoidRequest) (*Request, error) {
-	request := &Request{
+func buildVoidRequest(merchantName string, transactionKey string, voidRequest *sleet.VoidRequest) *Request {
+	return &Request{
 		CreateTransactionRequest: CreateTransactionRequest{
 			MerchantAuthentication: authentication(merchantName, transactionKey),
 			TransactionRequest: TransactionRequest{
@@ -47,10 +46,9 @@ func buildVoidRequest(merchantName string, transactionKey string, voidRequest *s
 			},
 		},
 	}
-	return request, nil
 }
 
-func buildCaptureRequest(merchantName string, transactionKey string, captureRequest *sleet.CaptureRequest) (*Request, error) {
+func buildCaptureRequest(merchantName string, transactionKey string, captureRequest *sleet.CaptureRequest) *Request {
 	amountStr := sleet.AmountToDecimalString(captureRequest.Amount)
 	request := &Request{
 		CreateTransactionRequest: CreateTransactionRequest{
@@ -62,7 +60,7 @@ func buildCaptureRequest(merchantName string, transactionKey string, captureRequ
 			},
 		},
 	}
-	return request, nil
+	return request
 }
 
 func buildRefundRequest(merchantName string, transactionKey string, refundRequest *sleet.RefundRequest) (*Request, error) {
