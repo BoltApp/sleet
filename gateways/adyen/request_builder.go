@@ -10,8 +10,9 @@ import (
 )
 
 const (
-	maxLineItemDescriptionLength = 26
 	level3Default                = "NA"
+	maxLineItemDescriptionLength = 26
+	maxProductCodeLength         = 12
 )
 
 func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount string) *checkout.PaymentRequest {
@@ -29,7 +30,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 			"number":      authRequest.CreditCard.Number,
 			"type":        "scheme",
 		},
-		MerchantAccount: merchantAccount,
+		MerchantAccount:        merchantAccount,
 		MerchantOrderReference: authRequest.MerchantOrderReference,
 	}
 
@@ -105,7 +106,7 @@ func buildLevel3Data(level3Data *sleet.Level3Data) map[string]string {
 		additionalData[keyBase+"commodityCode"] = lineItem.CommodityCode
 		additionalData[keyBase+"description"] = sleet.TruncateString(lineItem.Description, maxLineItemDescriptionLength)
 		additionalData[keyBase+"discountAmount"] = sleet.AmountToString(&lineItem.ItemDiscountAmount)
-		additionalData[keyBase+"productCode"] = lineItem.ProductCode
+		additionalData[keyBase+"productCode"] = sleet.TruncateString(lineItem.ProductCode, maxProductCodeLength)
 		additionalData[keyBase+"quantity"] = strconv.Itoa(int(lineItem.Quantity))
 		additionalData[keyBase+"totalAmount"] = sleet.AmountToString(&lineItem.TotalAmount)
 		additionalData[keyBase+"unitOfMeasure"] = common.ConvertUnitOfMeasurementToCode(lineItem.UnitOfMeasure)
