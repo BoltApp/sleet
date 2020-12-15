@@ -112,6 +112,7 @@ func (client *AuthorizeNetClient) sendRequest(data Request) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	reader := bytes.NewReader(bodyJSON)
 	request, err := http.NewRequest(http.MethodPost, client.url, reader)
 	if err != nil {
