@@ -112,13 +112,13 @@ func (client *AuthorizeNetClient) sendRequest(data Request) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	reader := bytes.NewReader(bodyJSON)
 	request, err := http.NewRequest(http.MethodPost, client.url, reader)
 	if err != nil {
 		return nil, err
 	}
 	request.Header.Add("User-Agent", common.UserAgent())
+	request.Header.Add("Content-Type", "application/json")
 
 	resp, err := client.httpClient.Do(request)
 	if err != nil {
