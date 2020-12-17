@@ -357,20 +357,6 @@ func TestRefund(t *testing.T) {
 		}
 	})
 
-	t.Run("Request without credit_card results in error", func(t *testing.T) {
-		request := sleet_t.BaseRefundRequest()
-		client := NewClient("MerchantName", "Key", common.Sandbox)
-
-		_, err := client.Refund(request)
-
-		if err == nil {
-			t.Fatalf("Error must be thrown after sending request")
-		}
-		if err.Error() != "missing credit card last four digits" {
-			t.Fatalf("Unexpected error message: %s", err.Error())
-		}
-	})
-
 	t.Run("With Network Error", func(t *testing.T) {
 		request := sleet_t.BaseRefundRequest()
 		httpmock.Activate()
