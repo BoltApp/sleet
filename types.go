@@ -68,7 +68,6 @@ type Level3Data struct {
 
 // AuthorizationRequest specifies needed information for request to authorize by PsPs
 // Note: Only credit cards are supported
-// Note: Options is a generic key-value pair that can be used to provide additional information to PsP
 type AuthorizationRequest struct {
 	Amount                     Amount
 	CreditCard                 *CreditCard
