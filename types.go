@@ -84,7 +84,6 @@ type AuthorizationRequest struct {
 	// If we are in a recurring situation, then we can use the PreviousExternalTransactionID as part of the auth request
 	ProcessingInitiator           *ProcessingInitiatorType
 	PreviousExternalTransactionID *string
-	Options                       map[string]interface{}
 }
 
 // AuthorizationResponse is a generic response returned back to client after data massaging from PsP Response
@@ -132,12 +131,12 @@ type VoidResponse struct {
 	ErrorCode            *string
 }
 
-// RefundRequest for refunding a captured transaction with generic Options and amount to be refunded
+// RefundRequest for refunding a captured transaction with amount to be refunded
 type RefundRequest struct {
 	Amount                     *Amount
 	TransactionReference       string
 	ClientTransactionReference *string // Custom transaction reference metadata that will be associated with this request
-	Options                    map[string]interface{}
+	Last4                      string
 }
 
 // RefundResponse indicating if request went through successfully
