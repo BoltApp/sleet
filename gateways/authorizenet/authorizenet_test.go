@@ -313,7 +313,7 @@ func TestRefund(t *testing.T) {
 
 		want := &sleet.RefundResponse{
 			Success:              true,
-			TransactionReference: "1234567890",
+			TransactionReference: "1234569999",
 		}
 
 		client := NewClient("MerchantName", "Key", common.Sandbox)
