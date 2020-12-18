@@ -203,7 +203,8 @@ func TestCapture(t *testing.T) {
 		})
 
 		want := &sleet.CaptureResponse{
-			Success: true,
+			Success:              true,
+			TransactionReference: "1234567890",
 		}
 
 		client := NewClient("MerchantName", "Key", common.Sandbox)
@@ -259,7 +260,8 @@ func TestVoid(t *testing.T) {
 		})
 
 		want := &sleet.VoidResponse{
-			Success: true,
+			Success:              true,
+			TransactionReference: "1234567890",
 		}
 
 		client := NewClient("MerchantName", "Key", common.Sandbox)
@@ -310,7 +312,8 @@ func TestRefund(t *testing.T) {
 		})
 
 		want := &sleet.RefundResponse{
-			Success: true,
+			Success:              true,
+			TransactionReference: "1234567890",
 		}
 
 		client := NewClient("MerchantName", "Key", common.Sandbox)
