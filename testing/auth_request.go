@@ -35,40 +35,40 @@ func BaseAuthorizationRequest() *sleet.AuthorizationRequest {
 // BaseLevel3Data is used as a testing helper method to standardize request calls for integration tests
 func BaseLevel3Data() *sleet.Level3Data {
 	return &sleet.Level3Data{
-		CustomerReference:      "customer",
-		TaxAmount:              sleet.Amount{
+		CustomerReference: "customer",
+		TaxAmount: sleet.Amount{
 			Amount:   100,
 			Currency: "USD",
 		},
-		DiscountAmount:         sleet.Amount{
+		DiscountAmount: sleet.Amount{
 			Amount:   200,
 			Currency: "USD",
 		},
-		ShippingAmount:         sleet.Amount{
+		ShippingAmount: sleet.Amount{
 			Amount:   300,
 			Currency: "USD",
 		},
-		DutyAmount:             sleet.Amount{
+		DutyAmount: sleet.Amount{
 			Amount:   400,
 			Currency: "USD",
 		},
 		DestinationPostalCode:  "94105",
 		DestinationCountryCode: "US",
-		LineItems:              []sleet.LineItem{
+		LineItems: []sleet.LineItem{
 			{
-				Description:        "pot",
-				ProductCode:        "abc",
-				UnitPrice:          sleet.Amount{
+				Description: "pot",
+				ProductCode: "abc",
+				UnitPrice: sleet.Amount{
 					Amount:   500,
 					Currency: "USD",
 				},
-				Quantity:           2,
-				TotalAmount:        sleet.Amount{
+				Quantity: 2,
+				TotalAmount: sleet.Amount{
 					Amount:   1000,
 					Currency: "USD",
 				},
-				UnitOfMeasure:      "count",
-				CommodityCode:      "cmd",
+				UnitOfMeasure: "count",
+				CommodityCode: "cmd",
 			},
 		},
 	}
@@ -108,6 +108,6 @@ func BaseRefundRequest() *sleet.RefundRequest {
 		Amount:                     &amount,
 		TransactionReference:       "111111",
 		ClientTransactionReference: &clientRef,
-		Options:                    nil,
+		Last4:                      "1111",
 	}
 }

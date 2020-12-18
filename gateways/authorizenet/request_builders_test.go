@@ -133,9 +133,6 @@ func TestBuildRefundRequest(t *testing.T) {
 
 	t.Run("With Valid Requests", func(t *testing.T) {
 		base := sleet_testing.BaseRefundRequest()
-		base.Options = map[string]interface{}{"credit_card": "1111"}
-		// TODO without last four
-		// TODO wrong length last 4
 
 		amount := "1.00"
 
@@ -172,42 +169,6 @@ func TestBuildRefundRequest(t *testing.T) {
 				if err != nil {
 					t.Errorf("ERROR THROWN: Got %q", err)
 				}
-				if diff := deep.Equal(got, c.want); diff != nil {
-					t.Error(diff)
-				}
-			})
-		}
-	})
-
-	t.Run("With invalid requests", func(t *testing.T) {
-		withoutCreditCard := sleet_testing.BaseRefundRequest()
-		withBadCardNumber := sleet_testing.BaseRefundRequest()
-		withBadCardNumber.Options = map[string]interface{}{"credit_card": "4111111111111111"}
-
-		cases := []struct {
-			label string
-			in    *sleet.RefundRequest
-			want  *Request
-		}{
-			{
-				"Without credit card optiont",
-				withoutCreditCard,
-				nil,
-			},
-			{
-				"With bad card number formatting",
-				withBadCardNumber,
-				nil,
-			},
-		}
-
-		for _, c := range cases {
-			t.Run(c.label, func(t *testing.T) {
-				got, err := buildRefundRequest("MerchantName", "Key", c.in)
-				if err == nil {
-					t.Errorf("Error is nil, expected to get error response")
-				}
-
 				if diff := deep.Equal(got, c.want); diff != nil {
 					t.Error(diff)
 				}

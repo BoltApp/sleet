@@ -1,13 +1,12 @@
 package authorizenet
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/BoltApp/sleet"
 )
 
-func buildAuthRequest(merchantName string, transactionKey string, authRequest *sleet.AuthorizationRequest) *Request{
+func buildAuthRequest(merchantName string, transactionKey string, authRequest *sleet.AuthorizationRequest) *Request {
 	amountStr := sleet.AmountToDecimalString(&authRequest.Amount)
 	billingAddress := authRequest.BillingAddress
 	authorizeRequest := CreateTransactionRequest{
@@ -64,14 +63,6 @@ func buildCaptureRequest(merchantName string, transactionKey string, captureRequ
 }
 
 func buildRefundRequest(merchantName string, transactionKey string, refundRequest *sleet.RefundRequest) (*Request, error) {
-	lastFour, ok := refundRequest.Options["credit_card"]
-	if !ok {
-		return nil, errors.New("missing credit card last four digits")
-	}
-	lastFourAsString := lastFour.(string)
-	if len(lastFourAsString) != 4 {
-		return nil, errors.New("incorrect credit card last four digits")
-	}
 	amountStr := sleet.AmountToDecimalString(refundRequest.Amount)
 	request := &Request{
 		CreateTransactionRequest: CreateTransactionRequest{
@@ -82,7 +73,7 @@ func buildRefundRequest(merchantName string, transactionKey string, refundReques
 				RefTransactionID: &refundRequest.TransactionReference,
 				Payment: &Payment{
 					CreditCard: CreditCard{
-						CardNumber:     lastFourAsString,
+						CardNumber:     refundRequest.Last4,
 						ExpirationDate: expirationDateXXXX,
 					},
 				},

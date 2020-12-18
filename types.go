@@ -137,6 +137,7 @@ type RefundRequest struct {
 	Amount                     *Amount
 	TransactionReference       string
 	ClientTransactionReference *string // Custom transaction reference metadata that will be associated with this request
+	Last4                      string
 	Options                    map[string]interface{}
 }
 
