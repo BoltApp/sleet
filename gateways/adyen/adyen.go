@@ -53,7 +53,12 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 	// potentially do something with http response
 	result, _, err := adyenClient.Checkout.Payments(buildAuthRequest(request, client.merchantAccount))
 	if err != nil {
-		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: sleet.AVSResponseUnknown, CvvResult: sleet.CVVResponseUnknown}, err
+		return &sleet.AuthorizationResponse{
+			Success:              false,
+			TransactionReference: "",
+			AvsResult:            sleet.AVSResponseUnknown,
+			CvvResult:            sleet.CVVResponseUnknown,
+		}, err
 	}
 
 	response := &sleet.AuthorizationResponse{
@@ -74,7 +79,6 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 		response.ErrorCode = result.RefusalReasonCode
 		response.Response = result.RefusalReason
 	}
-
 	return response, nil
 }
 
@@ -155,21 +159,23 @@ func addAdditionalDataFields(
 	if cvcRaw, isPresent := additionalData["cvcResultRaw"]; isPresent {
 		response.CvvResultRaw = cvcRaw.(string)
 	}
-	if rtauStatus, isPresent := additionalData["realtimeAccountUpdaterStatus"].(string); isPresent {
-		rtauResponse := sleet.RTAUResponse{
-			RealTimeAccountUpdateStatus: GetRTAUStatus(rtauStatus),
-		}
-		if expiryDate, isPresent := additionalData["expiryDate"].(string); isPresent {
-			updatedExpiry, err := time.Parse(AdyenRTAUExpiryTimeFormat, expiryDate)
-			if err != nil {
-				return err
-			}
-			rtauResponse.UpdatedExpiry = &updatedExpiry
-		}
-		if lastFour, isPresent := additionalData["cardSummary"].(string); isPresent {
-			rtauResponse.UpdatedLast4 = lastFour
-		}
-		response.RTAUResult = &rtauResponse
+
+	rtauResponse := sleet.RTAUResponse{
+		RealTimeAccountUpdateStatus: sleet.RTAUStatusNoResponse,
 	}
+	if rtauStatus, isPresent := additionalData["realtimeAccountUpdaterStatus"].(string); isPresent {
+		rtauResponse.RealTimeAccountUpdateStatus = GetRTAUStatus(rtauStatus)
+	}
+	if expiryDate, isPresent := additionalData["expiryDate"].(string); isPresent {
+		updatedExpiry, err := time.Parse(AdyenRTAUExpiryTimeFormat, expiryDate)
+		if err != nil {
+			return err
+		}
+		rtauResponse.UpdatedExpiry = &updatedExpiry
+	}
+	if lastFour, isPresent := additionalData["cardSummary"].(string); isPresent {
+		rtauResponse.UpdatedLast4 = lastFour
+	}
+	response.RTAUResult = &rtauResponse
 	return nil
 }
