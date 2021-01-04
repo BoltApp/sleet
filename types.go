@@ -1,5 +1,7 @@
 package sleet
 
+import "time"
+
 // Client defines the Sleet interface which takes in a generic request and returns a generic response
 // The translations for each specific PsP takes place in the corresponding gateways/<PsP> folders
 // The four supported methods are Auth, Capture, Void, Refund
@@ -103,10 +105,7 @@ type AuthorizationResponse struct {
 	ErrorCode            string
 	AvsResultRaw         string
 	CvvResultRaw         string
-	// Fields in case card details were updated through RTAU
-	RealTimeAccountUpdateStatus RTAUStatus
-	UpdatedExpiry               string
-	UpdatedLast4                string
+	RTAUResult           *RTAUResponse
 }
 
 // CaptureRequest specifies the authorized transaction to capture and also an amount for partial capture use cases
@@ -162,11 +161,15 @@ type Currency struct {
 type RTAUStatus string
 
 const (
-	RTAUStatusUnknown      RTAUStatus = "Unknown"
+	RTAUStatusUnknown      RTAUStatus = "Unknown"    // when a processor has RTAU capability, but returns an unexpected status
+	RTAUStatusNoResponse   RTAUStatus = "NoResponse" // when a processor has RTAU capability, but doesn't return any additional info
 	RTAUStatusCardChanged  RTAUStatus = "CardChanged"
 	RTAUStatusCardExpired  RTAUStatus = "CardExpiryChanged"
 	RTAUStatusCloseAccount RTAUStatus = "CloseAccount"
 )
 
-const RTAUExpiryTimeFormat = "1/2006"
-
+type RTAUResponse struct {
+	RealTimeAccountUpdateStatus RTAUStatus
+	UpdatedExpiry               *time.Time
+	UpdatedLast4                string
+}
