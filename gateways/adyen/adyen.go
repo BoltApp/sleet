@@ -77,17 +77,17 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 				response.CvvResultRaw = cvcRaw.(string)
 			}
 			// if rtau status is present, expiry and last 4 must also be present
-			if rtauStatus, rtauStatusIsPresent := values["realtimeAccountUpdaterStatus"].(string); rtauStatusIsPresent {
+			if rtauStatus, isPresent := values["realtimeAccountUpdaterStatus"].(string); isPresent {
 				response.RealTimeAccountUpdateStatus = GetRTAUStatus(rtauStatus)
 			}
-			if expiryDate, expiryDateIsPresent := values["expiryDate"].(string); expiryDateIsPresent {
+			if expiryDate, isPresent := values["expiryDate"].(string); isPresent {
 				updatedExpiry, err := time.Parse(AdyenRTAUExpiryTimeFormat, expiryDate)
 				if err != nil {
 					return nil, err
 				}
 				response.UpdatedExpiry = updatedExpiry
 			}
-			if lastFour, lastFourIsPresent := values["cardSummary"].(string); lastFourIsPresent {
+			if lastFour, isPresent := values["cardSummary"].(string); isPresent {
 				response.UpdatedLast4 = lastFour
 			}
 		}
