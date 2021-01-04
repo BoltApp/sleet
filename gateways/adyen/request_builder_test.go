@@ -102,7 +102,7 @@ func TestBuildAuthRequest(t *testing.T) {
 		},
 		{
 			"Auth Request with level3 data with Item Discount",
-			requestWithLevel3Data,
+			requestWithLevel3ItemDiscount,
 			&checkout.PaymentRequest{
 				Amount: checkout.Amount{
 					Currency: "USD",
