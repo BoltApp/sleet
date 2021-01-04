@@ -9,6 +9,7 @@ const (
 	RTAUExpiryTimeFormat = "1/2006"
 )
 
+// GetRTAUStatus converts an Adyen RTAU response to its equivalent Sleet representation.
 func GetRTAUStatus(
 	status string,
 ) sleet.RTAUStatus {
