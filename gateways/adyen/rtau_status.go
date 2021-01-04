@@ -6,7 +6,6 @@ const (
 	AdyenRTAUStatusCardChanged       = "CardChanged"
 	AdyenRTAUStatusCardExpiryChanged = "CardExpiryChanged"
 	AdyenRTAUStatusCloseAccount      = "CloseAccount"
-	RTAUExpiryTimeFormat = "1/2006"
 )
 
 // GetRTAUStatus converts an Adyen RTAU response to its equivalent Sleet representation.
