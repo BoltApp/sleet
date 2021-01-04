@@ -144,7 +144,7 @@ func TestAuthorize(t *testing.T) {
 			TransactionReference: "60157186288",
 			AvsResult:            sleet.AVSResponseMatch,
 			CvvResult:            sleet.CVVResponseNotProcessed,
-			ErrorCode: "2",
+			ErrorCode:            "2",
 			AvsResultRaw:         "Y",
 			CvvResultRaw:         "P",
 		}
@@ -203,7 +203,8 @@ func TestCapture(t *testing.T) {
 		})
 
 		want := &sleet.CaptureResponse{
-			Success: true,
+			Success:              true,
+			TransactionReference: "1234567890",
 		}
 
 		client := NewClient("MerchantName", "Key", common.Sandbox)
@@ -259,7 +260,8 @@ func TestVoid(t *testing.T) {
 		})
 
 		want := &sleet.VoidResponse{
-			Success: true,
+			Success:              true,
+			TransactionReference: "1234567890",
 		}
 
 		client := NewClient("MerchantName", "Key", common.Sandbox)
@@ -303,9 +305,6 @@ func TestRefund(t *testing.T) {
 		defer httpmock.DeactivateAndReset()
 
 		request := sleet_t.BaseRefundRequest()
-		request.Options = map[string]interface{}{
-			"credit_card": "1234",
-		}
 		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
 			refundResponseRaw := helper.ReadFile("test_data/refundSuccessResponse.json")
 			resp := httpmock.NewBytesResponse(http.StatusOK, refundResponseRaw)
@@ -313,7 +312,8 @@ func TestRefund(t *testing.T) {
 		})
 
 		want := &sleet.RefundResponse{
-			Success: true,
+			Success:              true,
+			TransactionReference: "1234569999",
 		}
 
 		client := NewClient("MerchantName", "Key", common.Sandbox)
@@ -335,9 +335,6 @@ func TestRefund(t *testing.T) {
 		defer httpmock.DeactivateAndReset()
 
 		request := sleet_t.BaseRefundRequest()
-		request.Options = map[string]interface{}{
-			"credit_card": "1234",
-		}
 		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
 			refundResponseRaw := helper.ReadFile("test_data/refundErrorResponse.json")
 			resp := httpmock.NewBytesResponse(http.StatusOK, refundResponseRaw)
@@ -345,7 +342,7 @@ func TestRefund(t *testing.T) {
 		})
 
 		want := &sleet.RefundResponse{
-			Success: false,
+			Success:   false,
 			ErrorCode: common.SPtr("16"),
 		}
 
@@ -363,25 +360,8 @@ func TestRefund(t *testing.T) {
 		}
 	})
 
-	t.Run("Request without credit_card results in error", func(t *testing.T) {
-		request := sleet_t.BaseRefundRequest()
-		client := NewClient("MerchantName", "Key", common.Sandbox)
-
-		_, err := client.Refund(request)
-
-		if err == nil {
-			t.Fatalf("Error must be thrown after sending request")
-		}
-		if err.Error() != "missing credit card last four digits" {
-			t.Fatalf("Unexpected error message: %s", err.Error())
-		}
-	})
-
 	t.Run("With Network Error", func(t *testing.T) {
 		request := sleet_t.BaseRefundRequest()
-		request.Options = map[string]interface{}{
-			"credit_card": "1234",
-		}
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
 

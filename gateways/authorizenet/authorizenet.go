@@ -69,7 +69,10 @@ func (client *AuthorizeNetClient) Capture(request *sleet.CaptureRequest) (*sleet
 		errorCode := getErrorCode(authorizeNetResponse.TransactionResponse)
 		return &sleet.CaptureResponse{ErrorCode: &errorCode}, nil
 	}
-	return &sleet.CaptureResponse{Success: true}, nil
+	return &sleet.CaptureResponse{
+		Success:              true,
+		TransactionReference: authorizeNetResponse.TransactionResponse.TransID,
+	}, nil
 }
 
 // Void an existing authorized transaction
@@ -84,7 +87,10 @@ func (client *AuthorizeNetClient) Void(request *sleet.VoidRequest) (*sleet.VoidR
 		errorCode := getErrorCode(authorizeNetResponse.TransactionResponse)
 		return &sleet.VoidResponse{ErrorCode: &errorCode}, nil
 	}
-	return &sleet.VoidResponse{Success: true}, nil
+	return &sleet.VoidResponse{
+		Success:              true,
+		TransactionReference: authorizeNetResponse.TransactionResponse.TransID,
+	}, nil
 }
 
 // Refund a captured transaction with amount and captured transaction reference
@@ -104,7 +110,10 @@ func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.R
 		response := sleet.RefundResponse{ErrorCode: &errorCode}
 		return &response, nil
 	}
-	return &sleet.RefundResponse{Success: true}, nil
+	return &sleet.RefundResponse{
+		Success:              true,
+		TransactionReference: authorizeNetResponse.TransactionResponse.TransID,
+	}, nil
 }
 
 func (client *AuthorizeNetClient) sendRequest(data Request) (*Response, error) {
@@ -119,6 +128,7 @@ func (client *AuthorizeNetClient) sendRequest(data Request) (*Response, error) {
 		return nil, err
 	}
 	request.Header.Add("User-Agent", common.UserAgent())
+	request.Header.Add("Content-Type", "application/json")
 
 	resp, err := client.httpClient.Do(request)
 	if err != nil {
