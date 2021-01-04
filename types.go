@@ -166,5 +166,7 @@ const (
 	RTAUStatusCardChanged  RTAUStatus = "CardChanged"
 	RTAUStatusCardExpired  RTAUStatus = "CardExpiryChanged"
 	RTAUStatusCloseAccount RTAUStatus = "CloseAccount"
-	RTAUExpiryTimeFormat = "1/2006"
 )
+
+const RTAUExpiryTimeFormat = "1/2006"
+
