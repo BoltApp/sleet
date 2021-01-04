@@ -126,7 +126,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				},
 				ShopperInteraction: "Ecommerce",
 				RecurringProcessingModel: "CardOnFile",
-				Reference: *requestWithLevel3Data.ClientTransactionReference,
+				Reference: *requestWithLevel3ItemDiscount.ClientTransactionReference,
 				StorePaymentMethod: true,
 				AdditionalData: map[string]string{
 					"enhancedSchemeData.totalTaxAmount": "100",
