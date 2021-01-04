@@ -153,3 +153,13 @@ type Currency struct {
 	Precision int
 	Symbol    string
 }
+
+// RTAUStatus represents the Real Time Account Updater response from a processor, if applicable
+type RTAUStatus string
+
+const (
+	RTAUStatusUnknown      RTAUStatus = "Unknown"
+	RTAUStatusCardChanged  RTAUStatus = "CardChanged"
+	RTAUStatusCardExpired  RTAUStatus = "CardExpiryChanged"
+	RTAUStatusCloseAccount RTAUStatus = "CloseAccount"
+)
