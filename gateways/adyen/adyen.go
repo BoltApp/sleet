@@ -2,6 +2,7 @@ package adyen
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
@@ -74,6 +75,20 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 			}
 			if cvcRaw, isPresent := values["cvcResultRaw"]; isPresent {
 				response.CvvResultRaw = cvcRaw.(string)
+			}
+			// if rtau status is present, expiry and last 4 must also be present
+			if rtauStatus, rtauStatusIsPresent := values["realtimeAccountUpdaterStatus"].(string); rtauStatusIsPresent {
+				response.RealTimeAccountUpdateStatus = GetRTAUStatus(rtauStatus)
+			}
+			if expiryDate, expiryDateIsPresent := values["expiryDate"].(string); expiryDateIsPresent {
+				updatedExpiry, err := time.Parse(AdyenRTAUExpiryTimeFormat, expiryDate)
+				if err != nil {
+					return nil, err
+				}
+				response.UpdatedExpiry = updatedExpiry
+			}
+			if lastFour, lastFourIsPresent := values["cardSummary"].(string); lastFourIsPresent {
+				response.UpdatedLast4 = lastFour
 			}
 		}
 	}

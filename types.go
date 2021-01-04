@@ -1,5 +1,7 @@
 package sleet
 
+import "time"
+
 // Client defines the Sleet interface which takes in a generic request and returns a generic response
 // The translations for each specific PsP takes place in the corresponding gateways/<PsP> folders
 // The four supported methods are Auth, Capture, Void, Refund
@@ -105,7 +107,7 @@ type AuthorizationResponse struct {
 	CvvResultRaw         string
 	// Fields in case card details were updated through RTAU
 	RealTimeAccountUpdateStatus RTAUStatus
-	UpdatedExpiry               string
+	UpdatedExpiry               time.Time
 	UpdatedLast4                string
 }
 
@@ -167,6 +169,3 @@ const (
 	RTAUStatusCardExpired  RTAUStatus = "CardExpiryChanged"
 	RTAUStatusCloseAccount RTAUStatus = "CloseAccount"
 )
-
-const RTAUExpiryTimeFormat = "1/2006"
-
