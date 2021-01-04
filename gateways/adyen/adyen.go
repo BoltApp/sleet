@@ -60,7 +60,6 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 	response := &sleet.AuthorizationResponse{
 		TransactionReference: result.PspReference,
 	}
-
 	if result.AdditionalData != nil {
 		values, ok := result.AdditionalData.(map[string]interface{})
 		if ok {
@@ -78,17 +77,20 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 			}
 			// if rtau status is present, expiry and last 4 must also be present
 			if rtauStatus, isPresent := values["realtimeAccountUpdaterStatus"].(string); isPresent {
-				response.RealTimeAccountUpdateStatus = GetRTAUStatus(rtauStatus)
-			}
-			if expiryDate, isPresent := values["expiryDate"].(string); isPresent {
-				updatedExpiry, err := time.Parse(AdyenRTAUExpiryTimeFormat, expiryDate)
-				if err != nil {
-					return nil, err
+				rtauResponse := sleet.RTAUResponse{
+					RealTimeAccountUpdateStatus: GetRTAUStatus(rtauStatus),
 				}
-				response.UpdatedExpiry = updatedExpiry
-			}
-			if lastFour, isPresent := values["cardSummary"].(string); isPresent {
-				response.UpdatedLast4 = lastFour
+				if expiryDate, isPresent := values["expiryDate"].(string); isPresent {
+					updatedExpiry, err := time.Parse(AdyenRTAUExpiryTimeFormat, expiryDate)
+					if err != nil {
+						return nil, err
+					}
+					rtauResponse.UpdatedExpiry = &updatedExpiry
+				}
+				if lastFour, isPresent := values["cardSummary"].(string); isPresent {
+					rtauResponse.UpdatedLast4 = lastFour
+				}
+				response.RTAUResult = rtauResponse
 			}
 		}
 	}

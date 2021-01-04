@@ -105,10 +105,7 @@ type AuthorizationResponse struct {
 	ErrorCode            string
 	AvsResultRaw         string
 	CvvResultRaw         string
-	// Fields in case card details were updated through RTAU
-	RealTimeAccountUpdateStatus RTAUStatus
-	UpdatedExpiry               time.Time
-	UpdatedLast4                string
+	RTAUResult 			 RTAUResponse
 }
 
 // CaptureRequest specifies the authorized transaction to capture and also an amount for partial capture use cases
@@ -169,3 +166,9 @@ const (
 	RTAUStatusCardExpired  RTAUStatus = "CardExpiryChanged"
 	RTAUStatusCloseAccount RTAUStatus = "CloseAccount"
 )
+
+type RTAUResponse struct {
+	RealTimeAccountUpdateStatus RTAUStatus
+	UpdatedExpiry               *time.Time
+	UpdatedLast4                string
+}
