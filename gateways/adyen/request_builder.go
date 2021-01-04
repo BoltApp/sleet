@@ -102,13 +102,11 @@ func buildLevel3Data(level3Data *sleet.Level3Data) map[string]string {
 		if idx == 9 {
 			break
 		}
-
+		keyBase = fmt.Sprintf("enhancedSchemeData.itemDetailLine%d.", idx+1)
 		// Due to issues with the credit card networks, dont send any line item if discount amount is 0
 		if lineItem.ItemDiscountAmount.Amount > 0 {
 			additionalData[keyBase+"discountAmount"] = sleet.AmountToString(&lineItem.ItemDiscountAmount)
 		}
-
-		keyBase = fmt.Sprintf("enhancedSchemeData.itemDetailLine%d.", idx+1)
 		additionalData[keyBase+"commodityCode"] = lineItem.CommodityCode
 		additionalData[keyBase+"description"] = sleet.TruncateString(lineItem.Description, maxLineItemDescriptionLength)
 		additionalData[keyBase+"discountAmount"] = sleet.AmountToString(&lineItem.ItemDiscountAmount)
