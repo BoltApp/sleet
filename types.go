@@ -105,7 +105,7 @@ type AuthorizationResponse struct {
 	ErrorCode            string
 	AvsResultRaw         string
 	CvvResultRaw         string
-	RTAUResult           RTAUResponse
+	RTAUResult           *RTAUResponse
 }
 
 // CaptureRequest specifies the authorized transaction to capture and also an amount for partial capture use cases

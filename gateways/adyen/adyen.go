@@ -90,7 +90,7 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 				if lastFour, isPresent := values["cardSummary"].(string); isPresent {
 					rtauResponse.UpdatedLast4 = lastFour
 				}
-				response.RTAUResult = rtauResponse
+				response.RTAUResult = &rtauResponse
 			}
 		}
 	}
