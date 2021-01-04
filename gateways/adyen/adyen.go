@@ -6,7 +6,6 @@ import (
 	"github.com/adyen/adyen-go-api-library/v4/src/adyen"
 	adyen_common "github.com/adyen/adyen-go-api-library/v4/src/common"
 	"net/http"
-	"time"
 )
 
 // AdyenClient represents the authentication fields needed to make API Requests for a given environment
@@ -160,22 +159,8 @@ func addAdditionalDataFields(
 		response.CvvResultRaw = cvcRaw.(string)
 	}
 
-	rtauResponse := sleet.RTAUResponse{
-		RealTimeAccountUpdateStatus: sleet.RTAUStatusNoResponse,
-	}
-	if rtauStatus, isPresent := additionalData["realtimeAccountUpdaterStatus"].(string); isPresent {
-		rtauResponse.RealTimeAccountUpdateStatus = GetRTAUStatus(rtauStatus)
-	}
-	if expiryDate, isPresent := additionalData["expiryDate"].(string); isPresent {
-		updatedExpiry, err := time.Parse(AdyenRTAUExpiryTimeFormat, expiryDate)
-		if err != nil {
-			return err
-		}
-		rtauResponse.UpdatedExpiry = &updatedExpiry
-	}
-	if lastFour, isPresent := additionalData["cardSummary"].(string); isPresent {
-		rtauResponse.UpdatedLast4 = lastFour
-	}
-	response.RTAUResult = &rtauResponse
-	return nil
+	rtauResponse, err := GetAdditionalDataRTAUResponse(additionalData)
+	response.RTAUResult = rtauResponse
+
+	return err
 }
