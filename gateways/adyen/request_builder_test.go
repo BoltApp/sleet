@@ -94,7 +94,6 @@ func TestBuildAuthRequest(t *testing.T) {
 					"enhancedSchemeData.itemDetailLine1.quantity": "2",
 					"enhancedSchemeData.itemDetailLine1.unitPrice": "500",
 					"enhancedSchemeData.itemDetailLine1.totalAmount" : "1000",
-					"enhancedSchemeData.itemDetailLine1.discountAmount": "0",
 					"enhancedSchemeData.destinationCountryCode": "US",
 					"enhancedSchemeData.customerReference": "customer",
 					"enhancedSchemeData.destinationPostalCode": "94105",
