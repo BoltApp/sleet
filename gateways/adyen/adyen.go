@@ -161,6 +161,5 @@ func addAdditionalDataFields(
 
 	rtauResponse, err := GetAdditionalDataRTAUResponse(additionalData)
 	response.RTAUResult = rtauResponse
-
 	return err
 }

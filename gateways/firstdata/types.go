@@ -39,7 +39,7 @@ const (
 	StateWaiting      TransactionState = "WAITING"
 )
 
-// CVVResponseCode represents the valid cvv resposne codes that can be present in a firstdata response
+// CVVResponseCode represents the valid cvv response codes that can be present in a firstdata response
 type CVVResponseCode string
 
 const (
