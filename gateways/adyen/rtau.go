@@ -38,6 +38,9 @@ func GetAdditionalDataRTAUResponse(
 	if rtauStatus, isPresent := additionalData["realtimeAccountUpdaterStatus"].(string); isPresent {
 		rtauResponse.RealTimeAccountUpdateStatus = GetRTAUStatus(rtauStatus)
 	}
+	if bin, isPresent := additionalData["cardBin"].(string); isPresent {
+		rtauResponse.UpdatedBIN = bin
+	}
 	if expiryDate, isPresent := additionalData["expiryDate"].(string); isPresent {
 		updatedExpiry, err := time.Parse(AdyenRTAUExpiryTimeFormat, expiryDate)
 		if err != nil {
