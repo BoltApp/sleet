@@ -31,7 +31,7 @@ func TestGetRTAUStatus(t *testing.T) {
 }
 
 func TestGetAdditionalDataRTAUResponse(t *testing.T) {
-	expiry := "08/2030"
+	expiry, bin, last4 := "08/2030", "545454", "1234"
 	expiryDate, _ := time.Parse(AdyenRTAUExpiryTimeFormat, expiry)
 	cases := []struct {
 		label string
@@ -43,12 +43,14 @@ func TestGetAdditionalDataRTAUResponse(t *testing.T) {
 			map[string]interface{}{
 				"realtimeAccountUpdaterStatus": AdyenRTAUStatusCardChanged,
 				"expiryDate":                   expiry,
-				"cardSummary":                  "1234",
+				"cardSummary":                  last4,
+				"cardBin":                      bin,
 			},
 			&sleet.RTAUResponse{
 				RealTimeAccountUpdateStatus: sleet.RTAUStatusCardChanged,
 				UpdatedExpiry:               &expiryDate,
-				UpdatedLast4:                "1234",
+				UpdatedBIN:                  bin,
+				UpdatedLast4:                last4,
 			},
 		},
 		{

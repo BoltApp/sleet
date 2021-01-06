@@ -171,5 +171,6 @@ const (
 type RTAUResponse struct {
 	RealTimeAccountUpdateStatus RTAUStatus
 	UpdatedExpiry               *time.Time
+	UpdatedBIN                  string
 	UpdatedLast4                string
 }
