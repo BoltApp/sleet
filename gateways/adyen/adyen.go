@@ -1,12 +1,11 @@
 package adyen
 
 import (
-	"net/http"
-
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/adyen/adyen-go-api-library/v4/src/adyen"
 	adyen_common "github.com/adyen/adyen-go-api-library/v4/src/common"
+	"net/http"
 )
 
 // AdyenClient represents the authentication fields needed to make API Requests for a given environment
@@ -53,27 +52,22 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 	// potentially do something with http response
 	result, _, err := adyenClient.Checkout.Payments(buildAuthRequest(request, client.merchantAccount))
 	if err != nil {
-		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: sleet.AVSResponseUnknown, CvvResult: sleet.CVVResponseUnknown}, err
+		return &sleet.AuthorizationResponse{
+			Success:              false,
+			TransactionReference: "",
+			AvsResult:            sleet.AVSResponseUnknown,
+			CvvResult:            sleet.CVVResponseUnknown,
+		}, err
 	}
 
 	response := &sleet.AuthorizationResponse{
 		TransactionReference: result.PspReference,
 	}
-
 	if result.AdditionalData != nil {
 		values, ok := result.AdditionalData.(map[string]interface{})
 		if ok {
-			if avs, isPresent := values["avsResult"]; isPresent {
-				response.AvsResult = translateAvs(AVSResponse(avs.(string)))
-			}
-			if avsRaw, isPresent := values["avsResultRaw"]; isPresent {
-				response.AvsResultRaw = avsRaw.(string)
-			}
-			if cvc, isPresent := values["cvcResult"]; isPresent {
-				response.CvvResult = translateCvv(CVCResult(cvc.(string)))
-			}
-			if cvcRaw, isPresent := values["cvcResultRaw"]; isPresent {
-				response.CvvResultRaw = cvcRaw.(string)
+			if err = addAdditionalDataFields(values, response); err != nil {
+				return nil, err
 			}
 		}
 	}
@@ -84,7 +78,6 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 		response.ErrorCode = result.RefusalReasonCode
 		response.Response = result.RefusalReason
 	}
-
 	return response, nil
 }
 
@@ -147,4 +140,26 @@ func (client *AdyenClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse
 		Success:              true,
 		TransactionReference: void.PspReference,
 	}, nil
+}
+
+func addAdditionalDataFields(
+	additionalData map[string]interface{},
+	response *sleet.AuthorizationResponse,
+) error {
+	if avs, isPresent := additionalData["avsResult"]; isPresent {
+		response.AvsResult = translateAvs(AVSResponse(avs.(string)))
+	}
+	if avsRaw, isPresent := additionalData["avsResultRaw"]; isPresent {
+		response.AvsResultRaw = avsRaw.(string)
+	}
+	if cvc, isPresent := additionalData["cvcResult"]; isPresent {
+		response.CvvResult = translateCvv(CVCResult(cvc.(string)))
+	}
+	if cvcRaw, isPresent := additionalData["cvcResultRaw"]; isPresent {
+		response.CvvResultRaw = cvcRaw.(string)
+	}
+
+	rtauResponse, err := GetAdditionalDataRTAUResponse(additionalData)
+	response.RTAUResult = rtauResponse
+	return err
 }
