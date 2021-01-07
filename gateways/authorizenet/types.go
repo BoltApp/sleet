@@ -115,9 +115,9 @@ type Payment struct {
 
 // CreditCard is raw cc info
 type CreditCard struct {
-	CardNumber     string  `json:"cardNumber"`
-	ExpirationDate string  `json:"expirationDate"`
-	CardCode       *string `json:"cardCode,omitempty"`
+	CardNumber     string `json:"cardNumber"`
+	ExpirationDate string `json:"expirationDate"`
+	CardCode       string `json:"cardCode,omitempty"`
 }
 
 // BillingAddress is used in TransactionRequest for making an auth call

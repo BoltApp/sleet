@@ -18,7 +18,7 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 				CreditCard: CreditCard{
 					CardNumber:     authRequest.CreditCard.Number,
 					ExpirationDate: fmt.Sprintf("%d-%d", authRequest.CreditCard.ExpirationYear, authRequest.CreditCard.ExpirationMonth),
-					CardCode:       &authRequest.CreditCard.CVV,
+					CardCode:       authRequest.CreditCard.CVV,
 				},
 			},
 			BillingAddress: &BillingAddress{
