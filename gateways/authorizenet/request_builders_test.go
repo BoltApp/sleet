@@ -33,7 +33,7 @@ func TestBuildAuthRequest(t *testing.T) {
 							CreditCard: CreditCard{
 								CardNumber:     "4111111111111111",
 								ExpirationDate: "2023-10",
-								CardCode:       &base.CreditCard.CVV,
+								CardCode:       base.CreditCard.CVV,
 							},
 						},
 						BillingAddress: &BillingAddress{
