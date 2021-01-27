@@ -2,9 +2,8 @@ package authorizenet
 
 import (
 	"fmt"
-	"github.com/BoltApp/sleet/common"
-
 	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
 )
 
 func buildAuthRequest(merchantName string, transactionKey string, authRequest *sleet.AuthorizationRequest) *Request {
@@ -17,8 +16,8 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 	}
 	if authRequest.Cryptogram != "" {
 		// Apple Pay request
-		creditCard.Cryptogram = authRequest.Cryptogram
 		creditCard.IsPaymentToken = common.BPtr(true)
+		creditCard.Cryptogram = authRequest.Cryptogram
 	} else {
 		// Credit Card request
 		creditCard.CardCode = authRequest.CreditCard.CVV

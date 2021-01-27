@@ -3,7 +3,6 @@
 package authorizenet
 
 import (
-	"github.com/BoltApp/sleet/common"
 	"testing"
 
 	"github.com/BoltApp/sleet"
@@ -69,8 +68,8 @@ func TestBuildAuthRequest(t *testing.T) {
 							CreditCard: CreditCard{
 								CardNumber:     "4111111111111111",
 								ExpirationDate: "2023-10",
-								Cryptogram:     "cryptogram",
 								IsPaymentToken: common.BPtr(true),
+								Cryptogram:     "cryptogram",
 							},
 						},
 						BillingAddress: &BillingAddress{
