@@ -118,6 +118,8 @@ type CreditCard struct {
 	CardNumber     string `json:"cardNumber"`
 	ExpirationDate string `json:"expirationDate"`
 	CardCode       string `json:"cardCode,omitempty"`
+	IsPaymentToken *bool  `json:"isPaymentToken,omitempty"`
+	Cryptogram     string `json:"cryptogram,omitempty"`
 }
 
 // BillingAddress is used in TransactionRequest for making an auth call

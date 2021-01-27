@@ -3,12 +3,11 @@
 package authorizenet
 
 import (
-	"testing"
-
 	"github.com/BoltApp/sleet"
-	"github.com/go-test/deep"
-
+	"github.com/BoltApp/sleet/common"
 	sleet_testing "github.com/BoltApp/sleet/testing"
+	"github.com/go-test/deep"
+	"testing"
 )
 
 func TestBuildAuthRequest(t *testing.T) {
@@ -34,6 +33,42 @@ func TestBuildAuthRequest(t *testing.T) {
 								CardNumber:     "4111111111111111",
 								ExpirationDate: "2023-10",
 								CardCode:       base.CreditCard.CVV,
+							},
+						},
+						BillingAddress: &BillingAddress{
+							FirstName: "Bolt",
+							LastName:  "Checkout",
+							Address:   base.BillingAddress.StreetAddress1,
+							City:      base.BillingAddress.Locality,
+							State:     base.BillingAddress.RegionCode,
+							Zip:       base.BillingAddress.PostalCode,
+							Country:   base.BillingAddress.CountryCode,
+						},
+					},
+				},
+			},
+		},
+		{
+			"Apple Pay Auth Request",
+			&sleet.AuthorizationRequest{
+				Amount:                     base.Amount,
+				CreditCard:                 base.CreditCard,
+				BillingAddress:             base.BillingAddress,
+				ClientTransactionReference: base.ClientTransactionReference,
+				Cryptogram:                 "cryptogram",
+			},
+			&Request{
+				CreateTransactionRequest: CreateTransactionRequest{
+					MerchantAuthentication: MerchantAuthentication{Name: "MerchantName", TransactionKey: "Key"},
+					TransactionRequest: TransactionRequest{
+						TransactionType: TransactionTypeAuthOnly,
+						Amount:          &amount,
+						Payment: &Payment{
+							CreditCard: CreditCard{
+								CardNumber:     "4111111111111111",
+								ExpirationDate: "2023-10",
+								IsPaymentToken: common.BPtr(true),
+								Cryptogram:     "cryptogram",
 							},
 						},
 						BillingAddress: &BillingAddress{
