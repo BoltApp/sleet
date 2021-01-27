@@ -3,12 +3,11 @@
 package authorizenet
 
 import (
-	"testing"
-
 	"github.com/BoltApp/sleet"
-	"github.com/go-test/deep"
-
+	"github.com/BoltApp/sleet/common"
 	sleet_testing "github.com/BoltApp/sleet/testing"
+	"github.com/go-test/deep"
+	"testing"
 )
 
 func TestBuildAuthRequest(t *testing.T) {
