@@ -13,3 +13,8 @@ func SafeStr(s *string) string {
 func SPtr(s string) *string {
 	return &s
 }
+
+// BPtr returns a pointer to the bool value b
+func BPtr(b bool) *bool {
+	return &b
+}

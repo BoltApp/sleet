@@ -2,6 +2,7 @@ package authorizenet
 
 import (
 	"fmt"
+	"github.com/BoltApp/sleet/common"
 
 	"github.com/BoltApp/sleet"
 )
@@ -9,17 +10,27 @@ import (
 func buildAuthRequest(merchantName string, transactionKey string, authRequest *sleet.AuthorizationRequest) *Request {
 	amountStr := sleet.AmountToDecimalString(&authRequest.Amount)
 	billingAddress := authRequest.BillingAddress
+
+	creditCard := CreditCard{
+		CardNumber:     authRequest.CreditCard.Number,
+		ExpirationDate: fmt.Sprintf("%d-%d", authRequest.CreditCard.ExpirationYear, authRequest.CreditCard.ExpirationMonth),
+	}
+	if authRequest.Cryptogram != "" {
+		// Apple Pay request
+		creditCard.Cryptogram = authRequest.Cryptogram
+		creditCard.IsPaymentToken = common.BPtr(true)
+	} else {
+		// Credit Card request
+		creditCard.CardCode = authRequest.CreditCard.CVV
+	}
+
 	authorizeRequest := CreateTransactionRequest{
 		MerchantAuthentication: authentication(merchantName, transactionKey),
 		TransactionRequest: TransactionRequest{
 			TransactionType: TransactionTypeAuthOnly,
 			Amount:          &amountStr,
 			Payment: &Payment{
-				CreditCard: CreditCard{
-					CardNumber:     authRequest.CreditCard.Number,
-					ExpirationDate: fmt.Sprintf("%d-%d", authRequest.CreditCard.ExpirationYear, authRequest.CreditCard.ExpirationMonth),
-					CardCode:       authRequest.CreditCard.CVV,
-				},
+				CreditCard: creditCard,
 			},
 			BillingAddress: &BillingAddress{
 				FirstName: authRequest.CreditCard.FirstName,
