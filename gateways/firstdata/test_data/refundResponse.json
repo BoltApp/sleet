@@ -1,0 +1,41 @@
+{
+  "clientRequestId": "dd3553d8-cb6e-4aec-93df-1b72aea759e7",
+  "apiTraceId": "rrt-0657cd7557d7d3602-b-ea-24595-208762776-2",
+  "ipgTransactionId": "84539111123",
+  "orderId": "R-10be7c21-c1fc-4001-8067-de75c80a4f7a",
+  "transactionType": "RETURN",
+  "transactionOrigin": "ECOM",
+  "paymentMethodDetails": {
+    "paymentCard": {
+      "expiryDate": {
+        "month": "12",
+        "year": "2024"
+      },
+      "bin": "542418",
+      "last4": "1732",
+      "brand": "MASTERCARD"
+    },
+    "paymentMethodType": "PAYMENT_CARD"
+  },
+  "country": "USA",
+  "terminalId": "1588390",
+  "merchantId": "939650001885",
+  "transactionTime": 1595201257,
+  "approvedAmount": {
+    "total": 12.04,
+    "currency": "USD",
+    "components": {
+      "subtotal": 12.04
+    }
+  },
+  "transactionStatus": "APPROVED",
+  "processor": {
+    "referenceNumber": "84539111123 ",
+    "responseCode": "00",
+    "responseMessage": "APPROVAL",
+    "avsResponse": {
+      "streetMatch": "NO_INPUT_DATA",
+      "postalCodeMatch": "NO_INPUT_DATA"
+    }
+  }
+}

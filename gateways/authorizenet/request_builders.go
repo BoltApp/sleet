@@ -1,25 +1,35 @@
 package authorizenet
 
 import (
-	"errors"
 	"fmt"
 	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
 )
 
-func buildAuthRequest(merchantName string, transactionKey string, authRequest *sleet.AuthorizationRequest) (*Request, error) {
-	amountStr := sleet.AmountToString(&authRequest.Amount)
+func buildAuthRequest(merchantName string, transactionKey string, authRequest *sleet.AuthorizationRequest) *Request {
+	amountStr := sleet.AmountToDecimalString(&authRequest.Amount)
 	billingAddress := authRequest.BillingAddress
+
+	creditCard := CreditCard{
+		CardNumber:     authRequest.CreditCard.Number,
+		ExpirationDate: fmt.Sprintf("%d-%d", authRequest.CreditCard.ExpirationYear, authRequest.CreditCard.ExpirationMonth),
+	}
+	if authRequest.Cryptogram != "" {
+		// Apple Pay request
+		creditCard.IsPaymentToken = common.BPtr(true)
+		creditCard.Cryptogram = authRequest.Cryptogram
+	} else {
+		// Credit Card request
+		creditCard.CardCode = authRequest.CreditCard.CVV
+	}
+
 	authorizeRequest := CreateTransactionRequest{
 		MerchantAuthentication: authentication(merchantName, transactionKey),
 		TransactionRequest: TransactionRequest{
-			TransactionType: transactionTypeAuthOnly,
+			TransactionType: TransactionTypeAuthOnly,
 			Amount:          &amountStr,
 			Payment: &Payment{
-				CreditCard: CreditCard{
-					CardNumber:     authRequest.CreditCard.Number,
-					ExpirationDate: fmt.Sprintf("%d-%d", authRequest.CreditCard.ExpirationYear, authRequest.CreditCard.ExpirationMonth),
-					CardCode:       &authRequest.CreditCard.CVV,
-				},
+				CreditCard: creditCard,
 			},
 			BillingAddress: &BillingAddress{
 				FirstName: authRequest.CreditCard.FirstName,
@@ -32,58 +42,48 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 			},
 		},
 	}
-	request := Request{CreateTransactionRequest: authorizeRequest}
-	return &request, nil
+	return &Request{CreateTransactionRequest: authorizeRequest}
 }
 
-func buildVoidRequest(merchantName string, transactionKey string, voidRequest *sleet.VoidRequest) (*Request, error) {
-	request := &Request{
+func buildVoidRequest(merchantName string, transactionKey string, voidRequest *sleet.VoidRequest) *Request {
+	return &Request{
 		CreateTransactionRequest: CreateTransactionRequest{
 			MerchantAuthentication: authentication(merchantName, transactionKey),
 			TransactionRequest: TransactionRequest{
-				TransactionType:  transactionTypeVoid,
+				TransactionType:  TransactionTypeVoid,
 				RefTransactionID: &voidRequest.TransactionReference,
 			},
 		},
 	}
-	return request, nil
 }
 
-func buildCaptureRequest(merchantName string, transactionKey string, captureRequest *sleet.CaptureRequest) (*Request, error) {
-	amountStr := sleet.AmountToString(captureRequest.Amount)
+func buildCaptureRequest(merchantName string, transactionKey string, captureRequest *sleet.CaptureRequest) *Request {
+	amountStr := sleet.AmountToDecimalString(captureRequest.Amount)
 	request := &Request{
 		CreateTransactionRequest: CreateTransactionRequest{
 			MerchantAuthentication: authentication(merchantName, transactionKey),
 			TransactionRequest: TransactionRequest{
-				TransactionType:  transactionTypePriorAuthCapture,
+				TransactionType:  TransactionTypePriorAuthCapture,
 				Amount:           &amountStr,
 				RefTransactionID: &captureRequest.TransactionReference,
 			},
 		},
 	}
-	return request, nil
+	return request
 }
 
 func buildRefundRequest(merchantName string, transactionKey string, refundRequest *sleet.RefundRequest) (*Request, error) {
-	lastFour, ok := refundRequest.Options["credit_card"]
-	if !ok {
-		return nil, errors.New("missing credit card last four digits")
-	}
-	lastFourAsString := lastFour.(string)
-	if len(lastFourAsString) != 4 {
-		return nil, errors.New("incorrect credit card last four digits")
-	}
-	amountStr := sleet.AmountToString(refundRequest.Amount)
+	amountStr := sleet.AmountToDecimalString(refundRequest.Amount)
 	request := &Request{
 		CreateTransactionRequest: CreateTransactionRequest{
 			MerchantAuthentication: authentication(merchantName, transactionKey),
 			TransactionRequest: TransactionRequest{
-				TransactionType:  transactionTypeRefund,
+				TransactionType:  TransactionTypeRefund,
 				Amount:           &amountStr,
 				RefTransactionID: &refundRequest.TransactionReference,
 				Payment: &Payment{
 					CreditCard: CreditCard{
-						CardNumber:     lastFourAsString,
+						CardNumber:     refundRequest.Last4,
 						ExpirationDate: expirationDateXXXX,
 					},
 				},

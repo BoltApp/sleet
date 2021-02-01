@@ -50,7 +50,7 @@ func (client *NMIClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.
 	if nmiResponse.Response != "1" {
 		return &sleet.AuthorizationResponse{
 			Success:   false,
-			Response:  nmiResponse.Response,
+			Response:  nmiResponse.ResponseCode,
 			ErrorCode: nmiResponse.ResponseCode,
 		}, nil
 	}
@@ -60,7 +60,7 @@ func (client *NMIClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.
 		TransactionReference: nmiResponse.TransactionID,
 		AvsResult:            sleet.AVSResponseUnknown,
 		CvvResult:            sleet.CVVResponseUnknown,
-		Response:             nmiResponse.Response,
+		Response:             nmiResponse.ResponseCode,
 		AvsResultRaw:         nmiResponse.AVSResponseCode,
 		CvvResultRaw:         nmiResponse.CVVResponseCode,
 	}, nil

@@ -2,7 +2,7 @@ package adyen
 
 import (
 	"github.com/BoltApp/sleet/common"
-	adyen_common "github.com/adyen/adyen-go-api-library/src/common"
+	adyen_common "github.com/adyen/adyen-go-api-library/v4/src/common"
 )
 
 // Environment translates a Sleet common environment into the adyen specific environment for the library

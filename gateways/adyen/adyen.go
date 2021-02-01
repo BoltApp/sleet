@@ -1,12 +1,11 @@
 package adyen
 
 import (
-	"net/http"
-
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
-	"github.com/adyen/adyen-go-api-library/src/adyen"
-	adyen_common "github.com/adyen/adyen-go-api-library/src/common"
+	"github.com/adyen/adyen-go-api-library/v4/src/adyen"
+	adyen_common "github.com/adyen/adyen-go-api-library/v4/src/common"
+	"net/http"
 )
 
 // AdyenClient represents the authentication fields needed to make API Requests for a given environment
@@ -37,6 +36,9 @@ func NewWithHTTPClient(merchantAccount string, apiKey string, liveURLPrefix stri
 }
 
 // Authorize through Adyen gateway. This transaction must be captured for funds to be received
+//
+// Note: In order to be compliant, a credit card CVV is required for all transactions where a customer did not agree
+// to have their card information saved or where a customer does not have a previous transaction with the caller.
 func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	adyenClient := adyen.NewClient(&adyen_common.Config{
 		ApiKey:                client.apiKey,
@@ -48,28 +50,33 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 	)
 
 	// potentially do something with http response
-	result, _, err := adyenClient.Payments.Authorise(buildAuthRequest(request, client.merchantAccount))
+	result, _, err := adyenClient.Checkout.Payments(buildAuthRequest(request, client.merchantAccount))
 	if err != nil {
-		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: sleet.AVSResponseUnknown, CvvResult: sleet.CVVResponseUnknown}, err
-	}
-
-	if result.ResultCode == "Refused" || result.ResultCode == "Error" {
-		return &sleet.AuthorizationResponse{Success: false, TransactionReference: result.PspReference, ErrorCode: result.RefusalReason}, nil
+		return &sleet.AuthorizationResponse{
+			Success:              false,
+			TransactionReference: "",
+			AvsResult:            sleet.AVSResponseUnknown,
+			CvvResult:            sleet.CVVResponseUnknown,
+		}, err
 	}
 
 	response := &sleet.AuthorizationResponse{
-		Success:              true,
 		TransactionReference: result.PspReference,
 	}
-
 	if result.AdditionalData != nil {
 		values, ok := result.AdditionalData.(map[string]interface{})
 		if ok {
-			response.AvsResult = translateAvs(values["avsResult"].(string))
-			response.CvvResult = translateCvv(values["cvcResult"].(string))
-			response.AvsResultRaw = values["avsResultRaw"].(string)
-			response.CvvResultRaw = values["cvcResultRaw"].(string)
+			if err = addAdditionalDataFields(values, response); err != nil {
+				return nil, err
+			}
 		}
+	}
+
+	response.Success = true
+	if result.ResultCode != adyen_common.Authorised {
+		response.Success = false
+		response.ErrorCode = result.RefusalReasonCode
+		response.Response = result.RefusalReason
 	}
 	return response, nil
 }
@@ -133,4 +140,26 @@ func (client *AdyenClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse
 		Success:              true,
 		TransactionReference: void.PspReference,
 	}, nil
+}
+
+func addAdditionalDataFields(
+	additionalData map[string]interface{},
+	response *sleet.AuthorizationResponse,
+) error {
+	if avs, isPresent := additionalData["avsResult"]; isPresent {
+		response.AvsResult = translateAvs(AVSResponse(avs.(string)))
+	}
+	if avsRaw, isPresent := additionalData["avsResultRaw"]; isPresent {
+		response.AvsResultRaw = avsRaw.(string)
+	}
+	if cvc, isPresent := additionalData["cvcResult"]; isPresent {
+		response.CvvResult = translateCvv(CVCResult(cvc.(string)))
+	}
+	if cvcRaw, isPresent := additionalData["cvcResultRaw"]; isPresent {
+		response.CvvResultRaw = cvcRaw.(string)
+	}
+
+	rtauResponse, err := GetAdditionalDataRTAUResponse(additionalData)
+	response.RTAUResult = rtauResponse
+	return err
 }

@@ -1,0 +1,20 @@
+<Response>
+ <MarkForCaptureResp>
+  <MerchantID>123456</MerchantID>
+  <TerminalID>001</TerminalID>
+  <AccountNum>4111111111111111</AccountNum>
+  <OrderID>22222</OrderID>
+  <TxRefNum>11111</TxRefNum>
+  <TxRefIdx>1</TxRefIdx>
+  <Amount>100</Amount>
+  <ProcStatus>0</ProcStatus>
+  <ApprovalStatus>1</ApprovalStatus>
+  <RespCode>00</RespCode>
+  <AVSRespCode>H</AVSRespCode>
+  <AuthCode>191044</AuthCode>
+  <StatusMsg>Approved</StatusMsg>
+  <HostRespCode>00</HostRespCode>
+  <HostAVSRespCode>Y</HostAVSRespCode>
+  <RespTime>102708</RespTime>
+ </MarkForCaptureResp>
+</Response>

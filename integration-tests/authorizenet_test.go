@@ -28,6 +28,24 @@ func TestAuthNetAuth(t *testing.T) {
 	}
 }
 
+// TestAuthNetRechargeAuth
+//
+// Recharge requests will not have CVV. This should successfully create an authorization on Authorize.net
+func TestAuthNetRechargeAuth(t *testing.T) {
+	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
+	authRequest := sleet_testing.BaseAuthorizationRequest()
+	authRequest.CreditCard.CVV = ""
+	authRequest.Amount.Amount = int64(randomdata.Number(100))
+	auth, err := client.Authorize(authRequest)
+	if err != nil {
+		t.Error("Authorize request should not have failed")
+	}
+
+	if !auth.Success {
+		t.Error("Resulting auth should have been successful")
+	}
+}
+
 // TestAuthNetAuthFullCapture
 //
 // This should successfully create an authorization on Authorize.net then Capture for full amount

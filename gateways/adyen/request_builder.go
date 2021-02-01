@@ -1,31 +1,41 @@
 package adyen
 
 import (
+	"fmt"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
-	"github.com/adyen/adyen-go-api-library/src/payments"
+	"github.com/adyen/adyen-go-api-library/v4/src/checkout"
+	"github.com/adyen/adyen-go-api-library/v4/src/payments"
 	"strconv"
 )
 
-func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount string) *payments.PaymentRequest {
-	request := &payments.PaymentRequest{
-		Amount: payments.Amount{
+const (
+	level3Default                = "NA"
+	maxLineItemDescriptionLength = 26
+	maxProductCodeLength         = 12
+)
+
+func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount string) *checkout.PaymentRequest {
+	request := &checkout.PaymentRequest{
+		Amount: checkout.Amount{
 			Value:    authRequest.Amount.Amount,
 			Currency: authRequest.Amount.Currency,
 		},
 		// Adyen requires a reference in request so this will panic if client doesn't pass it. Assuming this is good for now
 		Reference: *authRequest.ClientTransactionReference,
-		Card: &payments.Card{
-			ExpiryYear:  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
-			ExpiryMonth: strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
-			Number:      authRequest.CreditCard.Number,
-			Cvc:         authRequest.CreditCard.CVV,
-			HolderName:  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
+		PaymentMethod: map[string]interface{}{
+			"expiryMonth": strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
+			"expiryYear":  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
+			"holderName":  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
+			"number":      authRequest.CreditCard.Number,
+			"type":        "scheme",
 		},
-		MerchantAccount: merchantAccount,
+		MerchantAccount:        merchantAccount,
+		MerchantOrderReference: authRequest.MerchantOrderReference,
 	}
+
 	if authRequest.BillingAddress != nil {
-		request.BillingAddress = &payments.Address{
+		request.BillingAddress = &checkout.Address{
 			City:              common.SafeStr(authRequest.BillingAddress.Locality),
 			Country:           common.SafeStr(authRequest.BillingAddress.CountryCode),
 			HouseNumberOrName: common.SafeStr(authRequest.BillingAddress.StreetAddress2),
@@ -34,7 +44,83 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 			Street:            common.SafeStr(authRequest.BillingAddress.StreetAddress1),
 		}
 	}
+
+	addPaymentSpecificFields(authRequest, request)
+
+	level3 := authRequest.Level3Data
+	if level3 != nil {
+		request.AdditionalData = buildLevel3Data(level3)
+	}
+
 	return request
+}
+
+// addPaymentSpecificFields adds fields to the Adyen Payment request that are dependent on the payment method
+func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
+	if authRequest.Cryptogram != "" && authRequest.ECI != "" {
+		// Apple Pay request
+		request.MpiData = &checkout.ThreeDSecureData{
+			AuthenticationResponse: "Y",
+			Cavv:                   authRequest.Cryptogram,
+			DirectoryResponse:      "Y",
+			Eci:                    authRequest.ECI,
+		}
+		request.PaymentMethod["brand"] = "applepay"
+		request.RecurringProcessingModel = "CardOnFile"
+		request.ShopperInteraction = "Ecommerce"
+	} else if authRequest.CreditCard.CVV != "" {
+		// New customer credit card request
+		request.PaymentMethod["cvc"] = authRequest.CreditCard.CVV
+		request.ShopperInteraction = "Ecommerce"
+		if authRequest.CreditCard.Save {
+			// Customer opts in to saving card details
+			request.RecurringProcessingModel = "CardOnFile"
+			request.StorePaymentMethod = true
+		} else {
+			// Customer opts out of saving card details
+			request.StorePaymentMethod = false
+		}
+	} else {
+		// Existing customer credit card request
+		request.RecurringProcessingModel = "CardOnFile"
+		request.ShopperInteraction = "ContAuth"
+	}
+}
+
+func buildLevel3Data(level3Data *sleet.Level3Data) map[string]string {
+	additionalData := map[string]string{
+		"enhancedSchemeData.customerReference":     sleet.DefaultIfEmpty(level3Data.CustomerReference, level3Default),
+		"enhancedSchemeData.destinationPostalCode": level3Data.DestinationPostalCode,
+		"enhancedSchemeData.dutyAmount":            sleet.AmountToString(&level3Data.DutyAmount),
+		"enhancedSchemeData.freightAmount":         sleet.AmountToString(&level3Data.ShippingAmount),
+		"enhancedSchemeData.totalTaxAmount":        sleet.AmountToString(&level3Data.TaxAmount),
+	}
+
+	var keyBase string
+	for idx, lineItem := range level3Data.LineItems {
+		// Maximum of 9 line items allowed in the request
+		if idx == 9 {
+			break
+		}
+		keyBase = fmt.Sprintf("enhancedSchemeData.itemDetailLine%d.", idx+1)
+		// Due to issues with the credit card networks, dont send any line item if discount amount is 0
+		if lineItem.ItemDiscountAmount.Amount > 0 {
+			additionalData[keyBase+"discountAmount"] = sleet.AmountToString(&lineItem.ItemDiscountAmount)
+		}
+		additionalData[keyBase+"commodityCode"] = lineItem.CommodityCode
+		additionalData[keyBase+"description"] = sleet.TruncateString(lineItem.Description, maxLineItemDescriptionLength)
+		additionalData[keyBase+"productCode"] = sleet.TruncateString(lineItem.ProductCode, maxProductCodeLength)
+		additionalData[keyBase+"quantity"] = strconv.Itoa(int(lineItem.Quantity))
+		additionalData[keyBase+"totalAmount"] = sleet.AmountToString(&lineItem.TotalAmount)
+		additionalData[keyBase+"unitOfMeasure"] = common.ConvertUnitOfMeasurementToCode(lineItem.UnitOfMeasure)
+		additionalData[keyBase+"unitPrice"] = sleet.AmountToString(&lineItem.UnitPrice)
+	}
+
+	// Omit optional fields if they are empty
+	addIfNonEmpty(level3Data.DestinationCountryCode, "enhancedSchemeData.destinationCountryCode", &additionalData)
+	addIfNonEmpty(level3Data.DestinationAdminArea, "enhancedSchemeData.destinationStateProvinceCode", &additionalData)
+
+	return additionalData
 }
 
 func buildCaptureRequest(captureRequest *sleet.CaptureRequest, merchantAccount string) *payments.ModificationRequest {
@@ -66,4 +152,10 @@ func buildVoidRequest(voidRequest *sleet.VoidRequest, merchantAccount string) *p
 		MerchantAccount:   merchantAccount,
 	}
 	return request
+}
+
+func addIfNonEmpty(value string, key string, data *map[string]string) {
+	if value != "" {
+		(*data)[key] = value
+	}
 }

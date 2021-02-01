@@ -42,10 +42,10 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*braintree_go.Tr
 }
 
 func convertToBraintreeDecimal(amount int64, currencyCode string) (*braintree_go.Decimal, error) {
-	code, err := sleet.GetCode(currencyCode)
+	code, err := common.GetCode(currencyCode)
 	if err != nil {
 		return nil, err
 	}
-	precision := sleet.CURRENCIES[code].Precision
+	precision := common.CURRENCIES[code].Precision
 	return braintree_go.NewDecimal(amount, precision), nil
 }

@@ -54,68 +54,64 @@ const (
 	CVCResult6 CVCResult = "6 No CVC/CVV provided"
 )
 
+var cvvMap = map[CVCResult]sleet.CVVResponse{
+	CVCResult0: sleet.CVVResponseUnknown,
+	CVCResult1: sleet.CVVResponseMatch,
+	CVCResult2: sleet.CVVResponseNoMatch,
+	CVCResult3: sleet.CVVResponseNotProcessed,
+	CVCResult4: sleet.CVVResponseRequiredButMissing,
+	CVCResult5: sleet.CVVResponseUnsupported,
+	CVCResult6: sleet.CVVResponseNotProcessed,
+}
+
+var avsMap = map[AVSResponse]sleet.AVSResponse{
+	AVSResponse0:  sleet.AVSResponseUnknown,
+	AVSResponse1:  sleet.AVSResponseZipNoMatchAddressMatch,
+	AVSResponse2:  sleet.AVSResponseNoMatch,
+	AVSResponse7:  sleet.AVSResponseNoMatch,
+	AVSResponse10: sleet.AVSResponseNoMatch,
+	AVSResponse13: sleet.AVSResponseNoMatch,
+	AVSResponse16: sleet.AVSResponseNoMatch,
+	AVSResponse17: sleet.AVSResponseNoMatch,
+	AVSResponse3:  sleet.AVSResponseUnsupported,
+	AVSResponse4:  sleet.AVSResponseUnsupported,
+	AVSResponse5:  sleet.AVSResponseSkipped,
+	AVSResponse8:  sleet.AVSResponseSkipped,
+	AVSResponse11: sleet.AVSResponseSkipped,
+	AVSResponse18: sleet.AVSResponseSkipped,
+	AVSResponse6:  sleet.AVSResponseZip9MatchAddressNoMatch,
+	AVSResponse9:  sleet.AVSResponseZipUnverifiedAddressMatch,
+	AVSResponse12: sleet.AVSResponseZipUnverifiedAddressMatch,
+	AVSResponse14: sleet.AVSResponseZipMatchAddressUnverified,
+	AVSResponse15: sleet.AVSResponseZipMatchAddressUnverified,
+	AVSResponse19: sleet.AVSResponseNameMatchZipMatchAddressNoMatch,
+	AVSResponse20: sleet.AVSResponseNameMatchZipMatchAddressMatch,
+	AVSResponse21: sleet.AVSResponseNameMatchZipNoMatchAddressMatch,
+	AVSResponse22: sleet.AVSResponseNameMatchZipNoMatchAddressNoMatch,
+	AVSResponse23: sleet.AVSResponseNameNoMatchZipMatch,
+	AVSResponse24: sleet.AVSResponseNameNoMatchZipMatchAddressMatch,
+	AVSResponse25: sleet.AVSResponseNameNoMatchAddressMatch,
+	AVSResponse26: sleet.AVSResponseNameMatchZipNoMatchAddressNoMatch,
+}
+
 // translateCvv converts a Adyen CVV response code to its equivalent Sleet standard code.
 // Note: Adyen already does a translation so this is a translation from Adyen to Sleet standard
 // https://docs.com/development-resources/test-cards/cvc-cvv-result-testing
-func translateCvv(adyenCVC string) sleet.CVVResponse {
-	switch CVCResult(adyenCVC) {
-	case CVCResult0:
-		return sleet.CVVResponseUnknown
-	case CVCResult1:
-		return sleet.CVVResponseMatch
-	case CVCResult2:
-		return sleet.CVVResponseNoMatch
-	case CVCResult3:
-		return sleet.CVVResponseNotProcessed
-	case CVCResult4:
-		return sleet.CVVResponseRequiredButMissing
-	case CVCResult5:
-		return sleet.CVVResponseUnsupported
-	case CVCResult6:
-		return sleet.CVVResponseNotProcessed
-	default:
+func translateCvv(adyenCVC CVCResult) sleet.CVVResponse {
+	sleetCode, ok := cvvMap[adyenCVC]
+	if !ok {
 		return sleet.CVVResponseUnknown
 	}
+	return sleetCode
 }
 
 // translateAvs converts a Adyen AVS response code to its equivalent Sleet standard code.
 // Note: Adyen already does some level of translation so we are relying on their docs here:
 // https://docs.com/risk-management/avs-checks
-func translateAvs(adyenAVS string) sleet.AVSResponse {
-	switch AVSResponse(adyenAVS) {
-	case AVSResponse0:
-		return sleet.AVSResponseUnknown
-	case AVSResponse1:
-		return sleet.AVSResponseZipNoMatchAddressMatch
-	case AVSResponse2, AVSResponse7, AVSResponse10, AVSResponse13, AVSResponse16, AVSResponse17:
-		return sleet.AVSResponseNoMatch
-	case AVSResponse3, AVSResponse4:
-		return sleet.AVSResponseUnsupported
-	case AVSResponse5, AVSResponse8, AVSResponse11, AVSResponse18:
-		return sleet.AVSResponseSkipped
-	case AVSResponse6:
-		return sleet.AVSResponseZip9MatchAddressNoMatch
-	case AVSResponse9, AVSResponse12:
-		return sleet.AVSResponseZipUnverifiedAddressMatch
-	case AVSResponse14, AVSResponse15:
-		return sleet.AVSResponseZipMatchAddressUnverified
-	case AVSResponse19:
-		return sleet.AVSResponseNameMatchZipMatchAddressNoMatch
-	case AVSResponse20:
-		return sleet.AVSResponseNameMatchZipMatchAddressMatch
-	case AVSResponse21:
-		return sleet.AVSResponseNameMatchZipNoMatchAddressMatch
-	case AVSResponse22:
-		return sleet.AVSResponseNameMatchZipNoMatchAddressNoMatch
-	case AVSResponse23:
-		return sleet.AVSResponseNameNoMatchZipMatch
-	case AVSResponse24:
-		return sleet.AVSResponseNameNoMatchZipMatchAddressMatch
-	case AVSResponse25:
-		return sleet.AVSResponseNameNoMatchAddressMatch
-	case AVSResponse26:
-		return sleet.AVSResponseNameMatchZipNoMatchAddressNoMatch
-	default:
+func translateAvs(adyenAVS AVSResponse) sleet.AVSResponse {
+	sleetCode, ok := avsMap[adyenAVS]
+	if !ok {
 		return sleet.AVSResponseUnknown
 	}
+	return sleetCode
 }

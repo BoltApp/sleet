@@ -1,5 +1,7 @@
 package sleet
 
+import "time"
+
 // Client defines the Sleet interface which takes in a generic request and returns a generic response
 // The translations for each specific PsP takes place in the corresponding gateways/<PsP> folders
 // The four supported methods are Auth, Capture, Void, Refund
@@ -36,6 +38,8 @@ type CreditCard struct {
 	ExpirationMonth int
 	ExpirationYear  int
 	CVV             string
+	Network         CreditCardNetwork
+	Save            bool // indicates if customer wants to save their credit card details
 }
 
 // LineItem is used for Level3 Processing if enabled (not default). Specifies information per item in the order
@@ -73,8 +77,16 @@ type AuthorizationRequest struct {
 	BillingAddress             *BillingAddress
 	Level3Data                 *Level3Data
 	ClientTransactionReference *string // Custom transaction reference metadata that will be associated with this request
-	Channel                    string // for Psps that track the sales channel
-	Options                    map[string]interface{}
+	Channel                    string  // for Psps that track the sales channel
+	Cryptogram                 string  // for Network Tokenization methods
+	ECI                        string  // E-Commerce Indicator (can be used for Network Tokenization as well)
+	MerchantOrderReference     string  // Similar to ClientTransactionReference but specifically if we want to store the shopping cart order id
+
+	// For Card on File transactions we want to store the various different types (initial cof, initial recurring, etc)
+	// If we are in a recurring situation, then we can use the PreviousExternalTransactionID as part of the auth request
+	ProcessingInitiator           *ProcessingInitiatorType
+	PreviousExternalTransactionID *string
+	Options                       map[string]interface{}
 }
 
 // AuthorizationResponse is a generic response returned back to client after data massaging from PsP Response
@@ -93,6 +105,7 @@ type AuthorizationResponse struct {
 	ErrorCode            string
 	AvsResultRaw         string
 	CvvResultRaw         string
+	RTAUResult           *RTAUResponse
 }
 
 // CaptureRequest specifies the authorized transaction to capture and also an amount for partial capture use cases
@@ -127,6 +140,7 @@ type RefundRequest struct {
 	Amount                     *Amount
 	TransactionReference       string
 	ClientTransactionReference *string // Custom transaction reference metadata that will be associated with this request
+	Last4                      string
 	Options                    map[string]interface{}
 }
 
@@ -141,4 +155,22 @@ type RefundResponse struct {
 type Currency struct {
 	Precision int
 	Symbol    string
+}
+
+// RTAUStatus represents the Real Time Account Updater response from a processor, if applicable
+type RTAUStatus string
+
+const (
+	RTAUStatusUnknown      RTAUStatus = "Unknown"    // when a processor has RTAU capability, but returns an unexpected status
+	RTAUStatusNoResponse   RTAUStatus = "NoResponse" // when a processor has RTAU capability, but doesn't return any additional info
+	RTAUStatusCardChanged  RTAUStatus = "CardChanged"
+	RTAUStatusCardExpired  RTAUStatus = "CardExpiryChanged"
+	RTAUStatusCloseAccount RTAUStatus = "CloseAccount"
+)
+
+type RTAUResponse struct {
+	RealTimeAccountUpdateStatus RTAUStatus
+	UpdatedExpiry               *time.Time
+	UpdatedBIN                  string
+	UpdatedLast4                string
 }
