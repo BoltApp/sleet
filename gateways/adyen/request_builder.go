@@ -17,7 +17,7 @@ const (
 
 const (
 	shopperInteractionEcommerce = "Ecommerce"
-	shopperInteractionCountAuth = "ContAuth"
+	shopperInteractionContAuth  = "ContAuth"
 )
 
 const (
@@ -28,11 +28,11 @@ const (
 
 // these maps are based on https://docs.adyen.com/online-payments/tokenization/create-and-use-tokens#set-parameters-to-flag-transactions
 var initiatorTypeToShopperInteraction = map[sleet.ProcessingInitiatorType]string{
-	sleet.ProcessingInitiatorTypeInitialCardOnFile: shopperInteractionEcommerce,
-	sleet.ProcessingInitiatorTypeInitialRecurring: shopperInteractionEcommerce,
-	sleet.ProcessingInitiatorTypeStoredCardholderInitiated: shopperInteractionCountAuth,
-	sleet.ProcessingInitiatorTypeStoredMerchantInitiated: shopperInteractionCountAuth,
-	sleet.ProcessingInitiatorTypeFollowingRecurring: shopperInteractionCountAuth,
+	sleet.ProcessingInitiatorTypeInitialCardOnFile:         shopperInteractionEcommerce,
+	sleet.ProcessingInitiatorTypeInitialRecurring:          shopperInteractionEcommerce,
+	sleet.ProcessingInitiatorTypeStoredCardholderInitiated: shopperInteractionContAuth,
+	sleet.ProcessingInitiatorTypeStoredMerchantInitiated:   shopperInteractionContAuth,
+	sleet.ProcessingInitiatorTypeFollowingRecurring:        shopperInteractionContAuth,
 }
 
 var initiatorTypeToRecurringProcessingModel = map[sleet.ProcessingInitiatorType]string{
@@ -75,7 +75,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 
 	addPaymentSpecificFields(authRequest, request)
 
-	// overwrites the flag transactions 
+	// overwrites the flag transactions
 	if authRequest.ProcessingInitiator != nil {
 		shopperInteraction, ok := initiatorTypeToShopperInteraction[*authRequest.ProcessingInitiator]
 		if ok {
