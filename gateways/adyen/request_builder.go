@@ -15,6 +15,34 @@ const (
 	maxProductCodeLength         = 12
 )
 
+const (
+	shopperInteractionEcommerce = "Ecommerce"
+	shopperInteractionCountAuth = "ContAuth"
+)
+
+const (
+	recurringProcessingModelCardOnFile = "CardOnFile"
+	recurringProcessingModelSubscription = "Subscription"
+	recurringProcessingModelUnscheduledCardOnFile = "UnscheduledCardOnFile"
+)
+
+// these maps are based on https://docs.adyen.com/online-payments/tokenization/create-and-use-tokens#set-parameters-to-flag-transactions
+var initiatorTypeToShopperInteraction = map[sleet.ProcessingInitiatorType]string{
+	sleet.ProcessingInitiatorTypeInitialCardOnFile: shopperInteractionEcommerce,
+	sleet.ProcessingInitiatorTypeInitialRecurring: shopperInteractionEcommerce,
+	sleet.ProcessingInitiatorTypeStoredCardholderInitiated: shopperInteractionCountAuth,
+	sleet.ProcessingInitiatorTypeStoredMerchantInitiated: shopperInteractionCountAuth,
+	sleet.ProcessingInitiatorTypeFollowingRecurring: shopperInteractionCountAuth,
+}
+
+var initiatorTypeToRecurringProcessingModel = map[sleet.ProcessingInitiatorType]string{
+	sleet.ProcessingInitiatorTypeInitialCardOnFile: recurringProcessingModelCardOnFile,
+	sleet.ProcessingInitiatorTypeInitialRecurring: recurringProcessingModelSubscription,
+	sleet.ProcessingInitiatorTypeStoredCardholderInitiated: recurringProcessingModelCardOnFile,
+	sleet.ProcessingInitiatorTypeStoredMerchantInitiated: recurringProcessingModelUnscheduledCardOnFile,
+	sleet.ProcessingInitiatorTypeFollowingRecurring: recurringProcessingModelSubscription,
+}
+
 func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount string) *checkout.PaymentRequest {
 	request := &checkout.PaymentRequest{
 		Amount: checkout.Amount{
@@ -46,6 +74,18 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 	}
 
 	addPaymentSpecificFields(authRequest, request)
+
+	// overwrites the flag transactions 
+	if authRequest.ProcessingInitiator != nil {
+		shopperInteraction, ok := initiatorTypeToShopperInteraction[*authRequest.ProcessingInitiator]
+		if ok {
+			request.ShopperInteraction = shopperInteraction
+		}
+		recurringProcessingModel, ok := initiatorTypeToRecurringProcessingModel[*authRequest.ProcessingInitiator]
+		if ok {
+			request.RecurringProcessingModel = recurringProcessingModel
+		}
+	}
 
 	level3 := authRequest.Level3Data
 	if level3 != nil {
