@@ -36,11 +36,11 @@ var initiatorTypeToShopperInteraction = map[sleet.ProcessingInitiatorType]string
 }
 
 var initiatorTypeToRecurringProcessingModel = map[sleet.ProcessingInitiatorType]string{
-	sleet.ProcessingInitiatorTypeInitialCardOnFile: recurringProcessingModelCardOnFile,
-	sleet.ProcessingInitiatorTypeInitialRecurring: recurringProcessingModelSubscription,
+	sleet.ProcessingInitiatorTypeInitialCardOnFile:         recurringProcessingModelCardOnFile,
+	sleet.ProcessingInitiatorTypeInitialRecurring:          recurringProcessingModelSubscription,
 	sleet.ProcessingInitiatorTypeStoredCardholderInitiated: recurringProcessingModelCardOnFile,
-	sleet.ProcessingInitiatorTypeStoredMerchantInitiated: recurringProcessingModelUnscheduledCardOnFile,
-	sleet.ProcessingInitiatorTypeFollowingRecurring: recurringProcessingModelSubscription,
+	sleet.ProcessingInitiatorTypeStoredMerchantInitiated:   recurringProcessingModelUnscheduledCardOnFile,
+	sleet.ProcessingInitiatorTypeFollowingRecurring:        recurringProcessingModelSubscription,
 }
 
 func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount string) *checkout.PaymentRequest {
