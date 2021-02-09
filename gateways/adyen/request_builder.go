@@ -77,12 +77,10 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 
 	// overwrites the flag transactions
 	if authRequest.ProcessingInitiator != nil {
-		shopperInteraction, ok := initiatorTypeToShopperInteraction[*authRequest.ProcessingInitiator]
-		if ok {
+		if shopperInteraction, ok := initiatorTypeToShopperInteraction[*authRequest.ProcessingInitiator]; ok {
 			request.ShopperInteraction = shopperInteraction
 		}
-		recurringProcessingModel, ok := initiatorTypeToRecurringProcessingModel[*authRequest.ProcessingInitiator]
-		if ok {
+		if recurringProcessingModel, ok := initiatorTypeToRecurringProcessingModel[*authRequest.ProcessingInitiator]; ok {
 			request.RecurringProcessingModel = recurringProcessingModel
 		}
 	}
