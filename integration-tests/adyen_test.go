@@ -22,7 +22,7 @@ func TestAdyenAuthorizeFailed(t *testing.T) {
 		t.Error("Authorize request should have failed with missing reference")
 	}
 
-	if !strings.Contains(err.Error(), "Reference Missing") {
+	if !strings.Contains(err.Error(), "'reference' is not provided") {
 		t.Errorf("Response should contain missing reference error, response - %s", err.Error())
 	}
 }
