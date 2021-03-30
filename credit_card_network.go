@@ -18,4 +18,6 @@ const (
 	CreditCardNetworkJcb
 	// CreditCardNetworkUnionpay UnionPay
 	CreditCardNetworkUnionpay
+	// CreditCardNetworkCitiPLCC citiplcc
+	CreditCardNetworkCitiPLCC
 )
