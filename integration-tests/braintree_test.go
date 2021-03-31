@@ -2,11 +2,11 @@ package test
 
 import (
 	"context"
+	braintree_go "github.com/BoltApp/braintree-go"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/BoltApp/sleet/gateways/braintree"
 	sleet_testing "github.com/BoltApp/sleet/testing"
-	braintree_go "github.com/braintree-go/braintree-go"
 	"testing"
 )
 
