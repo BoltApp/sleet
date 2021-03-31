@@ -1,8 +1,8 @@
 package braintree
 
 import (
+	"github.com/BoltApp/braintree-go"
 	"github.com/BoltApp/sleet/common"
-	"github.com/braintree-go/braintree-go"
 )
 
 func braintreeEnvironment(environment common.Environment) braintree.Environment {

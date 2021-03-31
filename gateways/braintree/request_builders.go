@@ -2,9 +2,9 @@ package braintree
 
 import (
 	"fmt"
+	braintree_go "github.com/BoltApp/braintree-go"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
-	braintree_go "github.com/braintree-go/braintree-go"
 )
 
 func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*braintree_go.TransactionRequest, error) {

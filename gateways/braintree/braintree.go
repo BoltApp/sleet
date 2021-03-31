@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"time"
 
+	braintree_go "github.com/BoltApp/braintree-go"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
-	braintree_go "github.com/braintree-go/braintree-go"
 )
 
 var (
