@@ -1,7 +1,6 @@
 version: 2.1
 orbs:
-  swissknife: roopakv/swissknife@0.16.0 
-  codecov: codecov/codecov@1.1.1
+  swissknife: roopakv/swissknife@0.54.0
 jobs:
   build-and-test:
     docker:
@@ -35,10 +34,6 @@ jobs:
           key: v1-pkg-cache
           paths:
             - "/go/pkg"
-      - codecov/upload:
-          file: unit_coverage.profile
-      - codecov/upload:
-          file: integration_coverage.profile
   release-github:
     docker:
       - image: circleci/golang:1.13
