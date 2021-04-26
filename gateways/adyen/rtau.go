@@ -6,10 +6,11 @@ import (
 )
 
 const (
-	AdyenRTAUStatusCardChanged       = "CardChanged"
-	AdyenRTAUStatusCardExpiryChanged = "CardExpiryChanged"
-	AdyenRTAUStatusCloseAccount      = "CloseAccount"
-	AdyenRTAUExpiryTimeFormat        = "1/2006"
+	AdyenRTAUStatusCardChanged              = "CardChanged"
+	AdyenRTAUStatusCardExpiryChanged        = "CardExpiryChanged"
+	AdyenRTAUStatusCloseAccount             = "CloseAccount"
+	AdyenRTAUStatusContactCardAccountHolder = "ContactCardAccountHolder"
+	AdyenRTAUExpiryTimeFormat               = "1/2006"
 )
 
 // GetRTAUStatus converts an Adyen RTAU response to its equivalent Sleet representation.
@@ -23,6 +24,8 @@ func GetRTAUStatus(
 		return sleet.RTAUStatusCardExpired
 	case AdyenRTAUStatusCloseAccount:
 		return sleet.RTAUStatusCloseAccount
+	case AdyenRTAUStatusContactCardAccountHolder:
+		return sleet.RTAUStatusContactCardAccountHolder
 	default:
 		return sleet.RTAUStatusUnknown
 	}

@@ -17,6 +17,7 @@ func TestGetRTAUStatus(t *testing.T) {
 		{AdyenRTAUStatusCardChanged, sleet.RTAUStatusCardChanged},
 		{AdyenRTAUStatusCardExpiryChanged, sleet.RTAUStatusCardExpired},
 		{AdyenRTAUStatusCloseAccount, sleet.RTAUStatusCloseAccount},
+		{AdyenRTAUStatusContactCardAccountHolder, sleet.RTAUStatusContactCardAccountHolder},
 		{"Anything Else", sleet.RTAUStatusUnknown},
 	}
 
