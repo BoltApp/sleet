@@ -87,7 +87,7 @@ func (client *BraintreeClient) Authorize(request *sleet.AuthorizationRequest) (*
 	}, nil
 }
 
-// Capture an authorized transaction with reference and amount
+// Capture an authorized transaction with reference and amount. Does not support MPC
 func (client *BraintreeClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	amount, err := convertToBraintreeDecimal(request.Amount.Amount, request.Amount.Currency)
 	if err != nil {
