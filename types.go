@@ -161,11 +161,12 @@ type Currency struct {
 type RTAUStatus string
 
 const (
-	RTAUStatusUnknown      RTAUStatus = "Unknown"    // when a processor has RTAU capability, but returns an unexpected status
-	RTAUStatusNoResponse   RTAUStatus = "NoResponse" // when a processor has RTAU capability, but doesn't return any additional info
-	RTAUStatusCardChanged  RTAUStatus = "CardChanged"
-	RTAUStatusCardExpired  RTAUStatus = "CardExpiryChanged"
-	RTAUStatusCloseAccount RTAUStatus = "CloseAccount"
+	RTAUStatusUnknown                  RTAUStatus = "Unknown"    // when a processor has RTAU capability, but returns an unexpected status
+	RTAUStatusNoResponse               RTAUStatus = "NoResponse" // when a processor has RTAU capability, but doesn't return any additional info
+	RTAUStatusCardChanged              RTAUStatus = "CardChanged"
+	RTAUStatusCardExpired              RTAUStatus = "CardExpiryChanged"
+	RTAUStatusContactCardAccountHolder RTAUStatus = "ContactCardAccountHolder"
+	RTAUStatusCloseAccount             RTAUStatus = "CloseAccount"
 )
 
 type RTAUResponse struct {
