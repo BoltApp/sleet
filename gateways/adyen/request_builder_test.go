@@ -3,11 +3,12 @@
 package adyen
 
 import (
+	"strconv"
+	"testing"
+
 	"github.com/BoltApp/sleet"
 	"github.com/adyen/adyen-go-api-library/v4/src/checkout"
 	"github.com/go-test/deep"
-	"strconv"
-	"testing"
 
 	sleet_testing "github.com/BoltApp/sleet/testing"
 )
@@ -53,7 +54,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				RecurringProcessingModel: "CardOnFile",
 				Reference:                *base.ClientTransactionReference,
 				StorePaymentMethod:       true,
-				ShopperReference: 		  *base.ClientTransactionReference,
+				ShopperReference:         *base.ClientTransactionReference,
 			},
 		},
 		{
@@ -84,6 +85,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				RecurringProcessingModel: "CardOnFile",
 				Reference:                *requestWithLevel3Data.ClientTransactionReference,
 				StorePaymentMethod:       true,
+				ShopperReference:         *requestWithLevel3Data.ClientTransactionReference,
 				AdditionalData: map[string]string{
 					"enhancedSchemeData.totalTaxAmount":                "100",
 					"enhancedSchemeData.freightAmount":                 "300",
@@ -145,6 +147,7 @@ func TestBuildAuthRequest(t *testing.T) {
 					"enhancedSchemeData.customerReference":              "customer",
 					"enhancedSchemeData.destinationPostalCode":          "94105",
 				},
+				ShopperReference: *requestWithLevel3ItemDiscount.ClientTransactionReference,
 			},
 		},
 	}
