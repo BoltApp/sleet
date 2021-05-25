@@ -159,6 +159,17 @@ func addAdditionalDataFields(
 		response.CvvResultRaw = cvcRaw.(string)
 	}
 
+	// get additional recurring info
+	if recurringDetailsReference, isPresent := additionalData["recurring.recurringDetailReference"]; isPresent {
+		response.RecurringDetailReference = recurringDetailsReference.(string)
+	}
+	if shopperReference, isPresent := additionalData["recurring.shopperReference"]; isPresent {
+		response.ShopperReference = shopperReference.(string)
+	}
+	if alias, isPresent := additionalData["alias"]; isPresent {
+		response.Alias = alias.(string)
+	}
+
 	rtauResponse, err := GetAdditionalDataRTAUResponse(additionalData)
 	response.RTAUResult = rtauResponse
 	return err

@@ -60,6 +60,10 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		},
 		MerchantAccount:        merchantAccount,
 		MerchantOrderReference: authRequest.MerchantOrderReference,
+
+		// reference to uniquely identify shopper
+		// https://docs.adyen.com/api-explorer/#/CheckoutService/latest/payments__reqParam_shopperReference
+		ShopperReference: *authRequest.ClientTransactionReference,
 	}
 
 	if authRequest.BillingAddress != nil {

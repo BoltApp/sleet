@@ -53,6 +53,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				RecurringProcessingModel: "CardOnFile",
 				Reference:                *base.ClientTransactionReference,
 				StorePaymentMethod:       true,
+				ShopperReference: 		  *base.ClientTransactionReference,
 			},
 		},
 		{
