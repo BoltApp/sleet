@@ -106,7 +106,7 @@ type AuthorizationResponse struct {
 	AvsResultRaw         string
 	CvvResultRaw         string
 	RTAUResult           *RTAUResponse
-	AdyenAdditionalData  map[string]string
+	AdyenAdditionalData  map[string]string // store additional Adyen recurring info
 }
 
 // CaptureRequest specifies the authorized transaction to capture and also an amount for partial capture use cases

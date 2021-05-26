@@ -52,8 +52,10 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 	},
 	)
 
+	// unique string to request recurring info from adyen
+	shopperReference := uuid.New().String()
 	// potentially do something with http response
-	result, _, err := adyenClient.Checkout.Payments(buildAuthRequest(request, client.merchantAccount, uuid.New().String()))
+	result, _, err := adyenClient.Checkout.Payments(buildAuthRequest(request, client.merchantAccount, shopperReference))
 	if err != nil {
 		return &sleet.AuthorizationResponse{
 			Success:              false,
