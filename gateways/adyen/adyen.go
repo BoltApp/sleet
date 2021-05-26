@@ -3,6 +3,8 @@ package adyen
 import (
 	"net/http"
 
+	"github.com/google/uuid"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/adyen/adyen-go-api-library/v4/src/adyen"
@@ -51,7 +53,7 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 	)
 
 	// potentially do something with http response
-	result, _, err := adyenClient.Checkout.Payments(buildAuthRequest(request, client.merchantAccount))
+	result, _, err := adyenClient.Checkout.Payments(buildAuthRequest(request, client.merchantAccount, uuid.New().String()))
 	if err != nil {
 		return &sleet.AuthorizationResponse{
 			Success:              false,
@@ -162,13 +164,13 @@ func addAdditionalDataFields(
 
 	// set additional recurring info on response
 	if recurringDetailsReference, isPresent := additionalData["recurring.recurringDetailReference"]; isPresent {
-		response.RecurringDetailReference = recurringDetailsReference.(string)
+		response.AdyenAdditionalData["recurring.recurringDetailReference"] = recurringDetailsReference.(string)
 	}
 	if shopperReference, isPresent := additionalData["recurring.shopperReference"]; isPresent {
-		response.ShopperReference = shopperReference.(string)
+		response.AdyenAdditionalData["recurring.shopperReference"] = shopperReference.(string)
 	}
 	if alias, isPresent := additionalData["alias"]; isPresent {
-		response.Alias = alias.(string)
+		response.AdyenAdditionalData["recurring.alias"] = alias.(string)
 	}
 
 	rtauResponse, err := GetAdditionalDataRTAUResponse(additionalData)
