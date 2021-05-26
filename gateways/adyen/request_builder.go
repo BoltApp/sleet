@@ -2,11 +2,12 @@ package adyen
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/adyen/adyen-go-api-library/v4/src/checkout"
 	"github.com/adyen/adyen-go-api-library/v4/src/payments"
-	"strconv"
 )
 
 const (
@@ -21,8 +22,8 @@ const (
 )
 
 const (
-	recurringProcessingModelCardOnFile = "CardOnFile"
-	recurringProcessingModelSubscription = "Subscription"
+	recurringProcessingModelCardOnFile            = "CardOnFile"
+	recurringProcessingModelSubscription          = "Subscription"
 	recurringProcessingModelUnscheduledCardOnFile = "UnscheduledCardOnFile"
 )
 
@@ -43,7 +44,7 @@ var initiatorTypeToRecurringProcessingModel = map[sleet.ProcessingInitiatorType]
 	sleet.ProcessingInitiatorTypeFollowingRecurring:        recurringProcessingModelSubscription,
 }
 
-func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount string) *checkout.PaymentRequest {
+func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount string, shopperReference string) *checkout.PaymentRequest {
 	request := &checkout.PaymentRequest{
 		Amount: checkout.Amount{
 			Value:    authRequest.Amount.Amount,
@@ -61,9 +62,8 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		MerchantAccount:        merchantAccount,
 		MerchantOrderReference: authRequest.MerchantOrderReference,
 
-		// reference to uniquely identify shopper
 		// https://docs.adyen.com/api-explorer/#/CheckoutService/latest/payments__reqParam_shopperReference
-		ShopperReference: *authRequest.ClientTransactionReference,
+		ShopperReference: shopperReference,
 	}
 
 	if authRequest.BillingAddress != nil {

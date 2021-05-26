@@ -97,18 +97,16 @@ type AuthorizationResponse struct {
 	// the non-raw fields are the best parsings to a single standard, with
 	// loss of granularity minimized. The latter should be preferred when
 	// treating Sleet as a black box.
-	Success                  bool
-	TransactionReference     string
-	AvsResult                AVSResponse
-	CvvResult                CVVResponse
-	Response                 string
-	ErrorCode                string
-	AvsResultRaw             string
-	CvvResultRaw             string
-	RTAUResult               *RTAUResponse
-	RecurringDetailReference string
-	ShopperReference         string
-	Alias                    string
+	Success              bool
+	TransactionReference string
+	AvsResult            AVSResponse
+	CvvResult            CVVResponse
+	Response             string
+	ErrorCode            string
+	AvsResultRaw         string
+	CvvResultRaw         string
+	RTAUResult           *RTAUResponse
+	AdyenAdditionalData  map[string]string
 }
 
 // CaptureRequest specifies the authorized transaction to capture and also an amount for partial capture use cases

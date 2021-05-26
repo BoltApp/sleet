@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/google/uuid"
+
 	"github.com/BoltApp/sleet"
 	"github.com/adyen/adyen-go-api-library/v4/src/checkout"
 	"github.com/go-test/deep"
@@ -14,7 +16,11 @@ import (
 )
 
 func TestBuildAuthRequest(t *testing.T) {
+
+	shopperReference := uuid.New().String()
+
 	base := sleet_testing.BaseAuthorizationRequest()
+
 	requestWithLevel3Data := sleet_testing.BaseAuthorizationRequest()
 	requestWithLevel3Data.Level3Data = sleet_testing.BaseLevel3Data()
 	requestWithLevel3ItemDiscount := sleet_testing.BaseAuthorizationRequest()
@@ -54,7 +60,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				RecurringProcessingModel: "CardOnFile",
 				Reference:                *base.ClientTransactionReference,
 				StorePaymentMethod:       true,
-				ShopperReference:         *base.ClientTransactionReference,
+				ShopperReference:         shopperReference,
 			},
 		},
 		{
@@ -85,7 +91,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				RecurringProcessingModel: "CardOnFile",
 				Reference:                *requestWithLevel3Data.ClientTransactionReference,
 				StorePaymentMethod:       true,
-				ShopperReference:         *requestWithLevel3Data.ClientTransactionReference,
+				ShopperReference:         shopperReference,
 				AdditionalData: map[string]string{
 					"enhancedSchemeData.totalTaxAmount":                "100",
 					"enhancedSchemeData.freightAmount":                 "300",
@@ -147,14 +153,14 @@ func TestBuildAuthRequest(t *testing.T) {
 					"enhancedSchemeData.customerReference":              "customer",
 					"enhancedSchemeData.destinationPostalCode":          "94105",
 				},
-				ShopperReference: *requestWithLevel3ItemDiscount.ClientTransactionReference,
+				ShopperReference: shopperReference,
 			},
 		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.label, func(t *testing.T) {
-			got := buildAuthRequest(c.in, "merchant-account")
+			got := buildAuthRequest(c.in, "merchant-account", shopperReference)
 			if diff := deep.Equal(got, c.want); diff != nil {
 				t.Error(diff)
 			}
