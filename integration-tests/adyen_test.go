@@ -1,12 +1,13 @@
 package test
 
 import (
+	"strings"
+	"testing"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/BoltApp/sleet/gateways/adyen"
 	sleet_testing "github.com/BoltApp/sleet/testing"
-	"strings"
-	"testing"
 )
 
 // TestAdyenAuthorizeFailed
@@ -89,6 +90,19 @@ func TestAdyenAuthFailedAVSPresent(t *testing.T) {
 
 	if auth.AvsResultRaw != "2" {
 		t.Error("AVS Result Raw should have been code 1")
+	}
+}
+
+func TestAdyenAdditionalRecurringInfo(t *testing.T) {
+	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
+	adyenRequest := adyenBaseAuthRequest()
+	adyenRequest.ShopperReference = "testAdyen"
+	auth, err := client.Authorize(adyenRequest)
+	if err != nil {
+		t.Error("Authorize shouldn't give error running request with ShopperReference")
+	}
+	if len(auth.AdyenAdditionalData) == 0 {
+		t.Error("auth should contain AdyenAdditionalData")
 	}
 }
 
