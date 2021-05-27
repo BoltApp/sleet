@@ -93,6 +93,19 @@ func TestAdyenAuthFailedAVSPresent(t *testing.T) {
 	}
 }
 
+func TestAdyenAdditionalRecurringInfo(t *testing.T) {
+	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
+	adyenRequest := adyenBaseAuthRequest()
+	adyenRequest.ShopperReference = "testAdyen"
+	auth, err := client.Authorize(adyenRequest)
+	if err != nil {
+		t.Error("Authorize shouldn't give error running request with ShopperReference")
+	}
+	if len(auth.AdyenAdditionalData) == 0 {
+		t.Error("auth should contain AdyenAdditionalData")
+	}
+}
+
 // TestAdyenAVSCode1
 //
 // This test should test for Adyen AVS Code: 1 Address matches, postal code doesn't
