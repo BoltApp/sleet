@@ -6,7 +6,7 @@ import "time"
 // The translations for each specific PsP takes place in the corresponding gateways/<PsP> folders
 // The four supported methods are Auth, Capture, Void, Refund
 type Client interface {
-	Authorize(request *AuthorizationRequest) (*AuthorizationResponse, error)
+	Authorize(request *AuthorizationRequest, shopperReference string) (*AuthorizationResponse, error)
 	Capture(request *CaptureRequest) (*CaptureResponse, error)
 	Void(request *VoidRequest) (*VoidResponse, error)
 	Refund(request *RefundRequest) (*RefundResponse, error)
