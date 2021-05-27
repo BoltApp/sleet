@@ -2,11 +2,12 @@ package adyen
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/adyen/adyen-go-api-library/v4/src/checkout"
 	"github.com/adyen/adyen-go-api-library/v4/src/payments"
-	"strconv"
 )
 
 const (
@@ -21,8 +22,8 @@ const (
 )
 
 const (
-	recurringProcessingModelCardOnFile = "CardOnFile"
-	recurringProcessingModelSubscription = "Subscription"
+	recurringProcessingModelCardOnFile            = "CardOnFile"
+	recurringProcessingModelSubscription          = "Subscription"
 	recurringProcessingModelUnscheduledCardOnFile = "UnscheduledCardOnFile"
 )
 
@@ -60,6 +61,9 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		},
 		MerchantAccount:        merchantAccount,
 		MerchantOrderReference: authRequest.MerchantOrderReference,
+
+		// https://docs.adyen.com/api-explorer/#/CheckoutService/latest/payments__reqParam_shopperReference
+		ShopperReference: authRequest.ShopperReference,
 	}
 
 	if authRequest.BillingAddress != nil {

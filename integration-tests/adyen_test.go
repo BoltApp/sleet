@@ -1,12 +1,13 @@
 package test
 
 import (
+	"strings"
+	"testing"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/BoltApp/sleet/gateways/adyen"
 	sleet_testing "github.com/BoltApp/sleet/testing"
-	"strings"
-	"testing"
 )
 
 // TestAdyenAuthorizeFailed
