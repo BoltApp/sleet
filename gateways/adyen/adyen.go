@@ -40,7 +40,7 @@ func NewWithHTTPClient(merchantAccount string, apiKey string, liveURLPrefix stri
 //
 // Note: In order to be compliant, a credit card CVV is required for all transactions where a customer did not agree
 // to have their card information saved or where a customer does not have a previous transaction with the caller.
-func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest, shopperReference string) (*sleet.AuthorizationResponse, error) {
+func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	adyenClient := adyen.NewClient(&adyen_common.Config{
 		ApiKey:                client.apiKey,
 		LiveEndpointURLPrefix: client.liveURLPrefix,
@@ -51,7 +51,7 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest, shoppe
 	)
 
 	// potentially do something with http response
-	result, _, err := adyenClient.Checkout.Payments(buildAuthRequest(request, client.merchantAccount, shopperReference))
+	result, _, err := adyenClient.Checkout.Payments(buildAuthRequest(request, client.merchantAccount))
 	if err != nil {
 		return &sleet.AuthorizationResponse{
 			Success:              false,

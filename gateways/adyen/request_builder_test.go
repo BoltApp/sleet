@@ -6,8 +6,6 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/google/uuid"
-
 	"github.com/BoltApp/sleet"
 	"github.com/adyen/adyen-go-api-library/v4/src/checkout"
 	"github.com/go-test/deep"
@@ -16,8 +14,6 @@ import (
 )
 
 func TestBuildAuthRequest(t *testing.T) {
-
-	shopperReference := uuid.New().String()
 
 	base := sleet_testing.BaseAuthorizationRequest()
 
@@ -60,7 +56,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				RecurringProcessingModel: "CardOnFile",
 				Reference:                *base.ClientTransactionReference,
 				StorePaymentMethod:       true,
-				ShopperReference:         shopperReference,
+				ShopperReference:         "test",
 			},
 		},
 		{
@@ -91,7 +87,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				RecurringProcessingModel: "CardOnFile",
 				Reference:                *requestWithLevel3Data.ClientTransactionReference,
 				StorePaymentMethod:       true,
-				ShopperReference:         shopperReference,
+				ShopperReference:         "test",
 				AdditionalData: map[string]string{
 					"enhancedSchemeData.totalTaxAmount":                "100",
 					"enhancedSchemeData.freightAmount":                 "300",
@@ -153,14 +149,14 @@ func TestBuildAuthRequest(t *testing.T) {
 					"enhancedSchemeData.customerReference":              "customer",
 					"enhancedSchemeData.destinationPostalCode":          "94105",
 				},
-				ShopperReference: shopperReference,
+				ShopperReference: "test",
 			},
 		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.label, func(t *testing.T) {
-			got := buildAuthRequest(c.in, "merchant-account", shopperReference)
+			got := buildAuthRequest(c.in, "merchant-account")
 			if diff := deep.Equal(got, c.want); diff != nil {
 				t.Error(diff)
 			}

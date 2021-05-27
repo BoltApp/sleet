@@ -6,7 +6,7 @@ import "time"
 // The translations for each specific PsP takes place in the corresponding gateways/<PsP> folders
 // The four supported methods are Auth, Capture, Void, Refund
 type Client interface {
-	Authorize(request *AuthorizationRequest, shopperReference string) (*AuthorizationResponse, error)
+	Authorize(request *AuthorizationRequest) (*AuthorizationResponse, error)
 	Capture(request *CaptureRequest) (*CaptureResponse, error)
 	Void(request *VoidRequest) (*VoidResponse, error)
 	Refund(request *RefundRequest) (*RefundResponse, error)
@@ -87,6 +87,7 @@ type AuthorizationRequest struct {
 	ProcessingInitiator           *ProcessingInitiatorType
 	PreviousExternalTransactionID *string
 	Options                       map[string]interface{}
+	ShopperReference              string // shopperReference used to get adyen recurring info
 }
 
 // AuthorizationResponse is a generic response returned back to client after data massaging from PsP Response

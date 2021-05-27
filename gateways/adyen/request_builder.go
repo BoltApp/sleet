@@ -44,7 +44,7 @@ var initiatorTypeToRecurringProcessingModel = map[sleet.ProcessingInitiatorType]
 	sleet.ProcessingInitiatorTypeFollowingRecurring:        recurringProcessingModelSubscription,
 }
 
-func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount string, shopperReference string) *checkout.PaymentRequest {
+func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount string) *checkout.PaymentRequest {
 	request := &checkout.PaymentRequest{
 		Amount: checkout.Amount{
 			Value:    authRequest.Amount.Amount,
@@ -63,7 +63,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		MerchantOrderReference: authRequest.MerchantOrderReference,
 
 		// https://docs.adyen.com/api-explorer/#/CheckoutService/latest/payments__reqParam_shopperReference
-		ShopperReference: shopperReference,
+		ShopperReference: authRequest.ShopperReference,
 	}
 
 	if authRequest.BillingAddress != nil {
