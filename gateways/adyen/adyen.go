@@ -168,7 +168,7 @@ func addAdditionalDataFields(
 		response.AdyenAdditionalData["recurring.shopperReference"] = shopperReference.(string)
 	}
 	if alias, isPresent := additionalData["alias"]; isPresent {
-		response.AdyenAdditionalData["recurring.alias"] = alias.(string)
+		response.AdyenAdditionalData["alias"] = alias.(string)
 	}
 
 	rtauResponse, err := GetAdditionalDataRTAUResponse(additionalData)
