@@ -40,10 +40,11 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 				Zip:       billingAddress.PostalCode,
 				Country:   billingAddress.CountryCode,
 			},
-			Order: &Order{
-				InvoiceNumber: authRequest.MerchantOrderReference,
-			},
 		},
+	}
+
+	if authRequest.MerchantOrderReference != "" {
+		authorizeRequest.TransactionRequest.Order = &Order{InvoiceNumber: authRequest.MerchantOrderReference}
 	}
 	return &Request{CreateTransactionRequest: authorizeRequest}
 }
