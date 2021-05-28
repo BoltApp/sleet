@@ -105,6 +105,7 @@ type TransactionRequest struct {
 	Payment          *Payment        `json:"payment,omitempty"`
 	BillingAddress   *BillingAddress `json:"billTo,omitempty"`
 	RefTransactionID *string         `json:"refTransId,omitempty"`
+	Order            *Order          `json:"order,omitempty"`
 	// Ignoring Line items, Shipping, Tax, Duty, etc.
 }
 
@@ -132,6 +133,11 @@ type BillingAddress struct {
 	State     *string `json:"state"`
 	Zip       *string `json:"zip"`
 	Country   *string `json:"country"`
+}
+
+// Order is used in TransactionRequest for passing information about the order
+type Order struct {
+	InvoiceNumber string `json:"invoiceNumber"`
 }
 
 // Response is a generic Auth.net response

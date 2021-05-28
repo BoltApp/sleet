@@ -12,6 +12,7 @@ import (
 
 func TestBuildAuthRequest(t *testing.T) {
 	base := sleet_testing.BaseAuthorizationRequest()
+	base.MerchantOrderReference = "test_merchant_reference"
 
 	amount := "1.00"
 	cases := []struct {
@@ -43,6 +44,9 @@ func TestBuildAuthRequest(t *testing.T) {
 							State:     base.BillingAddress.RegionCode,
 							Zip:       base.BillingAddress.PostalCode,
 							Country:   base.BillingAddress.CountryCode,
+						},
+						Order: &Order{
+							InvoiceNumber: "test_merchant_reference",
 						},
 					},
 				},
