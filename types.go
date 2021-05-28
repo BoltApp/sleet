@@ -87,6 +87,7 @@ type AuthorizationRequest struct {
 	ProcessingInitiator           *ProcessingInitiatorType
 	PreviousExternalTransactionID *string
 	Options                       map[string]interface{}
+	ShopperReference              string // shopperReference used to get adyen recurring info
 }
 
 // AuthorizationResponse is a generic response returned back to client after data massaging from PsP Response
@@ -106,6 +107,7 @@ type AuthorizationResponse struct {
 	AvsResultRaw         string
 	CvvResultRaw         string
 	RTAUResult           *RTAUResponse
+	AdyenAdditionalData  map[string]string // store additional Adyen recurring info
 }
 
 // CaptureRequest specifies the authorized transaction to capture and also an amount for partial capture use cases

@@ -1,11 +1,12 @@
 package adyen
 
 import (
+	"net/http"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/adyen/adyen-go-api-library/v4/src/adyen"
 	adyen_common "github.com/adyen/adyen-go-api-library/v4/src/common"
-	"net/http"
 )
 
 // AdyenClient represents the authentication fields needed to make API Requests for a given environment
@@ -159,7 +160,25 @@ func addAdditionalDataFields(
 		response.CvvResultRaw = cvcRaw.(string)
 	}
 
+	// set adyen additional recurring info on response
+	response.AdyenAdditionalData = getAdyenAdditionalData(additionalData)
+
 	rtauResponse, err := GetAdditionalDataRTAUResponse(additionalData)
 	response.RTAUResult = rtauResponse
 	return err
+}
+
+func getAdyenAdditionalData(additionalData map[string]interface{}) map[string]string {
+	adyenMap := make(map[string]string)
+
+	if recurringDetailsReference, isPresent := additionalData["recurring.recurringDetailReference"]; isPresent {
+		adyenMap["recurring.recurringDetailReference"] = recurringDetailsReference.(string)
+	}
+	if shopperReference, isPresent := additionalData["recurring.shopperReference"]; isPresent {
+		adyenMap["recurring.shopperReference"] = shopperReference.(string)
+	}
+	if alias, isPresent := additionalData["alias"]; isPresent {
+		adyenMap["alias"] = alias.(string)
+	}
+	return adyenMap
 }
