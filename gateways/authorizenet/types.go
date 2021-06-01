@@ -103,9 +103,9 @@ type TransactionRequest struct {
 	TransactionType  TransactionType `json:"transactionType"`
 	Amount           *string         `json:"amount,omitempty"`
 	Payment          *Payment        `json:"payment,omitempty"`
+	Order            *Order          `json:"order,omitempty"`
 	BillingAddress   *BillingAddress `json:"billTo,omitempty"`
 	RefTransactionID *string         `json:"refTransId,omitempty"`
-	Order            *Order          `json:"order,omitempty"`
 	// Ignoring Line items, Shipping, Tax, Duty, etc.
 }
 

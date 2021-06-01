@@ -18,6 +18,7 @@ func TestAuthNetAuth(t *testing.T) {
 	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	authRequest.Amount.Amount = int64(randomdata.Number(100))
+	authRequest.MerchantOrderReference = "test-order-ref"
 	auth, err := client.Authorize(authRequest)
 	if err != nil {
 		t.Error("Authorize request should not have failed")
