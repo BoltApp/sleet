@@ -2,6 +2,7 @@ package authorizenet
 
 import (
 	"fmt"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 )

@@ -6,6 +6,7 @@ import (
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	sleet_testing "github.com/BoltApp/sleet/testing"
+	"github.com/Pallinder/go-randomdata"
 	"github.com/go-test/deep"
 	"testing"
 )
