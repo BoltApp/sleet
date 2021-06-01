@@ -6,6 +6,10 @@ import (
 	"github.com/BoltApp/sleet/common"
 )
 
+const (
+	InvoiceNumberMaxLength = 20
+)
+
 func buildAuthRequest(merchantName string, transactionKey string, authRequest *sleet.AuthorizationRequest) *Request {
 	amountStr := sleet.AmountToDecimalString(&authRequest.Amount)
 	billingAddress := authRequest.BillingAddress
@@ -44,7 +48,8 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 	}
 
 	if authRequest.MerchantOrderReference != "" {
-		authorizeRequest.TransactionRequest.Order = &Order{InvoiceNumber: authRequest.MerchantOrderReference}
+		invoiceNumber := sleet.TruncateString(authRequest.MerchantOrderReference, InvoiceNumberMaxLength)
+		authorizeRequest.TransactionRequest.Order = &Order{InvoiceNumber: invoiceNumber}
 	}
 	return &Request{CreateTransactionRequest: authorizeRequest}
 }
