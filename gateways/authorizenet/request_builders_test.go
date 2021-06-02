@@ -13,7 +13,7 @@ import (
 
 func TestBuildAuthRequest(t *testing.T) {
 	base := sleet_testing.BaseAuthorizationRequest()
-	base.MerchantOrderReference = randomdata.Alphanumeric(24)
+	base.MerchantOrderReference = randomdata.Alphanumeric(InvoiceNumberMaxLength + 5)
 
 	amount := "1.00"
 	cases := []struct {
@@ -47,7 +47,7 @@ func TestBuildAuthRequest(t *testing.T) {
 							Country:   base.BillingAddress.CountryCode,
 						},
 						Order: &Order{
-							InvoiceNumber: base.MerchantOrderReference[:20],
+							InvoiceNumber: base.MerchantOrderReference[:InvoiceNumberMaxLength],
 						},
 					},
 				},
