@@ -89,6 +89,12 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		}
 	}
 
+	// overwrites for citiplcc
+	if authRequest.CreditCard.Network == sleet.CreditCardNetworkCitiPLCC {
+		request.RecurringProcessingModel = "Subscription"
+		request.ShopperInteraction = "Ecommerce"
+	}
+
 	level3 := authRequest.Level3Data
 	if level3 != nil {
 		request.AdditionalData = buildLevel3Data(level3)
