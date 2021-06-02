@@ -77,12 +77,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		}
 	}
 
-	if authRequest.CreditCard.Network == sleet.CreditCardNetworkCitiPLCC {
-		request.RecurringProcessingModel = "Subscription"
-		request.ShopperInteraction = "Ecommerce"
-	} else {
-		addPaymentSpecificFields(authRequest, request)
-	}
+	addPaymentSpecificFields(authRequest, request)
 
 	// overwrites the flag transactions
 	if authRequest.ProcessingInitiator != nil {
@@ -92,6 +87,12 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		if recurringProcessingModel, ok := initiatorTypeToRecurringProcessingModel[*authRequest.ProcessingInitiator]; ok {
 			request.RecurringProcessingModel = recurringProcessingModel
 		}
+	}
+
+	// overwrites for citiplcc
+	if authRequest.CreditCard.Network == sleet.CreditCardNetworkCitiPLCC {
+		request.RecurringProcessingModel = "Subscription"
+		request.ShopperInteraction = "Ecommerce"
 	}
 
 	level3 := authRequest.Level3Data
