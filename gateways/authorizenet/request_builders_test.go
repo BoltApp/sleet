@@ -6,13 +6,14 @@ import (
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	sleet_testing "github.com/BoltApp/sleet/testing"
+	"github.com/Pallinder/go-randomdata"
 	"github.com/go-test/deep"
 	"testing"
 )
 
 func TestBuildAuthRequest(t *testing.T) {
 	base := sleet_testing.BaseAuthorizationRequest()
-	base.MerchantOrderReference = "test_merchant_reference"
+	base.MerchantOrderReference = randomdata.Alphanumeric(InvoiceNumberMaxLength + 5)
 
 	amount := "1.00"
 	cases := []struct {
@@ -46,7 +47,7 @@ func TestBuildAuthRequest(t *testing.T) {
 							Country:   base.BillingAddress.CountryCode,
 						},
 						Order: &Order{
-							InvoiceNumber: "test_merchant_reference",
+							InvoiceNumber: base.MerchantOrderReference[:InvoiceNumberMaxLength],
 						},
 					},
 				},

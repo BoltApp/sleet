@@ -2,8 +2,13 @@ package authorizenet
 
 import (
 	"fmt"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
+)
+
+const (
+	InvoiceNumberMaxLength = 20
 )
 
 func buildAuthRequest(merchantName string, transactionKey string, authRequest *sleet.AuthorizationRequest) *Request {
@@ -44,7 +49,8 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 	}
 
 	if authRequest.MerchantOrderReference != "" {
-		authorizeRequest.TransactionRequest.Order = &Order{InvoiceNumber: authRequest.MerchantOrderReference}
+		invoiceNumber := sleet.TruncateString(authRequest.MerchantOrderReference, InvoiceNumberMaxLength)
+		authorizeRequest.TransactionRequest.Order = &Order{InvoiceNumber: invoiceNumber}
 	}
 	return &Request{CreateTransactionRequest: authorizeRequest}
 }
