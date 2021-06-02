@@ -77,7 +77,12 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		}
 	}
 
-	addPaymentSpecificFields(authRequest, request)
+	if authRequest.CreditCard.Network == sleet.CreditCardNetworkCitiPLCC {
+		request.RecurringProcessingModel = "Subscription"
+		request.ShopperInteraction = "Ecommerce"
+	} else {
+		addPaymentSpecificFields(authRequest, request)
+	}
 
 	// overwrites the flag transactions
 	if authRequest.ProcessingInitiator != nil {
