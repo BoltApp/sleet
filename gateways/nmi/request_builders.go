@@ -37,6 +37,7 @@ func buildAuthRequest(testMode bool, securityKey string, request *sleet.Authoriz
 		CVV:             &request.CreditCard.CVV,
 		FirstName:       &request.CreditCard.FirstName,
 		LastName:        &request.CreditCard.LastName,
+		OrderID:         request.MerchantOrderReference,
 		SecurityKey:     securityKey,
 		State:           request.BillingAddress.RegionCode,
 		TestMode:        enableTestMode(testMode),

@@ -1,13 +1,14 @@
 package nmi
 
 import (
-	"github.com/BoltApp/sleet"
-	"github.com/BoltApp/sleet/common"
-	"github.com/go-playground/form"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
+	"github.com/go-playground/form"
 )
 
 const (

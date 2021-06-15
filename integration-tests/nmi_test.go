@@ -13,6 +13,7 @@ import (
 func TestNMIAuthorize(t *testing.T) {
 	client := nmi.NewClient(common.Sandbox, getEnv("NMI_SECURITY_KEY"))
 	authRequest := sleet_testing.BaseAuthorizationRequest()
+	authRequest.MerchantOrderReference = "test_merchant_reference"
 
 	rand.Seed(time.Now().UnixNano())
 	minTransaction := 100    // Sending request under $1.00 in test mode causes a decline
@@ -51,6 +52,7 @@ func TestNMIAuthorizeDeclined(t *testing.T) {
 func TestNMIAuthorizeAndCapture(t *testing.T) {
 	client := nmi.NewClient(common.Sandbox, getEnv("NMI_SECURITY_KEY"))
 	authRequest := sleet_testing.BaseAuthorizationRequest()
+	authRequest.MerchantOrderReference = "test_merchant_reference"
 
 	rand.Seed(time.Now().UnixNano())
 	minTransaction := 100    // Sending request under $1.00 in test mode causes a decline
