@@ -23,6 +23,9 @@ func TestBuildAuthRequest(t *testing.T) {
 	requestWithLevel3ItemDiscount.Level3Data = sleet_testing.BaseLevel3Data()
 	requestWithLevel3ItemDiscount.Level3Data.LineItems[0].ItemDiscountAmount.Amount = 100
 
+	requestCitiPLCC := sleet_testing.BaseAuthorizationRequest()
+	requestCitiPLCC.CreditCard.Network = sleet.CreditCardNetworkCitiPLCC
+
 	cases := []struct {
 		label string
 		in    *sleet.AuthorizationRequest
@@ -150,6 +153,37 @@ func TestBuildAuthRequest(t *testing.T) {
 					"enhancedSchemeData.destinationPostalCode":          "94105",
 				},
 				ShopperReference: "test",
+			},
+		},
+		{
+			"CitiPLCC Auth Request",
+			requestCitiPLCC,
+			&checkout.PaymentRequest{
+				Amount: checkout.Amount{
+					Currency: "USD",
+					Value:    100,
+				},
+				BillingAddress: &checkout.Address{
+					City:            *requestCitiPLCC.BillingAddress.Locality,
+					Country:         *requestCitiPLCC.BillingAddress.CountryCode,
+					PostalCode:      *requestCitiPLCC.BillingAddress.PostalCode,
+					StateOrProvince: *requestCitiPLCC.BillingAddress.RegionCode,
+					Street:          *requestCitiPLCC.BillingAddress.StreetAddress1,
+				},
+				MerchantAccount: "merchant-account",
+				PaymentMethod: map[string]interface{}{
+					"number":      requestCitiPLCC.CreditCard.Number,
+					"expiryMonth": strconv.Itoa(base.CreditCard.ExpirationMonth),
+					"expiryYear":  strconv.Itoa(base.CreditCard.ExpirationYear),
+					"holderName":  requestCitiPLCC.CreditCard.FirstName + " " + requestCitiPLCC.CreditCard.LastName,
+					"cvc":         requestCitiPLCC.CreditCard.CVV,
+					"type":        "scheme",
+				},
+				ShopperInteraction:       "Ecommerce",
+				RecurringProcessingModel: "Subscription",
+				Reference:                *requestCitiPLCC.ClientTransactionReference,
+				StorePaymentMethod:       true,
+				ShopperReference:         "test",
 			},
 		},
 	}
