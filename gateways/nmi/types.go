@@ -12,6 +12,7 @@ type Request struct {
 	CVV             *string `form:"cvv,omitempty"`
 	FirstName       *string `form:"first_name,omitempty"`
 	LastName        *string `form:"last_name,omitempty"`
+	OrderID         string  `form:"orderid,omitempty"`
 	SecurityKey     string  `form:"security_key"`
 	State           *string `form:"state,omitempty"`
 	TestMode        *string `form:"test_mode"`
@@ -25,7 +26,7 @@ type Response struct {
 	AuthCode        string `form:"authcode"`
 	AVSResponseCode string `form:"avsresponse"`
 	CVVResponseCode string `form:"cvvresponse"`
-	OrderId         string `form:"orderid"`
+	OrderID         string `form:"orderid"`
 	Response        string `form:"response"`
 	ResponseCode    string `form:"response_code"`
 	ResponseText    string `form:"responsetext"`
