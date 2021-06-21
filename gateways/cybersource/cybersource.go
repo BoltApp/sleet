@@ -105,11 +105,17 @@ func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.
 	if err != nil {
 		return nil, err
 	}
-
+	if cybersourceResponse.ErrorInformation != nil {
+		return &sleet.CaptureResponse{
+			Success:   false,
+			ErrorCode: &cybersourceResponse.ErrorInformation.Reason,
+		}, nil
+	}
 	if cybersourceResponse.ErrorReason != nil || cybersourceResponse.ID == nil {
-		// return error
-		response := sleet.CaptureResponse{ErrorCode: cybersourceResponse.ErrorReason}
-		return &response, nil
+		return &sleet.CaptureResponse{
+			Success:   false,
+			ErrorCode: cybersourceResponse.ErrorReason,
+		}, nil
 	}
 	return &sleet.CaptureResponse{Success: true, TransactionReference: *cybersourceResponse.ID}, nil
 }
