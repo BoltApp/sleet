@@ -100,7 +100,7 @@ func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.
 	if err != nil {
 		return nil, err
 	}
-	capturePath := authPath + "/" + request.TransactionReference + "/captures"
+	capturePath := authPath + request.TransactionReference + "/captures"
 	cybersourceResponse, err := client.sendRequest(capturePath, cybersourceCaptureRequest)
 	if err != nil {
 		return nil, err
@@ -121,16 +121,22 @@ func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidRe
 	if err != nil {
 		return nil, err
 	}
-	voidPath := authPath + "/" + request.TransactionReference + "/voids"
+	voidPath := authPath + request.TransactionReference + "/voids"
 	cybersourceResponse, err := client.sendRequest(voidPath, cybersourceVoidRequest)
 	if err != nil {
 		return nil, err
 	}
-
+	if cybersourceResponse.ErrorInformation != nil {
+		return &sleet.VoidResponse{
+			Success:   false,
+			ErrorCode: &cybersourceResponse.ErrorInformation.Reason,
+		}, nil
+	}
 	if cybersourceResponse.ErrorReason != nil {
-		// return error
-		response := sleet.VoidResponse{ErrorCode: cybersourceResponse.ErrorReason}
-		return &response, nil
+		return &sleet.VoidResponse{
+			Success:   false,
+			ErrorCode: cybersourceResponse.ErrorReason,
+		}, nil
 	}
 	return &sleet.VoidResponse{TransactionReference: *cybersourceResponse.ID, Success: true}, nil
 }
@@ -142,16 +148,22 @@ func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 	if err != nil {
 		return nil, err
 	}
-	refundPath := authPath + "/" + request.TransactionReference + "/refunds"
+	refundPath := authPath + request.TransactionReference + "/refunds"
 	cybersourceResponse, err := client.sendRequest(refundPath, cybersourceRefundRequest)
 	if err != nil {
 		return nil, err
 	}
-
+	if cybersourceResponse.ErrorInformation != nil {
+		return &sleet.RefundResponse{
+			Success:   false,
+			ErrorCode: &cybersourceResponse.ErrorInformation.Reason,
+		}, nil
+	}
 	if cybersourceResponse.ErrorReason != nil {
-		// return error
-		response := sleet.RefundResponse{ErrorCode: cybersourceResponse.ErrorReason, Success: false}
-		return &response, nil
+		return &sleet.RefundResponse{
+			Success:   false,
+			ErrorCode: cybersourceResponse.ErrorReason,
+		}, nil
 	}
 	return &sleet.RefundResponse{Success: true, TransactionReference: *cybersourceResponse.ID}, nil
 }
