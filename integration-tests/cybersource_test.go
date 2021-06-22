@@ -1,11 +1,12 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/BoltApp/sleet/gateways/cybersource"
 	sleet_testing "github.com/BoltApp/sleet/testing"
-	"testing"
 )
 
 func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
@@ -111,5 +112,18 @@ func TestVoid(t *testing.T) {
 	}
 	if voidResp.ErrorCode != nil {
 		t.Errorf("Expected No Error Code: received: %s", *voidResp.ErrorCode)
+	}
+}
+
+func TestMissingReference(t *testing.T) {
+	client := cybersource.NewClient(common.Sandbox, getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
+	request := sleet_testing.BaseRefundRequest()
+	request.TransactionReference = ""
+	resp, err := client.Refund(request)
+	if err == nil {
+		t.Error("Expected error, received none")
+	}
+	if resp != nil {
+		t.Errorf("Expected no response, received %v", resp)
 	}
 }
