@@ -118,17 +118,12 @@ func TestVoid(t *testing.T) {
 func TestMissingReference(t *testing.T) {
 	client := cybersource.NewClient(common.Sandbox, getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
 	request := sleet_testing.BaseRefundRequest()
-	request.TransactionReference = "" // Cause 404 (request will go to "/pts/v2/payments//refunds")
+	request.TransactionReference = ""
 	resp, err := client.Refund(request)
-	if err != nil {
-		t.Errorf("Expected no error: received: %s", err)
+	if err == nil {
+		t.Error("Expected error, received none")
 	}
-	if resp.Success {
-		t.Errorf("Expected Success: received: %s", *resp.ErrorCode)
-	}
-	if resp.ErrorCode == nil {
-		t.Errorf("Expected error response, got nil")
-	} else if *resp.ErrorCode != "NOT_FOUND" {
-		t.Errorf("Expected error code NOT_FOUND, got %s", *resp.ErrorCode)
+	if resp != nil {
+		t.Errorf("Expected no response, received %v", resp)
 	}
 }

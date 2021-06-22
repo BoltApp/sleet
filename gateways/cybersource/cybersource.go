@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -96,6 +97,9 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 // Multiple captures can be made on the same authorization, but the total amount captured should not exceed the
 // total authorized amount.
 func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
+	if request.TransactionReference == "" {
+		return nil, errors.New("TransactionReference given to capture request is empty")
+	}
 	cybersourceCaptureRequest, err := buildCaptureRequest(request)
 	if err != nil {
 		return nil, err
@@ -123,6 +127,9 @@ func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.
 // Void cancels a CyberSource payment. If successful, the void response will be returned. A previously voided
 // payment or one that has already been settled cannot be voided.
 func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+	if request.TransactionReference == "" {
+		return nil, errors.New("TransactionReference given to void request is empty")
+	}
 	cybersourceVoidRequest, err := buildVoidRequest(request)
 	if err != nil {
 		return nil, err
@@ -150,6 +157,9 @@ func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidRe
 // Refund refunds a CyberSource payment. If successful, the refund response will be returned. Multiple
 // refunds can be made on the same payment, but the total amount refunded should not exceed the payment total.
 func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	if request.TransactionReference == "" {
+		return nil, errors.New("TransactionReference given to refund request is empty")
+	}
 	cybersourceRefundRequest, err := buildRefundRequest(request)
 	if err != nil {
 		return nil, err
