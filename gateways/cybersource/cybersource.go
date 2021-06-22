@@ -142,7 +142,7 @@ func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 	if err != nil {
 		return nil, err
 	}
-	refundPath := authPath + "/" + request.TransactionReference + "/refunds"
+	refundPath := authPath + request.TransactionReference + "/refunds"
 	cybersourceResponse, err := client.sendRequest(refundPath, cybersourceRefundRequest)
 	if err != nil {
 		return nil, err
