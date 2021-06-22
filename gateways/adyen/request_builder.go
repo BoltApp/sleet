@@ -133,6 +133,8 @@ func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *
 		request.RecurringProcessingModel = "CardOnFile"
 		request.ShopperInteraction = "ContAuth"
 	}
+	request.RecurringProcessingModel = "CardOnFile"
+	request.ShopperInteraction = "ContAuth"
 }
 
 func buildLevel3Data(level3Data *sleet.Level3Data) map[string]string {

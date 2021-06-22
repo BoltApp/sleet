@@ -67,6 +67,8 @@ func (client *FirstdataClient) Authorize(request *sleet.AuthorizationRequest) (*
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("Niraj niraj after auth call")
+	fmt.Printf("%+v\n", firstdataResponse)
 
 	success := false
 
@@ -195,6 +197,8 @@ func (client *FirstdataClient) sendRequest(reqId, url string, data Request) (*Re
 	if err != nil {
 		return nil, err
 	}
+	fmt.Printf("Creds: %+v\n", client.credentials )
+	fmt.Printf("Response body: %+v\n", resp )
 
 	defer resp.Body.Close()
 
@@ -202,6 +206,7 @@ func (client *FirstdataClient) sendRequest(reqId, url string, data Request) (*Re
 	if err != nil {
 		return nil, err
 	}
+	fmt.Printf("Response body: %+v", body )
 
 	var firstdataResponse Response
 	err = json.Unmarshal(body, &firstdataResponse)
