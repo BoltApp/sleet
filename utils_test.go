@@ -1,14 +1,15 @@
 package sleet
 
 import (
-	"github.com/google/go-cmp/cmp"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestAmountToString(t *testing.T) {
 	t.Run("convert", func(t *testing.T) {
 		actual := AmountToString(&Amount{
-			Amount: 100,
+			Amount:   100,
 			Currency: "USD",
 		})
 		if !cmp.Equal(actual, "100") {
@@ -20,7 +21,7 @@ func TestAmountToString(t *testing.T) {
 func TestAmountToDecimalString(t *testing.T) {
 	t.Run("convert", func(t *testing.T) {
 		actual := AmountToDecimalString(&Amount{
-			Amount: 100,
+			Amount:   100,
 			Currency: "USD",
 		})
 		if !cmp.Equal(actual, "1.00") {
@@ -30,28 +31,40 @@ func TestAmountToDecimalString(t *testing.T) {
 }
 
 func TestTruncateString(t *testing.T) {
-	const str = "Test string"
+	tests := []struct {
+		name          string
+		inputStr      string
+		inputTruncLen int
+		want          string
+	}{
+		{
+			name:          "Truncate length less than str length",
+			inputStr:      "Test string",
+			inputTruncLen: 4,
+			want:          "Test",
+		},
+		{
+			name:          "Truncate length equals str length",
+			inputStr:      "Test String",
+			inputTruncLen: 11,
+			want:          "Test String",
+		},
+		{
+			name:          "Truncate length greater than str length",
+			inputStr:      "Test String",
+			inputTruncLen: 20,
+			want:          "Test String",
+		},
+	}
 
-	t.Run("Truncate length less than str length", func(t *testing.T) {
-		truncated := TruncateString(str, 4)
-		if !cmp.Equal(truncated, "Test") {
-			t.Error("Truncated string does not match expected")
-		}
-	})
-
-	t.Run("Truncate length equals str length", func(t *testing.T) {
-		truncated := TruncateString(str, len(str))
-		if !cmp.Equal(truncated, str) {
-			t.Error("Truncated string does not match expected")
-		}
-	})
-
-	t.Run("Truncate length greater than str length", func(t *testing.T) {
-		truncated := TruncateString(str, len(str)+5)
-		if !cmp.Equal(truncated, str) {
-			t.Error("Truncated string does not match expected")
-		}
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			truncated := TruncateString(tt.inputStr, tt.inputTruncLen)
+			if !cmp.Equal(truncated, tt.want) {
+				t.Errorf("Truncated string does not match expected: %s", cmp.Diff(truncated, tt.want))
+			}
+		})
+	}
 }
 
 func TestDefaultIfEmpty(t *testing.T) {
