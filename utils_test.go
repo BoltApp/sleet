@@ -31,37 +31,47 @@ func TestAmountToDecimalString(t *testing.T) {
 }
 
 func TestTruncateString(t *testing.T) {
+	type args struct {
+		str            string
+		truncateLength int
+	}
+
 	tests := []struct {
-		name          string
-		inputStr      string
-		inputTruncLen int
-		want          string
+		name string
+		args args
+		want string
 	}{
 		{
-			name:          "Truncate length less than str length",
-			inputStr:      "Test string",
-			inputTruncLen: 4,
-			want:          "Test",
+			name: "Truncate length less than str length",
+			args: args{
+				str:            "Test String",
+				truncateLength: 4,
+			},
+			want: "Test",
 		},
 		{
-			name:          "Truncate length equals str length",
-			inputStr:      "Test String",
-			inputTruncLen: 11,
-			want:          "Test String",
+			name: "Truncate length equals str length",
+			args: args{
+				str:            "Test String",
+				truncateLength: 11,
+			},
+			want: "Test String",
 		},
 		{
-			name:          "Truncate length greater than str length",
-			inputStr:      "Test String",
-			inputTruncLen: 20,
-			want:          "Test String",
+			name: "Truncate length greater than str length",
+			args: args{
+				str:            "Test String",
+				truncateLength: 20,
+			},
+			want: "Test String",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			truncated := TruncateString(tt.inputStr, tt.inputTruncLen)
-			if !cmp.Equal(truncated, tt.want) {
-				t.Errorf("Truncated string does not match expected: %s", cmp.Diff(truncated, tt.want))
+			got := TruncateString(tt.args.str, tt.args.truncateLength)
+			if !cmp.Equal(got, tt.want) {
+				t.Errorf("Truncated string does not match expected: %s", cmp.Diff(got, tt.want))
 			}
 		})
 	}
