@@ -6,7 +6,33 @@ import (
 	"strconv"
 )
 
+const (
+	InitiatorTypeMerchant = "merchant"
+	InitiatorTypeConsumer = "consumer"
+)
+
+// add mappings
+var initiatorTypeToInitiatorType = map[sleet.ProcessingInitiatorType]string{
+	sleet.ProcessingInitiatorTypeInitialCardOnFile:         InitiatorTypeConsumer,
+	sleet.ProcessingInitiatorTypeInitialRecurring:          InitiatorTypeConsumer,
+	sleet.ProcessingInitiatorTypeStoredCardholderInitiated: InitiatorTypeConsumer,
+	sleet.ProcessingInitiatorTypeStoredMerchantInitiated:   InitiatorTypeMerchant,
+	sleet.ProcessingInitiatorTypeFollowingRecurring:        InitiatorTypeMerchant,
+}
+
+var initiatorTypeToCredentialStoredOnFile = map[sleet.ProcessingInitiatorType]bool{
+	sleet.ProcessingInitiatorTypeInitialCardOnFile:         true,
+	sleet.ProcessingInitiatorTypeInitialRecurring:          true,
+	sleet.ProcessingInitiatorTypeStoredCardholderInitiated: false,
+	sleet.ProcessingInitiatorTypeStoredMerchantInitiated:   false,
+	sleet.ProcessingInitiatorTypeFollowingRecurring:        false,
+}
+
 func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error) {
+	initiatorType := initiatorTypeToInitiatorType[*authRequest.ProcessingInitiator]
+	credentialStoredOnFile := initiatorTypeToCredentialStoredOnFile[*authRequest.ProcessingInitiator]
+	storedCredentialUsed := !credentialStoredOnFile
+
 	amountStr := sleet.AmountToDecimalString(&authRequest.Amount)
 	request := &Request{
 		ClientReferenceInformation: &ClientReferenceInformation{
@@ -17,6 +43,13 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 		ProcessingInformation: &ProcessingInformation{
 			Capture:           false, // no autocapture for now
 			CommerceIndicator: "internet",
+			AuthorizationOptions: &AuthorizationOptions{
+				Initiator: &Initiator{
+					InitiatorType: initiatorType,
+					CredentialStoredOnFile: credentialStoredOnFile,
+					StoredCredentialUsed: storedCredentialUsed,
+				},
+			},
 		},
 		PaymentInformation: &PaymentInformation{
 			Card: CardInformation{
