@@ -20,16 +20,30 @@ var initiatorTypeToInitiatorType = map[sleet.ProcessingInitiatorType]string{
 	sleet.ProcessingInitiatorTypeFollowingRecurring:        InitiatorTypeMerchant,
 }
 
+var initiatorTypeToCredentialStoredOnFile = map[sleet.ProcessingInitiatorType]bool{
+	sleet.ProcessingInitiatorTypeInitialCardOnFile:         true,
+	sleet.ProcessingInitiatorTypeInitialRecurring:          true,
+	sleet.ProcessingInitiatorTypeStoredCardholderInitiated: false,
+	sleet.ProcessingInitiatorTypeStoredMerchantInitiated:   false,
+	sleet.ProcessingInitiatorTypeFollowingRecurring:        false,
+}
+
+var initiatorTypeToStoredCredentialUsed = map[sleet.ProcessingInitiatorType]bool{
+	sleet.ProcessingInitiatorTypeInitialCardOnFile:         false,
+	sleet.ProcessingInitiatorTypeInitialRecurring:          false,
+	sleet.ProcessingInitiatorTypeStoredCardholderInitiated: true,
+	sleet.ProcessingInitiatorTypeStoredMerchantInitiated:   true,
+	sleet.ProcessingInitiatorTypeFollowingRecurring:        true,
+}
+
 func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error) {
-	initiatorType := initiatorTypeToInitiatorType[*authRequest.ProcessingInitiator]
-	credentialStoredOnFile := false
-	storedCredentialUsed := false
+	var initiatorType string
+	var credentialStoredOnFile bool
+	var storedCredentialUsed bool
 	if authRequest.ProcessingInitiator != nil {
-		if *authRequest.ProcessingInitiator == sleet.ProcessingInitiatorTypeInitialCardOnFile || *authRequest.ProcessingInitiator == sleet.ProcessingInitiatorTypeInitialRecurring {
-			credentialStoredOnFile = true
-		} else {
-			storedCredentialUsed = true
-		}
+		initiatorType = initiatorTypeToInitiatorType[*authRequest.ProcessingInitiator]
+		credentialStoredOnFile = initiatorTypeToCredentialStoredOnFile[*authRequest.ProcessingInitiator]
+		storedCredentialUsed = initiatorTypeToStoredCredentialUsed[*authRequest.ProcessingInitiator]
 	}
 
 	amountStr := sleet.AmountToDecimalString(&authRequest.Amount)
