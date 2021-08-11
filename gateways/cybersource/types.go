@@ -64,10 +64,11 @@ type ProcessorInformation struct {
 
 // ProcessingInformation specifies various fields for authorize for options (auto-capture, Level3 Data, etc)
 type ProcessingInformation struct {
-	Capture           bool   `json:"capture,omitempty"`
-	CommerceIndicator string `json:"commerceIndicator"` // typically internet
-	PaymentSolution   string `json:"paymentSolution"`
-	PurchaseLevel     string `json:"purchaseLevel,omitempty"` // Specifies if level 3 data is being sent
+	Capture              bool                  `json:"capture,omitempty"`
+	CommerceIndicator    string                `json:"commerceIndicator"` // typically internet
+	PaymentSolution      string                `json:"paymentSolution"`
+	PurchaseLevel        string                `json:"purchaseLevel,omitempty"` // Specifies if level 3 data is being sent
+	AuthorizationOptions *AuthorizationOptions `json:"authorizationOptions,omitempty"`
 }
 
 // OrderInformation is also used for authorize mainly to specify billing details and other Level3 items
@@ -159,4 +160,14 @@ type Links struct {
 type Link struct {
 	Href   string `json:"href"`
 	Method string `json:"method"`
+}
+
+type AuthorizationOptions struct {
+	Initiator *Initiator `json:"initiator,omitempty"`
+}
+
+type Initiator struct {
+	InitiatorType          string `json:"type"`
+	CredentialStoredOnFile bool   `json:"credentialStoredOnFile"`
+	StoredCredentialUsed   bool   `json:"storedCredentialUsed"`
 }
