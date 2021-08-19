@@ -60,6 +60,7 @@ type ProcessorInformation struct {
 		Code    string `json:"code"`
 		CodeRaw string `json:"codeRaw"`
 	} `json:"avs"`
+	TransactionID string `json:"transactionId"`
 }
 
 // ProcessingInformation specifies various fields for authorize for options (auto-capture, Level3 Data, etc)
