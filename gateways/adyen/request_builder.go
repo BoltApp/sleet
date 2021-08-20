@@ -100,8 +100,8 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		request.AdditionalData = buildLevel3Data(level3)
 	}
 
-	// Attach results of 3DS verification was performed
-	if authRequest.ThreeDS != nil {
+	// Attach results of 3DS verification if performed (and not "R"ejected)
+	if authRequest.ThreeDS != nil && authRequest.ThreeDS.PAResStatus != "R" {
 		request.MpiData = &checkout.ThreeDSecureData{
 			Cavv:              authRequest.ThreeDS.CAVV,
 			CavvAlgorithm:     authRequest.ThreeDS.CAVVAlgorithm,
