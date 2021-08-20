@@ -81,6 +81,7 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 	response := &sleet.AuthorizationResponse{
 		Success:              success,
 		TransactionReference: *cybersourceResponse.ID,
+		TransactionID:        cybersourceResponse.ProcessorInformation.TransactionID,
 		Response:             cybersourceResponse.Status,
 		ErrorCode:            errorCode,
 	}

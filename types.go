@@ -100,6 +100,7 @@ type AuthorizationResponse struct {
 	// treating Sleet as a black box.
 	Success              bool
 	TransactionReference string
+	TransactionID        string
 	AvsResult            AVSResponse
 	CvvResult            CVVResponse
 	Response             string
