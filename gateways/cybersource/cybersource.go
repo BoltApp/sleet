@@ -79,10 +79,11 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 	}
 
 	response := &sleet.AuthorizationResponse{
-		Success:              success,
-		TransactionReference: *cybersourceResponse.ID,
-		Response:             cybersourceResponse.Status,
-		ErrorCode:            errorCode,
+		Success:               success,
+		TransactionReference:  *cybersourceResponse.ID,
+		ExternalTransactionID: cybersourceResponse.ProcessorInformation.TransactionID,
+		Response:              cybersourceResponse.Status,
+		ErrorCode:             errorCode,
 	}
 	if cybersourceResponse.ProcessorInformation != nil {
 		response.AvsResult = translateAvs(cybersourceResponse.ProcessorInformation.AVS.Code)

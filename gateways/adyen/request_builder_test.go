@@ -206,8 +206,11 @@ func TestBuild3DSAuthRequest(t *testing.T) {
 		t.Errorf("expected no 3DS fields in request since none were provided but got %v", result.MpiData)
 	}
 
+	// Rejected flow
+	request = sleet_testing.BaseAuthorizationRequest()
+	request.ThreeDS = sleet_testing.Base3DS()
 	request.ThreeDS.PAResStatus = "R"
-	result := buildAuthRequest(request, "merchant-account")
+	result = buildAuthRequest(request, "merchant-account")
 	if result.MpiData != nil {
 		t.Errorf("expected no 3DS fields in request due to rejection status but got %v", result.MpiData)
 	}
