@@ -197,3 +197,30 @@ func TestBuildAuthRequest(t *testing.T) {
 		})
 	}
 }
+
+func TestBuild3DSAuthRequest(t *testing.T) {
+	request := sleet_testing.BaseAuthorizationRequest()
+	result := buildAuthRequest(request, "merchant-account")
+	if result.MpiData != nil {
+		t.Errorf("expected no 3DS fields in request since none were provided but got %v", result.MpiData)
+	}
+
+	request = sleet_testing.BaseAuthorizationRequest()
+	request.ThreeDS = sleet_testing.Base3DS()
+	request.ECI = "eci"
+	result = buildAuthRequest(request, "merchant-account")
+	if result.MpiData == nil {
+		expected := &checkout.ThreeDSecureData{
+			Cavv:              "cavv",
+			CavvAlgorithm:     "cavv-algorithm",
+			DirectoryResponse: "pares-status",
+			DsTransID:         "pares-status",
+			Eci:               "eci",
+			ThreeDSVersion:    "version",
+			Xid:               "xid",
+		}
+		if diff := deep.Equal(result.MpiData, expected); diff != nil {
+			t.Error(diff)
+		}
+	}
+}

@@ -111,3 +111,19 @@ func BaseRefundRequest() *sleet.RefundRequest {
 		Last4:                      "1111",
 	}
 }
+
+// Base3DS provides a template with 3DS authorization data. Fields are populated by their names
+// since no valid values will exist without first having run 3DS.
+func Base3DS() *sleet.ThreeDS {
+	return &sleet.ThreeDS{
+		Frictionless:     false,
+		ACSTransactionID: "acs-transaction-id",
+		CAVV:             "cavv",
+		CAVVAlgorithm:    "cavv-algorithm",
+		DSTransactionID:  "ds-transaction-id",
+		PAResStatus:      "pares-status",
+		UCAFIndicator:    "ucaf-indicator",
+		Version:          "version",
+		XID:              "xid",
+	}
+}
