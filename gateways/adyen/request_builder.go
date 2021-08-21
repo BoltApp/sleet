@@ -100,6 +100,23 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		request.AdditionalData = buildLevel3Data(level3)
 	}
 
+	// Attach results of 3DS verification if performed (and not "R"ejected)
+	if authRequest.ThreeDS != nil && authRequest.ThreeDS.PAResStatus != sleet.ThreedsStatusRejected {
+		request.MpiData = &checkout.ThreeDSecureData{
+			Cavv:              authRequest.ThreeDS.CAVV,
+			CavvAlgorithm:     authRequest.ThreeDS.CAVVAlgorithm,
+			DirectoryResponse: authRequest.ThreeDS.PAResStatus, // Same as DsTransID for 3DS2
+			DsTransID:         authRequest.ThreeDS.PAResStatus,
+			Eci:               authRequest.ECI,
+			ThreeDSVersion:    authRequest.ThreeDS.Version,
+			Xid:               authRequest.ThreeDS.XID,
+		}
+		// Only pass these fields for challenge flow
+		if !authRequest.ThreeDS.Frictionless {
+			request.MpiData.AuthenticationResponse = authRequest.ThreeDS.PAResStatus
+		}
+	}
+
 	return request
 }
 

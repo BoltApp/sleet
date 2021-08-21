@@ -88,6 +88,7 @@ type AuthorizationRequest struct {
 	PreviousExternalTransactionID *string
 	Options                       map[string]interface{}
 	ShopperReference              string // shopperReference used to get adyen recurring info
+	ThreeDS                       *ThreeDS
 }
 
 // AuthorizationResponse is a generic response returned back to client after data massaging from PsP Response
@@ -177,4 +178,17 @@ type RTAUResponse struct {
 	UpdatedExpiry               *time.Time
 	UpdatedBIN                  string
 	UpdatedLast4                string
+}
+
+// ThreeDS holds results from a 3DS verification challenge.
+type ThreeDS struct {
+	Frictionless     bool   // Whether the 3DS flow for this transaction was frictionless
+	ACSTransactionID string // Transaction ID assigned by ACS
+	CAVV             string // Cardholder Authentication Value
+	CAVVAlgorithm    string // Algorithm used to calculate CAVV
+	DSTransactionID  string // Directory Server (DS) Transaction ID (for 3DS2)
+	PAResStatus      string // Transaction status result
+	UCAFIndicator    string // Universal Cardholder Authentication Field Indicator value provided by issuer
+	Version          string // 3DS Version
+	XID              string // Transaction ID from authentication processing (for 3DS1)
 }
