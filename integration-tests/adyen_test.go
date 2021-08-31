@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -165,6 +166,9 @@ func TestAdyenAVSCode2(t *testing.T) {
 //
 // This should successfully create an authorization on Adyen for a new customer
 func TestAdyenAuth(t *testing.T) {
+	fmt.Println(getEnv("ADYEN_ACCOUNT"))
+	fmt.Println(len(getEnv("ADYEN_KEY")))
+	fmt.Println(getEnv("ADYEN_KEY")[:5])
 	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
 	request := adyenBaseAuthRequest()
 	auth, err := client.Authorize(request)
