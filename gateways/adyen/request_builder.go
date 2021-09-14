@@ -66,11 +66,9 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		ShopperReference: authRequest.ShopperReference,
 	}
 
-	addBillingAddress(authRequest, request)
 	addPaymentSpecificFields(authRequest, request)
-	addShopperIP(authRequest, request)
-	addShopperEmail(authRequest, request)
-	addShippingAddress(authRequest, request)
+	addShopperData(authRequest, request)
+	addAddresses(authRequest, request)
 
 	// overwrites the flag transactions
 	if authRequest.ProcessingInitiator != nil {
@@ -145,8 +143,8 @@ func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *
 	}
 }
 
-// addBillingAddress adds the billing address to the Ayden Payment request if available
-func addBillingAddress(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
+// addAddresses adds the billing address and shipping address to the Ayden Payment request if available
+func addAddresses(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
 	if authRequest.BillingAddress != nil {
 		request.BillingAddress = &checkout.Address{
 			City:              common.SafeStr(authRequest.BillingAddress.Locality),
@@ -157,24 +155,6 @@ func addBillingAddress(authRequest *sleet.AuthorizationRequest, request *checkou
 			Street:            common.SafeStr(authRequest.BillingAddress.StreetAddress1),
 		}
 	}
-}
-
-// addShopperIP adds the shoppers IP to the Ayden Payment request if available
-func addShopperIP(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
-	if authRequest.ShopperIP != nil {
-		request.ShopperIP = common.SafeStr(authRequest.ShopperIP)
-	}
-}
-
-// addShopperEmail adds the shoppers email to the Ayden Payment request if available
-func addShopperEmail(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
-	if authRequest.ShopperEmail != nil {
-		request.ShopperEmail = common.SafeStr(authRequest.ShopperEmail)
-	}
-}
-
-// addShippingAddress adds the shipping address to the Ayden Payment request if available
-func addShippingAddress(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
 	if authRequest.ShippingAddress != nil {
 		request.DeliveryAddress = &checkout.Address{
 			City:              common.SafeStr(authRequest.ShippingAddress.Locality),
@@ -184,6 +164,16 @@ func addShippingAddress(authRequest *sleet.AuthorizationRequest, request *checko
 			StateOrProvince:   common.SafeStr(authRequest.ShippingAddress.RegionCode),
 			Street:            common.SafeStr(authRequest.ShippingAddress.StreetAddress1),
 		}
+	}
+}
+
+// addShopperData adds the shoppers IP and email to the Ayden Payment request if available
+func addShopperData(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
+	if authRequest.ShopperIP != nil {
+		request.ShopperIP = common.SafeStr(authRequest.ShopperIP)
+	}
+	if authRequest.ShopperEmail != nil {
+		request.ShopperEmail = common.SafeStr(authRequest.ShopperEmail)
 	}
 }
 
