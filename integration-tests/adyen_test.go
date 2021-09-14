@@ -177,6 +177,24 @@ func TestAdyenAuth(t *testing.T) {
 	}
 }
 
+// TestAdyenAuthWithIPEmailShippingAddress
+//
+// This should successfully create an authorization on Adyen for a new customer with IP, email, and shipping address
+// included
+func TestAdyenAuthWithIPEmailShippingAddress(t *testing.T) {
+	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
+	request := adyenBaseAuthRequest()
+	adyenEnhanceAuthRequestIPEmailShipping(request)
+	auth, err := client.Authorize(request)
+	if err != nil {
+		t.Error("Authorize request should not have failed")
+	}
+
+	if !auth.Success {
+		t.Error("Resulting auth should have been successful")
+	}
+}
+
 // TestAdyenRechargeAuth
 //
 // This should successfully create an authorization on Adyen for an existing customer
@@ -348,4 +366,10 @@ func adyenBaseAuthRequest() *sleet.AuthorizationRequest {
 	request.CreditCard.ExpirationMonth = 3
 	request.CreditCard.ExpirationYear = 2030
 	return request
+}
+
+func adyenEnhanceAuthRequestIPEmailShipping(request *sleet.AuthorizationRequest) {
+	request.ShopperEmail = sPtr("test@bolt.com")
+	request.ShopperIP = sPtr("192.168.0.0")
+	request.ShippingAddress = request.BillingAddress
 }
