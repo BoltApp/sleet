@@ -104,7 +104,7 @@ func TestBuildAuthRequest(t *testing.T) {
 					Street:          *baseWithAydenData.ShippingAddress.StreetAddress1,
 				},
 				ShopperEmail: *baseWithAydenData.ShopperEmail,
-				ShopperIP:    *baseWithAydenData.ShopperIP,
+				ShopperIP:    "192.168.0.0",
 			},
 		},
 		{
@@ -282,7 +282,10 @@ func TestBuild3DSAuthRequest(t *testing.T) {
 }
 
 func enhanceBaseAuthorizationDataWithAdditionalFields(authRequest *sleet.AuthorizationRequest) {
-	authRequest.ShopperIP = common.SPtr("192.168.0.0")
+	if authRequest.Options == nil {
+		authRequest.Options = make(map[string]interface{})
+	}
+	authRequest.Options["ShopperIP"] = "192.168.0.0"
 	authRequest.ShopperEmail = common.SPtr("test@bolt.com")
 	authRequest.ShippingAddress = &sleet.Address{
 		PostalCode:     common.SPtr("94103"),

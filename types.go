@@ -83,7 +83,6 @@ type AuthorizationRequest struct {
 	ECI                        string  // E-Commerce Indicator (can be used for Network Tokenization as well)
 	MerchantOrderReference     string  // Similar to ClientTransactionReference but specifically if we want to store the shopping cart order id
 	ShippingAddress            *Address
-	ShopperIP                  *string
 	ShopperEmail               *string
 
 	// For Card on File transactions we want to store the various different types (initial cof, initial recurring, etc)

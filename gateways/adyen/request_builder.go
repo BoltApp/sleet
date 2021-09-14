@@ -169,8 +169,8 @@ func addAddresses(authRequest *sleet.AuthorizationRequest, request *checkout.Pay
 
 // addShopperData adds the shoppers IP and email to the Ayden Payment request if available
 func addShopperData(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
-	if authRequest.ShopperIP != nil {
-		request.ShopperIP = common.SafeStr(authRequest.ShopperIP)
+	if authRequest.Options["ShopperIP"] != nil {
+		request.ShopperIP = authRequest.Options["ShopperIP"].(string)
 	}
 	if authRequest.ShopperEmail != nil {
 		request.ShopperEmail = common.SafeStr(authRequest.ShopperEmail)
