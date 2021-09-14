@@ -18,8 +18,9 @@ type Amount struct {
 	Currency string
 }
 
-// BillingAddress used for AVS checks for auth calls
-type BillingAddress struct {
+// Address generic address to represent billing address, shipping address, etc.
+// used for AVS checks for auth calls
+type Address struct {
 	StreetAddress1 *string
 	StreetAddress2 *string
 	Locality       *string
@@ -74,13 +75,16 @@ type Level3Data struct {
 type AuthorizationRequest struct {
 	Amount                     Amount
 	CreditCard                 *CreditCard
-	BillingAddress             *BillingAddress
+	BillingAddress             *Address
 	Level3Data                 *Level3Data
 	ClientTransactionReference *string // Custom transaction reference metadata that will be associated with this request
 	Channel                    string  // for Psps that track the sales channel
 	Cryptogram                 string  // for Network Tokenization methods
 	ECI                        string  // E-Commerce Indicator (can be used for Network Tokenization as well)
 	MerchantOrderReference     string  // Similar to ClientTransactionReference but specifically if we want to store the shopping cart order id
+	ShippingAddress            *Address
+	ShopperIP                  *string
+	ShopperEmail               *string
 
 	// For Card on File transactions we want to store the various different types (initial cof, initial recurring, etc)
 	// If we are in a recurring situation, then we can use the PreviousExternalTransactionID as part of the auth request

@@ -60,7 +60,7 @@ func TestAdyenAuthFailedAVSPresent(t *testing.T) {
 	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
 	expiredRequest := adyenBaseAuthRequest()
 	expiredRequest.CreditCard.ExpirationYear = 2010
-	expiredRequest.BillingAddress = &sleet.BillingAddress{
+	expiredRequest.BillingAddress = &sleet.Address{
 		StreetAddress1: common.SPtr("1600 Pennsylvania Ave NE"),
 		Locality:       common.SPtr("Washington"),
 		CountryCode:    common.SPtr("US"),
@@ -102,7 +102,7 @@ func TestAdyenAVSCode1(t *testing.T) {
 	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
 	avsRequest := adyenBaseAuthRequest()
 	avsRequest.CreditCard.Number = "5500000000000004"
-	avsRequest.BillingAddress = &sleet.BillingAddress{
+	avsRequest.BillingAddress = &sleet.Address{
 		StreetAddress1: common.SPtr("1600 Pennsylvania Ave NE"),
 		Locality:       common.SPtr("Washington"),
 		CountryCode:    common.SPtr("US"),
@@ -136,7 +136,7 @@ func TestAdyenAVSCode2(t *testing.T) {
 	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
 	avsRequest := adyenBaseAuthRequest()
 	avsRequest.CreditCard.Number = "5500000000000004"
-	avsRequest.BillingAddress = &sleet.BillingAddress{
+	avsRequest.BillingAddress = &sleet.Address{
 		StreetAddress1: common.SPtr("1599 Pennsylvania Ave NE"),
 		Locality:       common.SPtr("Washington"),
 		CountryCode:    common.SPtr("US"),

@@ -1,3 +1,4 @@
+//go:build unit
 // +build unit
 
 package adyen
@@ -10,6 +11,7 @@ import (
 	"github.com/adyen/adyen-go-api-library/v4/src/checkout"
 	"github.com/go-test/deep"
 
+	"github.com/BoltApp/sleet/common"
 	sleet_testing "github.com/BoltApp/sleet/testing"
 )
 
@@ -22,6 +24,9 @@ func TestBuildAuthRequest(t *testing.T) {
 	requestWithLevel3ItemDiscount := sleet_testing.BaseAuthorizationRequest()
 	requestWithLevel3ItemDiscount.Level3Data = sleet_testing.BaseLevel3Data()
 	requestWithLevel3ItemDiscount.Level3Data.LineItems[0].ItemDiscountAmount.Amount = 100
+
+	baseWithAydenData := sleet_testing.BaseAuthorizationRequest()
+	enhanceBaseAuthorizationDataWithAdditionalFields(baseWithAydenData)
 
 	requestCitiPLCC := sleet_testing.BaseAuthorizationRequest()
 	requestCitiPLCC.CreditCard.Network = sleet.CreditCardNetworkCitiPLCC
@@ -60,6 +65,46 @@ func TestBuildAuthRequest(t *testing.T) {
 				Reference:                *base.ClientTransactionReference,
 				StorePaymentMethod:       true,
 				ShopperReference:         "test",
+			},
+		},
+		{
+			"Auth Request with additional Ayden data",
+			baseWithAydenData,
+			&checkout.PaymentRequest{
+				Amount: checkout.Amount{
+					Currency: "USD",
+					Value:    100,
+				},
+				BillingAddress: &checkout.Address{
+					City:            *baseWithAydenData.BillingAddress.Locality,
+					Country:         *baseWithAydenData.BillingAddress.CountryCode,
+					PostalCode:      *baseWithAydenData.BillingAddress.PostalCode,
+					StateOrProvince: *baseWithAydenData.BillingAddress.RegionCode,
+					Street:          *baseWithAydenData.BillingAddress.StreetAddress1,
+				},
+				MerchantAccount: "merchant-account",
+				PaymentMethod: map[string]interface{}{
+					"number":      baseWithAydenData.CreditCard.Number,
+					"expiryMonth": strconv.Itoa(baseWithAydenData.CreditCard.ExpirationMonth),
+					"expiryYear":  strconv.Itoa(baseWithAydenData.CreditCard.ExpirationYear),
+					"holderName":  baseWithAydenData.CreditCard.FirstName + " " + baseWithAydenData.CreditCard.LastName,
+					"cvc":         baseWithAydenData.CreditCard.CVV,
+					"type":        "scheme",
+				},
+				ShopperInteraction:       "Ecommerce",
+				RecurringProcessingModel: "CardOnFile",
+				Reference:                *baseWithAydenData.ClientTransactionReference,
+				StorePaymentMethod:       true,
+				ShopperReference:         "test",
+				DeliveryAddress: &checkout.Address{
+					City:            *baseWithAydenData.ShippingAddress.Locality,
+					Country:         *baseWithAydenData.ShippingAddress.CountryCode,
+					PostalCode:      *baseWithAydenData.ShippingAddress.PostalCode,
+					StateOrProvince: *baseWithAydenData.ShippingAddress.RegionCode,
+					Street:          *baseWithAydenData.ShippingAddress.StreetAddress1,
+				},
+				ShopperEmail: *baseWithAydenData.ShopperEmail,
+				ShopperIP:    *baseWithAydenData.ShopperIP,
 			},
 		},
 		{
@@ -233,5 +278,17 @@ func TestBuild3DSAuthRequest(t *testing.T) {
 		if diff := deep.Equal(result.MpiData, expected); diff != nil {
 			t.Error(diff)
 		}
+	}
+}
+
+func enhanceBaseAuthorizationDataWithAdditionalFields(authRequest *sleet.AuthorizationRequest) {
+	authRequest.ShopperIP = common.SPtr("192.168.0.0")
+	authRequest.ShopperEmail = common.SPtr("test@bolt.com")
+	authRequest.ShippingAddress = &sleet.Address{
+		PostalCode:     common.SPtr("94103"),
+		CountryCode:    common.SPtr("US"),
+		StreetAddress1: common.SPtr("7683 Railroad Street"),
+		Locality:       common.SPtr("Zion"),
+		RegionCode:     common.SPtr("IL"),
 	}
 }
