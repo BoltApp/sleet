@@ -31,6 +31,18 @@ type Address struct {
 	Email          *string
 }
 
+// BillingAddress for backwards compatibility
+type BillingAddress struct {
+	StreetAddress1 *string
+	StreetAddress2 *string
+	Locality       *string
+	RegionCode     *string
+	PostalCode     *string
+	CountryCode    *string // ISO 2-digit code
+	Company        *string
+	Email          *string
+}
+
 // CreditCard represents raw credit card information
 type CreditCard struct {
 	FirstName       string
@@ -74,7 +86,7 @@ type Level3Data struct {
 // Note: Options is a generic key-value pair that can be used to provide additional information to PsP
 type AuthorizationRequest struct {
 	Amount                        Amount
-	BillingAddress                *Address
+	BillingAddress                *BillingAddress
 	Channel                       string  // for Psps that track the sales channel
 	ClientTransactionReference    *string // Custom transaction reference metadata that will be associated with this request
 	CreditCard                    *CreditCard
