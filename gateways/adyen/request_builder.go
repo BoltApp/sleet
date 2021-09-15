@@ -172,8 +172,8 @@ func addShopperData(authRequest *sleet.AuthorizationRequest, request *checkout.P
 	if authRequest.Options["ShopperIP"] != nil {
 		request.ShopperIP = authRequest.Options["ShopperIP"].(string)
 	}
-	if authRequest.ShopperEmail != nil {
-		request.ShopperEmail = common.SafeStr(authRequest.ShopperEmail)
+	if authRequest.BillingAddress.Email != nil {
+		request.ShopperEmail = common.SafeStr(authRequest.BillingAddress.Email)
 	}
 }
 

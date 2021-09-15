@@ -369,7 +369,7 @@ func adyenBaseAuthRequest() *sleet.AuthorizationRequest {
 }
 
 func adyenEnhanceAuthRequestIPEmailShipping(request *sleet.AuthorizationRequest) {
-	request.ShopperEmail = sPtr("test@bolt.com")
+	request.BillingAddress.Email = sPtr("test@bolt.com")
 	request.ShippingAddress = request.BillingAddress
 
 	if request.Options == nil {

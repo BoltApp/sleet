@@ -286,7 +286,7 @@ func enhanceBaseAuthorizationDataWithAdditionalFields(authRequest *sleet.Authori
 		authRequest.Options = make(map[string]interface{})
 	}
 	authRequest.Options["ShopperIP"] = "192.168.0.0"
-	authRequest.ShopperEmail = common.SPtr("test@bolt.com")
+	authRequest.BillingAddress.Email = common.SPtr("test@bolt.com")
 	authRequest.ShippingAddress = &sleet.Address{
 		PostalCode:     common.SPtr("94103"),
 		CountryCode:    common.SPtr("US"),
