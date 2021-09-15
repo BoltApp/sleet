@@ -12,7 +12,7 @@ func BaseAuthorizationRequest() *sleet.AuthorizationRequest {
 		Amount:   100,
 		Currency: "USD",
 	}
-	address := sleet.Address{
+	address := sleet.BillingAddress{
 		PostalCode:     common.SPtr("94103"),
 		CountryCode:    common.SPtr("US"),
 		StreetAddress1: common.SPtr("7683 Railroad Street"),
