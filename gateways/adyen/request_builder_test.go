@@ -103,7 +103,7 @@ func TestBuildAuthRequest(t *testing.T) {
 					StateOrProvince: *baseWithAydenData.ShippingAddress.RegionCode,
 					Street:          *baseWithAydenData.ShippingAddress.StreetAddress1,
 				},
-				ShopperEmail: *baseWithAydenData.ShopperEmail,
+				ShopperEmail: *baseWithAydenData.BillingAddress.Email,
 				ShopperIP:    "192.168.0.0",
 			},
 		},
