@@ -31,6 +31,9 @@ type Address struct {
 	Email          *string
 }
 
+// BillingAddress for backwards compatibility
+type BillingAddress = Address
+
 // CreditCard represents raw credit card information
 type CreditCard struct {
 	FirstName       string
