@@ -18,8 +18,9 @@ type Amount struct {
 	Currency string
 }
 
-// BillingAddress used for AVS checks for auth calls
-type BillingAddress struct {
+// Address generic address to represent billing address, shipping address, etc.
+// used for AVS checks for auth calls
+type Address struct {
 	StreetAddress1 *string
 	StreetAddress2 *string
 	Locality       *string
@@ -72,23 +73,22 @@ type Level3Data struct {
 // Note: Only credit cards are supported
 // Note: Options is a generic key-value pair that can be used to provide additional information to PsP
 type AuthorizationRequest struct {
-	Amount                     Amount
-	CreditCard                 *CreditCard
-	BillingAddress             *BillingAddress
-	Level3Data                 *Level3Data
-	ClientTransactionReference *string // Custom transaction reference metadata that will be associated with this request
-	Channel                    string  // for Psps that track the sales channel
-	Cryptogram                 string  // for Network Tokenization methods
-	ECI                        string  // E-Commerce Indicator (can be used for Network Tokenization as well)
-	MerchantOrderReference     string  // Similar to ClientTransactionReference but specifically if we want to store the shopping cart order id
-
-	// For Card on File transactions we want to store the various different types (initial cof, initial recurring, etc)
-	// If we are in a recurring situation, then we can use the PreviousExternalTransactionID as part of the auth request
-	ProcessingInitiator           *ProcessingInitiatorType
-	PreviousExternalTransactionID *string
-	Options                       map[string]interface{}
+	Amount                        Amount
+	BillingAddress                *Address
+	Channel                       string  // for Psps that track the sales channel
+	ClientTransactionReference    *string // Custom transaction reference metadata that will be associated with this request
+	CreditCard                    *CreditCard
+	Cryptogram                    string // for Network Tokenization methods
+	ECI                           string // E-Commerce Indicator (can be used for Network Tokenization as well)
+	Level3Data                    *Level3Data
+	MerchantOrderReference        string                   // Similar to ClientTransactionReference but specifically if we want to store the shopping cart order id
+	PreviousExternalTransactionID *string                  // If we are in a recurring situation, then we can use the PreviousExternalTransactionID as part of the auth request
+	ProcessingInitiator           *ProcessingInitiatorType // For Card on File transactions we want to store the various different types (initial cof, initial recurring, etc)
+	ShippingAddress               *Address
 	ShopperReference              string // shopperReference used to get adyen recurring info
 	ThreeDS                       *ThreeDS
+
+	Options map[string]interface{}
 }
 
 // AuthorizationResponse is a generic response returned back to client after data massaging from PsP Response

@@ -14,7 +14,7 @@ func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
 	client := cybersource.NewClient(common.Sandbox, getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	authRequest.ClientTransactionReference = sPtr("[auth]-CUSTOMER-REFERENCE-CODE") // This will be overridden by the level 3 CustomerReference
-	authRequest.BillingAddress = &sleet.BillingAddress{
+	authRequest.BillingAddress = &sleet.Address{
 		StreetAddress1: sPtr("77 Geary St"),
 		StreetAddress2: sPtr("Floor 4"),
 		Locality:       sPtr("San Francisco"),
@@ -84,7 +84,7 @@ func TestVoid(t *testing.T) {
 	client := cybersource.NewClient(common.Sandbox, getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	authRequest.ClientTransactionReference = sPtr("[auth]-CUSTOMER-REFERENCE-CODE")
-	authRequest.BillingAddress = &sleet.BillingAddress{
+	authRequest.BillingAddress = &sleet.Address{
 		StreetAddress1: sPtr("77 Geary St"),
 		StreetAddress2: sPtr("Floor 4"),
 		Locality:       sPtr("San Francisco"),

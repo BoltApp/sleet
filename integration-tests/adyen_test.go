@@ -60,7 +60,7 @@ func TestAdyenAuthFailedAVSPresent(t *testing.T) {
 	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
 	expiredRequest := adyenBaseAuthRequest()
 	expiredRequest.CreditCard.ExpirationYear = 2010
-	expiredRequest.BillingAddress = &sleet.BillingAddress{
+	expiredRequest.BillingAddress = &sleet.Address{
 		StreetAddress1: common.SPtr("1600 Pennsylvania Ave NE"),
 		Locality:       common.SPtr("Washington"),
 		CountryCode:    common.SPtr("US"),
@@ -102,7 +102,7 @@ func TestAdyenAVSCode1(t *testing.T) {
 	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
 	avsRequest := adyenBaseAuthRequest()
 	avsRequest.CreditCard.Number = "5500000000000004"
-	avsRequest.BillingAddress = &sleet.BillingAddress{
+	avsRequest.BillingAddress = &sleet.Address{
 		StreetAddress1: common.SPtr("1600 Pennsylvania Ave NE"),
 		Locality:       common.SPtr("Washington"),
 		CountryCode:    common.SPtr("US"),
@@ -136,7 +136,7 @@ func TestAdyenAVSCode2(t *testing.T) {
 	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
 	avsRequest := adyenBaseAuthRequest()
 	avsRequest.CreditCard.Number = "5500000000000004"
-	avsRequest.BillingAddress = &sleet.BillingAddress{
+	avsRequest.BillingAddress = &sleet.Address{
 		StreetAddress1: common.SPtr("1599 Pennsylvania Ave NE"),
 		Locality:       common.SPtr("Washington"),
 		CountryCode:    common.SPtr("US"),
@@ -167,6 +167,24 @@ func TestAdyenAVSCode2(t *testing.T) {
 func TestAdyenAuth(t *testing.T) {
 	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
 	request := adyenBaseAuthRequest()
+	auth, err := client.Authorize(request)
+	if err != nil {
+		t.Error("Authorize request should not have failed")
+	}
+
+	if !auth.Success {
+		t.Error("Resulting auth should have been successful")
+	}
+}
+
+// TestAdyenAuthWithIPEmailShippingAddress
+//
+// This should successfully create an authorization on Adyen for a new customer with IP, email, and shipping address
+// included
+func TestAdyenAuthWithIPEmailShippingAddress(t *testing.T) {
+	client := adyen.NewClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox)
+	request := adyenBaseAuthRequest()
+	adyenEnhanceAuthRequestIPEmailShipping(request)
 	auth, err := client.Authorize(request)
 	if err != nil {
 		t.Error("Authorize request should not have failed")
@@ -348,4 +366,14 @@ func adyenBaseAuthRequest() *sleet.AuthorizationRequest {
 	request.CreditCard.ExpirationMonth = 3
 	request.CreditCard.ExpirationYear = 2030
 	return request
+}
+
+func adyenEnhanceAuthRequestIPEmailShipping(request *sleet.AuthorizationRequest) {
+	request.BillingAddress.Email = sPtr("test@bolt.com")
+	request.ShippingAddress = request.BillingAddress
+
+	if request.Options == nil {
+		request.Options = make(map[string]interface{})
+	}
+	request.Options["ShopperIP"] = "192.168.0.0"
 }
