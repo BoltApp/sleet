@@ -287,6 +287,59 @@ func TestBuild3DSAuthRequest(t *testing.T) {
 	}
 }
 
+func TestExtractAdyenStreetFormat(t *testing.T) {
+
+	cases := []struct {
+		label string
+		in    string
+		want  string
+		want2 string
+	}{
+		{
+			"Basic Sanity",
+			"123 Street Address",
+			"123",
+			"Street Address",
+		},
+		{
+			"Non-Street address",
+			"PO Box 123",
+			"",
+			"PO Box 123",
+		},
+		{
+			"Rare edge case",
+			"123 ",
+			"123",
+			"",
+		},
+		{
+			"Rare edge case 2",
+			"123 S",
+			"123",
+			"S",
+		},
+		{
+			"No street number",
+			"123Street",
+			"",
+			"123Street",
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.label, func(t *testing.T) {
+			got1, got2 := extractAdyenStreetFormat(c.in)
+			if diff := deep.Equal(got1, c.want); diff != nil {
+				t.Error(diff)
+			}
+			if diff2 := deep.Equal(got2, c.want2); diff2 != nil {
+				t.Error(diff2)
+			}
+		})
+	}
+}
+
 func enhanceBaseAuthorizationDataWithAdditionalFields(authRequest *sleet.AuthorizationRequest) {
 	if authRequest.Options == nil {
 		authRequest.Options = make(map[string]interface{})
