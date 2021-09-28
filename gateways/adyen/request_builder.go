@@ -28,6 +28,8 @@ const (
 	recurringProcessingModelUnscheduledCardOnFile = "UnscheduledCardOnFile"
 )
 
+var streetNumberRegex = regexp.MustCompile("^\\d+\\s")
+
 // these maps are based on https://docs.adyen.com/online-payments/tokenization/create-and-use-tokens#set-parameters-to-flag-transactions
 var initiatorTypeToShopperInteraction = map[sleet.ProcessingInitiatorType]string{
 	sleet.ProcessingInitiatorTypeInitialCardOnFile:         shopperInteractionEcommerce,
@@ -257,7 +259,7 @@ func addIfNonEmpty(value string, key string, data *map[string]string) {
 //                          returns (streetNumber, streetName) format
 //                          If address does not have leading street number, will return ("", street)
 func extractAdyenStreetFormat(streetAddress string) (string, string) {
-	streetLocation := regexp.MustCompile("^\\d+\\s").FindStringIndex(streetAddress)
+	streetLocation := streetNumberRegex.FindStringIndex(streetAddress)
 	if streetLocation == nil {
 		return "", streetAddress
 	}
