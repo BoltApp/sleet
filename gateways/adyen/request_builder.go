@@ -2,6 +2,7 @@ package adyen
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 
 	"github.com/BoltApp/sleet"
@@ -26,6 +27,8 @@ const (
 	recurringProcessingModelSubscription          = "Subscription"
 	recurringProcessingModelUnscheduledCardOnFile = "UnscheduledCardOnFile"
 )
+
+var streetNumberRegex = regexp.MustCompile(`^(\d+)\s(.*)`)
 
 // these maps are based on https://docs.adyen.com/online-payments/tokenization/create-and-use-tokens#set-parameters-to-flag-transactions
 var initiatorTypeToShopperInteraction = map[sleet.ProcessingInitiatorType]string{
@@ -146,23 +149,25 @@ func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *
 // addAddresses adds the billing address and shipping address to the Ayden Payment request if available
 func addAddresses(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
 	if authRequest.BillingAddress != nil {
+		billingStreetNumber, billingStreetName := extractAdyenStreetFormat(common.SafeStr(authRequest.BillingAddress.StreetAddress1))
 		request.BillingAddress = &checkout.Address{
 			City:              common.SafeStr(authRequest.BillingAddress.Locality),
 			Country:           common.SafeStr(authRequest.BillingAddress.CountryCode),
-			HouseNumberOrName: common.SafeStr(authRequest.BillingAddress.StreetAddress2),
+			HouseNumberOrName: billingStreetNumber,
 			PostalCode:        common.SafeStr(authRequest.BillingAddress.PostalCode),
 			StateOrProvince:   common.SafeStr(authRequest.BillingAddress.RegionCode),
-			Street:            common.SafeStr(authRequest.BillingAddress.StreetAddress1),
+			Street:            billingStreetName,
 		}
 	}
 	if authRequest.ShippingAddress != nil {
+		shippingStreetNumber, shippingStreetName := extractAdyenStreetFormat(common.SafeStr(authRequest.ShippingAddress.StreetAddress1))
 		request.DeliveryAddress = &checkout.Address{
 			City:              common.SafeStr(authRequest.ShippingAddress.Locality),
 			Country:           common.SafeStr(authRequest.ShippingAddress.CountryCode),
-			HouseNumberOrName: common.SafeStr(authRequest.ShippingAddress.StreetAddress2),
+			HouseNumberOrName: shippingStreetNumber,
 			PostalCode:        common.SafeStr(authRequest.ShippingAddress.PostalCode),
 			StateOrProvince:   common.SafeStr(authRequest.ShippingAddress.RegionCode),
-			Street:            common.SafeStr(authRequest.ShippingAddress.StreetAddress1),
+			Street:            shippingStreetName,
 		}
 	}
 }
@@ -248,4 +253,16 @@ func addIfNonEmpty(value string, key string, data *map[string]string) {
 	if value != "" {
 		(*data)[key] = value
 	}
+}
+
+// extractAdyenStreetFormat extracts adyen street format from generic street address
+//                          returns (streetNumber, streetName) format
+//                          If address does not have leading street number, will return ("", street)
+func extractAdyenStreetFormat(streetAddress string) (string, string) {
+	streetExtraction := streetNumberRegex.FindStringSubmatch(streetAddress)
+	if streetExtraction == nil {
+		return "", streetAddress
+	}
+
+	return streetExtraction[1], streetExtraction[2]
 }

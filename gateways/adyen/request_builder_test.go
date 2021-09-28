@@ -49,7 +49,8 @@ func TestBuildAuthRequest(t *testing.T) {
 					Country:         *base.BillingAddress.CountryCode,
 					PostalCode:      *base.BillingAddress.PostalCode,
 					StateOrProvince: *base.BillingAddress.RegionCode,
-					Street:          *base.BillingAddress.StreetAddress1,
+					Street:          "Railroad Street",
+					HouseNumberOrName: "7683",
 				},
 				MerchantAccount: "merchant-account",
 				PaymentMethod: map[string]interface{}{
@@ -80,7 +81,8 @@ func TestBuildAuthRequest(t *testing.T) {
 					Country:         *baseWithAydenData.BillingAddress.CountryCode,
 					PostalCode:      *baseWithAydenData.BillingAddress.PostalCode,
 					StateOrProvince: *baseWithAydenData.BillingAddress.RegionCode,
-					Street:          *baseWithAydenData.BillingAddress.StreetAddress1,
+					Street:          "Railroad Street",
+					HouseNumberOrName: "7683",
 				},
 				MerchantAccount: "merchant-account",
 				PaymentMethod: map[string]interface{}{
@@ -101,7 +103,8 @@ func TestBuildAuthRequest(t *testing.T) {
 					Country:         *baseWithAydenData.ShippingAddress.CountryCode,
 					PostalCode:      *baseWithAydenData.ShippingAddress.PostalCode,
 					StateOrProvince: *baseWithAydenData.ShippingAddress.RegionCode,
-					Street:          *baseWithAydenData.ShippingAddress.StreetAddress1,
+					Street:          "Railroad Street",
+					HouseNumberOrName: "7683",
 				},
 				ShopperEmail: *baseWithAydenData.BillingAddress.Email,
 				ShopperIP:    "192.168.0.0",
@@ -120,7 +123,8 @@ func TestBuildAuthRequest(t *testing.T) {
 					Country:         *requestWithLevel3Data.BillingAddress.CountryCode,
 					PostalCode:      *requestWithLevel3Data.BillingAddress.PostalCode,
 					StateOrProvince: *requestWithLevel3Data.BillingAddress.RegionCode,
-					Street:          *requestWithLevel3Data.BillingAddress.StreetAddress1,
+					Street:          "Railroad Street",
+					HouseNumberOrName: "7683",
 				},
 				MerchantAccount: "merchant-account",
 				PaymentMethod: map[string]interface{}{
@@ -166,7 +170,8 @@ func TestBuildAuthRequest(t *testing.T) {
 					Country:         *requestWithLevel3Data.BillingAddress.CountryCode,
 					PostalCode:      *requestWithLevel3Data.BillingAddress.PostalCode,
 					StateOrProvince: *requestWithLevel3Data.BillingAddress.RegionCode,
-					Street:          *requestWithLevel3Data.BillingAddress.StreetAddress1,
+					Street:          "Railroad Street",
+					HouseNumberOrName: "7683",
 				},
 				MerchantAccount: "merchant-account",
 				PaymentMethod: map[string]interface{}{
@@ -213,7 +218,8 @@ func TestBuildAuthRequest(t *testing.T) {
 					Country:         *requestCitiPLCC.BillingAddress.CountryCode,
 					PostalCode:      *requestCitiPLCC.BillingAddress.PostalCode,
 					StateOrProvince: *requestCitiPLCC.BillingAddress.RegionCode,
-					Street:          *requestCitiPLCC.BillingAddress.StreetAddress1,
+					Street:          "Railroad Street",
+					HouseNumberOrName: "7683",
 				},
 				MerchantAccount: "merchant-account",
 				PaymentMethod: map[string]interface{}{
@@ -278,6 +284,59 @@ func TestBuild3DSAuthRequest(t *testing.T) {
 		if diff := deep.Equal(result.MpiData, expected); diff != nil {
 			t.Error(diff)
 		}
+	}
+}
+
+func TestExtractAdyenStreetFormat(t *testing.T) {
+
+	cases := []struct {
+		label string
+		in    string
+		want  string
+		want2 string
+	}{
+		{
+			"Basic Sanity",
+			"123 Street Address",
+			"123",
+			"Street Address",
+		},
+		{
+			"Non-Street address",
+			"PO Box 123",
+			"",
+			"PO Box 123",
+		},
+		{
+			"Rare edge case",
+			"123 ",
+			"123",
+			"",
+		},
+		{
+			"Rare edge case 2",
+			"123 S",
+			"123",
+			"S",
+		},
+		{
+			"No street number",
+			"123Street",
+			"",
+			"123Street",
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.label, func(t *testing.T) {
+			got1, got2 := extractAdyenStreetFormat(c.in)
+			if diff := deep.Equal(got1, c.want); diff != nil {
+				t.Error(diff)
+			}
+			if diff2 := deep.Equal(got2, c.want2); diff2 != nil {
+				t.Error(diff2)
+			}
+		})
 	}
 }
 
