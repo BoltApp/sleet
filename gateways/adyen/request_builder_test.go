@@ -276,7 +276,7 @@ func TestBuild3DSAuthRequest(t *testing.T) {
 			Cavv:              "cavv",
 			CavvAlgorithm:     "cavv-algorithm",
 			DirectoryResponse: "pares-status",
-			DsTransID:         "pares-status",
+			DsTransID:         "ds-trans-id",
 			Eci:               "eci",
 			ThreeDSVersion:    "version",
 			Xid:               "xid",

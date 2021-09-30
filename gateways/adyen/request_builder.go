@@ -99,8 +99,8 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		request.MpiData = &checkout.ThreeDSecureData{
 			Cavv:              authRequest.ThreeDS.CAVV,
 			CavvAlgorithm:     authRequest.ThreeDS.CAVVAlgorithm,
-			DirectoryResponse: authRequest.ThreeDS.PAResStatus, // Same as DsTransID for 3DS2
-			DsTransID:         authRequest.ThreeDS.PAResStatus,
+			DirectoryResponse: authRequest.ThreeDS.PAResStatus,
+			DsTransID:         authRequest.ThreeDS.DSTransactionID,
 			Eci:               authRequest.ECI,
 			ThreeDSVersion:    authRequest.ThreeDS.Version,
 			Xid:               authRequest.ThreeDS.XID,
