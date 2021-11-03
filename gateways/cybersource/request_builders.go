@@ -49,6 +49,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 	amountStr := sleet.AmountToDecimalString(&authRequest.Amount)
 	request := &Request{
 		ClientReferenceInformation: &ClientReferenceInformation{
+			Code: authRequest.MerchantOrderReference,
 			Partner: Partner{
 				SolutionID: authRequest.Channel,
 			},
@@ -93,7 +94,10 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 	}
 	// If level 3 data is present, and ClientReferenceInformation in that data exists, it will override this.
 	if authRequest.ClientTransactionReference != nil {
-		request.ClientReferenceInformation.Code = *authRequest.ClientTransactionReference
+		request.MerchantDefinedInformation = append(request.MerchantDefinedInformation, MerchantDefinedInformation{
+			Key: "1",
+			Value: *authRequest.ClientTransactionReference,
+		})
 	}
 	if authRequest.Level3Data != nil {
 		level3 := authRequest.Level3Data
