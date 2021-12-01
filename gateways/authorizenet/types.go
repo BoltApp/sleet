@@ -99,14 +99,41 @@ type MerchantAuthentication struct {
 }
 
 // TransactionRequest has the raw credit card info as Payment and amount to authorize
+// Note -> oddly authorize.net has strict ordering even for JSON
 type TransactionRequest struct {
 	TransactionType  TransactionType `json:"transactionType"`
 	Amount           *string         `json:"amount,omitempty"`
 	Payment          *Payment        `json:"payment,omitempty"`
 	Order            *Order          `json:"order,omitempty"`
+	LineItem string `json:"lineItems,omitempty"`  // this is really a repeating LineItem, but authorize.net expects it in object not array
+	 											  // since not valid json, just going to represent as JSON string
+	Tax		*Tax	`json:"tax,omitempty"`
+	Duty	*Tax	`json:"duty,omitempty"`
+	Shipping	*Tax				`json:"shipping,omitempty"`
+	Customer 		*Customer		`json:"customer,omitempty"`
 	BillingAddress   *BillingAddress `json:"billTo,omitempty"`
+	ShippingAddress   *BillingAddress `json:"shipTo,omitempty"`
 	RefTransactionID *string         `json:"refTransId,omitempty"`
 	// Ignoring Line items, Shipping, Tax, Duty, etc.
+}
+
+type LineItem struct {
+	ItemId string `json:"itemId,omitempty"`
+	Name string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
+	Quantity string `json:"quantity,omitempty"`
+	UnitPrice string `json:"unitPrice,omitempty"`
+}
+
+type Tax struct {
+	Amount string 	`json:"amount,omitempty"`
+	Name string	`json:"name,omitempty"`
+	Description	string	`json:"description,omitempty"`
+}
+
+type Customer struct {
+	Type string `json:"type,omitempty"`
+	Id string `json:"id,omitempty"`
 }
 
 // Payment specifies the credit card to be authorized (only payment option for now)

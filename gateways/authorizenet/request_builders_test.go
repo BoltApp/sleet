@@ -15,6 +15,16 @@ func TestBuildAuthRequest(t *testing.T) {
 	base := sleet_testing.BaseAuthorizationRequest()
 	base.MerchantOrderReference = randomdata.Alphanumeric(InvoiceNumberMaxLength + 5)
 
+	baseL2L3 := sleet_testing.BaseAuthorizationRequest()
+	baseL2L3.MerchantOrderReference = randomdata.Alphanumeric(InvoiceNumberMaxLength + 5)
+	baseL2L3.Level3Data = sleet_testing.BaseLevel3Data()
+	baseL2L3.ShippingAddress = baseL2L3.BillingAddress
+
+	baseL2L3MultipleItems := sleet_testing.BaseAuthorizationRequest()
+	baseL2L3MultipleItems.MerchantOrderReference = randomdata.Alphanumeric(InvoiceNumberMaxLength + 5)
+	baseL2L3MultipleItems.Level3Data = sleet_testing.BaseLevel3DataMultipleItem()
+	baseL2L3MultipleItems.ShippingAddress = baseL2L3MultipleItems.BillingAddress
+
 	amount := "1.00"
 	cases := []struct {
 		label string
@@ -79,6 +89,116 @@ func TestBuildAuthRequest(t *testing.T) {
 						BillingAddress: &BillingAddress{
 							FirstName: "Bolt",
 							LastName:  "Checkout",
+							Address:   base.BillingAddress.StreetAddress1,
+							City:      base.BillingAddress.Locality,
+							State:     base.BillingAddress.RegionCode,
+							Zip:       base.BillingAddress.PostalCode,
+							Country:   base.BillingAddress.CountryCode,
+						},
+					},
+				},
+			},
+		},
+		{
+			"L2L3 Data",
+			baseL2L3,
+			&Request{
+				CreateTransactionRequest: CreateTransactionRequest{
+					MerchantAuthentication: MerchantAuthentication{Name: "MerchantName", TransactionKey: "Key"},
+					TransactionRequest: TransactionRequest{
+						TransactionType: TransactionTypeAuthOnly,
+						Amount:          &amount,
+						Payment: &Payment{
+							CreditCard: CreditCard{
+								CardNumber:     "4111111111111111",
+								ExpirationDate: "2023-10",
+								CardCode:       base.CreditCard.CVV,
+							},
+						},
+						BillingAddress: &BillingAddress{
+							FirstName: "Bolt",
+							LastName:  "Checkout",
+							Address:   base.BillingAddress.StreetAddress1,
+							City:      base.BillingAddress.Locality,
+							State:     base.BillingAddress.RegionCode,
+							Zip:       base.BillingAddress.PostalCode,
+							Country:   base.BillingAddress.CountryCode,
+						},
+						Order: &Order{
+							InvoiceNumber: baseL2L3.MerchantOrderReference[:InvoiceNumberMaxLength],
+						},
+						LineItem: "{\"lineItem\":{\"itemId\":\"cmd\",\"name\":\"abc\",\"description\":\"pot\",\"quantity\":\"2\",\"unitPrice\":\"500\"}}",
+						Tax: &Tax{
+							Amount: "100",
+						},
+						Duty: &Tax{
+							Amount: "400",
+						},
+						Shipping: &Tax{
+							Amount: "300",
+						},
+						Customer: &Customer{
+							Id: "customer",
+						},
+						ShippingAddress: &BillingAddress{
+							FirstName: "Bolt",
+							LastName:  "Checkout",
+							Company:   common.SafeStr(base.BillingAddress.Company),
+							Address:   base.BillingAddress.StreetAddress1,
+							City:      base.BillingAddress.Locality,
+							State:     base.BillingAddress.RegionCode,
+							Zip:       base.BillingAddress.PostalCode,
+							Country:   base.BillingAddress.CountryCode,
+						},
+					},
+				},
+			},
+		},
+		{
+			"L2L3 Data Multiple items",
+			baseL2L3MultipleItems,
+			&Request{
+				CreateTransactionRequest: CreateTransactionRequest{
+					MerchantAuthentication: MerchantAuthentication{Name: "MerchantName", TransactionKey: "Key"},
+					TransactionRequest: TransactionRequest{
+						TransactionType: TransactionTypeAuthOnly,
+						Amount:          &amount,
+						Payment: &Payment{
+							CreditCard: CreditCard{
+								CardNumber:     "4111111111111111",
+								ExpirationDate: "2023-10",
+								CardCode:       base.CreditCard.CVV,
+							},
+						},
+						BillingAddress: &BillingAddress{
+							FirstName: "Bolt",
+							LastName:  "Checkout",
+							Address:   base.BillingAddress.StreetAddress1,
+							City:      base.BillingAddress.Locality,
+							State:     base.BillingAddress.RegionCode,
+							Zip:       base.BillingAddress.PostalCode,
+							Country:   base.BillingAddress.CountryCode,
+						},
+						Order: &Order{
+							InvoiceNumber: baseL2L3MultipleItems.MerchantOrderReference[:InvoiceNumberMaxLength],
+						},
+						LineItem: "{\"lineItem\":{\"itemId\":\"cmd\",\"name\":\"abc\",\"description\":\"pot\",\"quantity\":\"2\",\"unitPrice\":\"500\"},\"lineItem\":{\"itemId\":\"321\",\"name\":\"123\",\"description\":\"vase\",\"quantity\":\"5\",\"unitPrice\":\"1000\"}}",
+						Tax: &Tax{
+							Amount: "100",
+						},
+						Duty: &Tax{
+							Amount: "400",
+						},
+						Shipping: &Tax{
+							Amount: "300",
+						},
+						Customer: &Customer{
+							Id: "customer",
+						},
+						ShippingAddress: &BillingAddress{
+							FirstName: "Bolt",
+							LastName:  "Checkout",
+							Company:   common.SafeStr(base.BillingAddress.Company),
 							Address:   base.BillingAddress.StreetAddress1,
 							City:      base.BillingAddress.Locality,
 							State:     base.BillingAddress.RegionCode,
