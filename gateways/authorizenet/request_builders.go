@@ -158,12 +158,6 @@ func addL2L3Data(authRequest *sleet.AuthorizationRequest, authNetAuthRequest *Cr
 // Authorize net converts json to XML before processing the request. This leads to weird scenarios like repeating json
 // fields. LineItems is one of them so we will build it as a raw string
 func buildLineItemsString(authRequest *sleet.AuthorizationRequest) *string {
-	// No more than 30 lineitems
-	lineItemCount := len(authRequest.Level3Data.LineItems)
-	if lineItemCount > 30 {
-		lineItemCount = 30
-	}
-
 	hasLineItem := false
 	lineItems := "{"
 	for i, authRequestLineItem := range authRequest.Level3Data.LineItems {
