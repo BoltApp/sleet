@@ -81,7 +81,6 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 	response := &sleet.AuthorizationResponse{
 		Success:               success,
 		TransactionReference:  *cybersourceResponse.ID,
-		ExternalTransactionID: cybersourceResponse.ProcessorInformation.TransactionID,
 		Response:              cybersourceResponse.Status,
 		ErrorCode:             errorCode,
 	}
@@ -90,6 +89,7 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 		response.AvsResultRaw = cybersourceResponse.ProcessorInformation.AVS.Code
 		response.CvvResult = translateCvv(cybersourceResponse.ProcessorInformation.CardVerification.ResultCode)
 		response.CvvResultRaw = cybersourceResponse.ProcessorInformation.CardVerification.ResultCode
+		response.ExternalTransactionID = cybersourceResponse.ProcessorInformation.TransactionID
 	}
 	return response, nil
 }

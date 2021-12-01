@@ -2,10 +2,11 @@ package cybersource
 
 // Request contains the information needed for all request types (Auth, Capture, Void, Refund)
 type Request struct {
-	ClientReferenceInformation *ClientReferenceInformation `json:"clientReferenceInformation,omitempty"`
-	ProcessingInformation      *ProcessingInformation      `json:"processingInformation,omitempty"`
-	OrderInformation           *OrderInformation           `json:"orderInformation,omitempty"`
-	PaymentInformation         *PaymentInformation         `json:"paymentInformation,omitempty"`
+	ClientReferenceInformation *ClientReferenceInformation   `json:"clientReferenceInformation,omitempty"`
+	ProcessingInformation      *ProcessingInformation        `json:"processingInformation,omitempty"`
+	OrderInformation           *OrderInformation             `json:"orderInformation,omitempty"`
+	PaymentInformation         *PaymentInformation           `json:"paymentInformation,omitempty"`
+	MerchantDefinedInformation []MerchantDefinedInformation  `json:"merchantDefinedInformation,omitempty"`
 }
 
 // Response contains all of the fields for all Cybersource API call responses
@@ -138,6 +139,12 @@ type ShippingDetails struct {
 // PaymentInformation just stores Card information (but can be extended to other payment types)
 type PaymentInformation struct {
 	Card CardInformation `json:"card"`
+}
+
+// MerchantDefinedInformation stores the custom data that the merchant defines.
+type MerchantDefinedInformation struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
 // CardInformation stores raw credit card details
