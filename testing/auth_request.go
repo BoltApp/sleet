@@ -74,6 +74,62 @@ func BaseLevel3Data() *sleet.Level3Data {
 	}
 }
 
+func BaseLevel3DataMultipleItem() *sleet.Level3Data {
+	return &sleet.Level3Data{
+		CustomerReference: "customer",
+		TaxAmount: sleet.Amount{
+			Amount:   100,
+			Currency: "USD",
+		},
+		DiscountAmount: sleet.Amount{
+			Amount:   200,
+			Currency: "USD",
+		},
+		ShippingAmount: sleet.Amount{
+			Amount:   300,
+			Currency: "USD",
+		},
+		DutyAmount: sleet.Amount{
+			Amount:   400,
+			Currency: "USD",
+		},
+		DestinationPostalCode:  "94105",
+		DestinationCountryCode: "US",
+		LineItems: []sleet.LineItem{
+			{
+				Description: "pot",
+				ProductCode: "abc",
+				UnitPrice: sleet.Amount{
+					Amount:   500,
+					Currency: "USD",
+				},
+				Quantity: 2,
+				TotalAmount: sleet.Amount{
+					Amount:   1000,
+					Currency: "USD",
+				},
+				UnitOfMeasure: "count",
+				CommodityCode: "cmd",
+			},
+			{
+				Description: "vase",
+				ProductCode: "123",
+				UnitPrice: sleet.Amount{
+					Amount:   1000,
+					Currency: "USD",
+				},
+				Quantity: 5,
+				TotalAmount: sleet.Amount{
+					Amount:   2000,
+					Currency: "USD",
+				},
+				UnitOfMeasure: "count",
+				CommodityCode: "321",
+			},
+		},
+	}
+}
+
 func BaseCaptureRequest() *sleet.CaptureRequest {
 	clientRef := "222222"
 
