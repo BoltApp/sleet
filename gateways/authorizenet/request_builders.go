@@ -117,7 +117,10 @@ func authentication(merchantName string, transactionKey string) MerchantAuthenti
 
 func addL2L3Data(authRequest *sleet.AuthorizationRequest, authNetAuthRequest *CreateTransactionRequest) *CreateTransactionRequest {
 	if authRequest.Level3Data != nil {
-		authNetAuthRequest.TransactionRequest.LineItem = json.RawMessage(buildLineItemsString(authRequest))
+		lineItemString := buildLineItemsString(authRequest)
+		if lineItemString != nil {
+			authNetAuthRequest.TransactionRequest.LineItem = json.RawMessage(*lineItemString)
+		}
 
 		authNetAuthRequest.TransactionRequest.Tax = &Tax{
 			Amount:  strconv.FormatInt(authRequest.Level3Data.TaxAmount.Amount, 10),
@@ -152,38 +155,45 @@ func addL2L3Data(authRequest *sleet.AuthorizationRequest, authNetAuthRequest *Cr
 	return authNetAuthRequest
 }
 
-func buildLineItemsString(authRequest *sleet.AuthorizationRequest) string {
+// Authorize net converts json to XML before processing the request. This leads to weird scenarios like repeating json
+// fields. LineItems is one of them so we will build it as a raw string
+func buildLineItemsString(authRequest *sleet.AuthorizationRequest) *string {
 	// No more than 30 lineitems
 	lineItemCount := len(authRequest.Level3Data.LineItems)
 	if lineItemCount > 30 {
 		lineItemCount = 30
 	}
 
+	hasLineItem := false
 	lineItems := "{"
-	for i := 0; i < lineItemCount; i++ {
-		lineItem := &LineItem{
-			ItemId: sleet.TruncateString(authRequest.Level3Data.LineItems[i].CommodityCode, 31),
-			Name: sleet.TruncateString(authRequest.Level3Data.LineItems[i].ProductCode, 31),
-			Description: sleet.TruncateString(authRequest.Level3Data.LineItems[i].Description, 255),
-			Quantity: strconv.FormatInt(authRequest.Level3Data.LineItems[i].Quantity, 10),
-			UnitPrice: strconv.FormatInt(authRequest.Level3Data.LineItems[i].UnitPrice.Amount, 10),
+	for i, authRequestLineItem := range authRequest.Level3Data.LineItems {
+		// Max LineItem count is 30 for authorize.net
+		if i == 30 {
+			break
 		}
 
-		// This is absolutely terrible why is json -> xml a thing
+		lineItem := &LineItem{
+			ItemId: sleet.TruncateString(authRequestLineItem.CommodityCode, 31),
+			Name: sleet.TruncateString(authRequestLineItem.ProductCode, 31),
+			Description: sleet.TruncateString(authRequestLineItem.Description, 255),
+			Quantity: strconv.FormatInt(authRequestLineItem.Quantity, 10),
+			UnitPrice: strconv.FormatInt(authRequestLineItem.UnitPrice.Amount, 10),
+		}
+
 		lineItemByte, err := json.Marshal(lineItem)
 		if err == nil {
-			// No error, add the string
-			// We must use a string because authnet allows invalid JSON
+			// No error, add the string. If there is an error we will just drop that line item
 			lineItems += "\"lineItem\":" + string(lineItemByte)
 			if i < lineItemCount - 1 {
 				lineItems += ","
 			}
+			hasLineItem = true
 		}
 	}
 	lineItems += "}"
 
-	if len(lineItems) > 2 {
-		return lineItems
+	if hasLineItem {
+		return &lineItems
 	}
-	return ""
+	return nil
 }

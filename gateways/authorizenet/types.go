@@ -116,7 +116,6 @@ type TransactionRequest struct {
 	BillingAddress   *BillingAddress `json:"billTo,omitempty"`
 	ShippingAddress  *BillingAddress `json:"shipTo,omitempty"`
 	RefTransactionID *string         `json:"refTransId,omitempty"`
-	// Ignoring Line items, Shipping, Tax, Duty, etc.
 }
 
 type LineItem struct {
