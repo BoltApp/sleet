@@ -3,6 +3,7 @@
 package authorizenet
 
 import (
+	"encoding/json"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	sleet_testing "github.com/BoltApp/sleet/testing"
@@ -127,7 +128,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						Order: &Order{
 							InvoiceNumber: baseL2L3.MerchantOrderReference[:InvoiceNumberMaxLength],
 						},
-						LineItem: "{\"lineItem\":{\"itemId\":\"cmd\",\"name\":\"abc\",\"description\":\"pot\",\"quantity\":\"2\",\"unitPrice\":\"500\"}}",
+						LineItem: json.RawMessage(`{"lineItem":{"itemId":"cmd","name":"abc","description":"pot","quantity":"2","unitPrice":"500"}}`),
 						Tax: &Tax{
 							Amount: "100",
 						},
@@ -182,7 +183,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						Order: &Order{
 							InvoiceNumber: baseL2L3MultipleItems.MerchantOrderReference[:InvoiceNumberMaxLength],
 						},
-						LineItem: "{\"lineItem\":{\"itemId\":\"cmd\",\"name\":\"abc\",\"description\":\"pot\",\"quantity\":\"2\",\"unitPrice\":\"500\"},\"lineItem\":{\"itemId\":\"321\",\"name\":\"123\",\"description\":\"vase\",\"quantity\":\"5\",\"unitPrice\":\"1000\"}}",
+						LineItem: json.RawMessage(`{"lineItem":{"itemId":"cmd","name":"abc","description":"pot","quantity":"2","unitPrice":"500"},"lineItem":{"itemId":"321","name":"123","description":"vase","quantity":"5","unitPrice":"1000"}}`),
 						Tax: &Tax{
 							Amount: "100",
 						},
