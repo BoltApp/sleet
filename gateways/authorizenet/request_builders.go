@@ -159,10 +159,11 @@ func addL2L3Data(authRequest *sleet.AuthorizationRequest, authNetAuthRequest *Cr
 // fields. LineItems is one of them so we will build it as a raw string
 func buildLineItemsString(authRequest *sleet.AuthorizationRequest) *string {
 	hasLineItem := false
+	maxLength := 30
 	lineItems := "{"
 	for i, authRequestLineItem := range authRequest.Level3Data.LineItems {
 		// Max LineItem count is 30 for authorize.net
-		if i == 30 {
+		if i == maxLength {
 			break
 		}
 
@@ -178,10 +179,12 @@ func buildLineItemsString(authRequest *sleet.AuthorizationRequest) *string {
 		if err == nil {
 			// No error, add the string. If there is an error we will just drop that line item
 			lineItems += "\"lineItem\":" + string(lineItemByte)
-			if i < lineItemCount - 1 {
+			hasLineItem = true
+
+			// Do not add a comma for the last item
+			if i < len(authRequest.Level3Data.LineItems) - 1 && i < maxLength - 1 {
 				lineItems += ","
 			}
-			hasLineItem = true
 		}
 	}
 	lineItems += "}"
