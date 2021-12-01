@@ -117,7 +117,7 @@ func authentication(merchantName string, transactionKey string) MerchantAuthenti
 
 func addL2L3Data(authRequest *sleet.AuthorizationRequest, authNetAuthRequest *CreateTransactionRequest) *CreateTransactionRequest {
 	if authRequest.Level3Data != nil {
-		authNetAuthRequest.TransactionRequest.LineItem = buildLineItemsString(authRequest)
+		authNetAuthRequest.TransactionRequest.LineItem = json.RawMessage(buildLineItemsString(authRequest))
 
 		authNetAuthRequest.TransactionRequest.Tax = &Tax{
 			Amount:  strconv.FormatInt(authRequest.Level3Data.TaxAmount.Amount, 10),
