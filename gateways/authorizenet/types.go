@@ -1,5 +1,7 @@
 package authorizenet
 
+import "encoding/json"
+
 type TransactionType string
 
 const (
@@ -67,14 +69,14 @@ const (
 	CAVVResultAttemptIncomplete CAVVResultCode = "3"
 	CAVVResultSytemError        CAVVResultCode = "4"
 
-// omitted
-// 5 -- N/A
-// 6 -- N/A
-// 7 -- CAVV failed validation, but the issuer is available. Valid for U.S.-issued card submitted to non-U.S acquirer.
-// 8 -- CAVV passed validation and the issuer is available. Valid for U.S.-issued card submitted to non-U.S. acquirer.
-// 9 -- CAVV failed validation and the issuer is unavailable. Valid for U.S.-issued card submitted to non-U.S acquirer.
-// A -- CAVV passed validation but the issuer unavailable. Valid for U.S.-issued card submitted to non-U.S acquirer.
-// B -- CAVV passed validation, information only, no liability shift.
+	// omitted
+	// 5 -- N/A
+	// 6 -- N/A
+	// 7 -- CAVV failed validation, but the issuer is available. Valid for U.S.-issued card submitted to non-U.S acquirer.
+	// 8 -- CAVV passed validation and the issuer is available. Valid for U.S.-issued card submitted to non-U.S. acquirer.
+	// 9 -- CAVV failed validation and the issuer is unavailable. Valid for U.S.-issued card submitted to non-U.S acquirer.
+	// A -- CAVV passed validation but the issuer unavailable. Valid for U.S.-issued card submitted to non-U.S acquirer.
+	// B -- CAVV passed validation, information only, no liability shift.
 )
 
 const expirationDateXXXX = "XXXX"
@@ -99,14 +101,40 @@ type MerchantAuthentication struct {
 }
 
 // TransactionRequest has the raw credit card info as Payment and amount to authorize
+// Note -> oddly authorize.net has strict ordering even for JSON
 type TransactionRequest struct {
-	TransactionType  TransactionType `json:"transactionType"`
-	Amount           *string         `json:"amount,omitempty"`
-	Payment          *Payment        `json:"payment,omitempty"`
-	Order            *Order          `json:"order,omitempty"`
+	TransactionType TransactionType `json:"transactionType"`
+	Amount          *string         `json:"amount,omitempty"`
+	Payment         *Payment        `json:"payment,omitempty"`
+	Order           *Order          `json:"order,omitempty"`
+	LineItem        json.RawMessage `json:"lineItems,omitempty"` // this is really a repeating LineItem, but authorize.net expects it in object not array
+	// since not valid json, just going to represent as JSON string
+	Tax              *Tax            `json:"tax,omitempty"`
+	Duty             *Tax            `json:"duty,omitempty"`
+	Shipping         *Tax            `json:"shipping,omitempty"`
+	Customer         *Customer       `json:"customer,omitempty"`
 	BillingAddress   *BillingAddress `json:"billTo,omitempty"`
+	ShippingAddress  *BillingAddress `json:"shipTo,omitempty"`
 	RefTransactionID *string         `json:"refTransId,omitempty"`
-	// Ignoring Line items, Shipping, Tax, Duty, etc.
+}
+
+type LineItem struct {
+	ItemId      string `json:"itemId,omitempty"`
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
+	Quantity    string `json:"quantity,omitempty"`
+	UnitPrice   string `json:"unitPrice,omitempty"`
+}
+
+type Tax struct {
+	Amount      string `json:"amount,omitempty"`
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
+}
+
+type Customer struct {
+	Type string `json:"type,omitempty"`
+	Id   string `json:"id,omitempty"`
 }
 
 // Payment specifies the credit card to be authorized (only payment option for now)

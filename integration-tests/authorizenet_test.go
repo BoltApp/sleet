@@ -29,6 +29,40 @@ func TestAuthNetAuth(t *testing.T) {
 	}
 }
 
+func TestAuthNetAuthL2L3(t *testing.T) {
+	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
+	authRequest := sleet_testing.BaseAuthorizationRequest()
+	authRequest.Amount.Amount = int64(randomdata.Number(100))
+	authRequest.MerchantOrderReference = "test-order-ref"
+	authRequest.Level3Data = sleet_testing.BaseLevel3Data()
+	authRequest.ShippingAddress = authRequest.BillingAddress
+	auth, err := client.Authorize(authRequest)
+	if err != nil {
+		t.Error("Authorize request should not have failed")
+	}
+
+	if !auth.Success {
+		t.Error("Resulting auth should have been successful")
+	}
+}
+
+func TestAuthNetAuthL2L3MultipleItem(t *testing.T) {
+	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
+	authRequest := sleet_testing.BaseAuthorizationRequest()
+	authRequest.Amount.Amount = int64(randomdata.Number(100))
+	authRequest.MerchantOrderReference = "test-order-ref"
+	authRequest.Level3Data = sleet_testing.BaseLevel3DataMultipleItem()
+	authRequest.ShippingAddress = authRequest.BillingAddress
+	auth, err := client.Authorize(authRequest)
+	if err != nil {
+		t.Error("Authorize request should not have failed")
+	}
+
+	if !auth.Success {
+		t.Error("Resulting auth should have been successful")
+	}
+}
+
 // TestAuthNetRechargeAuth
 //
 // Recharge requests will not have CVV. This should successfully create an authorization on Authorize.net
