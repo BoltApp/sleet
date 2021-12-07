@@ -120,6 +120,7 @@ type CaptureRequest struct {
 	Amount                     *Amount
 	TransactionReference       string
 	ClientTransactionReference *string // Custom transaction reference metadata that will be associated with this request
+	MerchantOrderReference     *string // Custom merchant order reference that will be associated with this request
 }
 
 // CaptureResponse will have Success be true if transaction is captured and also a reference to be used for subsequent operations
@@ -133,6 +134,7 @@ type CaptureResponse struct {
 type VoidRequest struct {
 	TransactionReference       string
 	ClientTransactionReference *string // Custom transaction reference metadata that will be associated with this request
+	MerchantOrderReference     *string // Custom merchant order reference that will be associated with this request
 }
 
 // VoidResponse also specifies a transaction reference if PsP uses different transaction references for different states
@@ -147,6 +149,7 @@ type RefundRequest struct {
 	Amount                     *Amount
 	TransactionReference       string
 	ClientTransactionReference *string // Custom transaction reference metadata that will be associated with this request
+	MerchantOrderReference     *string // Custom merchant order reference that will be associated with this request
 	Last4                      string
 	Options                    map[string]interface{}
 }
