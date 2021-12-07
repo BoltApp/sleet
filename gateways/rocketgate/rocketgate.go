@@ -20,8 +20,8 @@ type RocketgateClient struct {
 }
 
 // NewClient creates a Rocketgate client
-func NewClient(env common.Environment, merchantID string, merchantPassword string, merchantAccount *string, httpClient *http.Client) *RocketgateClient {
-	return NewWithHttpClient(env, merchantID, merchantPassword, merchantAccount, httpClient)
+func NewClient(env common.Environment, merchantID string, merchantPassword string, merchantAccount *string) *RocketgateClient {
+	return NewWithHttpClient(env, merchantID, merchantPassword, merchantAccount, common.DefaultHttpClient())
 }
 
 // NewWithHttpClient creates an Rocketgate client for custom behavior
