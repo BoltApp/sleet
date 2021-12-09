@@ -12,11 +12,11 @@ import (
 // RocketgateClient represents an HTTP client and the associated authentication information required for
 // making an API request.
 type RocketgateClient struct {
-	testMode 			bool
-	merchantID  		string
-	merchantPassword	string
-	merchantAccount 	*string
-	httpClient  		*http.Client
+	testMode            bool
+	merchantID          string
+	merchantPassword    string
+	merchantAccount     *string
+	httpClient          *http.Client
 }
 
 // NewClient creates a Rocketgate client
@@ -27,11 +27,11 @@ func NewClient(env common.Environment, merchantID string, merchantPassword strin
 // NewWithHttpClient creates an Rocketgate client for custom behavior
 func NewWithHttpClient(env common.Environment, merchantID string, merchantPassword string, merchantAccount *string, httpClient *http.Client) *RocketgateClient {
 	return &RocketgateClient{
-		testMode:			rocketgateTestMode(env),
-		merchantID:			merchantID,
-		merchantPassword:	merchantPassword,
-		merchantAccount: 	merchantAccount,
-		httpClient:			httpClient,
+		testMode:           rocketgateTestMode(env),
+		merchantID:         merchantID,
+		merchantPassword:   merchantPassword,
+		merchantAccount:    merchantAccount,
+		httpClient:         httpClient,
 	}
 }
 
@@ -45,19 +45,19 @@ func (client *RocketgateClient) Authorize(request *sleet.AuthorizationRequest) (
 
 	if !gatewayService.PerformAuthOnly(gatewayRequest, gatewayResponse) {
 		return &sleet.AuthorizationResponse{
-			Success: 				false,
-			Response: 				gatewayResponse.Get(response.RESPONSE_CODE),
-			ErrorCode: 				gatewayResponse.Get(response.REASON_CODE),
-			TransactionReference: 	"",
-			AvsResult:            	sleet.AVSResponseUnknown,
-			CvvResult:            	sleet.CVVResponseUnknown,
+			Success:                false,
+			Response:               gatewayResponse.Get(response.RESPONSE_CODE),
+			ErrorCode:              gatewayResponse.Get(response.REASON_CODE),
+			TransactionReference:   "",
+			AvsResult:              sleet.AVSResponseUnknown,
+			CvvResult:              sleet.CVVResponseUnknown,
 		}, nil
 	}
 
 	return &sleet.AuthorizationResponse{
-		Success: 				true,
-		TransactionReference: 	gatewayResponse.Get(response.TRANSACT_ID),
-		Response: 				gatewayResponse.Get(response.RESPONSE_CODE),
+		Success:                true,
+		TransactionReference:   gatewayResponse.Get(response.TRANSACT_ID),
+		Response:               gatewayResponse.Get(response.RESPONSE_CODE),
 	}, nil
 }
 
@@ -72,15 +72,15 @@ func (client *RocketgateClient) Capture(request *sleet.CaptureRequest) (*sleet.C
 	if !gatewayService.PerformTicket(gatewayRequest, gatewayResponse) {
 		errCode := gatewayResponse.Get(response.REASON_CODE)
 		return &sleet.CaptureResponse{
-			Success: 				false,
-			ErrorCode: 				&errCode,
-			TransactionReference: 	"",
+			Success:                false,
+			ErrorCode:              &errCode,
+			TransactionReference:   "",
 		}, nil
 	}
 
 	return &sleet.CaptureResponse{
-		Success:              true,
-		TransactionReference: gatewayResponse.Get(response.TRANSACT_ID),
+		Success:                true,
+		TransactionReference:   gatewayResponse.Get(response.TRANSACT_ID),
 	}, nil
 }
 
@@ -95,14 +95,14 @@ func (client *RocketgateClient) Void(request *sleet.VoidRequest) (*sleet.VoidRes
 	if !gatewayService.PerformVoid(gatewayRequest, gatewayResponse) {
 		errCode := gatewayResponse.Get(response.REASON_CODE)
 		return &sleet.VoidResponse{
-			Success: 				false,
-			ErrorCode: 				&errCode,
+			Success:    false,
+			ErrorCode:  &errCode,
 		}, nil
 	}
 
 	return &sleet.VoidResponse{
-		Success:              true,
-		TransactionReference: gatewayResponse.Get(response.TRANSACT_ID),
+		Success:                true,
+		TransactionReference:   gatewayResponse.Get(response.TRANSACT_ID),
 	}, nil
 }
 
@@ -117,8 +117,8 @@ func (client *RocketgateClient) Refund(request *sleet.RefundRequest) (*sleet.Ref
 	if !gatewayService.PerformCredit(gatewayRequest, gatewayResponse) {
 		errCode := gatewayResponse.Get(response.REASON_CODE)
 		return &sleet.RefundResponse{
-			Success: 				false,
-			ErrorCode: 				&errCode,
+			Success:    false,
+			ErrorCode:  &errCode,
 		}, nil
 	}
 
