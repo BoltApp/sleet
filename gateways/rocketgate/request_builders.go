@@ -21,7 +21,12 @@ var initiatorTypeToCofType = map[sleet.ProcessingInitiatorType]string{
 	sleet.ProcessingInitiatorTypeFollowingRecurring:        cofMIT,
 }
 
-func buildAuthRequest(merchantID string, merchantPassword string, merchantAccount *string, authRequest *sleet.AuthorizationRequest) *request.GatewayRequest {
+func buildAuthRequest(
+	merchantID string,
+	merchantPassword string,
+	merchantAccount *string,
+	authRequest *sleet.AuthorizationRequest,
+) *request.GatewayRequest {
 	card := authRequest.CreditCard
 
 	gatewayRequest := request.NewGatewayRequest()
@@ -53,7 +58,11 @@ func buildAuthRequest(merchantID string, merchantPassword string, merchantAccoun
 	return gatewayRequest
 }
 
-func buildCaptureRequest(merchantID string, merchantPassword string, captureRequest *sleet.CaptureRequest) *request.GatewayRequest {
+func buildCaptureRequest(
+	merchantID string,
+	merchantPassword string,
+	captureRequest *sleet.CaptureRequest,
+) *request.GatewayRequest {
 	gatewayRequest := request.NewGatewayRequest()
 
 	gatewayRequest.Set(request.MERCHANT_ID, merchantID)
@@ -67,7 +76,11 @@ func buildCaptureRequest(merchantID string, merchantPassword string, captureRequ
 	return gatewayRequest
 }
 
-func buildVoidRequest(merchantID string, merchantPassword string, voidRequest *sleet.VoidRequest) *request.GatewayRequest {
+func buildVoidRequest(
+	merchantID string,
+	merchantPassword string,
+	voidRequest *sleet.VoidRequest,
+) *request.GatewayRequest {
 	gatewayRequest := request.NewGatewayRequest()
 
 	gatewayRequest.Set(request.MERCHANT_ID, merchantID)
@@ -77,7 +90,11 @@ func buildVoidRequest(merchantID string, merchantPassword string, voidRequest *s
 	return gatewayRequest
 }
 
-func buildRefundRequest(merchantID string, merchantPassword string, refundRequest *sleet.RefundRequest) *request.GatewayRequest {
+func buildRefundRequest(
+	merchantID string,
+	merchantPassword string,
+	refundRequest *sleet.RefundRequest,
+) *request.GatewayRequest {
 	gatewayRequest := request.NewGatewayRequest()
 
 	gatewayRequest.Set(request.MERCHANT_ID, merchantID)
