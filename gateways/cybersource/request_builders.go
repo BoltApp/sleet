@@ -143,10 +143,16 @@ func buildCaptureRequest(captureRequest *sleet.CaptureRequest) (*Request, error)
 			},
 		},
 	}
-	if captureRequest.ClientTransactionReference != nil {
+	if captureRequest.MerchantOrderReference != nil {
 		request.ClientReferenceInformation = &ClientReferenceInformation{
-			Code: *captureRequest.ClientTransactionReference,
+			Code: *captureRequest.MerchantOrderReference,
 		}
+	}
+	if captureRequest.ClientTransactionReference != nil {
+		request.MerchantDefinedInformation = append(request.MerchantDefinedInformation, MerchantDefinedInformation{
+			Key: "1",
+			Value: *captureRequest.ClientTransactionReference,
+		})
 	}
 	return request, nil
 }
@@ -154,10 +160,16 @@ func buildCaptureRequest(captureRequest *sleet.CaptureRequest) (*Request, error)
 func buildVoidRequest(voidRequest *sleet.VoidRequest) (*Request, error) {
 	// Maybe add reason / more details, but for now nothing
 	request := &Request{}
-	if voidRequest.ClientTransactionReference != nil {
+	if voidRequest.MerchantOrderReference != nil {
 		request.ClientReferenceInformation = &ClientReferenceInformation{
-			Code: *voidRequest.ClientTransactionReference,
+			Code: *voidRequest.MerchantOrderReference,
 		}
+	}
+	if voidRequest.ClientTransactionReference != nil {
+		request.MerchantDefinedInformation = append(request.MerchantDefinedInformation, MerchantDefinedInformation{
+			Key: "1",
+			Value: *voidRequest.ClientTransactionReference,
+		})
 	}
 	return request, nil
 }
@@ -172,10 +184,16 @@ func buildRefundRequest(refundRequest *sleet.RefundRequest) (*Request, error) {
 			},
 		},
 	}
-	if refundRequest.ClientTransactionReference != nil {
+	if refundRequest.MerchantOrderReference != nil {
 		request.ClientReferenceInformation = &ClientReferenceInformation{
-			Code: *refundRequest.ClientTransactionReference,
+			Code: *refundRequest.MerchantOrderReference,
 		}
+	}
+	if refundRequest.ClientTransactionReference != nil {
+		request.MerchantDefinedInformation = append(request.MerchantDefinedInformation, MerchantDefinedInformation{
+			Key: "1",
+			Value: *refundRequest.ClientTransactionReference,
+		})
 	}
 	return request, nil
 }
