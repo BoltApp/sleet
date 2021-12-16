@@ -61,7 +61,7 @@ func buildCaptureRequest(merchantID string, merchantPassword string, captureRequ
 	gatewayRequest.Set(request.TRANSACT_ID, captureRequest.TransactionReference)
 
 	// Optional if the amount is the same as the original purchase or auth-only transaction.
-	gatewayRequest.Set(request.AMOUNT, strconv.Itoa(int(captureRequest.Amount.Amount)))
+	gatewayRequest.Set(request.AMOUNT, sleet.AmountToDecimalString(captureRequest.Amount))
 	gatewayRequest.Set(request.CURRENCY, captureRequest.Amount.Currency)
 
 	return gatewayRequest
@@ -85,7 +85,7 @@ func buildRefundRequest(merchantID string, merchantPassword string, refundReques
 	gatewayRequest.Set(request.TRANSACT_ID, refundRequest.TransactionReference)
 
 	// Optional if the amount is the same as the original purchase or auth-only transaction.
-	gatewayRequest.Set(request.AMOUNT, strconv.Itoa(int(refundRequest.Amount.Amount)))
+	gatewayRequest.Set(request.AMOUNT, sleet.AmountToDecimalString(refundRequest.Amount))
 	gatewayRequest.Set(request.CURRENCY, refundRequest.Amount.Currency)
 
 	return gatewayRequest
