@@ -36,7 +36,7 @@ func buildAuthRequest(merchantID string, merchantPassword string, merchantAccoun
 	gatewayRequest.Set(request.CARDNO, card.Number)
 	gatewayRequest.Set(request.EXPIRE_MONTH, strconv.Itoa(card.ExpirationMonth))
 	gatewayRequest.Set(request.EXPIRE_YEAR, strconv.Itoa(card.ExpirationYear))
-	gatewayRequest.Set(request.AMOUNT, strconv.Itoa(int(authRequest.Amount.Amount)))
+	gatewayRequest.Set(request.AMOUNT, sleet.AmountToDecimalString(&authRequest.Amount))
 	gatewayRequest.Set(request.CURRENCY, authRequest.Amount.Currency)
 
 	// overwrites the flag transactions
@@ -47,7 +47,7 @@ func buildAuthRequest(merchantID string, merchantPassword string, merchantAccoun
 	}
 
 	// Ignore CVV and AVS check
-	gatewayRequest.Set(request.CVV2_CHECK, "IGNORE")
+	gatewayRequest.Set(request.CVV2_CHECK, "NO")
 	gatewayRequest.Set(request.AVS_CHECK, "IGNORE")
 
 	return gatewayRequest

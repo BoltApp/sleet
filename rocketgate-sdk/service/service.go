@@ -194,7 +194,7 @@ func (r GatewayService) BuildPaymentLink(req *request.GatewayRequest,
 }
 
 // SetTestMode Enable/Disable testing mode.
-func (r GatewayService) SetTestMode(testingMode bool) {
+func (r *GatewayService) SetTestMode(testingMode bool) {
 	if testingMode {
 		r._ROCKETGATE_HOST = _ROCKETGATE_TEST_HOST
 		r._ROCKETGATE_PROTOCOL = _ROCKETGATE_TEST_PROTOCOL
@@ -284,7 +284,7 @@ func (r GatewayService) getConnectTimeout(req *request.GatewayRequest) int64 {
 	return int64(connectTimeout) * 1000
 }
 
-func (r GatewayService) getServerNameAndCleanFailedParams(req *request.GatewayRequest, resp *response.GatewayResponse) (string, bool) {
+func (r *GatewayService) getServerNameAndCleanFailedParams(req *request.GatewayRequest, resp *response.GatewayResponse) (string, bool) {
 	fullURL := req.Get(request.GATEWAY_URL)
 	if fullURL == "" {
 		fullURL = req.Get(request.EMBEDDED_FIELDS_TOKEN)
