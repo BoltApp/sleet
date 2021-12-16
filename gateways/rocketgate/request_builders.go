@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/BoltApp/sleet"
-	"github.com/BoltApp/sleet/rocketgate-sdk/request"
+	"github.com/rocketgate/rocketgate-go-sdk/request"
 )
 
 // Cof specifies the transaction type under the Credential-on-File framework
@@ -41,7 +41,7 @@ func buildAuthRequest(
 	gatewayRequest.Set(request.CARDNO, card.Number)
 	gatewayRequest.Set(request.EXPIRE_MONTH, strconv.Itoa(card.ExpirationMonth))
 	gatewayRequest.Set(request.EXPIRE_YEAR, strconv.Itoa(card.ExpirationYear))
-	gatewayRequest.Set(request.AMOUNT, strconv.Itoa(int(authRequest.Amount.Amount)))
+	gatewayRequest.Set(request.AMOUNT, sleet.AmountToDecimalString(&authRequest.Amount))
 	gatewayRequest.Set(request.CURRENCY, authRequest.Amount.Currency)
 
 	// overwrites the flag transactions
@@ -52,8 +52,12 @@ func buildAuthRequest(
 	}
 
 	// Ignore CVV and AVS check
-	gatewayRequest.Set(request.CVV2_CHECK, "IGNORE")
 	gatewayRequest.Set(request.AVS_CHECK, "IGNORE")
+	gatewayRequest.Set(request.CVV2_CHECK, "NO")
+	if card.CVV != "" {
+		gatewayRequest.Set(request.CVV2, card.CVV)
+		gatewayRequest.Set(request.CVV2_CHECK, "IGNORE")
+	}
 
 	return gatewayRequest
 }
@@ -70,7 +74,7 @@ func buildCaptureRequest(
 	gatewayRequest.Set(request.TRANSACT_ID, captureRequest.TransactionReference)
 
 	// Optional if the amount is the same as the original purchase or auth-only transaction.
-	gatewayRequest.Set(request.AMOUNT, strconv.Itoa(int(captureRequest.Amount.Amount)))
+	gatewayRequest.Set(request.AMOUNT, sleet.AmountToDecimalString(captureRequest.Amount))
 	gatewayRequest.Set(request.CURRENCY, captureRequest.Amount.Currency)
 
 	return gatewayRequest
@@ -102,7 +106,7 @@ func buildRefundRequest(
 	gatewayRequest.Set(request.TRANSACT_ID, refundRequest.TransactionReference)
 
 	// Optional if the amount is the same as the original purchase or auth-only transaction.
-	gatewayRequest.Set(request.AMOUNT, strconv.Itoa(int(refundRequest.Amount.Amount)))
+	gatewayRequest.Set(request.AMOUNT, sleet.AmountToDecimalString(refundRequest.Amount))
 	gatewayRequest.Set(request.CURRENCY, refundRequest.Amount.Currency)
 
 	return gatewayRequest

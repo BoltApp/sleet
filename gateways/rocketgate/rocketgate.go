@@ -5,8 +5,8 @@ import (
 
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
-	"github.com/BoltApp/sleet/rocketgate-sdk/response"
-	"github.com/BoltApp/sleet/rocketgate-sdk/service"
+	"github.com/rocketgate/rocketgate-go-sdk/response"
+	"github.com/rocketgate/rocketgate-go-sdk/service"
 )
 
 // RocketgateClient represents an HTTP client and the associated authentication information required for
