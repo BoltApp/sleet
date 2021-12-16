@@ -284,7 +284,7 @@ func (r GatewayService) getConnectTimeout(req *request.GatewayRequest) int64 {
 	return int64(connectTimeout) * 1000
 }
 
-func (r *GatewayService) getServerNameAndCleanFailedParams(req *request.GatewayRequest, resp *response.GatewayResponse) (string, bool) {
+func (r GatewayService) getServerNameAndCleanFailedParams(req *request.GatewayRequest, resp *response.GatewayResponse) (string, bool) {
 	fullURL := req.Get(request.GATEWAY_URL)
 	if fullURL == "" {
 		fullURL = req.Get(request.EMBEDDED_FIELDS_TOKEN)
