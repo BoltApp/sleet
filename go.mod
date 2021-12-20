@@ -12,7 +12,7 @@ require (
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/google/go-cmp v0.5.1
 	github.com/jarcoal/httpmock v1.0.5
-	github.com/rocketgate/rocketgate-go-sdk v0.0.0-20211216201057-1639c0c82738 // indirect
+	github.com/rocketgate/rocketgate-go-sdk v0.0.0-20211217152011-c85f16d1e9f3 // indirect
 	github.com/stripe/stripe-go v70.11.0+incompatible
 	golang.org/x/net v0.0.0-20201110031124-69a78807bb2b // indirect
 	golang.org/x/oauth2 v0.0.0-20201109201403-9fd604954f58 // indirect
