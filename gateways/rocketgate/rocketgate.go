@@ -5,8 +5,8 @@ import (
 
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
-	"github.com/rocketgate/rocketgate-go-sdk/response"
-	"github.com/rocketgate/rocketgate-go-sdk/service"
+	"github.com/rlcooper46/rocketgate-go-sdk/response"
+	"github.com/rlcooper46/rocketgate-go-sdk/service"
 )
 
 // RocketgateClient represents an HTTP client and the associated authentication information required for
@@ -53,6 +53,7 @@ func (client *RocketgateClient) Authorize(request *sleet.AuthorizationRequest) (
 	gatewayRequest := buildAuthRequest(client.merchantID, client.merchantPassword, client.merchantAccount, request)
 
 	gatewayService.SetTestMode(client.testMode)
+	gatewayService.SetHttpClient(client.httpClient)
 
 	if !gatewayService.PerformAuthOnly(gatewayRequest, gatewayResponse) {
 		return &sleet.AuthorizationResponse{

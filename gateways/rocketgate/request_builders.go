@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/BoltApp/sleet"
-	"github.com/rocketgate/rocketgate-go-sdk/request"
+	"github.com/rlcooper46/rocketgate-go-sdk/request"
 )
 
 // Cof specifies the transaction type under the Credential-on-File framework
