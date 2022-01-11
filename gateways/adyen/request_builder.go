@@ -55,13 +55,6 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		},
 		// Adyen requires a reference in request so this will panic if client doesn't pass it. Assuming this is good for now
 		Reference: *authRequest.ClientTransactionReference,
-		PaymentMethod: map[string]interface{}{
-			"expiryMonth": strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
-			"expiryYear":  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
-			"holderName":  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
-			"number":      authRequest.CreditCard.Number,
-			"type":        "scheme",
-		},
 		MerchantAccount:        merchantAccount,
 		MerchantOrderReference: authRequest.MerchantOrderReference,
 
@@ -69,6 +62,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		ShopperReference: authRequest.ShopperReference,
 	}
 
+	addPaymentMethod(authRequest, request)
 	addPaymentSpecificFields(authRequest, request)
 	addShopperData(authRequest, request)
 	addAddresses(authRequest, request)
@@ -112,6 +106,24 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 	}
 
 	return request
+}
+
+// addPaymentMethod add payment method to the adyen payment request.
+func addPaymentMethod(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
+	if authRequest.Options["ApplePayToken"] != nil {
+		request.PaymentMethod = map[string]interface{}{
+			"type": "applepay",
+			"applePayToken": authRequest.Options["ApplePayToken"].(string),
+		}
+	} else {
+		request.PaymentMethod = map[string]interface{}{
+			"expiryMonth": strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
+			"expiryYear":  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
+			"holderName":  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
+			"number":      authRequest.CreditCard.Number,
+			"type":        "scheme",
+		}
+	}
 }
 
 // addPaymentSpecificFields adds fields to the Adyen Payment request that are dependent on the payment method
