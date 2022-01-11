@@ -145,7 +145,7 @@ func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *
 			Eci:                    authRequest.ECI,
 		}
 		request.PaymentMethod["brand"] = "applepay"
-		request.RecurringProcessingModel = recurringProcessingModelSubscription
+		request.RecurringProcessingModel = recurringProcessingModelCardOnFile
 		request.ShopperInteraction = shopperInteractionEcommerce
 	} else if authRequest.CreditCard.CVV != "" {
 		// New customer credit card request
