@@ -24,6 +24,8 @@ func TestBuildAuthRequest(t *testing.T) {
 	requestWithLevel3ItemDiscount := sleet_testing.BaseAuthorizationRequest()
 	requestWithLevel3ItemDiscount.Level3Data = sleet_testing.BaseLevel3Data()
 	requestWithLevel3ItemDiscount.Level3Data.LineItems[0].ItemDiscountAmount.Amount = 100
+	requestWithApplePayToken := sleet_testing.BaseAuthorizationRequest()
+	requestWithApplePayToken.Options["ApplePayToken"] = "test"
 
 	baseWithAydenData := sleet_testing.BaseAuthorizationRequest()
 	enhanceBaseAuthorizationDataWithAdditionalFields(baseWithAydenData)
