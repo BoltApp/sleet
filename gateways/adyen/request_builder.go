@@ -17,11 +17,19 @@ const (
 	maxProductCodeLength         = 12
 )
 
+// Options
+const (
+	applePayTokenOption = "ApplePayToken"
+	shopperIPOption = "ShopperIP"
+)
+
+// Shopper Interactions
 const (
 	shopperInteractionEcommerce = "Ecommerce"
 	shopperInteractionContAuth  = "ContAuth"
 )
 
+// Recurring Processing Models
 const (
 	recurringProcessingModelCardOnFile            = "CardOnFile"
 	recurringProcessingModelSubscription          = "Subscription"
@@ -55,13 +63,6 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		},
 		// Adyen requires a reference in request so this will panic if client doesn't pass it. Assuming this is good for now
 		Reference: *authRequest.ClientTransactionReference,
-		PaymentMethod: map[string]interface{}{
-			"expiryMonth": strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
-			"expiryYear":  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
-			"holderName":  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
-			"number":      authRequest.CreditCard.Number,
-			"type":        "scheme",
-		},
 		MerchantAccount:        merchantAccount,
 		MerchantOrderReference: authRequest.MerchantOrderReference,
 
@@ -85,8 +86,8 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 
 	// overwrites for citiplcc
 	if authRequest.CreditCard.Network == sleet.CreditCardNetworkCitiPLCC {
-		request.RecurringProcessingModel = "Subscription"
-		request.ShopperInteraction = "Ecommerce"
+		request.RecurringProcessingModel = recurringProcessingModelSubscription
+		request.ShopperInteraction = shopperInteractionEcommerce
 	}
 
 	level3 := authRequest.Level3Data
@@ -116,6 +117,22 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 
 // addPaymentSpecificFields adds fields to the Adyen Payment request that are dependent on the payment method
 func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
+	// Add PaymentMethod field
+	if authRequest.Options[applePayTokenOption] != nil {
+		request.PaymentMethod = map[string]interface{}{
+			"type": "applepay",
+			"applePayToken": authRequest.Options[applePayTokenOption].(string),
+		}
+	} else {
+		request.PaymentMethod = map[string]interface{}{
+			"expiryMonth": strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
+			"expiryYear":  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
+			"holderName":  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
+			"number":      authRequest.CreditCard.Number,
+			"type":        "scheme",
+		}
+	}
+
 	if authRequest.Cryptogram != "" && authRequest.ECI != "" {
 		// Apple Pay request
 		request.MpiData = &checkout.ThreeDSecureData{
@@ -125,15 +142,15 @@ func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *
 			Eci:                    authRequest.ECI,
 		}
 		request.PaymentMethod["brand"] = "applepay"
-		request.RecurringProcessingModel = "CardOnFile"
-		request.ShopperInteraction = "Ecommerce"
+		request.RecurringProcessingModel = recurringProcessingModelCardOnFile
+		request.ShopperInteraction = shopperInteractionEcommerce
 	} else if authRequest.CreditCard.CVV != "" {
 		// New customer credit card request
 		request.PaymentMethod["cvc"] = authRequest.CreditCard.CVV
-		request.ShopperInteraction = "Ecommerce"
+		request.ShopperInteraction = shopperInteractionEcommerce
 		if authRequest.CreditCard.Save {
 			// Customer opts in to saving card details
-			request.RecurringProcessingModel = "CardOnFile"
+			request.RecurringProcessingModel = recurringProcessingModelCardOnFile
 			request.StorePaymentMethod = true
 		} else {
 			// Customer opts out of saving card details
@@ -141,8 +158,8 @@ func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *
 		}
 	} else {
 		// Existing customer credit card request
-		request.RecurringProcessingModel = "CardOnFile"
-		request.ShopperInteraction = "ContAuth"
+		request.RecurringProcessingModel = recurringProcessingModelCardOnFile
+		request.ShopperInteraction = shopperInteractionContAuth
 	}
 }
 
@@ -174,8 +191,8 @@ func addAddresses(authRequest *sleet.AuthorizationRequest, request *checkout.Pay
 
 // addShopperData adds the shoppers IP and email to the Ayden Payment request if available
 func addShopperData(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
-	if authRequest.Options["ShopperIP"] != nil {
-		request.ShopperIP = authRequest.Options["ShopperIP"].(string)
+	if authRequest.Options[shopperIPOption] != nil {
+		request.ShopperIP = authRequest.Options[shopperIPOption].(string)
 	}
 	if authRequest.BillingAddress.Email != nil {
 		request.ShopperEmail = common.SafeStr(authRequest.BillingAddress.Email)
