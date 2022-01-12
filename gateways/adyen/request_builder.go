@@ -70,7 +70,6 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 		ShopperReference: authRequest.ShopperReference,
 	}
 
-	addPaymentMethod(authRequest, request)
 	addPaymentSpecificFields(authRequest, request)
 	addShopperData(authRequest, request)
 	addAddresses(authRequest, request)
@@ -116,8 +115,9 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 	return request
 }
 
-// addPaymentMethod add payment method to the adyen payment request.
-func addPaymentMethod(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
+// addPaymentSpecificFields adds fields to the Adyen Payment request that are dependent on the payment method
+func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
+	// Add PaymentMethod field
 	if authRequest.Options[applePayTokenOption] != nil {
 		request.PaymentMethod = map[string]interface{}{
 			"type": "applepay",
@@ -132,10 +132,7 @@ func addPaymentMethod(authRequest *sleet.AuthorizationRequest, request *checkout
 			"type":        "scheme",
 		}
 	}
-}
 
-// addPaymentSpecificFields adds fields to the Adyen Payment request that are dependent on the payment method
-func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
 	if authRequest.Cryptogram != "" && authRequest.ECI != "" {
 		// Apple Pay request
 		request.MpiData = &checkout.ThreeDSecureData{
