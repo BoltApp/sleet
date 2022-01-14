@@ -13,12 +13,29 @@ const (
 	cofMIT = "MIT"	// Merchant Initiated Transaction
 )
 
+// Indicator for the type of billing operation
+const (
+	oneTimeNonMembershipSale = "S"
+	initialMembershipBillingSignup = "I"
+	conversionOfTrialToFullMembership = "C"
+	instantUpgradeOfTrialMembershipToFullMembership = "U"
+	standardRebillOfMembership = "R"
+)
+
 var initiatorTypeToCofType = map[sleet.ProcessingInitiatorType]string{
 	sleet.ProcessingInitiatorTypeInitialCardOnFile:         cofCIT,
 	sleet.ProcessingInitiatorTypeInitialRecurring:          cofCIT,
 	sleet.ProcessingInitiatorTypeStoredCardholderInitiated: cofCIT,
 	sleet.ProcessingInitiatorTypeStoredMerchantInitiated:   cofMIT,
 	sleet.ProcessingInitiatorTypeFollowingRecurring:        cofMIT,
+}
+
+var initatorTypeToBillingType = map[sleet.ProcessingInitiatorType] string {
+	sleet.ProcessingInitiatorTypeInitialCardOnFile:         oneTimeNonMembershipSale,
+	sleet.ProcessingInitiatorTypeInitialRecurring:          initialMembershipBillingSignup,
+	sleet.ProcessingInitiatorTypeStoredCardholderInitiated: oneTimeNonMembershipSale,
+	sleet.ProcessingInitiatorTypeStoredMerchantInitiated:   oneTimeNonMembershipSale,
+	sleet.ProcessingInitiatorTypeFollowingRecurring:        standardRebillOfMembership,
 }
 
 func buildAuthRequest(
@@ -48,6 +65,9 @@ func buildAuthRequest(
 	if authRequest.ProcessingInitiator != nil {
 		if cofType, ok := initiatorTypeToCofType[*authRequest.ProcessingInitiator]; ok {
 			gatewayRequest.Set(request.COF_FRAMEWORK, cofType)
+		}
+		if billingType, ok := initatorTypeToBillingType[*authRequest.ProcessingInitiator]; ok {
+			gatewayRequest.Set(request.BILLING_TYPE, billingType)
 		}
 	}
 
