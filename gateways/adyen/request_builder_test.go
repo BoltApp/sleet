@@ -24,6 +24,9 @@ func TestBuildAuthRequest(t *testing.T) {
 	requestWithLevel3ItemDiscount := sleet_testing.BaseAuthorizationRequest()
 	requestWithLevel3ItemDiscount.Level3Data = sleet_testing.BaseLevel3Data()
 	requestWithLevel3ItemDiscount.Level3Data.LineItems[0].ItemDiscountAmount.Amount = 100
+	requestWithApplePayToken := sleet_testing.BaseAuthorizationRequest()
+	requestWithApplePayToken.CreditCard.CVV = ""
+	requestWithApplePayToken.Options = map[string]interface{}{applePayTokenOption: "testApplePayToken"}
 
 	baseWithAydenData := sleet_testing.BaseAuthorizationRequest()
 	enhanceBaseAuthorizationDataWithAdditionalFields(baseWithAydenData)
@@ -234,6 +237,34 @@ func TestBuildAuthRequest(t *testing.T) {
 				RecurringProcessingModel: "Subscription",
 				Reference:                *requestCitiPLCC.ClientTransactionReference,
 				StorePaymentMethod:       true,
+				ShopperReference:         "test",
+			},
+		},
+		{
+			"Basic Auth Request With ApplePayToken",
+			requestWithApplePayToken,
+			&checkout.PaymentRequest{
+				Amount: checkout.Amount{
+					Currency: "USD",
+					Value:    100,
+				},
+				BillingAddress: &checkout.Address{
+					City:            *base.BillingAddress.Locality,
+					Country:         *base.BillingAddress.CountryCode,
+					PostalCode:      *base.BillingAddress.PostalCode,
+					StateOrProvince: *base.BillingAddress.RegionCode,
+					Street:          "Railroad Street",
+					HouseNumberOrName: "7683",
+				},
+				MerchantAccount: "merchant-account",
+				PaymentMethod: map[string]interface{}{
+					"type":        "applepay",
+					"applePayToken": "testApplePayToken",
+				},
+				ShopperInteraction:       "ContAuth",
+				RecurringProcessingModel: "CardOnFile",
+				Reference:                *requestWithApplePayToken.ClientTransactionReference,
+				StorePaymentMethod:       false,
 				ShopperReference:         "test",
 			},
 		},

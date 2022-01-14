@@ -53,6 +53,7 @@ func (client *RocketgateClient) Authorize(request *sleet.AuthorizationRequest) (
 	gatewayRequest := buildAuthRequest(client.merchantID, client.merchantPassword, client.merchantAccount, request)
 
 	gatewayService.SetTestMode(client.testMode)
+	gatewayService.SetHttpClient(client.httpClient)
 
 	if !gatewayService.PerformAuthOnly(gatewayRequest, gatewayResponse) {
 		return &sleet.AuthorizationResponse{
