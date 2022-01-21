@@ -2,11 +2,12 @@ package cybersource
 
 // Request contains the information needed for all request types (Auth, Capture, Void, Refund)
 type Request struct {
-	ClientReferenceInformation *ClientReferenceInformation   `json:"clientReferenceInformation,omitempty"`
-	ProcessingInformation      *ProcessingInformation        `json:"processingInformation,omitempty"`
-	OrderInformation           *OrderInformation             `json:"orderInformation,omitempty"`
-	PaymentInformation         *PaymentInformation           `json:"paymentInformation,omitempty"`
-	MerchantDefinedInformation []MerchantDefinedInformation  `json:"merchantDefinedInformation,omitempty"`
+	ClientReferenceInformation        *ClientReferenceInformation        `json:"clientReferenceInformation,omitempty"`
+	ProcessingInformation             *ProcessingInformation             `json:"processingInformation,omitempty"`
+	OrderInformation                  *OrderInformation                  `json:"orderInformation,omitempty"`
+	PaymentInformation                *PaymentInformation                `json:"paymentInformation,omitempty"`
+	MerchantDefinedInformation        []MerchantDefinedInformation       `json:"merchantDefinedInformation,omitempty"`
+	ConsumerAuthenticationInformation *ConsumerAuthenticationInformation `json:"consumerAuthenticationInformation,omitempty"`
 }
 
 // Response contains all of the fields for all Cybersource API call responses
@@ -136,9 +137,10 @@ type ShippingDetails struct {
 	Company        string `json:"company,omitempty"`
 }
 
-// PaymentInformation just stores Card information (but can be extended to other payment types)
+// PaymentInformation stores Card or TokenizedCard information (but can be extended to other payment types)
 type PaymentInformation struct {
-	Card CardInformation `json:"card"`
+	Card          *CardInformation `json:"card,omitempty"`
+	TokenizedCard *TokenizedCard   `json:"tokenizedCard,omitempty"`
 }
 
 // MerchantDefinedInformation stores the custom data that the merchant defines.
@@ -153,6 +155,16 @@ type CardInformation struct {
 	ExpMonth string `json:"expirationMonth"`
 	Number   string `json:"number"`
 	CVV      string `json:"securityCode"`
+}
+
+// TokenizedCard stores tokenized card details
+type TokenizedCard struct {
+	Number          string `json:"number"`
+	ExpirationMonth string `json:"expirationMonth"`
+	ExpirationYear  string `json:"expirationYear"`
+	Type            string `json:"type,omitempty"`
+	TransactionType string `json:"transactionType"`
+	Cryptogram      string `json:"cryptogram"`
 }
 
 // Links are part of the response which specify URLs to hit via REST to take follow-up actions (capture, void, etc)
@@ -178,4 +190,11 @@ type Initiator struct {
 	InitiatorType          string `json:"type"`
 	CredentialStoredOnFile bool   `json:"credentialStoredOnFile"`
 	StoredCredentialUsed   bool   `json:"storedCredentialUsed"`
+}
+
+type ConsumerAuthenticationInformation struct {
+	UcafAuthenticationData  string `json:"ucafAuthenticationData,omitempty"`
+	UcafCollectionIndicator string `json:"ucafCollectionIndicator,omitempty"`
+	Xid                     string `json:"xid,omitempty"`
+	Cavv                    string `json:"cavv,omitempty"`
 }
