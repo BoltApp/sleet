@@ -1,7 +1,9 @@
 package cybersource
 
 import (
+	"errors"
 	"fmt"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"strconv"
@@ -164,6 +166,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 				Cavv: authRequest.Cryptogram,
 			}
 		default:
+			return nil, errors.New("unsupported payment method")
 		}
 	}
 
