@@ -1,5 +1,24 @@
 package cybersource
 
+type (
+	CommerceIndicatorType string
+	CardType              string
+)
+
+const (
+	CommerceIndicatorInternet   CommerceIndicatorType = "internet"
+	CommerceIndicatorMastercard CommerceIndicatorType = "spa"
+	CommerceIndicatorAmex       CommerceIndicatorType = "aesk"
+	CommerceIndicatorDiscover   CommerceIndicatorType = "dipb"
+)
+
+const (
+	CardTypeVisa       CardType = "001"
+	CardTypeMastercard CardType = "002"
+	CardTypeAmex       CardType = "003"
+	CardTypeDiscover   CardType = "004"
+)
+
 // Request contains the information needed for all request types (Auth, Capture, Void, Refund)
 type Request struct {
 	ClientReferenceInformation        *ClientReferenceInformation        `json:"clientReferenceInformation,omitempty"`

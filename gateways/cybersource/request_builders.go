@@ -15,22 +15,16 @@ const (
 )
 
 const (
-	CommerceIndicatorInternet   = "internet"
-	CommerceIndicatorMastercard = "spa"
-	CommerceIndicatorAmex       = "aesk"
-	CommerceIndicatorDiscover   = "dipb"
-)
-
-const (
-	CardTypeVisa       = "001"
-	CardTypeMastercard = "002"
-	CardTypeAmex       = "003"
-	CardTypeDiscover   = "004"
-)
-
-const (
 	AmexCryptogramMaxLength   = 40
 	AmexCryptogramSplitLength = 20
+)
+
+const (
+	TransactionTypeInApp = "1"
+)
+
+const (
+	PaymentSolutionApplepay = "001"
 )
 
 // add mappings
@@ -78,7 +72,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 		},
 		ProcessingInformation: &ProcessingInformation{
 			Capture:           false, // no autocapture for now
-			CommerceIndicator: CommerceIndicatorInternet,
+			CommerceIndicator: string(CommerceIndicatorInternet),
 			AuthorizationOptions: &AuthorizationOptions{
 				Initiator: &Initiator{
 					InitiatorType: initiatorType,
@@ -117,56 +111,9 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 
 	// Apple Pay request
 	if authRequest.Cryptogram != "" {
-		request.PaymentInformation = &PaymentInformation{
-			TokenizedCard: &TokenizedCard{
-				Number: authRequest.CreditCard.Number,
-				ExpirationYear: strconv.Itoa(authRequest.CreditCard.ExpirationYear),
-				ExpirationMonth: fmt.Sprintf("%02d", authRequest.CreditCard.ExpirationMonth),
-				TransactionType: "1",	// in-app transaction
-				Cryptogram: authRequest.Cryptogram,
-			},
-		}
-
-		request.ProcessingInformation.PaymentSolution = "001"	// Apple Pay
-
-		switch authRequest.CreditCard.Network {
-		case sleet.CreditCardNetworkVisa:
-			request.PaymentInformation.TokenizedCard.Type = CardTypeVisa
-			request.ConsumerAuthenticationInformation = &ConsumerAuthenticationInformation{
-				Xid: authRequest.Cryptogram,
-				Cavv: authRequest.Cryptogram,
-			}
-		case sleet.CreditCardNetworkMastercard:
-			request.PaymentInformation.TokenizedCard.Type = CardTypeMastercard
-			request.ProcessingInformation.CommerceIndicator = CommerceIndicatorMastercard
-			request.ConsumerAuthenticationInformation = &ConsumerAuthenticationInformation{
-				UcafAuthenticationData: authRequest.Cryptogram,
-				UcafCollectionIndicator: "2",
-			}
-		case sleet.CreditCardNetworkAmex:
-			request.PaymentInformation.TokenizedCard.Type = CardTypeAmex
-			request.ProcessingInformation.CommerceIndicator = CommerceIndicatorAmex
-			request.ConsumerAuthenticationInformation = &ConsumerAuthenticationInformation{
-				Cavv: authRequest.Cryptogram,
-			}
-
-			// For a 40-byte cryptogram, split the cryptogram into two 20-byte binary values (block A and block B).
-			// Send the first 20-byte value (block A) in the cavv field. Send the second 20-byte value (block B) in
-			// the xid field.
-			if len(authRequest.Cryptogram) == AmexCryptogramMaxLength {
-				request.ConsumerAuthenticationInformation = &ConsumerAuthenticationInformation{
-					Cavv: authRequest.Cryptogram[:AmexCryptogramSplitLength],
-					Xid: authRequest.Cryptogram[AmexCryptogramSplitLength:],
-				}
-			}
-		case sleet.CreditCardNetworkDiscover:
-			request.PaymentInformation.TokenizedCard.Type = CardTypeDiscover
-			request.ProcessingInformation.CommerceIndicator = CommerceIndicatorDiscover
-			request.ConsumerAuthenticationInformation = &ConsumerAuthenticationInformation{
-				Cavv: authRequest.Cryptogram,
-			}
-		default:
-			return nil, errors.New("unsupported payment method")
+		err := buildApplepayRequest(authRequest, request)
+		if err != nil {
+			return nil, err
 		}
 	}
 
@@ -274,4 +221,70 @@ func buildRefundRequest(refundRequest *sleet.RefundRequest) (*Request, error) {
 		})
 	}
 	return request, nil
+}
+
+func buildApplepayRequest(authRequest *sleet.AuthorizationRequest, request *Request) error {
+	request.PaymentInformation = &PaymentInformation{
+		TokenizedCard: &TokenizedCard{
+			Number: authRequest.CreditCard.Number,
+			ExpirationYear: strconv.Itoa(authRequest.CreditCard.ExpirationYear),
+			ExpirationMonth: fmt.Sprintf("%02d", authRequest.CreditCard.ExpirationMonth),
+			TransactionType: TransactionTypeInApp,
+			Cryptogram: authRequest.Cryptogram,
+		},
+	}
+
+	request.ProcessingInformation.PaymentSolution = PaymentSolutionApplepay
+
+	switch authRequest.CreditCard.Network {
+	case sleet.CreditCardNetworkVisa:
+		request.PaymentInformation.TokenizedCard.Type = string(CardTypeVisa)
+		request.ConsumerAuthenticationInformation = &ConsumerAuthenticationInformation{
+			Xid: authRequest.Cryptogram,
+			Cavv: authRequest.Cryptogram,
+		}
+	case sleet.CreditCardNetworkMastercard:
+		request.PaymentInformation.TokenizedCard.Type = string(CardTypeMastercard)
+		request.ProcessingInformation.CommerceIndicator = string(CommerceIndicatorMastercard)
+		request.ConsumerAuthenticationInformation = &ConsumerAuthenticationInformation{
+			UcafAuthenticationData: authRequest.Cryptogram,
+			UcafCollectionIndicator: "2",
+		}
+	case sleet.CreditCardNetworkAmex:
+		request.PaymentInformation.TokenizedCard.Type = string(CardTypeAmex)
+		request.ProcessingInformation.CommerceIndicator = string(CommerceIndicatorAmex)
+		consumerAuthInfo, err := getAmexConsumerAuthInfo(authRequest.Cryptogram)
+		if err != nil {
+			return err
+		}
+		request.ConsumerAuthenticationInformation = consumerAuthInfo
+	case sleet.CreditCardNetworkDiscover:
+		request.PaymentInformation.TokenizedCard.Type = string(CardTypeDiscover)
+		request.ProcessingInformation.CommerceIndicator = string(CommerceIndicatorDiscover)
+		request.ConsumerAuthenticationInformation = &ConsumerAuthenticationInformation{
+			Cavv: authRequest.Cryptogram,
+		}
+	default:
+		return errors.New("unsupported payment method")
+	}
+
+	return nil
+}
+
+func getAmexConsumerAuthInfo(cryptogram string) (*ConsumerAuthenticationInformation, error) {
+	if len(cryptogram) > AmexCryptogramMaxLength {
+		return nil, errors.New("invalid Amex cryptogram length")
+	} else if len(cryptogram) == AmexCryptogramMaxLength {
+		// For a 40-byte cryptogram, split the cryptogram into two 20-byte binary values (block A and block B).
+		// Send the first 20-byte value (block A) in the cavv field. Send the second 20-byte value (block B) in
+		// the xid field.
+		return &ConsumerAuthenticationInformation{
+			Cavv: cryptogram[:AmexCryptogramSplitLength],
+			Xid: cryptogram[AmexCryptogramSplitLength:],
+		}, nil
+	}
+
+	return &ConsumerAuthenticationInformation{
+		Cavv: cryptogram,
+	}, nil
 }
