@@ -17,13 +17,7 @@ const (
 const (
 	AmexCryptogramMaxLength   = 40
 	AmexCryptogramSplitLength = 20
-)
-
-const (
 	TransactionTypeInApp = "1"
-)
-
-const (
 	PaymentSolutionApplepay = "001"
 )
 
