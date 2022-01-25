@@ -25,7 +25,7 @@ func (client *CheckoutDotComClient) Authorize(request *sleet.AuthorizationReques
 	config, err := checkout.Create(client.apiKey, nil)
 
 	if err != nil {
-		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: sleet.AVSResponseUnknown, CvvResult: sleet.CVVResponseUnknown, ErrorCode: err.Error()}, err
+		return nil, err
 	}
 	var checkoutDCClient = payments.NewClient(*config)
 
@@ -38,9 +38,9 @@ func (client *CheckoutDotComClient) Authorize(request *sleet.AuthorizationReques
 	return &sleet.AuthorizationResponse{
 		Success:              true,
 		TransactionReference: response.Processed.Reference,
-		AvsResult:            sleet.AVSresponseZipMatchAddressMatch, // TODO: Add translator
-		CvvResult:            sleet.CVVResponseMatch,                // TODO: Add translator
-		AvsResultRaw:         response.Processed.ID,
+		AvsResult:            sleet.AVSresponseZipMatchAddressMatch, // TODO: Use translateAvs(AVSResponseCode(response.Processed.Source.AVSCheck)) to enable avs code handling
+		CvvResult:            sleet.CVVResponseMatch, // TODO: use translateCvv(CVVResponseCode(response.Processed.Source.CVVCheck)) to enable cvv code handling
+		AvsResultRaw:         response.Processed.Source.AVSCheck,
 		CvvResultRaw:         response.Processed.Source.CVVCheck,
 	}, nil
 }
@@ -49,7 +49,7 @@ func (client *CheckoutDotComClient) Authorize(request *sleet.AuthorizationReques
 func (client *CheckoutDotComClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	config, err := checkout.Create(client.apiKey, nil)
 	if err != nil {
-		return &sleet.CaptureResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, nil
+		return nil, err
 	}
 
 	checkoutDCClient := payments.NewClient(*config)
@@ -66,7 +66,7 @@ func (client *CheckoutDotComClient) Capture(request *sleet.CaptureRequest) (*sle
 func (client *CheckoutDotComClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
 	config, err := checkout.Create(client.apiKey, nil)
 	if err != nil {
-		return &sleet.RefundResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, nil
+		return nil, err
 	}
 	checkoutDCClient := payments.NewClient(*config)
 	response, err := checkoutDCClient.Refunds("pay_", buildRefundParams(request), nil)
@@ -81,7 +81,7 @@ func (client *CheckoutDotComClient) Refund(request *sleet.RefundRequest) (*sleet
 func (client *CheckoutDotComClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
 	config, err := checkout.Create(client.apiKey, nil)
 	if err != nil {
-		return &sleet.VoidResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, nil
+		return nil, err
 	}
 	checkoutDCClient := payments.NewClient(*config)
 
