@@ -1,4 +1,4 @@
-package checkoutdotcom
+package checkoutcom
 
 type CVVResponseCode string
 

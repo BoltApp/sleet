@@ -1,4 +1,4 @@
-package checkoutdotcom
+package checkoutcom
 
 import (
 	"github.com/BoltApp/sleet"
@@ -7,21 +7,21 @@ import (
 	"github.com/checkout/checkout-sdk-go/payments"
 )
 
-// CheckoutDotComClient uses API-Key and custom http client to make http calls
-type CheckoutDotComClient struct {
+// checkoutomClient uses API-Key and custom http client to make http calls
+type CheckoutComClient struct {
 	apiKey     string
 }
 
-// NewClient creates a CheckoutDotComClient
+// NewClient creates a CheckoutComClient
 // Note: the environment is indicated by the apiKey. See "isSandbox" assignment in checkout.Create.
-func NewClient(apiKey string) *CheckoutDotComClient {
-	return &CheckoutDotComClient{
+func NewClient(apiKey string) *CheckoutComClient {
+	return &CheckoutComClient{
 		apiKey:     apiKey,
 	}
 }
 
 // Authorize a transaction for specified amount
-func (client *CheckoutDotComClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
+func (client *CheckoutComClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	config, err := checkout.Create(client.apiKey, nil)
 
 	if err != nil {
@@ -46,7 +46,7 @@ func (client *CheckoutDotComClient) Authorize(request *sleet.AuthorizationReques
 }
 
 // Capture an authorized transaction by charge ID
-func (client *CheckoutDotComClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
+func (client *CheckoutComClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	config, err := checkout.Create(client.apiKey, nil)
 	if err != nil {
 		return nil, err
@@ -63,7 +63,7 @@ func (client *CheckoutDotComClient) Capture(request *sleet.CaptureRequest) (*sle
 }
 
 // Refund a captured transaction with amount and charge ID
-func (client *CheckoutDotComClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+func (client *CheckoutComClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
 	config, err := checkout.Create(client.apiKey, nil)
 	if err != nil {
 		return nil, err
@@ -78,7 +78,7 @@ func (client *CheckoutDotComClient) Refund(request *sleet.RefundRequest) (*sleet
 }
 
 // Void an authorized transaction with charge ID
-func (client *CheckoutDotComClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+func (client *CheckoutComClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
 	config, err := checkout.Create(client.apiKey, nil)
 	if err != nil {
 		return nil, err

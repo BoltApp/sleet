@@ -1,4 +1,4 @@
-package checkoutdotcom
+package checkoutcom
 
 import "github.com/BoltApp/sleet"
 
