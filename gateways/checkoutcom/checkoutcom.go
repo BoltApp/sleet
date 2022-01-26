@@ -1,35 +1,60 @@
 package checkoutcom
 
 import (
+	"crypto/tls"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/checkout/checkout-sdk-go"
 	"github.com/checkout/checkout-sdk-go/payments"
+	"net/http"
+	"time"
 )
 
 // checkoutomClient uses API-Key and custom http client to make http calls
 type CheckoutComClient struct {
 	apiKey     string
+	httpClient *http.Client
 }
 
 // NewClient creates a CheckoutComClient
 // Note: the environment is indicated by the apiKey. See "isSandbox" assignment in checkout.Create.
 func NewClient(apiKey string) *CheckoutComClient {
+	return NewWithHTTPClient(apiKey, defaultHttpClient)
+}
+
+// NewWithHTTPClient uses a custom http client for requests
+func NewWithHTTPClient(apiKey string, httpClient *http.Client) *CheckoutComClient {
 	return &CheckoutComClient{
 		apiKey:     apiKey,
+		httpClient: httpClient,
 	}
+}
+
+var defaultHttpClient = &http.Client{
+	Timeout: 60 * time.Second,
+
+	// Disable HTTP2 by default (see stripe-go library - https://github.com/stripe/stripe-go/blob/d1d103ec32297246e5b086c867f3c18a166bf8bd/stripe.go#L1050 )
+	Transport: &http.Transport{
+		TLSNextProto: make(map[string]func(string, *tls.Conn) http.RoundTripper),
+	},
 }
 
 // Authorize a transaction for specified amount
 func (client *CheckoutComClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	config, err := checkout.Create(client.apiKey, nil)
-
 	if err != nil {
 		return nil, err
 	}
+	config.HTTPClient = client.httpClient
+
 	var checkoutDCClient = payments.NewClient(*config)
 
-	response, err := checkoutDCClient.Request(buildChargeParams(request), nil)
+	input, err := buildChargeParams(request)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := checkoutDCClient.Request(input, nil)
 
 	if err != nil {
 		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: sleet.AVSResponseUnknown, CvvResult: sleet.CVVResponseUnknown, ErrorCode: err.Error()}, err
@@ -51,10 +76,16 @@ func (client *CheckoutComClient) Capture(request *sleet.CaptureRequest) (*sleet.
 	if err != nil {
 		return nil, err
 	}
+	config.HTTPClient = client.httpClient
 
 	checkoutDCClient := payments.NewClient(*config)
 
-	response, err := checkoutDCClient.Captures("pay_", buildCaptureParams(request), nil)
+	input, err := buildCaptureParams(request)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := checkoutDCClient.Captures("pay_", input, nil)
 
 	if err != nil {
 		return &sleet.CaptureResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, nil
@@ -68,8 +99,16 @@ func (client *CheckoutComClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 	if err != nil {
 		return nil, err
 	}
+	config.HTTPClient = client.httpClient
+
 	checkoutDCClient := payments.NewClient(*config)
-	response, err := checkoutDCClient.Refunds("pay_", buildRefundParams(request), nil)
+
+	input, err := buildRefundParams(request)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := checkoutDCClient.Refunds("pay_", input, nil)
 	if err != nil {
 		return &sleet.RefundResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, nil
 	}
@@ -83,9 +122,16 @@ func (client *CheckoutComClient) Void(request *sleet.VoidRequest) (*sleet.VoidRe
 	if err != nil {
 		return nil, err
 	}
+	config.HTTPClient = client.httpClient
+
 	checkoutDCClient := payments.NewClient(*config)
 
-	response, err := checkoutDCClient.Voids("pay_", buildVoidParams(request), nil)
+	input, err := buildVoidParams(request)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := checkoutDCClient.Voids("pay_", input, nil)
 
 	if err != nil {
 		return &sleet.VoidResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, nil

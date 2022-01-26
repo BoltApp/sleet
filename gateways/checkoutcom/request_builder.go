@@ -6,7 +6,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/payments"
 )
 
-func buildChargeParams(authRequest *sleet.AuthorizationRequest) *payments.Request {
+func buildChargeParams(authRequest *sleet.AuthorizationRequest) (*payments.Request, error) {
 	var source = payments.CardSource{
 		Type: "card",
 		Number: authRequest.CreditCard.Number,
@@ -33,27 +33,27 @@ func buildChargeParams(authRequest *sleet.AuthorizationRequest) *payments.Reques
 			Email: *authRequest.BillingAddress.Email,
 			Name:  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
 		},
-	}
+	}, nil
 }
 
-func buildRefundParams(refundRequest *sleet.RefundRequest) *payments.RefundsRequest {
+func buildRefundParams(refundRequest *sleet.RefundRequest) (*payments.RefundsRequest, error) {
 	return &payments.RefundsRequest{
 		Amount:    uint64(refundRequest.Amount.Amount),
 		Reference: refundRequest.TransactionReference,
-	}
+	}, nil
 }
 
-func buildCaptureParams(captureRequest *sleet.CaptureRequest) *payments.CapturesRequest {
+func buildCaptureParams(captureRequest *sleet.CaptureRequest) (*payments.CapturesRequest, error) {
 	return &payments.CapturesRequest{
 		Amount:    uint64(captureRequest.Amount.Amount),
 		Reference: captureRequest.TransactionReference,
-	}
+	}, nil
 }
 
-func buildVoidParams(voidRequest *sleet.VoidRequest) *payments.VoidsRequest {
+func buildVoidParams(voidRequest *sleet.VoidRequest) (*payments.VoidsRequest, error) {
 	return &payments.VoidsRequest{
 		Reference: voidRequest.TransactionReference,
-	}
+	}, nil
 }
 
 
