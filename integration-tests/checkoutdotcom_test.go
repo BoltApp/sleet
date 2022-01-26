@@ -10,7 +10,6 @@ import (
 
 // TestCheckoutDotComAuthorizeFailed
 //
-// Stripe has test cards here: https://stripe.com/docs/testing#cards-responses
 // Using a rejected card number
 func TestCheckoutDotComAuthorizeFailed(t *testing.T) {
 	client := checkoutdotcom.NewClient(getEnv("CHECKOUTDOTCOM_TEST_KEY"))
@@ -29,7 +28,7 @@ func TestCheckoutDotComAuthorizeFailed(t *testing.T) {
 
 // TestCheckoutDotComAuth
 //
-// This should successfully create an authorization on Stripe
+// This should successfully create an authorization
 func TestCheckoutDotComAuth(t *testing.T) {
 	client := checkoutdotcom.NewClient(getEnv("CHECKOUTDOTCOM_TEST_KEY"))
 	request := sleet_testing.BaseAuthorizationRequest()
