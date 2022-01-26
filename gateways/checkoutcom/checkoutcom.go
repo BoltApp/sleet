@@ -1,13 +1,11 @@
 package checkoutcom
 
 import (
-	"crypto/tls"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/checkout/checkout-sdk-go"
 	"github.com/checkout/checkout-sdk-go/payments"
 	"net/http"
-	"time"
 )
 
 // checkoutomClient uses API-Key and custom http client to make http calls
@@ -19,7 +17,7 @@ type CheckoutComClient struct {
 // NewClient creates a CheckoutComClient
 // Note: the environment is indicated by the apiKey. See "isSandbox" assignment in checkout.Create.
 func NewClient(apiKey string) *CheckoutComClient {
-	return NewWithHTTPClient(apiKey, defaultHttpClient)
+	return NewWithHTTPClient(apiKey, common.DefaultHttpClient())
 }
 
 // NewWithHTTPClient uses a custom http client for requests
@@ -28,15 +26,6 @@ func NewWithHTTPClient(apiKey string, httpClient *http.Client) *CheckoutComClien
 		apiKey:     apiKey,
 		httpClient: httpClient,
 	}
-}
-
-var defaultHttpClient = &http.Client{
-	Timeout: 60 * time.Second,
-
-	// Disable HTTP2 by default (see stripe-go library - https://github.com/stripe/stripe-go/blob/d1d103ec32297246e5b086c867f3c18a166bf8bd/stripe.go#L1050 )
-	Transport: &http.Transport{
-		TLSNextProto: make(map[string]func(string, *tls.Conn) http.RoundTripper),
-	},
 }
 
 // Authorize a transaction for specified amount
