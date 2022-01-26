@@ -10,12 +10,12 @@ import (
 
 // TestCheckoutDotComAuthorizeFailed
 //
+// checkout.com has test cards here: https://www.checkout.com/docs/testing/test-card-numbers
 // Using a rejected card number
 func TestCheckoutDotComAuthorizeFailed(t *testing.T) {
 	client := checkoutdotcom.NewClient(getEnv("CHECKOUTDOTCOM_TEST_KEY"))
 	failedRequest := sleet_testing.BaseAuthorizationRequest()
-	// set ClientTransactionReference to be empty
-	failedRequest.CreditCard.Number = "4000000000009995"
+	failedRequest.CreditCard.Number = "4870527017700692"
 	_, err := client.Authorize(failedRequest)
 	if err == nil {
 		t.Error("Authorize request should have failed with bad card number")
@@ -28,7 +28,7 @@ func TestCheckoutDotComAuthorizeFailed(t *testing.T) {
 
 // TestCheckoutDotComAuth
 //
-// This should successfully create an authorization
+// This should successfully create an authorizationz
 func TestCheckoutDotComAuth(t *testing.T) {
 	client := checkoutdotcom.NewClient(getEnv("CHECKOUTDOTCOM_TEST_KEY"))
 	request := sleet_testing.BaseAuthorizationRequest()
