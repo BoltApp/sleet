@@ -2,7 +2,8 @@ package checkoutcom
 
 import (
 	"github.com/BoltApp/sleet"
-	"github.com/checkout/checkout-sdk-go/common"
+	"github.com/BoltApp/sleet/common"
+	checkout_com_common "github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/payments"
 )
 
@@ -14,13 +15,13 @@ func buildChargeParams(authRequest *sleet.AuthorizationRequest) (*payments.Reque
 		ExpiryYear: uint64(authRequest.CreditCard.ExpirationYear),
 		Name: authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
 		CVV: authRequest.CreditCard.CVV,
-		BillingAddress: &common.Address{
-			AddressLine1: *authRequest.BillingAddress.StreetAddress1,
-			AddressLine2: *authRequest.BillingAddress.StreetAddress2,
-			City:         *authRequest.BillingAddress.Locality,
-			State:        *authRequest.BillingAddress.RegionCode,
-			ZIP:          *authRequest.BillingAddress.PostalCode,
-			Country:      *authRequest.BillingAddress.CountryCode,
+		BillingAddress: &checkout_com_common.Address{
+			AddressLine1: common.SafeStr(authRequest.BillingAddress.StreetAddress1),
+			AddressLine2: common.SafeStr(authRequest.BillingAddress.StreetAddress2),
+			City:         common.SafeStr(authRequest.BillingAddress.Locality),
+			State:        common.SafeStr(authRequest.BillingAddress.RegionCode),
+			ZIP:          common.SafeStr(authRequest.BillingAddress.PostalCode),
+			Country:      common.SafeStr(authRequest.BillingAddress.CountryCode),
 		},
 	}
 
@@ -30,7 +31,7 @@ func buildChargeParams(authRequest *sleet.AuthorizationRequest) (*payments.Reque
 		Currency: authRequest.Amount.Currency,
 		Reference: *authRequest.ClientTransactionReference,
 		Customer: &payments.Customer{
-			Email: *authRequest.BillingAddress.Email,
+			Email: common.SafeStr(authRequest.BillingAddress.Email),
 			Name:  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
 		},
 	}, nil
