@@ -4,31 +4,35 @@ import (
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/gateways/checkoutcom"
 	sleet_testing "github.com/BoltApp/sleet/testing"
-	"strings"
 	"testing"
 )
 
 // TestCheckoutComAuthorizeFailed
 //
-// checkout.com has test cards here: https://www.checkout.com/docs/testing/test-card-numbers
+// checkout.com has test cards here: https://www.checkout.com/docs/four/testing/response-code-testing
 // Using a rejected card number
 func TestCheckoutComAuthorizeFailed(t *testing.T) {
 	client := checkoutcom.NewClient(getEnv("CHECKOUTCOM_TEST_KEY"))
 	failedRequest := sleet_testing.BaseAuthorizationRequest()
-	failedRequest.CreditCard.Number = "4870527017700692"
-	_, err := client.Authorize(failedRequest)
-	if err == nil {
-		t.Error("Authorize request should have failed with bad card number")
+	failedRequest.CreditCard.Number = "4544249167673670"
+	response, err := client.Authorize(failedRequest)
+
+	if err != nil {
+		t.Errorf("Authorize request should not have an error even if authorization failed- %s", err.Error())
 	}
 
-	if !strings.Contains(err.Error(), "Your card has insufficient funds.") {
-		t.Errorf("Response should contain insufficient funds- %s", err.Error())
+	if response.Success {
+		t.Error("Auth response should indicate a failure")
+	}
+
+	if response.Response != "20051" {
+		t.Errorf("Response should be 20051, code for insufficient funds- %s", response.Response)
 	}
 }
 
 // TestCheckoutComAuth
 //
-// This should successfully create an authorizationz
+// This should successfully create an authorization
 func TestCheckoutComAuth(t *testing.T) {
 	client := checkoutcom.NewClient(getEnv("CHECKOUTCOM_TEST_KEY"))
 	request := sleet_testing.BaseAuthorizationRequest()

@@ -49,14 +49,26 @@ func (client *CheckoutComClient) Authorize(request *sleet.AuthorizationRequest) 
 		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: sleet.AVSResponseUnknown, CvvResult: sleet.CVVResponseUnknown, ErrorCode: err.Error()}, err
 	}
 
-	return &sleet.AuthorizationResponse{
-		Success:              true,
-		TransactionReference: response.Processed.Reference,
-		AvsResult:            sleet.AVSresponseZipMatchAddressMatch, // TODO: Use translateAvs(AVSResponseCode(response.Processed.Source.AVSCheck)) to enable avs code handling
-		CvvResult:            sleet.CVVResponseMatch, // TODO: use translateCvv(CVVResponseCode(response.Processed.Source.CVVCheck)) to enable cvv code handling
-		AvsResultRaw:         response.Processed.Source.AVSCheck,
-		CvvResultRaw:         response.Processed.Source.CVVCheck,
-	}, nil
+	if *response.Processed.Approved {
+		return &sleet.AuthorizationResponse{
+			Success:              true,
+			TransactionReference: response.Processed.ID,
+			AvsResult:            sleet.AVSresponseZipMatchAddressMatch, // TODO: Use translateAvs(AVSResponseCode(response.Processed.Source.AVSCheck)) to enable avs code handling
+			CvvResult:            sleet.CVVResponseMatch,                // TODO: use translateCvv(CVVResponseCode(response.Processed.Source.CVVCheck)) to enable cvv code handling
+			AvsResultRaw:         response.Processed.Source.AVSCheck,
+			CvvResultRaw:         response.Processed.Source.CVVCheck,
+			Response:             response.Processed.ResponseCode,
+		}, nil
+	} else {
+		return &sleet.AuthorizationResponse{
+			Success:              false,
+			TransactionReference: "",
+			AvsResult:            sleet.AVSResponseUnknown,
+			CvvResult:            sleet.CVVResponseUnknown,
+			Response:             response.Processed.ResponseCode,
+			ErrorCode:            response.Processed.ResponseCode,
+		}, nil
+	}
 }
 
 // Capture an authorized transaction by charge ID
@@ -74,7 +86,7 @@ func (client *CheckoutComClient) Capture(request *sleet.CaptureRequest) (*sleet.
 		return nil, err
 	}
 
-	response, err := checkoutDCClient.Captures("pay_", input, nil)
+	response, err := checkoutDCClient.Captures(request.TransactionReference, input, nil)
 
 	if err != nil {
 		return &sleet.CaptureResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, nil
@@ -97,7 +109,7 @@ func (client *CheckoutComClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 		return nil, err
 	}
 
-	response, err := checkoutDCClient.Refunds("pay_", input, nil)
+	response, err := checkoutDCClient.Refunds(request.TransactionReference, input, nil)
 	if err != nil {
 		return &sleet.RefundResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, nil
 	}
@@ -120,7 +132,7 @@ func (client *CheckoutComClient) Void(request *sleet.VoidRequest) (*sleet.VoidRe
 		return nil, err
 	}
 
-	response, err := checkoutDCClient.Voids("pay_", input, nil)
+	response, err := checkoutDCClient.Voids(request.TransactionReference, input, nil)
 
 	if err != nil {
 		return &sleet.VoidResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, nil

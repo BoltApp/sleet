@@ -28,6 +28,7 @@ func buildChargeParams(authRequest *sleet.AuthorizationRequest) (*payments.Reque
 	return &payments.Request{
 		Source:   source,
 		Amount:   uint64(authRequest.Amount.Amount),
+		Capture:  common.BPtr(false),
 		Currency: authRequest.Amount.Currency,
 		Reference: *authRequest.ClientTransactionReference,
 		Customer: &payments.Customer{
