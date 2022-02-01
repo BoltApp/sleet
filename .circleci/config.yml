@@ -20,10 +20,7 @@ jobs:
       - run:
           name: Unit Test
           command: |
-            go test -v \
-              -coverpkg $(go list ./... | grep -v integration-tests | grep -v testing | tr '\n' ',' | sed -e 's/.$//') \
-              -coverprofile=unit_coverage.profile -tags=unit \
-              $(go list ./... | grep -v integration-tests)
+            go test -v
       - run:
           name: Integration Test
           command: |
