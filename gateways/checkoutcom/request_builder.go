@@ -13,39 +13,6 @@ const (
 	cofMIT = "MIT"	// Merchant Initiated Transaction
 )
 
-// Indicator for the type of billing operation
-const (
-	oneTimeNonMembershipSale = "S"
-	initialMembershipBillingSignup = "I"
-	conversionOfTrialToFullMembership = "C"
-	instantUpgradeOfTrialMembershipToFullMembership = "U"
-	standardRebillOfMembership = "R"
-)
-
-var initiatorTypeToCredentialsStored = map[sleet.ProcessingInitiatorType] bool {
-	sleet.ProcessingInitiatorTypeInitialCardOnFile:         false,
-	sleet.ProcessingInitiatorTypeInitialRecurring:          false,
-	sleet.ProcessingInitiatorTypeStoredCardholderInitiated: true,
-	sleet.ProcessingInitiatorTypeStoredMerchantInitiated:   true,
-	sleet.ProcessingInitiatorTypeFollowingRecurring:        true,
-}
-
-var initiatorTypeToCofType = map[sleet.ProcessingInitiatorType]string{
-	sleet.ProcessingInitiatorTypeInitialCardOnFile:         cofCIT,
-	sleet.ProcessingInitiatorTypeInitialRecurring:          cofCIT,
-	sleet.ProcessingInitiatorTypeStoredCardholderInitiated: cofCIT,
-	sleet.ProcessingInitiatorTypeStoredMerchantInitiated:   cofMIT,
-	sleet.ProcessingInitiatorTypeFollowingRecurring:        cofMIT,
-}
-
-var initatorTypeToBillingType = map[sleet.ProcessingInitiatorType] string {
-	sleet.ProcessingInitiatorTypeInitialCardOnFile:         oneTimeNonMembershipSale,
-	sleet.ProcessingInitiatorTypeInitialRecurring:          initialMembershipBillingSignup,
-	sleet.ProcessingInitiatorTypeStoredCardholderInitiated: oneTimeNonMembershipSale,
-	sleet.ProcessingInitiatorTypeStoredMerchantInitiated:   oneTimeNonMembershipSale,
-	sleet.ProcessingInitiatorTypeFollowingRecurring:        standardRebillOfMembership,
-}
-
 func buildChargeParams(authRequest *sleet.AuthorizationRequest) (*payments.Request, error) {
 	var source = payments.CardSource{
 		Type: "card",
