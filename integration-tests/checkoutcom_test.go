@@ -5,6 +5,7 @@ import (
 	"github.com/BoltApp/sleet/gateways/checkoutcom"
 	sleet_testing "github.com/BoltApp/sleet/testing"
 	"testing"
+	"time"
 )
 
 // TestCheckoutComAuthorizeFailed
@@ -64,6 +65,7 @@ func TestCheckoutComAuthFullCapture(t *testing.T) {
 	captureRequest := &sleet.CaptureRequest{
 		Amount:               &authRequest.Amount,
 		TransactionReference: auth.TransactionReference,
+		ClientTransactionReference: authRequest.ClientTransactionReference,
 	}
 	capture, err := client.Capture(captureRequest)
 	if err != nil {
@@ -95,7 +97,9 @@ func TestCheckoutComAuthPartialCapture(t *testing.T) {
 		Amount: &sleet.Amount{
 			Amount:   50,
 			Currency: "USD",
-		}, TransactionReference: auth.TransactionReference,
+		},
+		TransactionReference: auth.TransactionReference,
+		ClientTransactionReference: authRequest.ClientTransactionReference,
 	}
 	capture, err := client.Capture(captureRequest)
 	if err != nil {
@@ -153,6 +157,7 @@ func TestCheckoutComAuthCaptureRefund(t *testing.T) {
 	captureRequest := &sleet.CaptureRequest{
 		Amount:               &authRequest.Amount,
 		TransactionReference: auth.TransactionReference,
+		ClientTransactionReference: authRequest.ClientTransactionReference,
 	}
 	capture, err := client.Capture(captureRequest)
 	if err != nil {
@@ -162,6 +167,8 @@ func TestCheckoutComAuthCaptureRefund(t *testing.T) {
 	if !capture.Success {
 		t.Error("Resulting capture should have been successful")
 	}
+
+	time.Sleep(3 * time.Second)
 
 	refundRequest := &sleet.RefundRequest{
 		Amount:               &authRequest.Amount,
