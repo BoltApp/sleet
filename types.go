@@ -78,17 +78,17 @@ type Level3Data struct {
 type AuthorizationRequest struct {
 	Amount                        Amount
 	BillingAddress                *Address
-	Channel                       string  // for Psps that track the sales channel
-	ClientTransactionReference    *string // Custom transaction reference metadata that will be associated with this request
+	Channel                       string                   // for PSPs that track the sales channel
+	ClientTransactionReference    *string                  // Custom transaction reference metadata that will be associated with this request
 	CreditCard                    *CreditCard
-	Cryptogram                    string // for Network Tokenization methods
-	ECI                           string // E-Commerce Indicator (can be used for Network Tokenization as well)
+	Cryptogram                    string                   // for Network Tokenization methods
+	ECI                           string                   // E-Commerce Indicator (can be used for Network Tokenization as well)
 	Level3Data                    *Level3Data
 	MerchantOrderReference        string                   // Similar to ClientTransactionReference but specifically if we want to store the shopping cart order id
 	PreviousExternalTransactionID *string                  // If we are in a recurring situation, then we can use the PreviousExternalTransactionID as part of the auth request
 	ProcessingInitiator           *ProcessingInitiatorType // For Card on File transactions we want to store the various different types (initial cof, initial recurring, etc)
 	ShippingAddress               *Address
-	ShopperReference              string // shopperReference used to get adyen recurring info
+	ShopperReference              string                   // ShopperReference Unique reference to a shopper (shopperId, etc.)
 	ThreeDS                       *ThreeDS
 
 	Options map[string]interface{}
@@ -112,7 +112,7 @@ type AuthorizationResponse struct {
 	AvsResultRaw          string
 	CvvResultRaw          string
 	RTAUResult            *RTAUResponse
-	AdyenAdditionalData   map[string]string // store additional Adyen recurring info
+	AdyenAdditionalData   map[string]string      // store additional recurring info (will be refactored to general naming on next major version upgrade)
 }
 
 // CaptureRequest specifies the authorized transaction to capture and also an amount for partial capture use cases
