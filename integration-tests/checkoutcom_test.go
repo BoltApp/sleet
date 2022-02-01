@@ -168,11 +168,12 @@ func TestCheckoutComAuthCaptureRefund(t *testing.T) {
 		t.Error("Resulting capture should have been successful")
 	}
 
-	time.Sleep(3 * time.Second)
+	time.Sleep(4 * time.Second) // Delay to make sure capture has processed
 
 	refundRequest := &sleet.RefundRequest{
 		Amount:               &authRequest.Amount,
 		TransactionReference: capture.TransactionReference,
+		ClientTransactionReference: authRequest.ClientTransactionReference,
 	}
 
 	refund, err := client.Refund(refundRequest)

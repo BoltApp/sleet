@@ -41,7 +41,7 @@ func buildChargeParams(authRequest *sleet.AuthorizationRequest) (*payments.Reque
 func buildRefundParams(refundRequest *sleet.RefundRequest) (*payments.RefundsRequest, error) {
 	return &payments.RefundsRequest{
 		Amount:    uint64(refundRequest.Amount.Amount),
-		Reference: refundRequest.TransactionReference,
+		Reference: *refundRequest.ClientTransactionReference,
 	}, nil
 }
 
