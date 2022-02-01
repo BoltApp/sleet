@@ -77,40 +77,6 @@ func TestCheckoutComAuthFullCapture(t *testing.T) {
 	}
 }
 
-// TestCheckoutComAuthPartialCapture
-//
-// This should successfully create an authorization on checkout.com then Capture for a partial amount
-// Since we auth for 1.00USD, we will capture for $0.50
-func TestCheckoutComAuthPartialCapture(t *testing.T) {
-	client := checkoutcom.NewClient(getEnv("CHECKOUTCOM_TEST_KEY"))
-	authRequest := sleet_testing.BaseAuthorizationRequest()
-	auth, err := client.Authorize(authRequest)
-	if err != nil {
-		t.Error("Authorize request should not have failed")
-	}
-
-	if !auth.Success {
-		t.Error("Resulting auth should have been successful")
-	}
-
-	captureRequest := &sleet.CaptureRequest{
-		Amount: &sleet.Amount{
-			Amount:   50,
-			Currency: "USD",
-		},
-		TransactionReference: auth.TransactionReference,
-		ClientTransactionReference: authRequest.ClientTransactionReference,
-	}
-	capture, err := client.Capture(captureRequest)
-	if err != nil {
-		t.Error("Capture request should not have failed")
-	}
-
-	if !capture.Success {
-		t.Error("Resulting capture should have been successful")
-	}
-}
-
 // TestCheckoutComAuthVoid
 //
 // This should successfully create an authorization on checkout.com then Void/Cancel the Auth

@@ -1,6 +1,8 @@
 package checkoutcom
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/checkout/checkout-sdk-go"
@@ -8,6 +10,8 @@ import (
 	"net/http"
 	"strconv"
 )
+
+// checkout.com documentation here: https://www.checkout.com/docs/four/payments/accept-payments, SDK here: https://github.com/checkout/checkout-sdk-go
 
 // checkoutomClient uses API-Key and custom http client to make http calls
 type CheckoutComClient struct {
@@ -31,26 +35,36 @@ func NewWithHTTPClient(apiKey string, httpClient *http.Client) *CheckoutComClien
 	}
 }
 
-// Authorize a transaction for specified amount
-func (client *CheckoutComClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
+func (client *CheckoutComClient) generateCheckoutDCClient() (*payments.Client, error) {
 	config, err := checkout.Create(client.apiKey, nil)
 	if err != nil {
 		return nil, err
 	}
 	config.HTTPClient = client.httpClient
 
-	var checkoutDCClient = payments.NewClient(*config)
+	return payments.NewClient(*config), nil
+}
+
+// Authorize a transaction for specified amount
+func (client *CheckoutComClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
+	checkoutComClient, err := client.generateCheckoutDCClient()
+	if err != nil {
+		return nil, err
+	}
 
 	input, err := buildChargeParams(request)
 	if err != nil {
 		return nil, err
 	}
 
-	response, err := checkoutDCClient.Request(input, nil)
+	response, err := checkoutComClient.Request(input, nil)
 
 	if err != nil {
 		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: sleet.AVSResponseUnknown, CvvResult: sleet.CVVResponseUnknown, ErrorCode: err.Error()}, err
 	}
+
+	out, _ := json.Marshal(response.StatusResponse.ResponseBody)
+	fmt.Printf(string(out))
 
 	if *response.Processed.Approved {
 		return &sleet.AuthorizationResponse{
@@ -76,23 +90,20 @@ func (client *CheckoutComClient) Authorize(request *sleet.AuthorizationRequest) 
 
 // Capture an authorized transaction by charge ID
 func (client *CheckoutComClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
-	config, err := checkout.Create(client.apiKey, nil)
+	checkoutComClient, err := client.generateCheckoutDCClient()
 	if err != nil {
 		return nil, err
 	}
-	config.HTTPClient = client.httpClient
-
-	checkoutDCClient := payments.NewClient(*config)
 
 	input, err := buildCaptureParams(request)
 	if err != nil {
 		return nil, err
 	}
 
-	response, err := checkoutDCClient.Captures(request.TransactionReference, input, nil)
+	response, err := checkoutComClient.Captures(request.TransactionReference, input, nil)
 
 	if err != nil {
-		return &sleet.CaptureResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, nil
+		return &sleet.CaptureResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, err
 	}
 
 	if response.StatusResponse.StatusCode == AcceptedStatusCode {
@@ -114,16 +125,16 @@ func (client *CheckoutComClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 	}
 	config.HTTPClient = client.httpClient
 
-	checkoutDCClient := payments.NewClient(*config)
+	checkoutComClient := payments.NewClient(*config)
 
 	input, err := buildRefundParams(request)
 	if err != nil {
 		return nil, err
 	}
 
-	response, err := checkoutDCClient.Refunds(request.TransactionReference, input, nil)
+	response, err := checkoutComClient.Refunds(request.TransactionReference, input, nil)
 	if err != nil {
-		return &sleet.RefundResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, nil
+		return &sleet.RefundResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, err
 	}
 
 	if response.StatusResponse.StatusCode == AcceptedStatusCode {
@@ -139,23 +150,20 @@ func (client *CheckoutComClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 
 // Void an authorized transaction with charge ID
 func (client *CheckoutComClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
-	config, err := checkout.Create(client.apiKey, nil)
+	checkoutComClient, err := client.generateCheckoutDCClient()
 	if err != nil {
 		return nil, err
 	}
-	config.HTTPClient = client.httpClient
-
-	checkoutDCClient := payments.NewClient(*config)
 
 	input, err := buildVoidParams(request)
 	if err != nil {
 		return nil, err
 	}
 
-	response, err := checkoutDCClient.Voids(request.TransactionReference, input, nil)
+	response, err := checkoutComClient.Voids(request.TransactionReference, input, nil)
 
 	if err != nil {
-		return &sleet.VoidResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, nil
+		return &sleet.VoidResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, err
 	}
 
 	if response.StatusResponse.StatusCode == AcceptedStatusCode {

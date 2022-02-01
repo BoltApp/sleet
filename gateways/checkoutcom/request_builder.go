@@ -30,7 +30,7 @@ func buildChargeParams(authRequest *sleet.AuthorizationRequest) (*payments.Reque
 		Amount:   uint64(authRequest.Amount.Amount),
 		Capture:  common.BPtr(false),
 		Currency: authRequest.Amount.Currency,
-		Reference: *authRequest.ClientTransactionReference,
+		Reference: authRequest.MerchantOrderReference,
 		Customer: &payments.Customer{
 			Email: common.SafeStr(authRequest.BillingAddress.Email),
 			Name:  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
@@ -41,20 +41,20 @@ func buildChargeParams(authRequest *sleet.AuthorizationRequest) (*payments.Reque
 func buildRefundParams(refundRequest *sleet.RefundRequest) (*payments.RefundsRequest, error) {
 	return &payments.RefundsRequest{
 		Amount:    uint64(refundRequest.Amount.Amount),
-		Reference: *refundRequest.ClientTransactionReference,
+		Reference: *refundRequest.MerchantOrderReference,
 	}, nil
 }
 
 func buildCaptureParams(captureRequest *sleet.CaptureRequest) (*payments.CapturesRequest, error) {
 	return &payments.CapturesRequest{
 		Amount:    uint64(captureRequest.Amount.Amount),
-		Reference: *captureRequest.ClientTransactionReference,
+		Reference: *captureRequest.MerchantOrderReference,
 	}, nil
 }
 
 func buildVoidParams(voidRequest *sleet.VoidRequest) (*payments.VoidsRequest, error) {
 	return &payments.VoidsRequest{
-		Reference: voidRequest.TransactionReference,
+		Reference: *voidRequest.MerchantOrderReference,
 	}, nil
 }
 
