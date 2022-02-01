@@ -66,6 +66,7 @@ func TestCheckoutComAuthFullCapture(t *testing.T) {
 		Amount:               &authRequest.Amount,
 		TransactionReference: auth.TransactionReference,
 		ClientTransactionReference: authRequest.ClientTransactionReference,
+		MerchantOrderReference: &authRequest.MerchantOrderReference,
 	}
 	capture, err := client.Capture(captureRequest)
 	if err != nil {
@@ -94,6 +95,7 @@ func TestCheckoutComAuthVoid(t *testing.T) {
 
 	voidRequest := &sleet.VoidRequest{
 		TransactionReference: auth.TransactionReference,
+		MerchantOrderReference: &authRequest.MerchantOrderReference,
 	}
 	void, err := client.Void(voidRequest)
 	if err != nil {
@@ -124,6 +126,7 @@ func TestCheckoutComAuthCaptureRefund(t *testing.T) {
 		Amount:               &authRequest.Amount,
 		TransactionReference: auth.TransactionReference,
 		ClientTransactionReference: authRequest.ClientTransactionReference,
+		MerchantOrderReference: &authRequest.MerchantOrderReference,
 	}
 	capture, err := client.Capture(captureRequest)
 	if err != nil {
@@ -140,6 +143,7 @@ func TestCheckoutComAuthCaptureRefund(t *testing.T) {
 		Amount:               &authRequest.Amount,
 		TransactionReference: capture.TransactionReference,
 		ClientTransactionReference: authRequest.ClientTransactionReference,
+		MerchantOrderReference: &authRequest.MerchantOrderReference,
 	}
 
 	refund, err := client.Refund(refundRequest)
