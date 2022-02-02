@@ -27,7 +27,9 @@ jobs:
       - run:
           name: Integration Test
           command: |
-            go test -v ./integration-tests/*.go
+            go test -v \
+              -coverpkg $(go list ./... | grep -v integration-tests | grep -v testing | tr '\n' ',' | sed -e 's/.$//') \
+              -coverprofile=integration_coverage.profile ./integration-tests/*.go
       - save_cache:
           key: v1-pkg-cache
           paths:
