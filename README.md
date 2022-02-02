@@ -32,6 +32,7 @@ We support abstracting PsP Webhook notifications into a common interface.
 | [Authorize.Net](https://developer.authorize.net/api/reference/index.html#payment-transactions) | ✅ | ❌ |
 | [Braintree](https://www.braintreepayments.com/) | ✅ | ❌ |
 | [CyberSource](https://developer.cybersource.com/api-reference-assets/index.html#payments) | ✅ | ❌ |
+| [Checkout.com](https://api-reference.checkout.com/) | ✅ | ❌ |
 | [FirstData](https://docs.firstdata.com/org/gateway/docs/api) | ✅ | ❌ |
 | [NMI](https://secure.networkmerchants.com/gw/merchants/resources/integration/integration_portal.php#methodology) | ✅ | ❌ |
 | [Orbital](https://developer.jpmorgan.com/products/orbital-api) | ✅ | ❌ |
