@@ -7,6 +7,9 @@ import (
 	"github.com/checkout/checkout-sdk-go/payments"
 )
 
+// Cof specifies the transaction type under the Credential-on-File framework
+const recurringPaymentType = "Recurring"
+
 func buildChargeParams(authRequest *sleet.AuthorizationRequest) (*payments.Request, error) {
 	var source = payments.CardSource{
 		Type: "card",
@@ -25,7 +28,7 @@ func buildChargeParams(authRequest *sleet.AuthorizationRequest) (*payments.Reque
 		},
 	}
 
-	return &payments.Request{
+	request := &payments.Request{
 		Source:   source,
 		Amount:   uint64(authRequest.Amount.Amount),
 		Capture:  common.BPtr(false),
@@ -35,7 +38,39 @@ func buildChargeParams(authRequest *sleet.AuthorizationRequest) (*payments.Reque
 			Email: common.SafeStr(authRequest.BillingAddress.Email),
 			Name:  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
 		},
-	}, nil
+	}
+
+	if authRequest.ProcessingInitiator != nil {
+		initializeProcessingInitiator(authRequest, request, &source)
+	}
+
+	return request, nil
+}
+
+func initializeProcessingInitiator(authRequest *sleet.AuthorizationRequest, request *payments.Request, source *payments.CardSource) {
+	// see documentation for instructions on stored credentials, merchant-initiated transactions, and subscriptions:
+	// https://www.checkout.com/docs/four/payments/accept-payments/use-saved-details/about-stored-card-details
+	switch *authRequest.ProcessingInitiator {
+	// initiated by merchant or cardholder, stored card, recurring, first payment
+	case sleet.ProcessingInitiatorTypeInitialRecurring:
+		if authRequest.CreditCard.Network == sleet.CreditCardNetworkVisa {
+			request.PaymentType = recurringPaymentType // visa only
+		}
+		request.MerchantInitiated = common.BPtr(false)
+	// initiated by merchant, stored card, recurring/single transaction, follow-on payment
+	case sleet.ProcessingInitiatorTypeFollowingRecurring,
+		sleet.ProcessingInitiatorTypeStoredMerchantInitiated:
+		request.MerchantInitiated = common.BPtr(true)
+		source.Stored = common.BPtr(true)
+		request.PaymentType = recurringPaymentType
+		request.PreviousPaymentID = *authRequest.PreviousExternalTransactionID
+	// initiated by cardholder, stored card, single transaction, follow-on payment
+	case sleet.ProcessingInitiatorTypeStoredCardholderInitiated:
+		source.Stored = common.BPtr(true)
+	// initiated by merchant or cardholder, stored card, single transaction, first payment
+	case sleet.ProcessingInitiatorTypeInitialCardOnFile:
+		request.MerchantInitiated = common.BPtr(false)
+	}
 }
 
 func buildRefundParams(refundRequest *sleet.RefundRequest) (*payments.RefundsRequest, error) {

@@ -1,8 +1,6 @@
 package checkoutcom
 
 import (
-	"encoding/json"
-	"fmt"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/checkout/checkout-sdk-go"
@@ -62,9 +60,6 @@ func (client *CheckoutComClient) Authorize(request *sleet.AuthorizationRequest) 
 	if err != nil {
 		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: sleet.AVSResponseUnknown, CvvResult: sleet.CVVResponseUnknown, ErrorCode: err.Error()}, err
 	}
-
-	out, _ := json.Marshal(response.StatusResponse.ResponseBody)
-	fmt.Printf(string(out))
 
 	if *response.Processed.Approved {
 		return &sleet.AuthorizationResponse{
