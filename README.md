@@ -14,22 +14,39 @@ Payment abstraction library - interact with different Payment Service Providers 
 
 Wherever possible, we try to use native Golang implementations of the PsP's API. We also assume that the caller can pass along raw credit card information (i.e. are PCI compliant)
 
-### Supported API Calls
+### Supported Gateway API Calls
 
 1. Authorize
 2. Capture
 3. Void
 4. Refund
 
-### To run tests
+### Webhooks Support
 
-####  Unit test
+We support abstracting PsP Webhook notifications into a common interface. 
+
+### PsP Support Matrix
+| PsP | Gateway APIs | Webhooks |
+|-----|--------------|----------|
+| [Adyen](https://docs.adyen.com/classic-integration/api-integration-ecommerce) | ✅ | ❌ |
+| [Authorize.Net](https://developer.authorize.net/api/reference/index.html#payment-transactions) | ✅ | ❌ |
+| [Braintree](https://www.braintreepayments.com/) | ✅ | ❌ |
+| [CyberSource](https://developer.cybersource.com/api-reference-assets/index.html#payments) | ✅ | ❌ |
+| [FirstData](https://docs.firstdata.com/org/gateway/docs/api) | ✅ | ❌ |
+| [NMI](https://secure.networkmerchants.com/gw/merchants/resources/integration/integration_portal.php#methodology) | ✅ | ❌ |
+| [Orbital](https://developer.jpmorgan.com/products/orbital-api) | ✅ | ❌ |
+| [RocketGate](https://www.rocketgate.com/) | ✅ | ❌ |
+| [Stripe](https://stripe.com/docs/api) | ✅ | ❌ |
+
+## To run tests
+
+###  Unit test
 
 ```
 go test -v -tags=unit $(go list ./... | grep -v integration-tests)
 ```
 
-#### Integration test
+### Integration test
 The following environment variables are needed in order to run tests
 
 ```shell script
@@ -50,7 +67,7 @@ $ export NMI_SECURITY_KEY="YOUR_NMI_PRIVATE_KEY"
 
 Then run tests with: `go test ./integration-tests/`
 
-#### Code Example for Auth + Capture
+## Code Example for Auth + Capture
 
 ```
 import (
@@ -97,12 +114,3 @@ captureRequest := sleet.CaptureRequest{
 }
 client.Capture(&captureRequest)
 ```
-
-#### Supported Gateways
-
-- [Authorize.Net](https://developer.authorize.net/api/reference/index.html#payment-transactions)
-- [CyberSource](https://developer.cybersource.com/api-reference-assets/index.html#payments)
-- [Stripe](https://stripe.com/docs/api)
-- [Adyen](https://docs.adyen.com/classic-integration/api-integration-ecommerce)
-- [Braintree](https://www.braintreepayments.com/)
-- [NMI](https://secure.networkmerchants.com/gw/merchants/resources/integration/integration_portal.php#methodology)
