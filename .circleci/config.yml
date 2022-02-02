@@ -27,7 +27,8 @@ jobs:
       - run:
           name: Integration Test
           command: |
-            go test -v ./integration-tests/*.go
+            cd ./integration-tests/*.go
+            go test -v
       - save_cache:
           key: v1-pkg-cache
           paths:
