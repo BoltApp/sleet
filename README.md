@@ -23,12 +23,12 @@ Wherever possible, we try to use native Golang implementations of the PsP's API.
 
 ### Webhooks Support
 
-We support abstracting PsP Webhook notifications into a common interface. 
+We support abstracting PsP Webhook notifications into a common event interface.
 
 ### PsP Support Matrix
-| PsP | Gateway APIs | Webhooks |
+| PsP | Gateway APIs | Webhooks (Beta) |
 |-----|--------------|----------|
-| [Adyen](https://docs.adyen.com/classic-integration/api-integration-ecommerce) | ✅ | ❌ |
+| [Adyen](https://docs.adyen.com/classic-integration/api-integration-ecommerce) | ✅ | ✅ |
 | [Authorize.Net](https://developer.authorize.net/api/reference/index.html#payment-transactions) | ✅ | ❌ |
 | [Braintree](https://www.braintreepayments.com/) | ✅ | ❌ |
 | [CyberSource](https://developer.cybersource.com/api-reference-assets/index.html#payments) | ✅ | ❌ |
@@ -37,7 +37,7 @@ We support abstracting PsP Webhook notifications into a common interface.
 | [NMI](https://secure.networkmerchants.com/gw/merchants/resources/integration/integration_portal.php#methodology) | ✅ | ❌ |
 | [Orbital](https://developer.jpmorgan.com/products/orbital-api) | ✅ | ❌ |
 | [RocketGate](https://www.rocketgate.com/) | ✅ | ❌ |
-| [Stripe](https://stripe.com/docs/api) | ✅ | ❌ |
+| [Stripe](https://stripe.com/docs/api) | ✅ | ✅ |
 
 ## To run tests
 
