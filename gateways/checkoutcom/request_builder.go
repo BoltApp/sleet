@@ -74,17 +74,27 @@ func initializeProcessingInitiator(authRequest *sleet.AuthorizationRequest, requ
 }
 
 func buildRefundParams(refundRequest *sleet.RefundRequest) (*payments.RefundsRequest, error) {
-	return &payments.RefundsRequest{
+	request := &payments.RefundsRequest{
 		Amount:    uint64(refundRequest.Amount.Amount),
-		Reference: *refundRequest.MerchantOrderReference,
-	}, nil
+	}
+
+	if refundRequest.MerchantOrderReference != nil {
+		request.Reference = *refundRequest.MerchantOrderReference
+	}
+
+	return request, nil
 }
 
 func buildCaptureParams(captureRequest *sleet.CaptureRequest) (*payments.CapturesRequest, error) {
-	return &payments.CapturesRequest{
+	request := &payments.CapturesRequest{
 		Amount:    uint64(captureRequest.Amount.Amount),
-		Reference: *captureRequest.MerchantOrderReference,
-	}, nil
+	}
+
+	if captureRequest.MerchantOrderReference != nil {
+		request.Reference = *captureRequest.MerchantOrderReference
+	}
+
+	return request, nil
 }
 
 func buildVoidParams(voidRequest *sleet.VoidRequest) (*payments.VoidsRequest, error) {
