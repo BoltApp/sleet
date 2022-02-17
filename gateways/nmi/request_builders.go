@@ -2,8 +2,10 @@ package nmi
 
 import (
 	"fmt"
-	"github.com/BoltApp/sleet"
 	"strconv"
+
+	"github.com/BoltApp/sleet"
+	"github.com/shopspring/decimal"
 )
 
 // NMI transaction types
@@ -85,7 +87,6 @@ func enableTestMode(testMode bool) *string {
 }
 
 func formatAmount(amountInt int64) *string {
-	amountString := strconv.FormatInt(amountInt, 10)
-	formattedAmount := fmt.Sprintf("%s.%s", amountString[:len(amountString)-2], amountString[len(amountString)-2:])
-	return &formattedAmount
+	formattatedAmount := decimal.NewFromInt(amountInt).Div(decimal.NewFromInt(int64(100))).StringFixed(2)
+	return &formattatedAmount
 }
