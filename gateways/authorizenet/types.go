@@ -21,6 +21,10 @@ const (
 	ResponseCodeHeld     ResponseCode = "4"
 )
 
+const (
+	MessageResponseCodeAlreadyCaptured = "311"
+)
+
 // ResultCode result of request (ok/error)
 type ResultCode string
 
@@ -191,10 +195,13 @@ type TransactionResponse struct {
 	Errors         []Error                      `json:"errors"`
 }
 
+// MessageResponseCode message API response codes specific to AuthorizeNet
+type MessageResponseCode string
+
 // TransactionResponseMessage contains additional information about transaction result from processor
 type TransactionResponseMessage struct {
-	Code        string `json:"code"`
-	Description string `json:"description"`
+	Code        MessageResponseCode `json:"code"`
+	Description string              `json:"description"`
 }
 
 // Error specifies a code and text explaining what happened
