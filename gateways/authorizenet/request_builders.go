@@ -123,15 +123,15 @@ func addL2L3Data(authRequest *sleet.AuthorizationRequest, authNetAuthRequest *Cr
 		}
 
 		authNetAuthRequest.TransactionRequest.Tax = &Tax{
-			Amount:  strconv.FormatInt(authRequest.Level3Data.TaxAmount.Amount, 10),
+			Amount: strconv.FormatInt(authRequest.Level3Data.TaxAmount.Amount, 10),
 		}
 
 		authNetAuthRequest.TransactionRequest.Duty = &Tax{
-			Amount:  strconv.FormatInt(authRequest.Level3Data.DutyAmount.Amount, 10),
+			Amount: strconv.FormatInt(authRequest.Level3Data.DutyAmount.Amount, 10),
 		}
 
 		authNetAuthRequest.TransactionRequest.Shipping = &Tax{
-			Amount:  strconv.FormatInt(authRequest.Level3Data.ShippingAmount.Amount, 10),
+			Amount: strconv.FormatInt(authRequest.Level3Data.ShippingAmount.Amount, 10),
 		}
 
 		authNetAuthRequest.TransactionRequest.Customer = &Customer{
@@ -141,14 +141,14 @@ func addL2L3Data(authRequest *sleet.AuthorizationRequest, authNetAuthRequest *Cr
 
 	if authRequest.ShippingAddress != nil {
 		authNetAuthRequest.TransactionRequest.ShippingAddress = &BillingAddress{
-			FirstName: 	authRequest.CreditCard.FirstName,
-			LastName: 	authRequest.CreditCard.LastName,
-			Company: 	common.SafeStr(authRequest.ShippingAddress.Company),
-			Address: 	authRequest.ShippingAddress.StreetAddress1,
-			City:      	authRequest.ShippingAddress.Locality,
-			State:    	authRequest.ShippingAddress.RegionCode,
-			Zip:       	authRequest.ShippingAddress.PostalCode,
-			Country:   	authRequest.ShippingAddress.CountryCode,
+			FirstName: authRequest.CreditCard.FirstName,
+			LastName:  authRequest.CreditCard.LastName,
+			Company:   common.SafeStr(authRequest.ShippingAddress.Company),
+			Address:   authRequest.ShippingAddress.StreetAddress1,
+			City:      authRequest.ShippingAddress.Locality,
+			State:     authRequest.ShippingAddress.RegionCode,
+			Zip:       authRequest.ShippingAddress.PostalCode,
+			Country:   authRequest.ShippingAddress.CountryCode,
 		}
 	}
 
@@ -168,11 +168,11 @@ func buildLineItemsString(authRequest *sleet.AuthorizationRequest) *string {
 		}
 
 		lineItem := &LineItem{
-			ItemId: sleet.TruncateString(authRequestLineItem.CommodityCode, 31),
-			Name: sleet.TruncateString(authRequestLineItem.ProductCode, 31),
+			ItemId:      sleet.TruncateString(authRequestLineItem.CommodityCode, 31),
+			Name:        sleet.TruncateString(authRequestLineItem.ProductCode, 31),
 			Description: sleet.TruncateString(authRequestLineItem.Description, 255),
-			Quantity: strconv.FormatInt(authRequestLineItem.Quantity, 10),
-			UnitPrice: strconv.FormatInt(authRequestLineItem.UnitPrice.Amount, 10),
+			Quantity:    strconv.FormatInt(authRequestLineItem.Quantity, 10),
+			UnitPrice:   strconv.FormatInt(authRequestLineItem.UnitPrice.Amount, 10),
 		}
 
 		lineItemByte, err := json.Marshal(lineItem)
@@ -182,7 +182,7 @@ func buildLineItemsString(authRequest *sleet.AuthorizationRequest) *string {
 			hasLineItem = true
 
 			// Do not add a comma for the last item
-			if i < len(authRequest.Level3Data.LineItems) - 1 && i < maxLength - 1 {
+			if i < len(authRequest.Level3Data.LineItems)-1 && i < maxLength-1 {
 				lineItems += ","
 			}
 		}
