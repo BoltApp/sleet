@@ -404,7 +404,7 @@ func TestAlreadyCaptured(t *testing.T) {
 		want := &sleet.CaptureResponse{
 			Success:              false,
 			TransactionReference: "",
-			ErrorCode:            common.SPtr("1"),
+			ErrorCode:            common.SPtr("311"),
 		}
 
 		client := NewClient("MerchantName", "Key", common.Sandbox)
