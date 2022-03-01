@@ -13,7 +13,7 @@ import (
 )
 
 func TestBuildAuthRequest(t *testing.T) {
-	base := sleet_testing.BaseAuthorizationRequest()
+	base := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
 	base.MerchantOrderReference = randomdata.Alphanumeric(InvoiceNumberMaxLength + 5)
 
 	baseL2L3 := sleet_testing.BaseAuthorizationRequest()
@@ -56,9 +56,13 @@ func TestBuildAuthRequest(t *testing.T) {
 							State:     base.BillingAddress.RegionCode,
 							Zip:       base.BillingAddress.PostalCode,
 							Country:   base.BillingAddress.CountryCode,
+							PhoneNumber: base.BillingAddress.PhoneNumber,
 						},
 						Order: &Order{
 							InvoiceNumber: base.MerchantOrderReference[:InvoiceNumberMaxLength],
+						},
+						Customer: &Customer{
+							Email: *base.BillingAddress.Email,
 						},
 					},
 				},
@@ -95,6 +99,10 @@ func TestBuildAuthRequest(t *testing.T) {
 							State:     base.BillingAddress.RegionCode,
 							Zip:       base.BillingAddress.PostalCode,
 							Country:   base.BillingAddress.CountryCode,
+							PhoneNumber: base.BillingAddress.PhoneNumber,
+						},
+						Customer: &Customer{
+							Email: *base.BillingAddress.Email,
 						},
 					},
 				},
@@ -141,7 +149,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						Customer: &Customer{
 							Id: "customer",
 						},
-						ShippingAddress: &BillingAddress{
+						ShippingAddress: &ShippingAddress{
 							FirstName: "Bolt",
 							LastName:  "Checkout",
 							Company:   common.SafeStr(base.BillingAddress.Company),
@@ -196,7 +204,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						Customer: &Customer{
 							Id: "customer",
 						},
-						ShippingAddress: &BillingAddress{
+						ShippingAddress: &ShippingAddress{
 							FirstName: "Bolt",
 							LastName:  "Checkout",
 							Company:   common.SafeStr(base.BillingAddress.Company),
