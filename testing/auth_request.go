@@ -18,6 +18,8 @@ func BaseAuthorizationRequest() *sleet.AuthorizationRequest {
 		StreetAddress1: common.SPtr("7683 Railroad Street"),
 		Locality:       common.SPtr("Zion"),
 		RegionCode:     common.SPtr("IL"),
+		Email: 			common.SPtr("test@bolt.com"),
+		PhoneNumber:    common.SPtr("555-555-5555"),
 	}
 	card := sleet.CreditCard{
 		FirstName:       "Bolt",
