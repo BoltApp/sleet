@@ -13,7 +13,7 @@ import (
 )
 
 func TestBuildAuthRequest(t *testing.T) {
-	base := sleet_testing.BaseAuthorizationRequest()
+	base := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
 	base.MerchantOrderReference = randomdata.Alphanumeric(InvoiceNumberMaxLength + 5)
 
 	baseL2L3 := sleet_testing.BaseAuthorizationRequest()

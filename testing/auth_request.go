@@ -18,8 +18,6 @@ func BaseAuthorizationRequest() *sleet.AuthorizationRequest {
 		StreetAddress1: common.SPtr("7683 Railroad Street"),
 		Locality:       common.SPtr("Zion"),
 		RegionCode:     common.SPtr("IL"),
-		Email: 			common.SPtr("test@bolt.com"),
-		PhoneNumber:    common.SPtr("555-555-5555"),
 	}
 	card := sleet.CreditCard{
 		FirstName:       "Bolt",
@@ -32,6 +30,13 @@ func BaseAuthorizationRequest() *sleet.AuthorizationRequest {
 	}
 	reference := randomdata.Letters(10)
 	return &sleet.AuthorizationRequest{Amount: amount, CreditCard: &card, BillingAddress: &address, ClientTransactionReference: &reference, ShopperReference: "test"}
+}
+
+func BaseAuthorizationRequestWithEmailPhoneNumber() *sleet.AuthorizationRequest {
+	base := BaseAuthorizationRequest()
+	base.BillingAddress.Email = common.SPtr("test@bolt.com")
+	base.BillingAddress.PhoneNumber = common.SPtr("555-555-5555")
+	return base
 }
 
 // BaseLevel3Data is used as a testing helper method to standardize request calls for integration tests
