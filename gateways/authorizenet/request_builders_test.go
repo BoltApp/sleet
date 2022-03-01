@@ -99,6 +99,10 @@ func TestBuildAuthRequest(t *testing.T) {
 							State:     base.BillingAddress.RegionCode,
 							Zip:       base.BillingAddress.PostalCode,
 							Country:   base.BillingAddress.CountryCode,
+							PhoneNumber: base.BillingAddress.PhoneNumber,
+						},
+						Customer: &Customer{
+							Email: *base.BillingAddress.Email,
 						},
 					},
 				},
