@@ -118,7 +118,7 @@ type TransactionRequest struct {
 	Shipping         *Tax            `json:"shipping,omitempty"`
 	Customer         *Customer       `json:"customer,omitempty"`
 	BillingAddress   *BillingAddress `json:"billTo,omitempty"`
-	ShippingAddress  *BillingAddress `json:"shipTo,omitempty"`
+	ShippingAddress  *ShippingAddress `json:"shipTo,omitempty"`
 	RefTransactionID *string         `json:"refTransId,omitempty"`
 }
 
@@ -137,8 +137,9 @@ type Tax struct {
 }
 
 type Customer struct {
-	Type string `json:"type,omitempty"`
-	Id   string `json:"id,omitempty"`
+	Type  string `json:"type,omitempty"`
+	Id    string `json:"id,omitempty"`
+	Email string `json:"email,omitempty"`
 }
 
 // Payment specifies the credit card to be authorized (only payment option for now)
@@ -155,6 +156,18 @@ type CreditCard struct {
 	Cryptogram     string `json:"cryptogram,omitempty"`
 }
 
+// ShippingAddress is used in TransactionRequest for making an auth call
+type ShippingAddress struct {
+	FirstName string  `json:"firstName"`
+	LastName  string  `json:"lastName"`
+	Company   string  `json:"company"`
+	Address   *string `json:"address"`
+	City      *string `json:"city"`
+	State     *string `json:"state"`
+	Zip       *string `json:"zip"`
+	Country   *string `json:"country"`
+}
+
 // BillingAddress is used in TransactionRequest for making an auth call
 type BillingAddress struct {
 	FirstName string  `json:"firstName"`
@@ -165,6 +178,7 @@ type BillingAddress struct {
 	State     *string `json:"state"`
 	Zip       *string `json:"zip"`
 	Country   *string `json:"country"`
+	PhoneNumber *string `json:"phoneNumber"`
 }
 
 // Order is used in TransactionRequest for passing information about the order

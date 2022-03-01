@@ -46,6 +46,10 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 				State:     billingAddress.RegionCode,
 				Zip:       billingAddress.PostalCode,
 				Country:   billingAddress.CountryCode,
+				PhoneNumber: billingAddress.PhoneNumber,
+			},
+			Customer: &Customer{
+				Email: common.SafeStr(billingAddress.Email),
 			},
 		},
 	}
@@ -134,21 +138,25 @@ func addL2L3Data(authRequest *sleet.AuthorizationRequest, authNetAuthRequest *Cr
 			Amount: strconv.FormatInt(authRequest.Level3Data.ShippingAmount.Amount, 10),
 		}
 
-		authNetAuthRequest.TransactionRequest.Customer = &Customer{
-			Id: authRequest.Level3Data.CustomerReference,
+		if authNetAuthRequest.TransactionRequest.Customer != nil {
+			authNetAuthRequest.TransactionRequest.Customer.Id = authRequest.Level3Data.CustomerReference
+		} else {
+			authNetAuthRequest.TransactionRequest.Customer = &Customer{
+				Id: authRequest.Level3Data.CustomerReference,
+			}
 		}
 	}
 
 	if authRequest.ShippingAddress != nil {
-		authNetAuthRequest.TransactionRequest.ShippingAddress = &BillingAddress{
-			FirstName: authRequest.CreditCard.FirstName,
-			LastName:  authRequest.CreditCard.LastName,
-			Company:   common.SafeStr(authRequest.ShippingAddress.Company),
-			Address:   authRequest.ShippingAddress.StreetAddress1,
-			City:      authRequest.ShippingAddress.Locality,
-			State:     authRequest.ShippingAddress.RegionCode,
-			Zip:       authRequest.ShippingAddress.PostalCode,
-			Country:   authRequest.ShippingAddress.CountryCode,
+		authNetAuthRequest.TransactionRequest.ShippingAddress = &ShippingAddress{
+			FirstName: 	authRequest.CreditCard.FirstName,
+			LastName: 	authRequest.CreditCard.LastName,
+			Company: 	common.SafeStr(authRequest.ShippingAddress.Company),
+			Address: 	authRequest.ShippingAddress.StreetAddress1,
+			City:      	authRequest.ShippingAddress.Locality,
+			State:    	authRequest.ShippingAddress.RegionCode,
+			Zip:       	authRequest.ShippingAddress.PostalCode,
+			Country:   	authRequest.ShippingAddress.CountryCode,
 		}
 	}
 
