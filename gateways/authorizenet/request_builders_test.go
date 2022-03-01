@@ -62,7 +62,7 @@ func TestBuildAuthRequest(t *testing.T) {
 							InvoiceNumber: base.MerchantOrderReference[:InvoiceNumberMaxLength],
 						},
 						Customer: &Customer{
-							Email: base.BillingAddress.Email,
+							Email: *base.BillingAddress.Email,
 						},
 					},
 				},
@@ -145,7 +145,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						Customer: &Customer{
 							Id: "customer",
 						},
-						ShippingAddress: &BillingAddress{
+						ShippingAddress: &ShippingAddress{
 							FirstName: "Bolt",
 							LastName:  "Checkout",
 							Company:   common.SafeStr(base.BillingAddress.Company),
@@ -200,7 +200,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						Customer: &Customer{
 							Id: "customer",
 						},
-						ShippingAddress: &BillingAddress{
+						ShippingAddress: &ShippingAddress{
 							FirstName: "Bolt",
 							LastName:  "Checkout",
 							Company:   common.SafeStr(base.BillingAddress.Company),
