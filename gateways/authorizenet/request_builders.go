@@ -106,6 +106,9 @@ func buildRefundRequest(merchantName string, transactionKey string, refundReques
 						ExpirationDate: expirationDateXXXX,
 					},
 				},
+				Order: &Order{
+					InvoiceNumber: common.SafeStr(refundRequest.MerchantOrderReference),
+				},
 			},
 		},
 	}
