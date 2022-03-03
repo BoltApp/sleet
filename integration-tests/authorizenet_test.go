@@ -16,7 +16,7 @@ import (
 // This should successfully create an authorization on Authorize.net
 func TestAuthNetAuth(t *testing.T) {
 	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
-	authRequest := sleet_testing.BaseAuthorizationRequest()
+	authRequest := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
 	authRequest.Amount.Amount = int64(randomdata.Number(100))
 	authRequest.MerchantOrderReference = "test-order-ref"
 	auth, err := client.Authorize(authRequest)
@@ -31,7 +31,7 @@ func TestAuthNetAuth(t *testing.T) {
 
 func TestAuthNetAuthL2L3(t *testing.T) {
 	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
-	authRequest := sleet_testing.BaseAuthorizationRequest()
+	authRequest := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
 	authRequest.Amount.Amount = int64(randomdata.Number(100))
 	authRequest.MerchantOrderReference = "test-order-ref"
 	authRequest.Level3Data = sleet_testing.BaseLevel3Data()
@@ -48,7 +48,7 @@ func TestAuthNetAuthL2L3(t *testing.T) {
 
 func TestAuthNetAuthL2L3MultipleItem(t *testing.T) {
 	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
-	authRequest := sleet_testing.BaseAuthorizationRequest()
+	authRequest := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
 	authRequest.Amount.Amount = int64(randomdata.Number(100))
 	authRequest.MerchantOrderReference = "test-order-ref"
 	authRequest.Level3Data = sleet_testing.BaseLevel3DataMultipleItem()
@@ -68,7 +68,7 @@ func TestAuthNetAuthL2L3MultipleItem(t *testing.T) {
 // Recharge requests will not have CVV. This should successfully create an authorization on Authorize.net
 func TestAuthNetRechargeAuth(t *testing.T) {
 	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
-	authRequest := sleet_testing.BaseAuthorizationRequest()
+	authRequest := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
 	authRequest.CreditCard.CVV = ""
 	authRequest.Amount.Amount = int64(randomdata.Number(100))
 	auth, err := client.Authorize(authRequest)
@@ -86,7 +86,7 @@ func TestAuthNetRechargeAuth(t *testing.T) {
 // This should successfully create an authorization on Authorize.net then Capture for full amount
 func TestAuthNetAuthFullCapture(t *testing.T) {
 	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
-	authRequest := sleet_testing.BaseAuthorizationRequest()
+	authRequest := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
 	authRequest.Amount.Amount = int64(randomdata.Number(100))
 	auth, err := client.Authorize(authRequest)
 	if err != nil {
@@ -117,7 +117,7 @@ func TestAuthNetAuthFullCapture(t *testing.T) {
 // Since we auth for 1.00USD, we will capture for $0.50
 func TestAuthNetAuthPartialCapture(t *testing.T) {
 	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
-	authRequest := sleet_testing.BaseAuthorizationRequest()
+	authRequest := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
 	authRequest.Amount.Amount = int64(randomdata.Number(11, 100))
 	auth, err := client.Authorize(authRequest)
 	if err != nil {
@@ -149,7 +149,7 @@ func TestAuthNetAuthPartialCapture(t *testing.T) {
 // This should successfully create an authorization on Authorize.net then Void/Cancel the Auth
 func TestAuthNetAuthVoid(t *testing.T) {
 	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
-	authRequest := sleet_testing.BaseAuthorizationRequest()
+	authRequest := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
 	authRequest.Amount.Amount = int64(randomdata.Number(100))
 	auth, err := client.Authorize(authRequest)
 	if err != nil {
