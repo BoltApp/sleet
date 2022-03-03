@@ -2,6 +2,7 @@ package test
 
 import (
 	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
 	"github.com/BoltApp/sleet/gateways/checkoutcom"
 	sleet_testing "github.com/BoltApp/sleet/testing"
 	"testing"
@@ -13,7 +14,7 @@ import (
 // checkout.com has test cards here: https://www.checkout.com/docs/four/testing/response-code-testing
 // Using a rejected card number
 func TestCheckoutComAuthorizeFailed(t *testing.T) {
-	client := checkoutcom.NewClient(getEnv("CHECKOUTCOM_TEST_KEY"))
+	client := checkoutcom.NewClient(common.Sandbox, getEnv("CHECKOUTCOM_TEST_KEY"))
 	failedRequest := sleet_testing.BaseAuthorizationRequest()
 	failedRequest.CreditCard.Number = "4544249167673670"
 	response, err := client.Authorize(failedRequest)
@@ -35,7 +36,7 @@ func TestCheckoutComAuthorizeFailed(t *testing.T) {
 //
 // This should successfully create an authorization
 func TestCheckoutComAuth(t *testing.T) {
-	client := checkoutcom.NewClient(getEnv("CHECKOUTCOM_TEST_KEY"))
+	client := checkoutcom.NewClient(common.Sandbox, getEnv("CHECKOUTCOM_TEST_KEY"))
 	request := sleet_testing.BaseAuthorizationRequest()
 	auth, err := client.Authorize(request)
 	if err != nil {
@@ -51,7 +52,7 @@ func TestCheckoutComAuth(t *testing.T) {
 //
 // This should successfully create an authorization on checkout.com then Capture for full amount
 func TestCheckoutComAuthFullCapture(t *testing.T) {
-	client := checkoutcom.NewClient(getEnv("CHECKOUTCOM_TEST_KEY"))
+	client := checkoutcom.NewClient(common.Sandbox, getEnv("CHECKOUTCOM_TEST_KEY"))
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	auth, err := client.Authorize(authRequest)
 	if err != nil {
@@ -78,11 +79,66 @@ func TestCheckoutComAuthFullCapture(t *testing.T) {
 	}
 }
 
+// TestCheckoutComAuthFullCapture
+//
+// This should successfully create an authorization on checkout.com then Capture for full amount
+func TestCheckoutComAuthPartialCapture(t *testing.T) {
+	client := checkoutcom.NewClient(common.Sandbox, getEnv("CHECKOUTCOM_TEST_KEY"))
+	authRequest := sleet_testing.BaseAuthorizationRequest()
+	authRequest.Amount.Amount = 100
+	auth, err := client.Authorize(authRequest)
+	if err != nil {
+		t.Error("Authorize request should not have failed")
+	}
+
+	if !auth.Success {
+		t.Error("Resulting auth should have been successful")
+	}
+
+	// Partial capture request
+	captureRequest := &sleet.CaptureRequest{
+		Amount: &sleet.Amount{
+			Amount:   50,
+			Currency: "USD",
+		},
+		TransactionReference: auth.TransactionReference,
+		ClientTransactionReference: authRequest.ClientTransactionReference,
+		MerchantOrderReference: &authRequest.MerchantOrderReference,
+	}
+	capture, err := client.Capture(captureRequest)
+	if err != nil {
+		t.Error("Partial capture request should not have failed")
+	}
+
+	if !capture.Success {
+		t.Error("Resulting partial capture should have been successful")
+	}
+
+	// Capture the rest
+	captureRequest = &sleet.CaptureRequest{
+		Amount: &sleet.Amount{
+			Amount:   50,
+			Currency: "USD",
+		},
+		TransactionReference: auth.TransactionReference,
+		ClientTransactionReference: authRequest.ClientTransactionReference,
+		MerchantOrderReference: &authRequest.MerchantOrderReference,
+	}
+	capture, err = client.Capture(captureRequest)
+	if err != nil {
+		t.Error("Final capture request should not have failed")
+	}
+
+	if !capture.Success {
+		t.Error("Resulting final capture should have been successful")
+	}
+}
+
 // TestCheckoutComAuthVoid
 //
 // This should successfully create an authorization on checkout.com then Void/Cancel the Auth
 func TestCheckoutComAuthVoid(t *testing.T) {
-	client := checkoutcom.NewClient(getEnv("CHECKOUTCOM_TEST_KEY"))
+	client := checkoutcom.NewClient(common.Sandbox, getEnv("CHECKOUTCOM_TEST_KEY"))
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	auth, err := client.Authorize(authRequest)
 	if err != nil {
@@ -111,7 +167,7 @@ func TestCheckoutComAuthVoid(t *testing.T) {
 //
 // This should successfully create an authorization on checkout.com then Capture for full amount, then refund for full amount
 func TestCheckoutComAuthCaptureRefund(t *testing.T) {
-	client := checkoutcom.NewClient(getEnv("CHECKOUTCOM_TEST_KEY"))
+	client := checkoutcom.NewClient(common.Sandbox, getEnv("CHECKOUTCOM_TEST_KEY"))
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	auth, err := client.Authorize(authRequest)
 	if err != nil {

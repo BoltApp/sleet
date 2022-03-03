@@ -40,8 +40,8 @@ github.com/Pallinder/go-randomdata v1.2.0/go.mod h1:yHmJgulpD2Nfrm0cR9tI/+oAgRqC
 github.com/adyen/adyen-go-api-library/v4 v4.0.0 h1:zNXA984f8PW/ygW+MwzXIp1A0mAFwdJ5qCAsFxiganU=
 github.com/adyen/adyen-go-api-library/v4 v4.0.0/go.mod h1:OpD0jxx7ObTThFu4Xg7PZID/Gr8LB7FaX+jutrJfUYw=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
-github.com/checkout/checkout-sdk-go v0.0.19 h1:T9HVkUCyrpTkC5DGu5ZmmdjuQs1JDpseJvdYxb1NNpk=
-github.com/checkout/checkout-sdk-go v0.0.19/go.mod h1:lPJ9QLwgdZZPdT7UJgfSRQSG6ygSVBFbU/xVb6QLI30=
+github.com/checkout/checkout-sdk-go v0.0.21 h1:gtndHDuBLLM4VPLSnGQbeoOjsGUYvuEjUQCc7EigE64=
+github.com/checkout/checkout-sdk-go v0.0.21/go.mod h1:8nX+8d2K+vvK/ROMXpCe8ds5T+nbv3LMlyKS9dbU1VU=
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
 github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e/go.mod h1:nSuG5e5PlCu98SY8svDHJxuZscDgtXS6KTTbou5AhLI=
 github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1/go.mod h1:Q3SI9o4m/ZMnBNeIyt5eFwwo7qiLfzFZmjNmxjkiQlU=
@@ -110,6 +110,8 @@ github.com/google/pprof v0.0.0-20200430221834-fc25d7d30c6d/go.mod h1:ZgVRPoUq/hf
 github.com/google/pprof v0.0.0-20200708004538-1a94d8640e99/go.mod h1:ZgVRPoUq/hfqzAqh7sHMqb3I9Rq5C59dIz2SbBwJ4eM=
 github.com/google/renameio v0.1.0/go.mod h1:KWCgfxg9yswjAJkECMjeO8J8rahYeXnNhOm40UhjYkI=
 github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
+github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/googleapis/gax-go/v2 v2.0.4/go.mod h1:0Wqv26UfaUD9n4G6kQubkQ+KchISgw+vpHVxEJEs9eg=
 github.com/googleapis/gax-go/v2 v2.0.5/go.mod h1:DWXyrwAJ9X0FpwwEdw+IPEYBICEFu5mhpdKc/us6bOk=
 github.com/hashicorp/golang-lru v0.5.0/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=

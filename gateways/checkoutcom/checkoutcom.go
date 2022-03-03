@@ -15,26 +15,28 @@ import (
 type CheckoutComClient struct {
 	apiKey     string
 	httpClient *http.Client
+	env        checkout.SupportedEnvironment
 }
 
 const AcceptedStatusCode = 202
 
 // NewClient creates a CheckoutComClient
 // Note: the environment is indicated by the apiKey. See "isSandbox" assignment in checkout.Create.
-func NewClient(apiKey string) *CheckoutComClient {
-	return NewWithHTTPClient(apiKey, common.DefaultHttpClient())
+func NewClient(env common.Environment, apiKey string) *CheckoutComClient {
+	return NewWithHTTPClient(env, apiKey, common.DefaultHttpClient())
 }
 
 // NewWithHTTPClient uses a custom http client for requests
-func NewWithHTTPClient(apiKey string, httpClient *http.Client) *CheckoutComClient {
+func NewWithHTTPClient(env common.Environment, apiKey string, httpClient *http.Client) *CheckoutComClient {
 	return &CheckoutComClient{
 		apiKey:     apiKey,
 		httpClient: httpClient,
+		env:        GetEnv(env),
 	}
 }
 
 func (client *CheckoutComClient) generateCheckoutDCClient() (*payments.Client, error) {
-	config, err := checkout.Create(client.apiKey, nil)
+	config, err := checkout.SdkConfig(common.SPtr(client.apiKey), nil, client.env)
 	if err != nil {
 		return nil, err
 	}
