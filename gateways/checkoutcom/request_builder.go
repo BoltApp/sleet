@@ -38,6 +38,7 @@ func buildChargeParams(authRequest *sleet.AuthorizationRequest) (*payments.Reque
 			Email: common.SafeStr(authRequest.BillingAddress.Email),
 			Name:  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
 		},
+		ProcessingChannelID: authRequest.Channel,
 	}
 
 	if authRequest.ProcessingInitiator != nil {
