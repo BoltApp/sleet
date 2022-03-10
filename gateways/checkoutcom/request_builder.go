@@ -88,6 +88,7 @@ func buildRefundParams(refundRequest *sleet.RefundRequest) (*payments.RefundsReq
 func buildCaptureParams(captureRequest *sleet.CaptureRequest) (*payments.CapturesRequest, error) {
 	request := &payments.CapturesRequest{
 		Amount:    uint64(captureRequest.Amount.Amount),
+		CaptureType: payments.NonFinal,
 	}
 
 	if captureRequest.MerchantOrderReference != nil {
