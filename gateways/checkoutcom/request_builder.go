@@ -10,7 +10,7 @@ import (
 // Cof specifies the transaction type under the Credential-on-File framework
 const recurringPaymentType = "Recurring"
 
-func buildChargeParams(authRequest *sleet.AuthorizationRequest) (*payments.Request, error) {
+func buildChargeParams(authRequest *sleet.AuthorizationRequest, processingChannelId *string) (*payments.Request, error) {
 	var source = payments.CardSource{
 		Type: "card",
 		Number: authRequest.CreditCard.Number,
@@ -38,6 +38,7 @@ func buildChargeParams(authRequest *sleet.AuthorizationRequest) (*payments.Reque
 			Email: common.SafeStr(authRequest.BillingAddress.Email),
 			Name:  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
 		},
+		ProcessingChannelId: common.SafeStr(processingChannelId),
 	}
 
 	if authRequest.ProcessingInitiator != nil {
