@@ -1,6 +1,7 @@
 package rocketgate
 
 import (
+	"github.com/BoltApp/sleet/common"
 	"strconv"
 
 	"github.com/BoltApp/sleet"
@@ -60,6 +61,13 @@ func buildAuthRequest(
 	gatewayRequest.Set(request.EXPIRE_YEAR, strconv.Itoa(card.ExpirationYear))
 	gatewayRequest.Set(request.AMOUNT, sleet.AmountToDecimalString(&authRequest.Amount))
 	gatewayRequest.Set(request.CURRENCY, authRequest.Amount.Currency)
+
+	// Billing Address
+	gatewayRequest.Set(request.BILLING_ADDRESS, common.SafeStr(authRequest.BillingAddress.StreetAddress1))
+	gatewayRequest.Set(request.BILLING_CITY, common.SafeStr(authRequest.BillingAddress.StreetAddress1))
+	gatewayRequest.Set(request.BILLING_STATE, common.SafeStr(authRequest.BillingAddress.StreetAddress1))
+	gatewayRequest.Set(request.BILLING_ZIPCODE, common.SafeStr(authRequest.BillingAddress.StreetAddress1))
+	gatewayRequest.Set(request.BILLING_COUNTRY, common.SafeStr(authRequest.BillingAddress.StreetAddress1))
 
 	// overwrites the flag transactions
 	if authRequest.ProcessingInitiator != nil {
