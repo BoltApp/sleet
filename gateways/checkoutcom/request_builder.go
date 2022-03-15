@@ -100,7 +100,7 @@ func buildCaptureParams(captureRequest *sleet.CaptureRequest) (*payments.Capture
 }
 
 func buildVoidParams(voidRequest *sleet.VoidRequest) (*payments.VoidsRequest, error) {
-	request := &payments.VoidRequest {}
+	request := &payments.VoidsRequest {}
 
 	if voidRequest.MerchantOrderReference != nil {
 		request.Reference = *voidRequest.MerchantOrderReference
