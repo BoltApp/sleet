@@ -20,7 +20,7 @@ type Request struct {
 	TransactionID         *string `form:"transactionid,omitempty"`
 	TransactionType       string  `form:"type"`
 	ZipCode               *string `form:"zip,omitempty"`
-	Email				  *string `form:"email,omitempty"`
+	Email                 *string `form:"email,omitempty"`
 }
 
 // Response contains all of the fields for all Cybersource API call responses
