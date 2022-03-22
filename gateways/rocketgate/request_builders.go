@@ -64,10 +64,10 @@ func buildAuthRequest(
 
 	// Billing Address
 	gatewayRequest.Set(request.BILLING_ADDRESS, common.SafeStr(authRequest.BillingAddress.StreetAddress1))
-	gatewayRequest.Set(request.BILLING_CITY, common.SafeStr(authRequest.BillingAddress.StreetAddress1))
-	gatewayRequest.Set(request.BILLING_STATE, common.SafeStr(authRequest.BillingAddress.StreetAddress1))
-	gatewayRequest.Set(request.BILLING_ZIPCODE, common.SafeStr(authRequest.BillingAddress.StreetAddress1))
-	gatewayRequest.Set(request.BILLING_COUNTRY, common.SafeStr(authRequest.BillingAddress.StreetAddress1))
+	gatewayRequest.Set(request.BILLING_CITY, common.SafeStr(authRequest.BillingAddress.Locality))
+	gatewayRequest.Set(request.BILLING_STATE, common.SafeStr(authRequest.BillingAddress.RegionCode))
+	gatewayRequest.Set(request.BILLING_ZIPCODE, common.SafeStr(authRequest.BillingAddress.PostalCode))
+	gatewayRequest.Set(request.BILLING_COUNTRY, common.SafeStr(authRequest.BillingAddress.CountryCode))
 
 	// overwrites the flag transactions
 	if authRequest.ProcessingInitiator != nil {
