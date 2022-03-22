@@ -46,6 +46,7 @@ func buildAuthRequest(testMode bool, securityKey string, request *sleet.Authoriz
 		TestMode:              enableTestMode(testMode),
 		TransactionType:       auth,
 		ZipCode:               request.BillingAddress.PostalCode,
+		Email:                 request.BillingAddress.Email,
 	}
 }
 

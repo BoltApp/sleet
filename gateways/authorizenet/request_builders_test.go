@@ -303,9 +303,6 @@ func TestBuildRefundRequest(t *testing.T) {
 	t.Run("With Valid Requests", func(t *testing.T) {
 		base := sleet_testing.BaseRefundRequest()
 
-		MerchantOrderReference := "543321"
-
-		base.MerchantOrderReference = &MerchantOrderReference
 		amount := "1.00"
 
 		cases := []struct {
@@ -328,9 +325,6 @@ func TestBuildRefundRequest(t *testing.T) {
 									CardNumber:     "1111",
 									ExpirationDate: expirationDateXXXX,
 								},
-							},
-							Order: &Order{
-								InvoiceNumber: MerchantOrderReference,
 							},
 						},
 					},
