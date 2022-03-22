@@ -173,4 +173,44 @@ func TestAuthNetAuthVoid(t *testing.T) {
 	}
 }
 
-// TestAuthNetAuthCaptureRefund cannot be written since there is no way to hack settlement and funds cannot refund until they settle
+// TestAuthNetAuthCaptureRefund
+func TestAuthNetAuthCaptureRefund(t *testing.T) {
+	//client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
+	client := authorizenet.NewClient("2aVS2p8uU6X", "2ZA4Jau3a6Km53Dx", common.Sandbox)
+	authRequest := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
+	authRequest.Amount.Amount = int64(randomdata.Number(100))
+	auth, err := client.Authorize(authRequest)
+	if err != nil {
+		t.Error("Authorize request should not have failed")
+	}
+	if !auth.Success {
+		t.Error("Resulting auth should have been successful")
+	}
+
+	captureRequest := &sleet.CaptureRequest{
+		Amount:               &authRequest.Amount,
+		TransactionReference: auth.TransactionReference,
+	}
+	capture, err := client.Capture(captureRequest)
+	if err != nil {
+		t.Error("Capture request should not have failed")
+	}
+	if !capture.Success {
+		t.Error("Resulting capture should have been successful")
+	}
+
+	refundRequest := &sleet.RefundRequest{
+		TransactionReference: auth.TransactionReference,
+		Amount:               &authRequest.Amount,
+		Last4: authRequest.CreditCard.Number[len(authRequest.CreditCard.Number) - 4:],
+		MerchantOrderReference: common.SPtr(randomdata.Digits(16)),
+	}
+
+	refund, err := client.Refund(refundRequest)
+	if err != nil {
+		t.Error("refund request should not have failed")
+	}
+	if !refund.Success {
+		t.Error("Resulting refund should have been successful")
+	}
+}

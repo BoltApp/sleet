@@ -105,11 +105,18 @@ type MerchantAuthentication struct {
 }
 
 // TransactionRequest has the raw credit card info as Payment and amount to authorize
-// Note -> oddly authorize.net has strict ordering even for JSON
+// *************************************************************************
+// *************************************************************************
+// ***** AUTHORIZE NET HAS STRICT JSON ORDERING DUE TO XML TRANSLATION *****
+// ***** YOU MUST FOLLOW FIELD ORDER AS SPECIFIED IN THEIR API DOCS    *****
+// ***** https://developer.authorize.net/api/reference/index.html      *****
+// *************************************************************************
+// *************************************************************************
 type TransactionRequest struct {
 	TransactionType TransactionType `json:"transactionType"`
 	Amount          *string         `json:"amount,omitempty"`
 	Payment         *Payment        `json:"payment,omitempty"`
+	RefTransactionID *string         `json:"refTransId,omitempty"`
 	Order           *Order          `json:"order,omitempty"`
 	LineItem        json.RawMessage `json:"lineItems,omitempty"` // this is really a repeating LineItem, but authorize.net expects it in object not array
 	// since not valid json, just going to represent as JSON string
@@ -119,7 +126,6 @@ type TransactionRequest struct {
 	Customer         *Customer       `json:"customer,omitempty"`
 	BillingAddress   *BillingAddress `json:"billTo,omitempty"`
 	ShippingAddress  *ShippingAddress `json:"shipTo,omitempty"`
-	RefTransactionID *string         `json:"refTransId,omitempty"`
 }
 
 type LineItem struct {
