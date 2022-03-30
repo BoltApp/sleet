@@ -176,7 +176,7 @@ func TestAuthNetAuthVoid(t *testing.T) {
 
 // TestAuthNetAuthCaptureRefund
 func TestAuthNetAuthCaptureRefund(t *testing.T) {
-	client := authorizenet.NewClient("2aVS2p8uU6X", "2ZA4Jau3a6Km53Dx", common.Sandbox)
+	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
 	authRequest.Amount.Amount = int64(randomdata.Number(100))
 	auth, err := client.Authorize(authRequest)
