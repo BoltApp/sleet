@@ -112,6 +112,15 @@ func buildRefundRequest(merchantName string, transactionKey string, refundReques
 			},
 		},
 	}
+
+	// Actual expiration date must be passed for testing only -> override from the options field
+	if refundRequest.Options != nil {
+		expirationOveride, ok := refundRequest.Options["TestingExpirationOverride"]
+		if ok {
+			request.CreateTransactionRequest.TransactionRequest.Payment.CreditCard.ExpirationDate = expirationOveride.(string)
+		}
+	}
+
 	return request, nil
 }
 

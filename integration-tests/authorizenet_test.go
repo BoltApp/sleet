@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/BoltApp/sleet/gateways/authorizenet"
@@ -175,7 +176,6 @@ func TestAuthNetAuthVoid(t *testing.T) {
 
 // TestAuthNetAuthCaptureRefund
 func TestAuthNetAuthCaptureRefund(t *testing.T) {
-	//client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
 	client := authorizenet.NewClient("2aVS2p8uU6X", "2ZA4Jau3a6Km53Dx", common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
 	authRequest.Amount.Amount = int64(randomdata.Number(100))
@@ -199,11 +199,15 @@ func TestAuthNetAuthCaptureRefund(t *testing.T) {
 		t.Error("Resulting capture should have been successful")
 	}
 
+	// Refunds for AuthNet take 24 hours to settle. The only option for immediate testing is to do a non-transaction
+	// referenced refund.
 	refundRequest := &sleet.RefundRequest{
-		TransactionReference: auth.TransactionReference,
 		Amount:               &authRequest.Amount,
-		Last4: authRequest.CreditCard.Number[len(authRequest.CreditCard.Number) - 4:],
+		Last4: authRequest.CreditCard.Number,
 		MerchantOrderReference: common.SPtr(randomdata.Digits(16)),
+		Options: map[string]interface{}{
+			"TestingExpirationOverride": fmt.Sprintf("%d%d", authRequest.CreditCard.ExpirationMonth, authRequest.CreditCard.ExpirationYear),
+		},
 	}
 
 	refund, err := client.Refund(refundRequest)
