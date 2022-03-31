@@ -175,6 +175,7 @@ func TestAuthNetAuthVoid(t *testing.T) {
 }
 
 // TestAuthNetAuthCaptureRefund
+// TODO: Have this refer to the auth/capture transactionId once automatic settlement is available
 func TestAuthNetAuthCaptureRefund(t *testing.T) {
 	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
@@ -200,7 +201,7 @@ func TestAuthNetAuthCaptureRefund(t *testing.T) {
 	}
 
 	// Refunds for AuthNet take 24 hours to settle. The only option for immediate testing is to do a non-transaction
-	// referenced refund.
+	// referenced refund. We will send full credit card number
 	refundRequest := &sleet.RefundRequest{
 		Amount:               &authRequest.Amount,
 		Last4: authRequest.CreditCard.Number,
