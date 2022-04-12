@@ -65,7 +65,8 @@ func (client *AuthorizeNetClient) Capture(request *sleet.CaptureRequest) (*sleet
 		return nil, err
 	}
 
-	if authorizeNetResponse.TransactionResponse.ResponseCode != ResponseCodeApproved {
+	if authorizeNetResponse.TransactionResponse.ResponseCode != ResponseCodeApproved ||
+		isAlreadyCaptured(authorizeNetResponse.TransactionResponse) {
 		errorCode := getErrorCode(authorizeNetResponse.TransactionResponse)
 		return &sleet.CaptureResponse{ErrorCode: &errorCode}, nil
 	}
@@ -161,4 +162,13 @@ func getErrorCode(txnResponse TransactionResponse) string {
 	} else {
 		return string(txnResponse.ResponseCode)
 	}
+}
+
+func isAlreadyCaptured(txnResponse TransactionResponse) bool {
+	for _, message := range txnResponse.Messages {
+		if message.Code == MessageResponseCodeAlreadyCaptured {
+			return true
+		}
+	}
+	return false
 }

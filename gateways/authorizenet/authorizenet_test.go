@@ -1,3 +1,4 @@
+//go:build unit
 // +build unit
 
 package authorizenet
@@ -375,6 +376,48 @@ func TestRefund(t *testing.T) {
 
 		if err == nil {
 			t.Fatalf("Error has to be thrown")
+		}
+	})
+}
+
+func TestAlreadyCaptured(t *testing.T) {
+	helper := sleet_t.NewTestHelper(t)
+
+	url := "https://apitest.authorize.net/xml/v1/request.api"
+
+	var captureResponseRaw []byte
+
+	captureResponseRaw = helper.ReadFile("test_data/authAlreadyCapturedResponse.json")
+
+	request := sleet_t.BaseCaptureRequest()
+
+	t.Run("With Successful Response", func(t *testing.T) {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			// TODO check if send json body matches test json body ?
+			resp := httpmock.NewBytesResponse(http.StatusOK, captureResponseRaw)
+			return resp, nil
+		})
+
+		want := &sleet.CaptureResponse{
+			Success:              false,
+			TransactionReference: "",
+			ErrorCode:            common.SPtr("1"),
+		}
+
+		client := NewClient("MerchantName", "Key", common.Sandbox)
+
+		got, err := client.Capture(request)
+
+		if err != nil {
+			t.Fatalf("Error thrown after sending request %q", err)
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
 		}
 	})
 }

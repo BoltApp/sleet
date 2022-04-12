@@ -29,6 +29,7 @@ type Address struct {
 	CountryCode    *string // ISO 2-digit code
 	Company        *string
 	Email          *string
+	PhoneNumber    *string
 }
 
 // BillingAddress for backwards compatibility

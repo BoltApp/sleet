@@ -10,7 +10,7 @@ import (
 // Cof specifies the transaction type under the Credential-on-File framework
 const recurringPaymentType = "Recurring"
 
-func buildChargeParams(authRequest *sleet.AuthorizationRequest) (*payments.Request, error) {
+func buildChargeParams(authRequest *sleet.AuthorizationRequest, processingChannelId *string) (*payments.Request, error) {
 	var source = payments.CardSource{
 		Type: "card",
 		Number: authRequest.CreditCard.Number,
@@ -38,6 +38,7 @@ func buildChargeParams(authRequest *sleet.AuthorizationRequest) (*payments.Reque
 			Email: common.SafeStr(authRequest.BillingAddress.Email),
 			Name:  authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
 		},
+		ProcessingChannelId: common.SafeStr(processingChannelId),
 	}
 
 	if authRequest.ProcessingInitiator != nil {
@@ -88,6 +89,7 @@ func buildRefundParams(refundRequest *sleet.RefundRequest) (*payments.RefundsReq
 func buildCaptureParams(captureRequest *sleet.CaptureRequest) (*payments.CapturesRequest, error) {
 	request := &payments.CapturesRequest{
 		Amount:    uint64(captureRequest.Amount.Amount),
+		CaptureType: payments.NonFinal,
 	}
 
 	if captureRequest.MerchantOrderReference != nil {
@@ -98,9 +100,13 @@ func buildCaptureParams(captureRequest *sleet.CaptureRequest) (*payments.Capture
 }
 
 func buildVoidParams(voidRequest *sleet.VoidRequest) (*payments.VoidsRequest, error) {
-	return &payments.VoidsRequest{
-		Reference: *voidRequest.MerchantOrderReference,
-	}, nil
+	request := &payments.VoidsRequest {}
+
+	if voidRequest.MerchantOrderReference != nil {
+		request.Reference = *voidRequest.MerchantOrderReference
+	}
+
+	return request, nil
 }
 
 

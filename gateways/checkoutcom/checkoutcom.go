@@ -13,28 +13,33 @@ import (
 
 // checkoutomClient uses API-Key and custom http client to make http calls
 type CheckoutComClient struct {
-	apiKey     string
-	httpClient *http.Client
+	apiKey              string
+	processingChannelId *string
+	httpClient          *http.Client
+	env        checkout.SupportedEnvironment
 }
 
 const AcceptedStatusCode = 202
 
 // NewClient creates a CheckoutComClient
-// Note: the environment is indicated by the apiKey. See "isSandbox" assignment in checkout.Create.
-func NewClient(apiKey string) *CheckoutComClient {
-	return NewWithHTTPClient(apiKey, common.DefaultHttpClient())
+// Note: PCID is optional to support legacy checkout.com merchants whose PCID is linked to their API key.
+// New merchants will need to provide their PCID or ask their checkout.com rep to disable the field requirement.
+func NewClient(env common.Environment, apiKey string, processingChannelId *string) *CheckoutComClient {
+	return NewWithHTTPClient(env, apiKey, processingChannelId, common.DefaultHttpClient())
 }
 
 // NewWithHTTPClient uses a custom http client for requests
-func NewWithHTTPClient(apiKey string, httpClient *http.Client) *CheckoutComClient {
+func NewWithHTTPClient(env common.Environment, apiKey string, processingChannelId *string, httpClient *http.Client) *CheckoutComClient {
 	return &CheckoutComClient{
 		apiKey:     apiKey,
 		httpClient: httpClient,
+		env:        GetEnv(env),
+		processingChannelId: processingChannelId,
 	}
 }
 
 func (client *CheckoutComClient) generateCheckoutDCClient() (*payments.Client, error) {
-	config, err := checkout.Create(client.apiKey, nil)
+	config, err := checkout.SdkConfig(common.SPtr(client.apiKey), nil, client.env)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +55,7 @@ func (client *CheckoutComClient) Authorize(request *sleet.AuthorizationRequest) 
 		return nil, err
 	}
 
-	input, err := buildChargeParams(request)
+	input, err := buildChargeParams(request, client.processingChannelId)
 	if err != nil {
 		return nil, err
 	}

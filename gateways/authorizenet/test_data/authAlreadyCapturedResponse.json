@@ -1,0 +1,32 @@
+{
+  "transactionResponse": {
+    "responseCode": "1",
+    "authCode": "",
+    "avsResultCode": "P",
+    "cvvResultCode": "",
+    "cavvResultCode": "",
+    "transId": "0",
+    "refTransID": "40082390329",
+    "transHash": "",
+    "testRequest": "0",
+    "accountNumber": "",
+    "accountType": "Visa",
+    "messages": [
+      {
+        "code": "311",
+        "description": "This transaction has already been captured."
+      }
+    ],
+    "transHashSha2": "",
+    "SupplementalDataQualificationIndicator": 0
+  },
+  "messages": {
+    "resultCode": "Ok",
+    "message": [
+      {
+        "code": "I00001",
+        "text": "Successful."
+      }
+    ]
+  }
+}

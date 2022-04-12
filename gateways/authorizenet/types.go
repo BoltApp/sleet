@@ -21,6 +21,10 @@ const (
 	ResponseCodeHeld     ResponseCode = "4"
 )
 
+const (
+	MessageResponseCodeAlreadyCaptured = "311"
+)
+
 // ResultCode result of request (ok/error)
 type ResultCode string
 
@@ -101,21 +105,27 @@ type MerchantAuthentication struct {
 }
 
 // TransactionRequest has the raw credit card info as Payment and amount to authorize
-// Note -> oddly authorize.net has strict ordering even for JSON
+// *************************************************************************
+// *************************************************************************
+// ***** AUTHORIZE NET HAS STRICT JSON ORDERING DUE TO XML TRANSLATION *****
+// ***** YOU MUST FOLLOW FIELD ORDER AS SPECIFIED IN THEIR API DOCS    *****
+// ***** https://developer.authorize.net/api/reference/index.html      *****
+// *************************************************************************
+// *************************************************************************
 type TransactionRequest struct {
-	TransactionType TransactionType `json:"transactionType"`
-	Amount          *string         `json:"amount,omitempty"`
-	Payment         *Payment        `json:"payment,omitempty"`
-	Order           *Order          `json:"order,omitempty"`
-	LineItem        json.RawMessage `json:"lineItems,omitempty"` // this is really a repeating LineItem, but authorize.net expects it in object not array
+	TransactionType  TransactionType  `json:"transactionType"`
+	Amount           *string          `json:"amount,omitempty"`
+	Payment          *Payment         `json:"payment,omitempty"`
+	RefTransactionID *string          `json:"refTransId,omitempty"`
+	Order            *Order           `json:"order,omitempty"`
+	LineItem         json.RawMessage  `json:"lineItems,omitempty"` // this is really a repeating LineItem, but authorize.net expects it in object not array
 	// since not valid json, just going to represent as JSON string
-	Tax              *Tax            `json:"tax,omitempty"`
-	Duty             *Tax            `json:"duty,omitempty"`
-	Shipping         *Tax            `json:"shipping,omitempty"`
-	Customer         *Customer       `json:"customer,omitempty"`
-	BillingAddress   *BillingAddress `json:"billTo,omitempty"`
-	ShippingAddress  *BillingAddress `json:"shipTo,omitempty"`
-	RefTransactionID *string         `json:"refTransId,omitempty"`
+	Tax              *Tax             `json:"tax,omitempty"`
+	Duty             *Tax             `json:"duty,omitempty"`
+	Shipping         *Tax             `json:"shipping,omitempty"`
+	Customer         *Customer        `json:"customer,omitempty"`
+	BillingAddress   *BillingAddress  `json:"billTo,omitempty"`
+	ShippingAddress  *ShippingAddress `json:"shipTo,omitempty"`
 }
 
 type LineItem struct {
@@ -133,8 +143,9 @@ type Tax struct {
 }
 
 type Customer struct {
-	Type string `json:"type,omitempty"`
-	Id   string `json:"id,omitempty"`
+	Type  string `json:"type,omitempty"`
+	Id    string `json:"id,omitempty"`
+	Email string `json:"email,omitempty"`
 }
 
 // Payment specifies the credit card to be authorized (only payment option for now)
@@ -151,6 +162,18 @@ type CreditCard struct {
 	Cryptogram     string `json:"cryptogram,omitempty"`
 }
 
+// ShippingAddress is used in TransactionRequest for making an auth call
+type ShippingAddress struct {
+	FirstName string  `json:"firstName"`
+	LastName  string  `json:"lastName"`
+	Company   string  `json:"company"`
+	Address   *string `json:"address"`
+	City      *string `json:"city"`
+	State     *string `json:"state"`
+	Zip       *string `json:"zip"`
+	Country   *string `json:"country"`
+}
+
 // BillingAddress is used in TransactionRequest for making an auth call
 type BillingAddress struct {
 	FirstName string  `json:"firstName"`
@@ -161,6 +184,7 @@ type BillingAddress struct {
 	State     *string `json:"state"`
 	Zip       *string `json:"zip"`
 	Country   *string `json:"country"`
+	PhoneNumber *string `json:"phoneNumber"`
 }
 
 // Order is used in TransactionRequest for passing information about the order
@@ -191,10 +215,13 @@ type TransactionResponse struct {
 	Errors         []Error                      `json:"errors"`
 }
 
+// MessageResponseCode message API response codes specific to AuthorizeNet
+type MessageResponseCode string
+
 // TransactionResponseMessage contains additional information about transaction result from processor
 type TransactionResponseMessage struct {
-	Code        string `json:"code"`
-	Description string `json:"description"`
+	Code        MessageResponseCode `json:"code"`
+	Description string              `json:"description"`
 }
 
 // Error specifies a code and text explaining what happened

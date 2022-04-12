@@ -46,6 +46,10 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 				State:     billingAddress.RegionCode,
 				Zip:       billingAddress.PostalCode,
 				Country:   billingAddress.CountryCode,
+				PhoneNumber: billingAddress.PhoneNumber,
+			},
+			Customer: &Customer{
+				Email: common.SafeStr(billingAddress.Email),
 			},
 		},
 	}
@@ -102,9 +106,21 @@ func buildRefundRequest(merchantName string, transactionKey string, refundReques
 						ExpirationDate: expirationDateXXXX,
 					},
 				},
+				Order: &Order{
+					InvoiceNumber: common.SafeStr(refundRequest.MerchantOrderReference),
+				},
 			},
 		},
 	}
+
+	// Actual expiration date must be passed for testing only -> override from the options field
+	if refundRequest.Options != nil {
+		expirationOveride, ok := refundRequest.Options["TestingExpirationOverride"]
+		if ok {
+			request.CreateTransactionRequest.TransactionRequest.Payment.CreditCard.ExpirationDate = expirationOveride.(string)
+		}
+	}
+
 	return request, nil
 }
 
@@ -123,24 +139,28 @@ func addL2L3Data(authRequest *sleet.AuthorizationRequest, authNetAuthRequest *Cr
 		}
 
 		authNetAuthRequest.TransactionRequest.Tax = &Tax{
-			Amount:  strconv.FormatInt(authRequest.Level3Data.TaxAmount.Amount, 10),
+			Amount: strconv.FormatInt(authRequest.Level3Data.TaxAmount.Amount, 10),
 		}
 
 		authNetAuthRequest.TransactionRequest.Duty = &Tax{
-			Amount:  strconv.FormatInt(authRequest.Level3Data.DutyAmount.Amount, 10),
+			Amount: strconv.FormatInt(authRequest.Level3Data.DutyAmount.Amount, 10),
 		}
 
 		authNetAuthRequest.TransactionRequest.Shipping = &Tax{
-			Amount:  strconv.FormatInt(authRequest.Level3Data.ShippingAmount.Amount, 10),
+			Amount: strconv.FormatInt(authRequest.Level3Data.ShippingAmount.Amount, 10),
 		}
 
-		authNetAuthRequest.TransactionRequest.Customer = &Customer{
-			Id: authRequest.Level3Data.CustomerReference,
+		if authNetAuthRequest.TransactionRequest.Customer != nil {
+			authNetAuthRequest.TransactionRequest.Customer.Id = authRequest.Level3Data.CustomerReference
+		} else {
+			authNetAuthRequest.TransactionRequest.Customer = &Customer{
+				Id: authRequest.Level3Data.CustomerReference,
+			}
 		}
 	}
 
 	if authRequest.ShippingAddress != nil {
-		authNetAuthRequest.TransactionRequest.ShippingAddress = &BillingAddress{
+		authNetAuthRequest.TransactionRequest.ShippingAddress = &ShippingAddress{
 			FirstName: 	authRequest.CreditCard.FirstName,
 			LastName: 	authRequest.CreditCard.LastName,
 			Company: 	common.SafeStr(authRequest.ShippingAddress.Company),
@@ -168,11 +188,11 @@ func buildLineItemsString(authRequest *sleet.AuthorizationRequest) *string {
 		}
 
 		lineItem := &LineItem{
-			ItemId: sleet.TruncateString(authRequestLineItem.CommodityCode, 31),
-			Name: sleet.TruncateString(authRequestLineItem.ProductCode, 31),
+			ItemId:      sleet.TruncateString(authRequestLineItem.CommodityCode, 31),
+			Name:        sleet.TruncateString(authRequestLineItem.ProductCode, 31),
 			Description: sleet.TruncateString(authRequestLineItem.Description, 255),
-			Quantity: strconv.FormatInt(authRequestLineItem.Quantity, 10),
-			UnitPrice: strconv.FormatInt(authRequestLineItem.UnitPrice.Amount, 10),
+			Quantity:    strconv.FormatInt(authRequestLineItem.Quantity, 10),
+			UnitPrice:   strconv.FormatInt(authRequestLineItem.UnitPrice.Amount, 10),
 		}
 
 		lineItemByte, err := json.Marshal(lineItem)
@@ -182,7 +202,7 @@ func buildLineItemsString(authRequest *sleet.AuthorizationRequest) *string {
 			hasLineItem = true
 
 			// Do not add a comma for the last item
-			if i < len(authRequest.Level3Data.LineItems) - 1 && i < maxLength - 1 {
+			if i < len(authRequest.Level3Data.LineItems)-1 && i < maxLength-1 {
 				lineItems += ","
 			}
 		}
