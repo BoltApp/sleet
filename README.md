@@ -73,7 +73,7 @@ Then run tests with: `go test ./integration-tests/`
 
 ## Code Example for Auth + Capture
 
-```
+```go
 import (
   "github.com/BoltApp/sleet"
   "github.com/BoltApp/sleet/gateways/authorize_net"
