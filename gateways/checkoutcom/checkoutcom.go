@@ -16,7 +16,7 @@ type CheckoutComClient struct {
 	apiKey              string
 	processingChannelId *string
 	httpClient          *http.Client
-	env        checkout.SupportedEnvironment
+	env                 checkout.SupportedEnvironment
 }
 
 const AcceptedStatusCode = 202
@@ -31,9 +31,9 @@ func NewClient(env common.Environment, apiKey string, processingChannelId *strin
 // NewWithHTTPClient uses a custom http client for requests
 func NewWithHTTPClient(env common.Environment, apiKey string, processingChannelId *string, httpClient *http.Client) *CheckoutComClient {
 	return &CheckoutComClient{
-		apiKey:     apiKey,
-		httpClient: httpClient,
-		env:        GetEnv(env),
+		apiKey:              apiKey,
+		httpClient:          httpClient,
+		env:                 GetEnv(env),
 		processingChannelId: processingChannelId,
 	}
 }
@@ -110,8 +110,8 @@ func (client *CheckoutComClient) Capture(request *sleet.CaptureRequest) (*sleet.
 		return &sleet.CaptureResponse{Success: true, TransactionReference: request.TransactionReference}, nil
 	} else {
 		return &sleet.CaptureResponse{
-			Success: false,
-			ErrorCode: common.SPtr(strconv.Itoa(response.StatusResponse.StatusCode)),
+			Success:              false,
+			ErrorCode:            common.SPtr(strconv.Itoa(response.StatusResponse.StatusCode)),
 			TransactionReference: request.TransactionReference,
 		}, nil
 	}
@@ -119,13 +119,10 @@ func (client *CheckoutComClient) Capture(request *sleet.CaptureRequest) (*sleet.
 
 // Refund a captured transaction with amount and charge ID
 func (client *CheckoutComClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
-	config, err := checkout.Create(client.apiKey, nil)
+	checkoutComClient, err := client.generateCheckoutDCClient()
 	if err != nil {
 		return nil, err
 	}
-	config.HTTPClient = client.httpClient
-
-	checkoutComClient := payments.NewClient(*config)
 
 	input, err := buildRefundParams(request)
 	if err != nil {
@@ -141,8 +138,8 @@ func (client *CheckoutComClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 		return &sleet.RefundResponse{Success: true, TransactionReference: response.Accepted.Reference}, nil
 	} else {
 		return &sleet.RefundResponse{
-			Success: false,
-			ErrorCode: common.SPtr(strconv.Itoa(response.StatusResponse.StatusCode)),
+			Success:              false,
+			ErrorCode:            common.SPtr(strconv.Itoa(response.StatusResponse.StatusCode)),
 			TransactionReference: request.TransactionReference,
 		}, nil
 	}
@@ -170,8 +167,8 @@ func (client *CheckoutComClient) Void(request *sleet.VoidRequest) (*sleet.VoidRe
 		return &sleet.VoidResponse{Success: true, TransactionReference: response.Accepted.Reference}, nil
 	} else {
 		return &sleet.VoidResponse{
-			Success: false,
-			ErrorCode: common.SPtr(strconv.Itoa(response.StatusResponse.StatusCode)),
+			Success:              false,
+			ErrorCode:            common.SPtr(strconv.Itoa(response.StatusResponse.StatusCode)),
 			TransactionReference: request.TransactionReference,
 		}, nil
 	}
