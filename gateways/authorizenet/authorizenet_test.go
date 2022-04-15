@@ -114,6 +114,7 @@ func TestAuthorize(t *testing.T) {
 			CvvResult:            sleet.CVVResponseRequiredButMissing,
 			AvsResultRaw:         "Y",
 			CvvResultRaw:         "S",
+			Response:             "1",
 		}
 
 		client := NewClient("MerchantName", "Key", common.Sandbox)
@@ -148,6 +149,7 @@ func TestAuthorize(t *testing.T) {
 			ErrorCode:            "2",
 			AvsResultRaw:         "Y",
 			CvvResultRaw:         "P",
+			Response:             "2",
 		}
 
 		client := NewClient("MerchantName", "Key", common.Sandbox)
