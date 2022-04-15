@@ -158,7 +158,7 @@ func (client *AuthorizeNetClient) sendRequest(data Request) (*Response, error) {
 }
 
 func getErrorCode(txnResponse TransactionResponse) string {
-	if txnResponse.ResponseCode == ResponseCodeHeld && len(txnResponse.Messages) > 0{
+	if txnResponse.ResponseCode == ResponseCodeHeld && len(txnResponse.Messages) > 0 {
 		return string(txnResponse.Messages[0].Code)
 	}
 	if len(txnResponse.Errors) > 0 {
