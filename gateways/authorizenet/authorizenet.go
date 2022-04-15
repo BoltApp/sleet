@@ -53,6 +53,7 @@ func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest)
 		CvvResult:            translateCvv(txnResponse.CVVResultCode),
 		AvsResultRaw:         string(txnResponse.AVSResultCode),
 		CvvResultRaw:         string(txnResponse.CVVResultCode),
+		Response:             string(txnResponse.ResponseCode),
 		ErrorCode:            errorCode,
 	}, nil
 }
@@ -157,6 +158,9 @@ func (client *AuthorizeNetClient) sendRequest(data Request) (*Response, error) {
 }
 
 func getErrorCode(txnResponse TransactionResponse) string {
+	if txnResponse.ResponseCode == ResponseCodeHeld && len(txnResponse.Messages) > 0{
+		return string(txnResponse.Messages[0].Code)
+	}
 	if len(txnResponse.Errors) > 0 {
 		return txnResponse.Errors[0].ErrorCode
 	} else {
