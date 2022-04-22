@@ -190,3 +190,21 @@ func Base3DS() *sleet.ThreeDS {
 		XID:              "xid",
 	}
 }
+
+func BaseCaptureRequestWithOptions() *sleet.CaptureRequest {
+	clientRef := "222222"
+
+	amount := sleet.Amount{
+		Amount:   100,
+		Currency: "USD",
+	}
+	return &sleet.CaptureRequest{
+		Amount:                     &amount,
+		TransactionReference:       "111111",
+		ClientTransactionReference: &clientRef,
+		Options: map[string]interface{}{
+			"captureSequenceNumber": "11",
+			"totalCaptureCount":     "99",
+		},
+	}
+}
