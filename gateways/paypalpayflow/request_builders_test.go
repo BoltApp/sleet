@@ -12,8 +12,8 @@ import (
 var (
 	defaultTestVerbosity      string = "HIGH"
 	defaultTestTender         string = "C"
-	defaultTestAmount         string = "100"
-	defaultTestExpirationDate string = "2023"
+	defaultTestAmount         string = "1.00"
+	defaultTestExpirationDate string = "1023"
 	OriginalID                string = "111111"
 )
 
@@ -47,7 +47,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				CreditCardNumber:   &visaBase.CreditCard.Number,
 				CardExpirationDate: &defaultTestExpirationDate,
 				Verbosity:          &defaultTestVerbosity,
-				Tender:             &defaultTestAmount,
+				Tender:             &defaultTestTender,
 			},
 		},
 		{
@@ -59,7 +59,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				CreditCardNumber:   &discoverBase.CreditCard.Number,
 				CardExpirationDate: &defaultTestExpirationDate,
 				Verbosity:          &defaultTestVerbosity,
-				Tender:             &defaultTestAmount,
+				Tender:             &defaultTestTender,
 			},
 		},
 		{
@@ -71,7 +71,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				CreditCardNumber:   &mastercardBase.CreditCard.Number,
 				CardExpirationDate: &defaultTestExpirationDate,
 				Verbosity:          &defaultTestVerbosity,
-				Tender:             &defaultTestAmount,
+				Tender:             &defaultTestTender,
 			},
 		},
 		{
@@ -83,7 +83,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				CreditCardNumber:   &applepayBase.CreditCard.Number,
 				CardExpirationDate: &defaultTestExpirationDate,
 				Verbosity:          &defaultTestVerbosity,
-				Tender:             &defaultTestAmount,
+				Tender:             &defaultTestTender,
 			},
 		},
 	}
@@ -91,7 +91,7 @@ func TestBuildAuthRequest(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.label, func(t *testing.T) {
 			got := buildAuthorizeParams(c.in)
-			if diff := deep.Equal(got, c.want); diff != nil {
+			if diff := deep.Equal(got, &c.want); diff != nil {
 				t.Error(diff)
 			}
 		})
@@ -109,12 +109,10 @@ func TestBuildCaptureRequest(t *testing.T) {
 			"Basic Capture Request",
 			base,
 			Request{
-				TrxType:            "D",
-				Amount:             &defaultTestAmount,
-				OriginalID:         &OriginalID,
-				CardExpirationDate: &defaultTestExpirationDate,
-				Verbosity:          &defaultTestVerbosity,
-				Tender:             &defaultTestAmount,
+				TrxType:    "D",
+				OriginalID: &OriginalID,
+				Verbosity:  &defaultTestVerbosity,
+				Tender:     &defaultTestTender,
 			},
 		},
 	}
@@ -122,7 +120,7 @@ func TestBuildCaptureRequest(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.label, func(t *testing.T) {
 			got := buildCaptureParams(c.in)
-			if diff := deep.Equal(got, c.want); diff != nil {
+			if diff := deep.Equal(got, &c.want); diff != nil {
 				t.Error(diff)
 			}
 		})
@@ -141,12 +139,10 @@ func TestBuildVoidRequest(t *testing.T) {
 			"Basic Void Request",
 			base,
 			Request{
-				TrxType:            "V",
-				Amount:             &defaultTestAmount,
-				OriginalID:         &OriginalID,
-				CardExpirationDate: &defaultTestExpirationDate,
-				Verbosity:          &defaultTestVerbosity,
-				Tender:             &defaultTestAmount,
+				TrxType:    "V",
+				OriginalID: &OriginalID,
+				Verbosity:  &defaultTestVerbosity,
+				Tender:     &defaultTestTender,
 			},
 		},
 	}
@@ -154,7 +150,7 @@ func TestBuildVoidRequest(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.label, func(t *testing.T) {
 			got := buildVoidParams(c.in)
-			if diff := deep.Equal(got, c.want); diff != nil {
+			if diff := deep.Equal(got, &c.want); diff != nil {
 				t.Error(diff)
 			}
 		})
@@ -173,12 +169,10 @@ func TestBuildRefundRequest(t *testing.T) {
 			"Basic Refund Request",
 			base,
 			Request{
-				TrxType:            "C",
-				Amount:             &defaultTestAmount,
-				OriginalID:         &OriginalID,
-				CardExpirationDate: &defaultTestExpirationDate,
-				Verbosity:          &defaultTestVerbosity,
-				Tender:             &defaultTestAmount,
+				TrxType:    "C",
+				OriginalID: &OriginalID,
+				Verbosity:  &defaultTestVerbosity,
+				Tender:     &defaultTestTender,
 			},
 		},
 	}
@@ -186,7 +180,7 @@ func TestBuildRefundRequest(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.label, func(t *testing.T) {
 			got := buildRefundParams(c.in)
-			if diff := deep.Equal(got, c.want); diff != nil {
+			if diff := deep.Equal(got, &c.want); diff != nil {
 				t.Error(diff)
 			}
 		})
