@@ -6,8 +6,10 @@ import (
 	"github.com/BoltApp/sleet"
 )
 
-var defaultVerbosity string = "HIGH"
-var defaultTender string = "C"
+var (
+	defaultVerbosity string = "HIGH"
+	defaultTender    string = "C"
+)
 
 func buildAuthorizeParams(request *sleet.AuthorizationRequest) *Request {
 	expirationDate := fmt.Sprintf("%02d%02d", request.CreditCard.ExpirationMonth, request.CreditCard.ExpirationYear%100)
@@ -40,7 +42,6 @@ func buildVoidParams(request *sleet.VoidRequest) *Request {
 }
 
 func buildRefundParams(request *sleet.RefundRequest) *Request {
-	fmt.Println(request.TransactionReference)
 	return &Request{
 		TrxType:    "C",
 		OriginalID: &request.TransactionReference,

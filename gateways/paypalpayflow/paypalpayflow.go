@@ -89,7 +89,6 @@ func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, err
 	if request.OriginalID != nil {
 		data = data + fmt.Sprintf("&ORIGID[%d]=%s", len(*request.OriginalID), *request.OriginalID)
 	}
-	fmt.Println(data)
 
 	req, err := http.NewRequest("POST", client.url, strings.NewReader(data))
 	if err != nil {
@@ -109,7 +108,6 @@ func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, err
 	response := make(Response)
 	for _, line := range strings.Split(string(bodyText), "&") {
 		line := strings.Split(strings.TrimSpace(line), "=")
-		fmt.Println(line)
 		if len(line) != 2 {
 			continue
 		}
