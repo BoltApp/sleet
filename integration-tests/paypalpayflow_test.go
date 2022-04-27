@@ -23,9 +23,7 @@ func TestPaypalAuth(t *testing.T) {
 	authRequest.CreditCard.ExpirationYear = 25
 	authRequest.CreditCard.Number = "4222222222222"
 	auth, err := client.Authorize(authRequest)
-	fmt.Println(auth)
 	if err != nil {
-		fmt.Println(err.Error())
 		t.Error("Authorize request should not have failed")
 	}
 
@@ -55,6 +53,7 @@ func TestPaypalAuthFullCapture(t *testing.T) {
 		Amount:               &authRequest.Amount,
 		TransactionReference: auth.TransactionReference,
 	}
+
 	capture, err := client.Capture(captureRequest)
 	if err != nil {
 		t.Error("Capture request should not have failed")
@@ -87,6 +86,7 @@ func TestPaypalAuthVoid(t *testing.T) {
 	voidRequest := &sleet.VoidRequest{
 		TransactionReference: auth.TransactionReference,
 	}
+
 	void, err := client.Void(voidRequest)
 	if err != nil {
 		t.Error("Void request should not have failed")
@@ -112,6 +112,7 @@ func TestPaypalAuthCaptureRefund(t *testing.T) {
 	if err != nil {
 		t.Error("Authorize request should not have failed")
 	}
+
 	if !auth.Success {
 		t.Error("Resulting auth should have been successful")
 	}
@@ -120,13 +121,16 @@ func TestPaypalAuthCaptureRefund(t *testing.T) {
 		Amount:               &authRequest.Amount,
 		TransactionReference: auth.TransactionReference,
 	}
+
 	capture, err := client.Capture(captureRequest)
 	if err != nil {
 		t.Error("Capture request should not have failed")
 	}
+
 	if !capture.Success {
 		t.Error("Resulting capture should have been successful")
 	}
+
 	fmt.Println(capture.TransactionReference)
 
 	refundRequest := &sleet.RefundRequest{

@@ -23,7 +23,8 @@ type PaypalPayflowClient struct {
 const (
 	REFUND        = "C"
 	AUTHORIZATION = "A"
-	CAPTURE       = ""
+	CAPTURE       = "D"
+	VOID          = "V"
 )
 
 func NewClient(partner string, password string, vendor string, user string, environment common.Environment) *PaypalPayflowClient {
@@ -46,7 +47,7 @@ func paypalURL(env common.Environment) string {
 	if env != common.Production {
 		return "https://pilot-payflowpro.paypal.com"
 	}
-	return "https://payflowpro.paypal.com'"
+	return "https://payflowpro.paypal.com"
 }
 
 type Request struct {
@@ -74,18 +75,23 @@ func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, err
 	if request.Amount != nil {
 		data = data + fmt.Sprintf("&AMT[%d]=%s", len(*request.Amount), *request.Amount)
 	}
+
 	if request.Verbosity != nil {
 		data = data + fmt.Sprintf("&VERBOSITY[%d]=%s", len(*request.Verbosity), *request.Verbosity)
 	}
+
 	if request.Tender != nil {
 		data = data + fmt.Sprintf("&TENDER[%d]=%s", len(*request.Tender), *request.Tender)
 	}
+
 	if request.CreditCardNumber != nil {
 		data = data + fmt.Sprintf("&ACCT[%d]=%s", len(*request.CreditCardNumber), *request.CreditCardNumber)
 	}
+
 	if request.CardExpirationDate != nil {
 		data = data + fmt.Sprintf("&EXPDATE[%d]=%s", len(*request.CardExpirationDate), *request.CardExpirationDate)
 	}
+
 	if request.OriginalID != nil {
 		data = data + fmt.Sprintf("&ORIGID[%d]=%s", len(*request.OriginalID), *request.OriginalID)
 	}
@@ -94,12 +100,14 @@ func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, err
 	if err != nil {
 		log.Fatal(err)
 	}
-	// req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
+
 	defer resp.Body.Close()
+
 	bodyText, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err

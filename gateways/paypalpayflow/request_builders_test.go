@@ -42,7 +42,7 @@ func TestBuildAuthRequest(t *testing.T) {
 			"Auth with Visa",
 			&visaBase,
 			Request{
-				TrxType:            "A",
+				TrxType:            AUTHORIZATION,
 				Amount:             &defaultTestAmount,
 				CreditCardNumber:   &visaBase.CreditCard.Number,
 				CardExpirationDate: &defaultTestExpirationDate,
@@ -54,7 +54,7 @@ func TestBuildAuthRequest(t *testing.T) {
 			"Auth with discover",
 			&discoverBase,
 			Request{
-				TrxType:            "A",
+				TrxType:            AUTHORIZATION,
 				Amount:             &defaultTestAmount,
 				CreditCardNumber:   &discoverBase.CreditCard.Number,
 				CardExpirationDate: &defaultTestExpirationDate,
@@ -66,7 +66,7 @@ func TestBuildAuthRequest(t *testing.T) {
 			"Auth with not visa nor discover",
 			&mastercardBase,
 			Request{
-				TrxType:            "A",
+				TrxType:            AUTHORIZATION,
 				Amount:             &defaultTestAmount,
 				CreditCardNumber:   &mastercardBase.CreditCard.Number,
 				CardExpirationDate: &defaultTestExpirationDate,
@@ -78,7 +78,7 @@ func TestBuildAuthRequest(t *testing.T) {
 			"Auth with applepay",
 			&applepayBase,
 			Request{
-				TrxType:            "A",
+				TrxType:            AUTHORIZATION,
 				Amount:             &defaultTestAmount,
 				CreditCardNumber:   &applepayBase.CreditCard.Number,
 				CardExpirationDate: &defaultTestExpirationDate,
@@ -109,7 +109,7 @@ func TestBuildCaptureRequest(t *testing.T) {
 			"Basic Capture Request",
 			base,
 			Request{
-				TrxType:    "D",
+				TrxType:    CAPTURE,
 				OriginalID: &OriginalID,
 				Verbosity:  &defaultTestVerbosity,
 				Tender:     &defaultTestTender,
@@ -139,7 +139,7 @@ func TestBuildVoidRequest(t *testing.T) {
 			"Basic Void Request",
 			base,
 			Request{
-				TrxType:    "V",
+				TrxType:    VOID,
 				OriginalID: &OriginalID,
 				Verbosity:  &defaultTestVerbosity,
 				Tender:     &defaultTestTender,
@@ -169,7 +169,7 @@ func TestBuildRefundRequest(t *testing.T) {
 			"Basic Refund Request",
 			base,
 			Request{
-				TrxType:    "C",
+				TrxType:    REFUND,
 				OriginalID: &OriginalID,
 				Verbosity:  &defaultTestVerbosity,
 				Tender:     &defaultTestTender,
