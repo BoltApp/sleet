@@ -88,7 +88,6 @@ type ProcessorInformation struct {
 type ProcessingInformation struct {
 	Capture              bool                  `json:"capture,omitempty"`
 	CommerceIndicator    string                `json:"commerceIndicator"` // typically internet
-	CaptureOptions       *CaptureOptions       `json:"captureOptions,omitempty"`
 	PaymentSolution      string                `json:"paymentSolution"`
 	PurchaseLevel        string                `json:"purchaseLevel,omitempty"` // Specifies if level 3 data is being sent
 	AuthorizationOptions *AuthorizationOptions `json:"authorizationOptions,omitempty"`
@@ -217,9 +216,4 @@ type ConsumerAuthenticationInformation struct {
 	UcafCollectionIndicator string `json:"ucafCollectionIndicator,omitempty"`
 	Xid                     string `json:"xid,omitempty"`
 	Cavv                    string `json:"cavv,omitempty"`
-}
-
-type CaptureOptions struct {
-	CaptureSequenceNumber string `json:"captureSequenceNumber,omitempty"`
-	TotalCaptureCount     string `json:"totalCaptureCount,omitempty"`
 }

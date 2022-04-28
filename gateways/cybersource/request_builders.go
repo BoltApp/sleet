@@ -179,12 +179,16 @@ func buildCaptureRequest(captureRequest *sleet.CaptureRequest) (*Request, error)
 			Value: *captureRequest.ClientTransactionReference,
 		})
 	}
-	if captureRequest.Options[captureSequenceNumber] != nil && captureRequest.Options[totalCaptureCount] != nil {
-		request.ProcessingInformation = &ProcessingInformation{
-			CaptureOptions: &CaptureOptions{
-				CaptureSequenceNumber: captureRequest.Options[captureSequenceNumber].(string),
-				TotalCaptureCount:     captureRequest.Options[totalCaptureCount].(string),
-			},
+	captureSeqNum, ok := captureRequest.Options[captureSequenceNumber]
+	if ok {
+		totalCapCount, ok := captureRequest.Options[totalCaptureCount]
+		if ok {
+			request.ProcessingInformation = &ProcessingInformation{
+				CaptureOptions: &CaptureOptions{
+					CaptureSequenceNumber: captureSeqNum.(string),
+					TotalCaptureCount:     totalCapCount.(string),
+				},
+			}
 		}
 	}
 	return request, nil
