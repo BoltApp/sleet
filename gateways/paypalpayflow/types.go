@@ -19,7 +19,9 @@ const (
 )
 
 const (
-	successResponse = "0"
+	successResponse      = "0"
+	transactionFieldName = "PNREF"
+	resultFieldName      = "RESULT"
 )
 
 type Request struct {

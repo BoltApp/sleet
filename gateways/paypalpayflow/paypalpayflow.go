@@ -133,9 +133,9 @@ func (client *PaypalPayflowClient) Authorize(request *sleet.AuthorizationRequest
 		return nil, err
 	}
 
-	transactionID, ok1 := (*response)["PNREF"]
-	result, ok2 := (*response)["RESULT"]
-	if ok1 && ok2 && result == "0" {
+	transactionID, ok1 := (*response)[transactionFieldName]
+	result, ok2 := (*response)[resultFieldName]
+	if ok1 && ok2 && result == successResponse {
 		return &sleet.AuthorizationResponse{
 			Success:              true,
 			TransactionReference: transactionID,
@@ -154,9 +154,9 @@ func (client *PaypalPayflowClient) Capture(request *sleet.CaptureRequest) (*slee
 		return nil, err
 	}
 
-	transactionID, ok1 := (*response)["PNREF"]
-	result, ok2 := (*response)["RESULT"]
-	if ok1 && ok2 && result == "0" {
+	transactionID, ok1 := (*response)[transactionFieldName]
+	result, ok2 := (*response)[resultFieldName]
+	if ok1 && ok2 && result == successResponse {
 		return &sleet.CaptureResponse{
 			Success:              true,
 			TransactionReference: transactionID,
@@ -175,8 +175,8 @@ func (client *PaypalPayflowClient) Void(request *sleet.VoidRequest) (*sleet.Void
 		return nil, err
 	}
 
-	result, ok := (*response)["RESULT"]
-	if ok && result == "0" {
+	result, ok := (*response)[resultFieldName]
+	if ok && result == successResponse {
 		return &sleet.VoidResponse{
 			Success: true,
 		}, nil
@@ -194,8 +194,8 @@ func (client *PaypalPayflowClient) Refund(request *sleet.RefundRequest) (*sleet.
 		return nil, err
 	}
 
-	result, ok := (*response)["RESULT"]
-	if ok && result == "0" {
+	result, ok := (*response)[resultFieldName]
+	if ok && result == successResponse {
 		return &sleet.RefundResponse{
 			Success: true,
 		}, nil
