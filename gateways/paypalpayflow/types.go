@@ -39,6 +39,7 @@ type Request struct {
 	BILLTOSTREET       *string
 	BILLTOSTREET2      *string
 	BILLTOCOUNTRY      *string // country code
+	SCAEXEMPTION       *string
 }
 
 type Response map[string]string

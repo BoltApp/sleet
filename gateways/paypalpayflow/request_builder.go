@@ -9,11 +9,18 @@ import (
 var (
 	defaultVerbosity string = "HIGH"
 	defaultTender    string = "C"
+	defaultMIT       string = "MIT"
 )
 
 func buildAuthorizeParams(request *sleet.AuthorizationRequest) *Request {
 	expirationDate := fmt.Sprintf("%02d%02d", request.CreditCard.ExpirationMonth, request.CreditCard.ExpirationYear%100)
 	amount := sleet.AmountToDecimalString(&request.Amount)
+	var SCAEXEMPTION *string = nil
+
+	if request.ProcessingInitiator != nil && *request.ProcessingInitiator == sleet.ProcessingInitiatorTypeStoredMerchantInitiated {
+		SCAEXEMPTION = &defaultMIT
+	}
+
 	return &Request{
 		TrxType:            AUTHORIZATION,
 		Amount:             &amount,
@@ -28,6 +35,7 @@ func buildAuthorizeParams(request *sleet.AuthorizationRequest) *Request {
 		BILLTOSTREET:       request.BillingAddress.StreetAddress1,
 		BILLTOSTREET2:      request.BillingAddress.StreetAddress2,
 		BILLTOCOUNTRY:      request.BillingAddress.CountryCode,
+		SCAEXEMPTION:       SCAEXEMPTION,
 	}
 }
 
