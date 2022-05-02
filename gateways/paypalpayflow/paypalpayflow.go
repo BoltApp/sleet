@@ -11,22 +11,6 @@ import (
 	"github.com/BoltApp/sleet/common"
 )
 
-type PaypalPayflowClient struct {
-	partner    string
-	password   string
-	vendor     string
-	user       string
-	httpClient *http.Client
-	url        string
-}
-
-const (
-	REFUND        = "C"
-	AUTHORIZATION = "A"
-	CAPTURE       = "D"
-	VOID          = "V"
-)
-
 func NewClient(partner string, password string, vendor string, user string, environment common.Environment) *PaypalPayflowClient {
 	return NewWithHttpClient(partner, password, vendor, user, environment, common.DefaultHttpClient())
 }
@@ -49,18 +33,6 @@ func paypalURL(env common.Environment) string {
 	}
 	return "https://payflowpro.paypal.com"
 }
-
-type Request struct {
-	TrxType            string
-	Amount             *string
-	Verbosity          *string
-	Tender             *string
-	CreditCardNumber   *string
-	CardExpirationDate *string
-	OriginalID         *string
-}
-
-type Response map[string]string
 
 func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, error) {
 	data := fmt.Sprintf(
@@ -96,6 +68,34 @@ func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, err
 		data = data + fmt.Sprintf("&ORIGID[%d]=%s", len(*request.OriginalID), *request.OriginalID)
 	}
 
+	if request.BILLTOFIRSTNAME != nil {
+		data = data + fmt.Sprintf("&BILLTOFIRSTNAME[%d]=%s", len(*request.BILLTOFIRSTNAME), *request.BILLTOFIRSTNAME)
+	}
+
+	if request.BILLTOLASTNAME != nil {
+		data = data + fmt.Sprintf("&BILLTOLASTNAME[%d]=%s", len(*request.BILLTOLASTNAME), *request.BILLTOLASTNAME)
+	}
+
+	if request.BILLTOZIP != nil {
+		data = data + fmt.Sprintf("&BILLTOZIP[%d]=%s", len(*request.BILLTOZIP), *request.BILLTOZIP)
+	}
+
+	if request.BILLTOSTATE != nil {
+		data = data + fmt.Sprintf("&BILLTOSTATE[%d]=%s", len(*request.BILLTOSTATE), *request.BILLTOSTATE)
+	}
+
+	if request.BILLTOSTREET != nil {
+		data = data + fmt.Sprintf("&BILLTOSTREET[%d]=%s", len(*request.BILLTOSTREET), *request.BILLTOSTREET)
+	}
+
+	if request.BILLTOSTREET2 != nil {
+		data = data + fmt.Sprintf("&BILLTOSTREET2[%d]=%s", len(*request.BILLTOSTREET2), *request.BILLTOSTREET2)
+	}
+
+	if request.BILLTOCOUNTRY != nil {
+		data = data + fmt.Sprintf("&BILLTOCOUNTRY[%d]=%s", len(*request.BILLTOCOUNTRY), *request.BILLTOCOUNTRY)
+	}
+
 	req, err := http.NewRequest("POST", client.url, strings.NewReader(data))
 	if err != nil {
 		log.Fatal(err)
@@ -114,6 +114,7 @@ func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, err
 	}
 
 	response := make(Response)
+	fmt.Println(string(bodyText))
 	for _, line := range strings.Split(string(bodyText), "&") {
 		line := strings.Split(strings.TrimSpace(line), "=")
 		if len(line) != 2 {
@@ -153,11 +154,12 @@ func (client *PaypalPayflowClient) Capture(request *sleet.CaptureRequest) (*slee
 		return nil, err
 	}
 
-	result, ok := (*response)["RESULT"]
-	if ok && result == "0" {
+	transactionID, ok1 := (*response)["PNREF"]
+	result, ok2 := (*response)["RESULT"]
+	if ok1 && ok2 && result == "0" {
 		return &sleet.CaptureResponse{
 			Success:              true,
-			TransactionReference: request.TransactionReference,
+			TransactionReference: transactionID,
 		}, nil
 	}
 

@@ -1,7 +1,6 @@
 package test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/BoltApp/sleet"
@@ -28,6 +27,24 @@ func TestPaypalAuth(t *testing.T) {
 	}
 
 	if !auth.Success {
+		t.Error("Resulting auth should have been successful")
+	}
+}
+
+func TestPaypalAuthBadCredentials(t *testing.T) {
+	client := paypalpayflow.NewClient("PAYPAL_PARTNER", "PAYPAL_PASSWORD", getEnv("PAYPAL_VENDOR"), getEnv("PAYPAL_USER"), common.Sandbox)
+	authRequest := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
+	authRequest.Amount.Amount = int64(randomdata.Number(10000))
+	authRequest.MerchantOrderReference = "test-order-ref"
+	authRequest.CreditCard.ExpirationMonth = 3
+	authRequest.CreditCard.ExpirationYear = 25
+	authRequest.CreditCard.Number = "4222222222222"
+	auth, err := client.Authorize(authRequest)
+	if err != nil {
+		t.Error("Authorize request should not have failed")
+	}
+
+	if auth.Success {
 		t.Error("Resulting auth should have been successful")
 	}
 }
@@ -131,17 +148,15 @@ func TestPaypalAuthCaptureRefund(t *testing.T) {
 		t.Error("Resulting capture should have been successful")
 	}
 
-	fmt.Println(capture.TransactionReference)
-
 	refundRequest := &sleet.RefundRequest{
-		Amount:               &authRequest.Amount,
-		Last4:                authRequest.CreditCard.Number,
-		TransactionReference: capture.TransactionReference,
+		Amount: &authRequest.Amount,
+		Last4:  authRequest.CreditCard.Number,
+		// TransactionReference: captureRequest.TransactionReference,
 	}
 
 	refund, err := client.Refund(refundRequest)
 	if err != nil {
-		t.Error("refund request should not have failed")
+		t.Error("Refund request should not have failed")
 	}
 	if !refund.Success {
 		t.Error("Resulting refund should have been successful")
