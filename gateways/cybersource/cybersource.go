@@ -74,15 +74,15 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 		errorCode = cybersourceResponse.ErrorInformation.Reason
 	}
 	success := false // DECLINED, INVALID_REQUEST
-	if cybersourceResponse.Status == "AUTHORIZED" || cybersourceResponse.Status == "PARTIAL_AUTHORIZED" || cybersourceResponse.Status == "AUTHORIZED_PENDING_REVIEW" {
+	if cybersourceResponse.Status == "AUTHORIZED" || cybersourceResponse.Status == "PARTIAL_AUTHORIZED" || cybersourceResponse.Status == "AUTHORIZED_PENDING_REVIEW" || cybersourceResponse.Status == "PENDING_REVIEW" {
 		success = true
 	}
 
 	response := &sleet.AuthorizationResponse{
-		Success:               success,
-		TransactionReference:  *cybersourceResponse.ID,
-		Response:              cybersourceResponse.Status,
-		ErrorCode:             errorCode,
+		Success:              success,
+		TransactionReference: *cybersourceResponse.ID,
+		Response:             cybersourceResponse.Status,
+		ErrorCode:            errorCode,
 	}
 	if cybersourceResponse.ProcessorInformation != nil {
 		response.AvsResult = translateAvs(cybersourceResponse.ProcessorInformation.AVS.Code)
