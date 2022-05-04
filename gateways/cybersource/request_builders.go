@@ -17,8 +17,14 @@ const (
 const (
 	AmexCryptogramMaxLength   = 40
 	AmexCryptogramSplitLength = 20
-	TransactionTypeInApp = "1"
-	PaymentSolutionApplepay = "001"
+	TransactionTypeInApp      = "1"
+	PaymentSolutionApplepay   = "001"
+)
+
+// Options
+const (
+	captureSequenceNumber = "captureSequenceNumber"
+	totalCaptureCount     = "totalCaptureCount"
 )
 
 // add mappings
@@ -69,9 +75,9 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 			CommerceIndicator: string(CommerceIndicatorInternet),
 			AuthorizationOptions: &AuthorizationOptions{
 				Initiator: &Initiator{
-					InitiatorType: initiatorType,
+					InitiatorType:          initiatorType,
 					CredentialStoredOnFile: credentialStoredOnFile,
-					StoredCredentialUsed: storedCredentialUsed,
+					StoredCredentialUsed:   storedCredentialUsed,
 				},
 			},
 		},
@@ -114,7 +120,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 	// If level 3 data is present, and ClientReferenceInformation in that data exists, it will override this.
 	if authRequest.ClientTransactionReference != nil {
 		request.MerchantDefinedInformation = append(request.MerchantDefinedInformation, MerchantDefinedInformation{
-			Key: "1",
+			Key:   "1",
 			Value: *authRequest.ClientTransactionReference,
 		})
 	}
@@ -169,9 +175,21 @@ func buildCaptureRequest(captureRequest *sleet.CaptureRequest) (*Request, error)
 	}
 	if captureRequest.ClientTransactionReference != nil {
 		request.MerchantDefinedInformation = append(request.MerchantDefinedInformation, MerchantDefinedInformation{
-			Key: "1",
+			Key:   "1",
 			Value: *captureRequest.ClientTransactionReference,
 		})
+	}
+	captureSeqNum, ok := captureRequest.Options[captureSequenceNumber]
+	if ok {
+		totalCapCount, ok := captureRequest.Options[totalCaptureCount]
+		if ok {
+			request.ProcessingInformation = &ProcessingInformation{
+				CaptureOptions: &CaptureOptions{
+					CaptureSequenceNumber: captureSeqNum.(string),
+					TotalCaptureCount:     totalCapCount.(string),
+				},
+			}
+		}
 	}
 	return request, nil
 }
@@ -186,7 +204,7 @@ func buildVoidRequest(voidRequest *sleet.VoidRequest) (*Request, error) {
 	}
 	if voidRequest.ClientTransactionReference != nil {
 		request.MerchantDefinedInformation = append(request.MerchantDefinedInformation, MerchantDefinedInformation{
-			Key: "1",
+			Key:   "1",
 			Value: *voidRequest.ClientTransactionReference,
 		})
 	}
@@ -210,7 +228,7 @@ func buildRefundRequest(refundRequest *sleet.RefundRequest) (*Request, error) {
 	}
 	if refundRequest.ClientTransactionReference != nil {
 		request.MerchantDefinedInformation = append(request.MerchantDefinedInformation, MerchantDefinedInformation{
-			Key: "1",
+			Key:   "1",
 			Value: *refundRequest.ClientTransactionReference,
 		})
 	}
@@ -220,11 +238,11 @@ func buildRefundRequest(refundRequest *sleet.RefundRequest) (*Request, error) {
 func buildApplepayRequest(authRequest *sleet.AuthorizationRequest, request *Request) error {
 	request.PaymentInformation = &PaymentInformation{
 		TokenizedCard: &TokenizedCard{
-			Number: authRequest.CreditCard.Number,
-			ExpirationYear: strconv.Itoa(authRequest.CreditCard.ExpirationYear),
+			Number:          authRequest.CreditCard.Number,
+			ExpirationYear:  strconv.Itoa(authRequest.CreditCard.ExpirationYear),
 			ExpirationMonth: fmt.Sprintf("%02d", authRequest.CreditCard.ExpirationMonth),
 			TransactionType: TransactionTypeInApp,
-			Cryptogram: authRequest.Cryptogram,
+			Cryptogram:      authRequest.Cryptogram,
 		},
 	}
 
@@ -234,14 +252,14 @@ func buildApplepayRequest(authRequest *sleet.AuthorizationRequest, request *Requ
 	case sleet.CreditCardNetworkVisa:
 		request.PaymentInformation.TokenizedCard.Type = string(CardTypeVisa)
 		request.ConsumerAuthenticationInformation = &ConsumerAuthenticationInformation{
-			Xid: authRequest.Cryptogram,
+			Xid:  authRequest.Cryptogram,
 			Cavv: authRequest.Cryptogram,
 		}
 	case sleet.CreditCardNetworkMastercard:
 		request.PaymentInformation.TokenizedCard.Type = string(CardTypeMastercard)
 		request.ProcessingInformation.CommerceIndicator = string(CommerceIndicatorMastercard)
 		request.ConsumerAuthenticationInformation = &ConsumerAuthenticationInformation{
-			UcafAuthenticationData: authRequest.Cryptogram,
+			UcafAuthenticationData:  authRequest.Cryptogram,
 			UcafCollectionIndicator: "2",
 		}
 	case sleet.CreditCardNetworkAmex:
@@ -274,7 +292,7 @@ func getAmexConsumerAuthInfo(cryptogram string) (*ConsumerAuthenticationInformat
 		// the xid field.
 		return &ConsumerAuthenticationInformation{
 			Cavv: cryptogram[:AmexCryptogramSplitLength],
-			Xid: cryptogram[AmexCryptogramSplitLength:],
+			Xid:  cryptogram[AmexCryptogramSplitLength:],
 		}, nil
 	}
 

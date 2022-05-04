@@ -1,5 +1,3 @@
-// +build unit
-
 package cybersource
 
 import (
@@ -43,9 +41,9 @@ func TestBuildAuthRequest(t *testing.T) {
 					CommerceIndicator: "internet",
 					AuthorizationOptions: &AuthorizationOptions{
 						Initiator: &Initiator{
-							InitiatorType: "",
+							InitiatorType:          "",
 							CredentialStoredOnFile: false,
-							StoredCredentialUsed: false,
+							StoredCredentialUsed:   false,
 						},
 					},
 				},
@@ -98,25 +96,25 @@ func TestBuildAuthRequest(t *testing.T) {
 					CommerceIndicator: "internet",
 					AuthorizationOptions: &AuthorizationOptions{
 						Initiator: &Initiator{
-							InitiatorType: "",
+							InitiatorType:          "",
 							CredentialStoredOnFile: false,
-							StoredCredentialUsed: false,
+							StoredCredentialUsed:   false,
 						},
 					},
-					PaymentSolution: "001",	// Apple pay
+					PaymentSolution: "001", // Apple pay
 				},
 				PaymentInformation: &PaymentInformation{
 					TokenizedCard: &TokenizedCard{
-						Number:   visaApplepayBase.CreditCard.Number,
+						Number:          visaApplepayBase.CreditCard.Number,
 						ExpirationYear:  strconv.Itoa(visaApplepayBase.CreditCard.ExpirationYear),
 						ExpirationMonth: fmt.Sprintf("%02d", visaApplepayBase.CreditCard.ExpirationMonth),
 						TransactionType: "1",
-						Cryptogram: visaApplepayBase.Cryptogram,
-						Type: "001",
+						Cryptogram:      visaApplepayBase.Cryptogram,
+						Type:            "001",
 					},
 				},
 				ConsumerAuthenticationInformation: &ConsumerAuthenticationInformation{
-					Xid: visaApplepayBase.Cryptogram,
+					Xid:  visaApplepayBase.Cryptogram,
 					Cavv: visaApplepayBase.Cryptogram,
 				},
 				OrderInformation: &OrderInformation{
@@ -160,25 +158,25 @@ func TestBuildAuthRequest(t *testing.T) {
 					CommerceIndicator: "spa",
 					AuthorizationOptions: &AuthorizationOptions{
 						Initiator: &Initiator{
-							InitiatorType: "",
+							InitiatorType:          "",
 							CredentialStoredOnFile: false,
-							StoredCredentialUsed: false,
+							StoredCredentialUsed:   false,
 						},
 					},
-					PaymentSolution: "001",	// Apple pay
+					PaymentSolution: "001", // Apple pay
 				},
 				PaymentInformation: &PaymentInformation{
 					TokenizedCard: &TokenizedCard{
-						Number:   mastercardApplepayBase.CreditCard.Number,
+						Number:          mastercardApplepayBase.CreditCard.Number,
 						ExpirationYear:  strconv.Itoa(mastercardApplepayBase.CreditCard.ExpirationYear),
 						ExpirationMonth: fmt.Sprintf("%02d", mastercardApplepayBase.CreditCard.ExpirationMonth),
 						TransactionType: "1",
-						Cryptogram: mastercardApplepayBase.Cryptogram,
-						Type: "002",
+						Cryptogram:      mastercardApplepayBase.Cryptogram,
+						Type:            "002",
 					},
 				},
 				ConsumerAuthenticationInformation: &ConsumerAuthenticationInformation{
-					UcafAuthenticationData: mastercardApplepayBase.Cryptogram,
+					UcafAuthenticationData:  mastercardApplepayBase.Cryptogram,
 					UcafCollectionIndicator: "2",
 				},
 				OrderInformation: &OrderInformation{
@@ -222,21 +220,21 @@ func TestBuildAuthRequest(t *testing.T) {
 					CommerceIndicator: "dipb",
 					AuthorizationOptions: &AuthorizationOptions{
 						Initiator: &Initiator{
-							InitiatorType: "",
+							InitiatorType:          "",
 							CredentialStoredOnFile: false,
-							StoredCredentialUsed: false,
+							StoredCredentialUsed:   false,
 						},
 					},
-					PaymentSolution: "001",	// Apple pay
+					PaymentSolution: "001", // Apple pay
 				},
 				PaymentInformation: &PaymentInformation{
 					TokenizedCard: &TokenizedCard{
-						Number:   discoverApplepayBase.CreditCard.Number,
+						Number:          discoverApplepayBase.CreditCard.Number,
 						ExpirationYear:  strconv.Itoa(discoverApplepayBase.CreditCard.ExpirationYear),
 						ExpirationMonth: fmt.Sprintf("%02d", discoverApplepayBase.CreditCard.ExpirationMonth),
 						TransactionType: "1",
-						Cryptogram: discoverApplepayBase.Cryptogram,
-						Type: "004",
+						Cryptogram:      discoverApplepayBase.Cryptogram,
+						Type:            "004",
 					},
 				},
 				ConsumerAuthenticationInformation: &ConsumerAuthenticationInformation{
@@ -283,21 +281,21 @@ func TestBuildAuthRequest(t *testing.T) {
 					CommerceIndicator: "aesk",
 					AuthorizationOptions: &AuthorizationOptions{
 						Initiator: &Initiator{
-							InitiatorType: "",
+							InitiatorType:          "",
 							CredentialStoredOnFile: false,
-							StoredCredentialUsed: false,
+							StoredCredentialUsed:   false,
 						},
 					},
-					PaymentSolution: "001",	// Apple pay
+					PaymentSolution: "001", // Apple pay
 				},
 				PaymentInformation: &PaymentInformation{
 					TokenizedCard: &TokenizedCard{
-						Number:   amexApplepayBase.CreditCard.Number,
+						Number:          amexApplepayBase.CreditCard.Number,
 						ExpirationYear:  strconv.Itoa(amexApplepayBase.CreditCard.ExpirationYear),
 						ExpirationMonth: fmt.Sprintf("%02d", amexApplepayBase.CreditCard.ExpirationMonth),
 						TransactionType: "1",
-						Cryptogram: amexApplepayBase.Cryptogram,
-						Type: "003",
+						Cryptogram:      amexApplepayBase.Cryptogram,
+						Type:            "003",
 					},
 				},
 				ConsumerAuthenticationInformation: &ConsumerAuthenticationInformation{
@@ -344,26 +342,26 @@ func TestBuildAuthRequest(t *testing.T) {
 					CommerceIndicator: "aesk",
 					AuthorizationOptions: &AuthorizationOptions{
 						Initiator: &Initiator{
-							InitiatorType: "",
+							InitiatorType:          "",
 							CredentialStoredOnFile: false,
-							StoredCredentialUsed: false,
+							StoredCredentialUsed:   false,
 						},
 					},
-					PaymentSolution: "001",	// Apple pay
+					PaymentSolution: "001", // Apple pay
 				},
 				PaymentInformation: &PaymentInformation{
 					TokenizedCard: &TokenizedCard{
-						Number:   amexLongCryptoApplepayBase.CreditCard.Number,
+						Number:          amexLongCryptoApplepayBase.CreditCard.Number,
 						ExpirationYear:  strconv.Itoa(amexLongCryptoApplepayBase.CreditCard.ExpirationYear),
 						ExpirationMonth: fmt.Sprintf("%02d", amexLongCryptoApplepayBase.CreditCard.ExpirationMonth),
 						TransactionType: "1",
-						Cryptogram: amexLongCryptoApplepayBase.Cryptogram,
-						Type: "003",
+						Cryptogram:      amexLongCryptoApplepayBase.Cryptogram,
+						Type:            "003",
 					},
 				},
 				ConsumerAuthenticationInformation: &ConsumerAuthenticationInformation{
 					Cavv: amexLongCryptoApplepayBase.Cryptogram[:20],
-					Xid: amexLongCryptoApplepayBase.Cryptogram[20:],
+					Xid:  amexLongCryptoApplepayBase.Cryptogram[20:],
 				},
 				OrderInformation: &OrderInformation{
 					AmountDetails: AmountDetails{
@@ -415,7 +413,7 @@ func TestBuildCaptureRequest(t *testing.T) {
 		{
 			"Basic Capture Request",
 			base,
-			&Request {
+			&Request{
 				OrderInformation: &OrderInformation{
 					AmountDetails: AmountDetails{
 						Amount:   "1.00",
@@ -534,4 +532,52 @@ func getBaseAuthorizationRequest(network sleet.CreditCardNetwork, cryptogram str
 	}
 
 	return base
+}
+
+func TestBuildCaptureRequestWithOptions(t *testing.T) {
+	base := sleet_testing.BaseCaptureRequestWithOptions()
+	base.MerchantOrderReference = common.SPtr("cart_display_id")
+
+	cases := []struct {
+		label string
+		in    *sleet.CaptureRequest
+		want  *Request
+	}{
+		{
+			"Basic Capture Request with options",
+			base,
+			&Request{
+				OrderInformation: &OrderInformation{
+					AmountDetails: AmountDetails{
+						Amount:   "1.00",
+						Currency: "USD",
+					},
+				},
+				ClientReferenceInformation: &ClientReferenceInformation{
+					Code: *base.MerchantOrderReference,
+				},
+				MerchantDefinedInformation: []MerchantDefinedInformation{
+					{
+						Key:   "1",
+						Value: *base.ClientTransactionReference,
+					},
+				},
+				ProcessingInformation: &ProcessingInformation{
+					CaptureOptions: &CaptureOptions{
+						CaptureSequenceNumber: "11",
+						TotalCaptureCount:     "99",
+					},
+				},
+			},
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.label, func(t *testing.T) {
+			got, _ := buildCaptureRequest(c.in)
+			if diff := deep.Equal(got, c.want); diff != nil {
+				t.Error(diff)
+			}
+		})
+	}
 }
