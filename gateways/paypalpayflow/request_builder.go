@@ -7,18 +7,34 @@ import (
 )
 
 var (
-	defaultVerbosity string = "HIGH"
-	defaultTender    string = "C"
-	defaultMIT       string = "MIT"
+	defaultVerbosity    string = "HIGH"
+	defaultTender       string = "C"
+	defaultMIT          string = "MIT"
+	MITUnscheduled      string = "MITR"
+	CITUnscheduled      string = "CITU"
+	CITInitial          string = "CITI"
+	CITInitialRecurring string = "CITR"
+	MITRecurring        string = "MITR"
 )
 
 func buildAuthorizeParams(request *sleet.AuthorizationRequest) *Request {
 	expirationDate := fmt.Sprintf("%02d%02d", request.CreditCard.ExpirationMonth, request.CreditCard.ExpirationYear%100)
 	amount := sleet.AmountToDecimalString(&request.Amount)
-	var SCAEXEMPTION *string = nil
+	var CARDONFILE *string = nil
 
-	if request.ProcessingInitiator != nil && *request.ProcessingInitiator == sleet.ProcessingInitiatorTypeStoredMerchantInitiated {
-		SCAEXEMPTION = &defaultMIT
+	if request.ProcessingInitiator != nil {
+		switch *request.ProcessingInitiator {
+		case sleet.ProcessingInitiatorTypeInitialRecurring:
+			CARDONFILE = &CITInitialRecurring
+		case sleet.ProcessingInitiatorTypeFollowingRecurring:
+			CARDONFILE = &CITUnscheduled
+		case sleet.ProcessingInitiatorTypeStoredMerchantInitiated:
+			CARDONFILE = &MITUnscheduled
+		case sleet.ProcessingInitiatorTypeStoredCardholderInitiated:
+			CARDONFILE = &CITUnscheduled
+		case sleet.ProcessingInitiatorTypeInitialCardOnFile:
+			CARDONFILE = &CITInitial
+		}
 	}
 
 	return &Request{
@@ -35,7 +51,7 @@ func buildAuthorizeParams(request *sleet.AuthorizationRequest) *Request {
 		BILLTOSTREET:       request.BillingAddress.StreetAddress1,
 		BILLTOSTREET2:      request.BillingAddress.StreetAddress2,
 		BILLTOCOUNTRY:      request.BillingAddress.CountryCode,
-		SCAEXEMPTION:       SCAEXEMPTION,
+		CARDONFILE:         CARDONFILE,
 	}
 }
 

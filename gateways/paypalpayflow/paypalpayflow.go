@@ -96,8 +96,8 @@ func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, err
 		data = data + fmt.Sprintf("&BILLTOCOUNTRY[%d]=%s", len(*request.BILLTOCOUNTRY), *request.BILLTOCOUNTRY)
 	}
 
-	if request.SCAEXEMPTION != nil {
-		data = data + fmt.Sprintf("&SCAEXEMPTION[%d]=%s", len(*request.SCAEXEMPTION), *request.SCAEXEMPTION)
+	if request.CARDONFILE != nil {
+		data = data + fmt.Sprintf("&CARDONFILE[%d]=%s", len(*request.CARDONFILE), *request.CARDONFILE)
 	}
 
 	req, err := http.NewRequest("POST", client.url, strings.NewReader(data))
