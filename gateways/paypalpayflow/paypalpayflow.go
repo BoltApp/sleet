@@ -118,7 +118,6 @@ func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, err
 	}
 
 	response := make(Response)
-	fmt.Println(string(bodyText))
 	for _, line := range strings.Split(string(bodyText), "&") {
 		line := strings.Split(strings.TrimSpace(line), "=")
 		if len(line) != 2 {

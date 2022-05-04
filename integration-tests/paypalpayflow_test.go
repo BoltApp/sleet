@@ -149,9 +149,9 @@ func TestPaypalAuthCaptureRefund(t *testing.T) {
 	}
 
 	refundRequest := &sleet.RefundRequest{
-		Amount: &authRequest.Amount,
-		Last4:  authRequest.CreditCard.Number,
-		// TransactionReference: captureRequest.TransactionReference,
+		Amount:               &authRequest.Amount,
+		Last4:                authRequest.CreditCard.Number,
+		TransactionReference: capture.TransactionReference,
 	}
 
 	refund, err := client.Refund(refundRequest)
