@@ -80,41 +80,40 @@ func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
 	}
 }
 
-// TODO: fix me and uncomment this
-// func TestVoid(t *testing.T) {
-// 	client := cybersource.NewClient(common.Sandbox, getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
-// 	authRequest := sleet_testing.BaseAuthorizationRequest()
-// 	authRequest.ClientTransactionReference = sPtr("[auth]-CUSTOMER-REFERENCE-CODE")
-// 	authRequest.BillingAddress = &sleet.Address{
-// 		StreetAddress1: sPtr("77 Geary St"),
-// 		StreetAddress2: sPtr("Floor 4"),
-// 		Locality:       sPtr("San Francisco"),
-// 		RegionCode:     sPtr("CA"),
-// 		PostalCode:     sPtr("94108"),
-// 		CountryCode:    sPtr("US"),
-// 		Company:        sPtr("Bolt"),
-// 		Email:          sPtr("test@bolt.com"),
-// 	}
-// 	resp, err := client.Authorize(authRequest)
-// 	if err != nil {
-// 		t.Errorf("Expected no error: received: %s", err)
-// 	}
-// 	if resp.Success != true {
-// 		t.Errorf("Expected Success: received: %s", resp.ErrorCode)
-// 	}
+func TestVoid(t *testing.T) {
+	client := cybersource.NewClient(common.Sandbox, getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
+	authRequest := sleet_testing.BaseAuthorizationRequest()
+	authRequest.ClientTransactionReference = sPtr("[auth]-CUSTOMER-REFERENCE-CODE")
+	authRequest.BillingAddress = &sleet.Address{
+		StreetAddress1: sPtr("77 Geary St"),
+		StreetAddress2: sPtr("Floor 4"),
+		Locality:       sPtr("San Francisco"),
+		RegionCode:     sPtr("CA"),
+		PostalCode:     sPtr("94108"),
+		CountryCode:    sPtr("US"),
+		Company:        sPtr("Bolt"),
+		Email:          sPtr("test@bolt.com"),
+	}
+	resp, err := client.Authorize(authRequest)
+	if err != nil {
+		t.Errorf("Expected no error: received: %s", err)
+	}
+	if resp.Success != true {
+		t.Errorf("Expected Success: received: %s", resp.ErrorCode)
+	}
 
-// 	// void
-// 	voidResp, err := client.Void(&sleet.VoidRequest{
-// 		TransactionReference:       resp.TransactionReference,
-// 		ClientTransactionReference: sPtr("[void]-CUSTOMER-REFERENCE-CODE"),
-// 	})
-// 	if err != nil {
-// 		t.Errorf("Expected no error: received: %s", err)
-// 	}
-// 	if voidResp.ErrorCode != nil {
-// 		t.Errorf("Expected No Error Code: received: %s", *voidResp.ErrorCode)
-// 	}
-// }
+	// void
+	voidResp, err := client.Void(&sleet.VoidRequest{
+		TransactionReference:       resp.TransactionReference,
+		ClientTransactionReference: sPtr("[void]-CUSTOMER-REFERENCE-CODE"),
+	})
+	if err != nil {
+		t.Errorf("Expected no error: received: %s", err)
+	}
+	if voidResp.ErrorCode != nil {
+		t.Errorf("Expected No Error Code: received: %s", *voidResp.ErrorCode)
+	}
+}
 
 func TestMissingReference(t *testing.T) {
 	client := cybersource.NewClient(common.Sandbox, getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))

@@ -32,14 +32,14 @@ type Request struct {
 	CreditCardNumber   *string
 	CardExpirationDate *string
 	OriginalID         *string
-	BILLTOFIRSTNAME    *string
-	BILLTOLASTNAME     *string
-	BILLTOZIP          *string
-	BILLTOSTATE        *string
-	BILLTOSTREET       *string
-	BILLTOSTREET2      *string
-	BILLTOCOUNTRY      *string // country code
-	CARDONFILE         *string
+	BillToFirstName    *string
+	BillToLastName     *string
+	BillToZIP          *string
+	BillToState        *string
+	BillToStreet       *string
+	BillToStreet2      *string
+	BillToCountry      *string // country code
+	CardOnFile         *string
 }
 
 type Response map[string]string

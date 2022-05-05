@@ -35,70 +35,42 @@ func paypalURL(env common.Environment) string {
 }
 
 func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, error) {
-	data := fmt.Sprintf(
-		"PARTNER[%d]=%s&PWD[%d]=%s&VENDOR[%d]=%s&USER[%d]=%s&TRXTYPE[%d]=%s",
-		len(client.partner), client.partner,
-		len(client.password), client.password,
-		len(client.vendor), client.vendor,
-		len(client.user), client.user,
-		len(request.TrxType), request.TrxType,
-	)
-
-	if request.Amount != nil {
-		data = data + fmt.Sprintf("&AMT[%d]=%s", len(*request.Amount), *request.Amount)
+	data := ""
+	fields := map[string]interface{}{
+		"PARTNER":         client.partner,
+		"PWD":             client.password,
+		"VENDOR":          client.vendor,
+		"USER":            client.user,
+		"TRXTYPE":         request.TrxType,
+		"AMT":             request.Amount,
+		"VERBOSITY":       request.Verbosity,
+		"TENDER":          request.Tender,
+		"ACCT":            request.CreditCardNumber,
+		"EXPDATE":         request.CardExpirationDate,
+		"ORIGID":          request.OriginalID,
+		"BILLTOFIRSTNAME": request.BillToFirstName,
+		"BILLTOLASTNAME":  request.BillToLastName,
+		"BILLTOZIP":       request.BillToZIP,
+		"BILLTOSTATE":     request.BillToState,
+		"BILLTOSTREET":    request.BillToStreet,
+		"BILLTOSTREET2":   request.BillToStreet2,
+		"BILLTOCOUNTRY":   request.BillToCountry,
+		"CARDONFILE":      request.CardOnFile,
+	}
+	for k, v := range fields {
+		switch v := v.(type) {
+		case string:
+			data = data + fmt.Sprintf("&%s[%d]=%s", k, len(v), v)
+		case *string:
+			if v != nil {
+				data = data + fmt.Sprintf("&%s[%d]=%s", k, len(*v), *v)
+			}
+		default:
+			continue
+		}
 	}
 
-	if request.Verbosity != nil {
-		data = data + fmt.Sprintf("&VERBOSITY[%d]=%s", len(*request.Verbosity), *request.Verbosity)
-	}
-
-	if request.Tender != nil {
-		data = data + fmt.Sprintf("&TENDER[%d]=%s", len(*request.Tender), *request.Tender)
-	}
-
-	if request.CreditCardNumber != nil {
-		data = data + fmt.Sprintf("&ACCT[%d]=%s", len(*request.CreditCardNumber), *request.CreditCardNumber)
-	}
-
-	if request.CardExpirationDate != nil {
-		data = data + fmt.Sprintf("&EXPDATE[%d]=%s", len(*request.CardExpirationDate), *request.CardExpirationDate)
-	}
-
-	if request.OriginalID != nil {
-		data = data + fmt.Sprintf("&ORIGID[%d]=%s", len(*request.OriginalID), *request.OriginalID)
-	}
-
-	if request.BILLTOFIRSTNAME != nil {
-		data = data + fmt.Sprintf("&BILLTOFIRSTNAME[%d]=%s", len(*request.BILLTOFIRSTNAME), *request.BILLTOFIRSTNAME)
-	}
-
-	if request.BILLTOLASTNAME != nil {
-		data = data + fmt.Sprintf("&BILLTOLASTNAME[%d]=%s", len(*request.BILLTOLASTNAME), *request.BILLTOLASTNAME)
-	}
-
-	if request.BILLTOZIP != nil {
-		data = data + fmt.Sprintf("&BILLTOZIP[%d]=%s", len(*request.BILLTOZIP), *request.BILLTOZIP)
-	}
-
-	if request.BILLTOSTATE != nil {
-		data = data + fmt.Sprintf("&BILLTOSTATE[%d]=%s", len(*request.BILLTOSTATE), *request.BILLTOSTATE)
-	}
-
-	if request.BILLTOSTREET != nil {
-		data = data + fmt.Sprintf("&BILLTOSTREET[%d]=%s", len(*request.BILLTOSTREET), *request.BILLTOSTREET)
-	}
-
-	if request.BILLTOSTREET2 != nil {
-		data = data + fmt.Sprintf("&BILLTOSTREET2[%d]=%s", len(*request.BILLTOSTREET2), *request.BILLTOSTREET2)
-	}
-
-	if request.BILLTOCOUNTRY != nil {
-		data = data + fmt.Sprintf("&BILLTOCOUNTRY[%d]=%s", len(*request.BILLTOCOUNTRY), *request.BILLTOCOUNTRY)
-	}
-
-	if request.CARDONFILE != nil {
-		data = data + fmt.Sprintf("&CARDONFILE[%d]=%s", len(*request.CARDONFILE), *request.CARDONFILE)
-	}
+	data = strings.TrimLeft(data, "&")
 
 	req, err := http.NewRequest("POST", client.url, strings.NewReader(data))
 	if err != nil {

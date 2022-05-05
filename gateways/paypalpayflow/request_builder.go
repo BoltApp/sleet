@@ -20,20 +20,20 @@ var (
 func buildAuthorizeParams(request *sleet.AuthorizationRequest) *Request {
 	expirationDate := fmt.Sprintf("%02d%02d", request.CreditCard.ExpirationMonth, request.CreditCard.ExpirationYear%100)
 	amount := sleet.AmountToDecimalString(&request.Amount)
-	var CARDONFILE *string = nil
+	var CardOnFile *string = nil
 
 	if request.ProcessingInitiator != nil {
 		switch *request.ProcessingInitiator {
 		case sleet.ProcessingInitiatorTypeInitialRecurring:
-			CARDONFILE = &CITInitialRecurring
+			CardOnFile = &CITInitialRecurring
 		case sleet.ProcessingInitiatorTypeFollowingRecurring:
-			CARDONFILE = &CITUnscheduled
+			CardOnFile = &CITUnscheduled
 		case sleet.ProcessingInitiatorTypeStoredMerchantInitiated:
-			CARDONFILE = &MITUnscheduled
+			CardOnFile = &MITUnscheduled
 		case sleet.ProcessingInitiatorTypeStoredCardholderInitiated:
-			CARDONFILE = &CITUnscheduled
+			CardOnFile = &CITUnscheduled
 		case sleet.ProcessingInitiatorTypeInitialCardOnFile:
-			CARDONFILE = &CITInitial
+			CardOnFile = &CITInitial
 		}
 	}
 
@@ -44,14 +44,14 @@ func buildAuthorizeParams(request *sleet.AuthorizationRequest) *Request {
 		CardExpirationDate: &expirationDate,
 		Verbosity:          &defaultVerbosity,
 		Tender:             &defaultTender,
-		BILLTOFIRSTNAME:    &request.CreditCard.FirstName,
-		BILLTOLASTNAME:     &request.CreditCard.LastName,
-		BILLTOZIP:          request.BillingAddress.PostalCode,
-		BILLTOSTATE:        request.BillingAddress.RegionCode,
-		BILLTOSTREET:       request.BillingAddress.StreetAddress1,
-		BILLTOSTREET2:      request.BillingAddress.StreetAddress2,
-		BILLTOCOUNTRY:      request.BillingAddress.CountryCode,
-		CARDONFILE:         CARDONFILE,
+		BillToFirstName:    &request.CreditCard.FirstName,
+		BillToLastName:     &request.CreditCard.LastName,
+		BillToZIP:          request.BillingAddress.PostalCode,
+		BillToState:        request.BillingAddress.RegionCode,
+		BillToStreet:       request.BillingAddress.StreetAddress1,
+		BillToStreet2:      request.BillingAddress.StreetAddress2,
+		BillToCountry:      request.BillingAddress.CountryCode,
+		CardOnFile:         CardOnFile,
 	}
 }
 
