@@ -27,7 +27,7 @@ func buildAuthorizeParams(request *sleet.AuthorizationRequest) *Request {
 		case sleet.ProcessingInitiatorTypeInitialRecurring:
 			CardOnFile = &CITInitialRecurring
 		case sleet.ProcessingInitiatorTypeFollowingRecurring:
-			CardOnFile = &CITUnscheduled
+			CardOnFile = &MITRecurring
 		case sleet.ProcessingInitiatorTypeStoredMerchantInitiated:
 			CardOnFile = &MITUnscheduled
 		case sleet.ProcessingInitiatorTypeStoredCardholderInitiated:
@@ -52,6 +52,7 @@ func buildAuthorizeParams(request *sleet.AuthorizationRequest) *Request {
 		BillToStreet2:      request.BillingAddress.StreetAddress2,
 		BillToCountry:      request.BillingAddress.CountryCode,
 		CardOnFile:         CardOnFile,
+		TxID:               request.PreviousExternalTransactionID,
 	}
 }
 

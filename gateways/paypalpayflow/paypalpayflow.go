@@ -56,6 +56,7 @@ func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, err
 		"BILLTOSTREET2":   request.BillToStreet2,
 		"BILLTOCOUNTRY":   request.BillToCountry,
 		"CARDONFILE":      request.CardOnFile,
+		"TXID":            request.TxID,
 	}
 	for k, v := range fields {
 		switch v := v.(type) {

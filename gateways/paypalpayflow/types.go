@@ -40,6 +40,7 @@ type Request struct {
 	BillToStreet2      *string
 	BillToCountry      *string // country code
 	CardOnFile         *string
+	TxID               *string
 }
 
 type Response map[string]string
