@@ -1,8 +1,9 @@
 package rocketgate
 
 import (
-	"github.com/BoltApp/sleet/common"
 	"strconv"
+
+	"github.com/BoltApp/sleet/common"
 
 	"github.com/BoltApp/sleet"
 	"github.com/rocketgate/rocketgate-go-sdk/request"
@@ -10,17 +11,17 @@ import (
 
 // Cof specifies the transaction type under the Credential-on-File framework
 const (
-	cofCIT = "CIT"	// Customer Initiated Transaction
-	cofMIT = "MIT"	// Merchant Initiated Transaction
+	cofCIT = "CIT" // Customer Initiated Transaction
+	cofMIT = "MIT" // Merchant Initiated Transaction
 )
 
 // Indicator for the type of billing operation
 const (
-	oneTimeNonMembershipSale = "S"
-	initialMembershipBillingSignup = "I"
-	conversionOfTrialToFullMembership = "C"
+	oneTimeNonMembershipSale                        = "S"
+	initialMembershipBillingSignup                  = "I"
+	conversionOfTrialToFullMembership               = "C"
 	instantUpgradeOfTrialMembershipToFullMembership = "U"
-	standardRebillOfMembership = "R"
+	standardRebillOfMembership                      = "R"
 )
 
 var initiatorTypeToCofType = map[sleet.ProcessingInitiatorType]string{
@@ -31,7 +32,7 @@ var initiatorTypeToCofType = map[sleet.ProcessingInitiatorType]string{
 	sleet.ProcessingInitiatorTypeFollowingRecurring:        cofMIT,
 }
 
-var initatorTypeToBillingType = map[sleet.ProcessingInitiatorType] string {
+var initatorTypeToBillingType = map[sleet.ProcessingInitiatorType]string{
 	sleet.ProcessingInitiatorTypeInitialCardOnFile:         oneTimeNonMembershipSale,
 	sleet.ProcessingInitiatorTypeInitialRecurring:          initialMembershipBillingSignup,
 	sleet.ProcessingInitiatorTypeStoredCardholderInitiated: oneTimeNonMembershipSale,
