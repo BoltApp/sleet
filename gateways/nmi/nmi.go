@@ -42,7 +42,7 @@ func NewWithHttpClient(env common.Environment, securityKey string, httpClient *h
 func (client *NMIClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	nmiAuthRequest := buildAuthRequest(client.testMode, client.securityKey, request)
 
-	nmiResponse, err := client.sendRequest(nmiAuthRequest)
+	nmiResponse, statusCode, err := client.sendRequest(nmiAuthRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -50,9 +50,10 @@ func (client *NMIClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.
 	// "2" means declined and "3" means bad request
 	if nmiResponse.Response != "1" {
 		return &sleet.AuthorizationResponse{
-			Success:   false,
-			Response:  nmiResponse.ResponseCode,
-			ErrorCode: nmiResponse.ResponseCode,
+			Success:    false,
+			Response:   nmiResponse.ResponseCode,
+			ErrorCode:  nmiResponse.ResponseCode,
+			StatusCode: *statusCode,
 		}, nil
 	}
 
@@ -64,6 +65,7 @@ func (client *NMIClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.
 		Response:             nmiResponse.ResponseCode,
 		AvsResultRaw:         nmiResponse.AVSResponseCode,
 		CvvResultRaw:         nmiResponse.CVVResponseCode,
+		StatusCode:           *statusCode,
 	}, nil
 }
 
@@ -72,7 +74,7 @@ func (client *NMIClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.
 func (client *NMIClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	nmiCaptureRequest := buildCaptureRequest(client.testMode, client.securityKey, request)
 
-	nmiResponse, err := client.sendRequest(nmiCaptureRequest)
+	nmiResponse, _, err := client.sendRequest(nmiCaptureRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +100,7 @@ func (client *NMIClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureR
 func (client *NMIClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
 	nmiVoidRequest := buildVoidRequest(client.testMode, client.securityKey, request)
 
-	nmiResponse, err := client.sendRequest(nmiVoidRequest)
+	nmiResponse, _, err := client.sendRequest(nmiVoidRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +127,7 @@ func (client *NMIClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, 
 func (client *NMIClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
 	nmiRefundRequest := buildRefundRequest(client.testMode, client.securityKey, request)
 
-	nmiResponse, err := client.sendRequest(nmiRefundRequest)
+	nmiResponse, _, err := client.sendRequest(nmiRefundRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -148,21 +150,21 @@ func (client *NMIClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResp
 
 // sendRequest sends an API request with the given payload to the NMI transaction endpoint.
 // If the request is successfully sent, its response message will be returned.
-func (client *NMIClient) sendRequest(data *Request) (*Response, error) {
+func (client *NMIClient) sendRequest(data *Request) (*Response, *int, error) {
 	encoder := form.NewEncoder()
 	formData, err := encoder.Encode(data)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	req, err := http.NewRequest(http.MethodPost, transactionEndpoint, strings.NewReader(formData.Encode()))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	parsedUrl, err := url.Parse(transactionEndpoint)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	req.Header.Add("Host", parsedUrl.Hostname())
 	req.Header.Add("User-Agent", common.UserAgent())
@@ -170,7 +172,7 @@ func (client *NMIClient) sendRequest(data *Request) (*Response, error) {
 
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer func() {
 		err := resp.Body.Close()
@@ -181,18 +183,18 @@ func (client *NMIClient) sendRequest(data *Request) (*Response, error) {
 
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	parsedFormData, err := url.ParseQuery(string(respBody))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	decoder := form.NewDecoder()
 	nmiResponse := Response{}
 	err = decoder.Decode(&nmiResponse, parsedFormData)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return &nmiResponse, nil
+	return &nmiResponse, &resp.StatusCode, nil
 }

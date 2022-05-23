@@ -72,7 +72,11 @@ func (client *BraintreeClient) Authorize(request *sleet.AuthorizationRequest) (*
 	btClient := braintree_go.NewWithHttpClient(client.environment, client.merchantID, client.publicKey, client.privateKey, client.httpClient)
 	auth, err := btClient.Transaction().Create(context.TODO(), authRequest)
 	if err != nil {
-		return &sleet.AuthorizationResponse{Success: false}, err
+		var statusCode int
+		if respErr, ok := err.(braintree_go.InvalidResponseError); ok {
+			statusCode = respErr.Response().StatusCode
+		}
+		return &sleet.AuthorizationResponse{Success: false, StatusCode: statusCode}, err
 	}
 
 	avsResult := fmt.Sprintf("%s:%s:%s", auth.AVSErrorResponseCode, auth.AVSStreetAddressResponseCode, auth.AVSStreetAddressResponseCode)

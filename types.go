@@ -114,6 +114,7 @@ type AuthorizationResponse struct {
 	CvvResultRaw          string
 	RTAUResult            *RTAUResponse
 	AdyenAdditionalData   map[string]string // store additional recurring info (will be refactored to general naming on next major version upgrade)
+	StatusCode            int               // the http response status code.
 }
 
 // CaptureRequest specifies the authorized transaction to capture and also an amount for partial capture use cases

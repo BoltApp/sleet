@@ -63,7 +63,14 @@ func (client *CheckoutComClient) Authorize(request *sleet.AuthorizationRequest) 
 	response, err := checkoutComClient.Request(input, nil)
 
 	if err != nil {
-		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: sleet.AVSResponseUnknown, CvvResult: sleet.CVVResponseUnknown, ErrorCode: err.Error()}, err
+		return &sleet.AuthorizationResponse{
+			Success:              false,
+			TransactionReference: "",
+			AvsResult:            sleet.AVSResponseUnknown,
+			CvvResult:            sleet.CVVResponseUnknown,
+			ErrorCode:            err.Error(),
+			StatusCode:           response.StatusResponse.StatusCode,
+		}, err
 	}
 
 	if *response.Processed.Approved {
@@ -75,6 +82,7 @@ func (client *CheckoutComClient) Authorize(request *sleet.AuthorizationRequest) 
 			AvsResultRaw:         response.Processed.Source.AVSCheck,
 			CvvResultRaw:         response.Processed.Source.CVVCheck,
 			Response:             response.Processed.ResponseCode,
+			StatusCode:           response.StatusResponse.StatusCode,
 		}, nil
 	} else {
 		return &sleet.AuthorizationResponse{
@@ -84,6 +92,7 @@ func (client *CheckoutComClient) Authorize(request *sleet.AuthorizationRequest) 
 			CvvResult:            sleet.CVVResponseUnknown,
 			Response:             response.Processed.ResponseCode,
 			ErrorCode:            response.Processed.ResponseCode,
+			StatusCode:           response.StatusResponse.StatusCode,
 		}, nil
 	}
 }

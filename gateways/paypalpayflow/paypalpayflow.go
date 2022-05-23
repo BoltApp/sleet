@@ -34,7 +34,7 @@ func paypalURL(env common.Environment) string {
 	return "https://payflowpro.paypal.com"
 }
 
-func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, error) {
+func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, *int, error) {
 	data := ""
 	fields := map[string]interface{}{
 		"PARTNER":         client.partner,
@@ -80,14 +80,14 @@ func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, err
 
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	defer resp.Body.Close()
 
 	bodyText, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	response := make(Response)
@@ -99,12 +99,12 @@ func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, err
 		response[line[0]] = line[1]
 	}
 
-	return &response, nil
+	return &response, &resp.StatusCode, nil
 }
 
 // Authorize a transaction. This transaction must be captured to receive funds
 func (client *PaypalPayflowClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
-	response, err := client.sendRequest(buildAuthorizeParams(request))
+	response, statusCode, err := client.sendRequest(buildAuthorizeParams(request))
 	if err != nil {
 		return nil, err
 	}
@@ -115,17 +115,19 @@ func (client *PaypalPayflowClient) Authorize(request *sleet.AuthorizationRequest
 		return &sleet.AuthorizationResponse{
 			Success:              true,
 			TransactionReference: transactionID,
+			StatusCode:           *statusCode,
 		}, nil
 	}
 
 	return &sleet.AuthorizationResponse{
-		ErrorCode: result,
+		ErrorCode:  result,
+		StatusCode: *statusCode,
 	}, nil
 }
 
 // Capture an authorized transaction
 func (client *PaypalPayflowClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
-	response, err := client.sendRequest(buildCaptureParams(request))
+	response, _, err := client.sendRequest(buildCaptureParams(request))
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +148,7 @@ func (client *PaypalPayflowClient) Capture(request *sleet.CaptureRequest) (*slee
 
 // Void an authorized transaction
 func (client *PaypalPayflowClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
-	response, err := client.sendRequest(buildVoidParams(request))
+	response, _, err := client.sendRequest(buildVoidParams(request))
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +167,7 @@ func (client *PaypalPayflowClient) Void(request *sleet.VoidRequest) (*sleet.Void
 
 // Refund a captured transaction
 func (client *PaypalPayflowClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
-	response, err := client.sendRequest(buildRefundParams(request))
+	response, _, err := client.sendRequest(buildRefundParams(request))
 	if err != nil {
 		return nil, err
 	}

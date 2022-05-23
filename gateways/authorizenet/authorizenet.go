@@ -36,7 +36,7 @@ func NewWithHttpClient(merchantName string, transactionKey string, environment c
 // Authorize a transaction for specified amount using Auth.net REST APIs
 func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	authorizeNetAuthorizeRequest := buildAuthRequest(client.merchantName, client.transactionKey, request)
-	response, err := client.sendRequest(*authorizeNetAuthorizeRequest)
+	response, statusCode, err := client.sendRequest(*authorizeNetAuthorizeRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -55,13 +55,14 @@ func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest)
 		CvvResultRaw:         string(txnResponse.CVVResultCode),
 		Response:             string(txnResponse.ResponseCode),
 		ErrorCode:            errorCode,
+		StatusCode:           *statusCode,
 	}, nil
 }
 
 // Capture an authorized transaction by transaction reference using the transactionTypePriorAuthCapture flag
 func (client *AuthorizeNetClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	authorizeNetCaptureRequest := buildCaptureRequest(client.merchantName, client.transactionKey, request)
-	authorizeNetResponse, err := client.sendRequest(*authorizeNetCaptureRequest)
+	authorizeNetResponse, _, err := client.sendRequest(*authorizeNetCaptureRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +81,7 @@ func (client *AuthorizeNetClient) Capture(request *sleet.CaptureRequest) (*sleet
 // Void an existing authorized transaction
 func (client *AuthorizeNetClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
 	authorizeNetCaptureRequest := buildVoidRequest(client.merchantName, client.transactionKey, request)
-	authorizeNetResponse, err := client.sendRequest(*authorizeNetCaptureRequest)
+	authorizeNetResponse, _, err := client.sendRequest(*authorizeNetCaptureRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +103,7 @@ func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.R
 		return nil, err
 	}
 
-	authorizeNetResponse, err := client.sendRequest(*authorizeNetRefundRequest)
+	authorizeNetResponse, _, err := client.sendRequest(*authorizeNetRefundRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -118,23 +119,23 @@ func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.R
 	}, nil
 }
 
-func (client *AuthorizeNetClient) sendRequest(data Request) (*Response, error) {
+func (client *AuthorizeNetClient) sendRequest(data Request) (*Response, *int, error) {
 	bodyJSON, err := json.Marshal(data)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	reader := bytes.NewReader(bodyJSON)
 	request, err := http.NewRequest(http.MethodPost, client.url, reader)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	request.Header.Add("User-Agent", common.UserAgent())
 	request.Header.Add("Content-Type", "application/json")
 
 	resp, err := client.httpClient.Do(request)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer func() {
 		err := resp.Body.Close()
@@ -145,16 +146,16 @@ func (client *AuthorizeNetClient) sendRequest(data Request) (*Response, error) {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	// trim UTF-8 BOM
 	bodyBytes := bytes.TrimPrefix(body, []byte("\xef\xbb\xbf"))
 	var authorizeNetResponse Response
 	err = json.Unmarshal(bodyBytes, &authorizeNetResponse)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return &authorizeNetResponse, nil
+	return &authorizeNetResponse, &resp.StatusCode, nil
 }
 
 func getErrorCode(txnResponse TransactionResponse) string {
