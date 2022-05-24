@@ -74,7 +74,7 @@ func TestSend(t *testing.T) {
 		var want *Response = new(Response)
 		helper.Unmarshal(authResponseRaw, want)
 
-		got, err := client.sendRequest(*request)
+		got, _, err := client.sendRequest(*request)
 
 		if err != nil {
 			t.Fatalf("Error thrown after sending request %q", err)
@@ -115,6 +115,7 @@ func TestAuthorize(t *testing.T) {
 			AvsResultRaw:         "Y",
 			CvvResultRaw:         "S",
 			Response:             "1",
+			StatusCode:           200,
 		}
 
 		client := NewClient("MerchantName", "Key", common.Sandbox)
@@ -150,6 +151,7 @@ func TestAuthorize(t *testing.T) {
 			AvsResultRaw:         "Y",
 			CvvResultRaw:         "P",
 			Response:             "2",
+			StatusCode:           200,
 		}
 
 		client := NewClient("MerchantName", "Key", common.Sandbox)
