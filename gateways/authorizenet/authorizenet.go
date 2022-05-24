@@ -36,7 +36,7 @@ func NewWithHttpClient(merchantName string, transactionKey string, environment c
 // Authorize a transaction for specified amount using Auth.net REST APIs
 func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	authorizeNetAuthorizeRequest := buildAuthRequest(client.merchantName, client.transactionKey, request)
-	response, statusCode, err := client.sendRequest(*authorizeNetAuthorizeRequest)
+	response, httpResp, err := client.sendRequest(*authorizeNetAuthorizeRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -44,6 +44,10 @@ func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest)
 	var errorCode string
 	if txnResponse.ResponseCode != ResponseCodeApproved {
 		errorCode = getErrorCode(txnResponse)
+	}
+	var statusCode int
+	if !sleet.IsTokenizerProxyError(httpResp.Header) {
+		statusCode = httpResp.StatusCode
 	}
 
 	return &sleet.AuthorizationResponse{
@@ -55,7 +59,7 @@ func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest)
 		CvvResultRaw:         string(txnResponse.CVVResultCode),
 		Response:             string(txnResponse.ResponseCode),
 		ErrorCode:            errorCode,
-		StatusCode:           *statusCode,
+		StatusCodeRaw:        statusCode,
 	}, nil
 }
 
@@ -119,7 +123,7 @@ func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.R
 	}, nil
 }
 
-func (client *AuthorizeNetClient) sendRequest(data Request) (*Response, *int, error) {
+func (client *AuthorizeNetClient) sendRequest(data Request) (*Response, *http.Response, error) {
 	bodyJSON, err := json.Marshal(data)
 	if err != nil {
 		return nil, nil, err
@@ -155,7 +159,7 @@ func (client *AuthorizeNetClient) sendRequest(data Request) (*Response, *int, er
 	if err != nil {
 		return nil, nil, err
 	}
-	return &authorizeNetResponse, &resp.StatusCode, nil
+	return &authorizeNetResponse, resp, nil
 }
 
 func getErrorCode(txnResponse TransactionResponse) string {

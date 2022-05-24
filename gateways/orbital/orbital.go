@@ -38,21 +38,25 @@ func NewWithHttpClient(env common.Environment, credentials Credentials, httpClie
 func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	authRequest := buildAuthRequest(request, client.credentials)
 
-	orbitalResponse, statusCode, err := client.sendRequest(authRequest)
+	orbitalResponse, httpResponse, err := client.sendRequest(authRequest)
 	if err != nil {
 		return nil, err
 	}
 
+	var statusCode int
+	if !sleet.IsTokenizerProxyError(httpResponse.Header) {
+		statusCode = httpResponse.StatusCode
+	}
 	if orbitalResponse.Body.ProcStatus != ProcStatusSuccess {
 		if orbitalResponse.Body.RespCode != "" {
-			return &sleet.AuthorizationResponse{ErrorCode: orbitalResponse.Body.RespCode}, nil
+			return &sleet.AuthorizationResponse{ErrorCode: orbitalResponse.Body.RespCode, StatusCodeRaw: statusCode}, nil
 		}
 
-		return &sleet.AuthorizationResponse{ErrorCode: RespCodeNotPresent, StatusCode: *statusCode}, nil
+		return &sleet.AuthorizationResponse{ErrorCode: RespCodeNotPresent, StatusCodeRaw: statusCode}, nil
 	}
 
 	if orbitalResponse.Body.RespCode != RespCodeApproved {
-		return &sleet.AuthorizationResponse{ErrorCode: orbitalResponse.Body.RespCode, StatusCode: *statusCode}, nil
+		return &sleet.AuthorizationResponse{ErrorCode: orbitalResponse.Body.RespCode, StatusCodeRaw: statusCode}, nil
 	}
 
 	return &sleet.AuthorizationResponse{
@@ -63,7 +67,7 @@ func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sl
 		Response:             strconv.Itoa(int(orbitalResponse.Body.ApprovalStatus)),
 		AvsResultRaw:         string(orbitalResponse.Body.AVSRespCode),
 		CvvResultRaw:         string(orbitalResponse.Body.CVV2RespCode),
-		StatusCode:           *statusCode,
+		StatusCodeRaw:        statusCode,
 	}, nil
 }
 
@@ -136,7 +140,7 @@ func (client *OrbitalClient) Refund(request *sleet.RefundRequest) (*sleet.Refund
 	}, nil
 }
 
-func (client *OrbitalClient) sendRequest(data Request) (*Response, *int, error) {
+func (client *OrbitalClient) sendRequest(data Request) (*Response, *http.Response, error) {
 
 	bodyXML, err := xml.Marshal(data)
 	if err != nil {
@@ -176,5 +180,5 @@ func (client *OrbitalClient) sendRequest(data Request) (*Response, *int, error) 
 		return nil, nil, err
 	}
 
-	return &orbitalResponse, &resp.StatusCode, nil
+	return &orbitalResponse, resp, nil
 }

@@ -34,7 +34,7 @@ func paypalURL(env common.Environment) string {
 	return "https://payflowpro.paypal.com"
 }
 
-func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, *int, error) {
+func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, *http.Response, error) {
 	data := ""
 	fields := map[string]interface{}{
 		"PARTNER":         client.partner,
@@ -99,29 +99,33 @@ func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, *in
 		response[line[0]] = line[1]
 	}
 
-	return &response, &resp.StatusCode, nil
+	return &response, resp, nil
 }
 
 // Authorize a transaction. This transaction must be captured to receive funds
 func (client *PaypalPayflowClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
-	response, statusCode, err := client.sendRequest(buildAuthorizeParams(request))
+	response, httpResponse, err := client.sendRequest(buildAuthorizeParams(request))
 	if err != nil {
 		return nil, err
 	}
 
+	var statusCode int
+	if !sleet.IsTokenizerProxyError(httpResponse.Header) {
+		statusCode = httpResponse.StatusCode
+	}
 	transactionID, ok1 := (*response)[transactionFieldName]
 	result, ok2 := (*response)[resultFieldName]
 	if ok1 && ok2 && result == successResponse {
 		return &sleet.AuthorizationResponse{
 			Success:              true,
 			TransactionReference: transactionID,
-			StatusCode:           *statusCode,
+			StatusCodeRaw:        statusCode,
 		}, nil
 	}
 
 	return &sleet.AuthorizationResponse{
-		ErrorCode:  result,
-		StatusCode: *statusCode,
+		ErrorCode:     result,
+		StatusCodeRaw: statusCode,
 	}, nil
 }
 

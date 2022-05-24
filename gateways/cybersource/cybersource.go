@@ -12,9 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/BoltApp/sleet/common"
-
 	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
 )
 
 const (
@@ -57,14 +56,18 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 		return nil, err
 	}
 
-	cybersourceResponse, statusCode, err := client.sendRequest(authPath, cybersourceAuthRequest)
+	cybersourceResponse, httpResponse, err := client.sendRequest(authPath, cybersourceAuthRequest)
 	if err != nil {
 		return nil, err
 	}
 
+	var statusCode int
+	if !sleet.IsTokenizerProxyError(httpResponse.Header) {
+		statusCode = httpResponse.StatusCode
+	}
 	// Status 400 or 502 - Failed
 	if cybersourceResponse.ErrorReason != nil {
-		response := sleet.AuthorizationResponse{Success: false, ErrorCode: *cybersourceResponse.ErrorReason, StatusCode: *statusCode}
+		response := sleet.AuthorizationResponse{Success: false, ErrorCode: *cybersourceResponse.ErrorReason, StatusCodeRaw: statusCode}
 		return &response, nil
 	}
 
@@ -83,7 +86,7 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 		TransactionReference: *cybersourceResponse.ID,
 		Response:             cybersourceResponse.Status,
 		ErrorCode:            errorCode,
-		StatusCode:           *statusCode,
+		StatusCodeRaw:        statusCode,
 	}
 	if cybersourceResponse.ProcessorInformation != nil {
 		response.AvsResult = translateAvs(cybersourceResponse.ProcessorInformation.AVS.Code)
@@ -188,7 +191,7 @@ func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 
 // sendRequest sends an API request with the give payload to the specified CyberSource endpoint.
 // If the request is successfully sent, its response message will be returned.
-func (client *CybersourceClient) sendRequest(path string, data *Request) (*Response, *int, error) {
+func (client *CybersourceClient) sendRequest(path string, data *Request) (*Response, *http.Response, error) {
 	payload, err := json.Marshal(data)
 	if err != nil {
 		return nil, nil, err
@@ -219,7 +222,7 @@ func (client *CybersourceClient) sendRequest(path string, data *Request) (*Respo
 	if err != nil {
 		return nil, nil, err
 	}
-	return &cybersourceResponse, &resp.StatusCode, nil
+	return &cybersourceResponse, resp, nil
 }
 
 // buildPOSTRequest creates an HTTP request for a given payload destined for a specified endpoint.

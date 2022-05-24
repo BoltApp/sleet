@@ -63,15 +63,19 @@ func (client *FirstdataClient) Authorize(request *sleet.AuthorizationRequest) (*
 		return nil, err
 	}
 
-	firstdataResponse, statusCode, err := client.sendRequest(*request.ClientTransactionReference, client.primaryURL(), *firstdataAuthRequest)
+	firstdataResponse, httpResponse, err := client.sendRequest(*request.ClientTransactionReference, client.primaryURL(), *firstdataAuthRequest)
 	if err != nil {
 		return nil, err
 	}
 
 	success := false
 
+	var statusCode int
+	if !sleet.IsTokenizerProxyError(httpResponse.Header) {
+		statusCode = httpResponse.StatusCode
+	}
 	if firstdataResponse.Error != nil {
-		response := sleet.AuthorizationResponse{Success: false, ErrorCode: firstdataResponse.Error.Code, StatusCode: *statusCode}
+		response := sleet.AuthorizationResponse{Success: false, ErrorCode: firstdataResponse.Error.Code, StatusCodeRaw: statusCode}
 		return &response, nil
 	}
 
@@ -89,7 +93,7 @@ func (client *FirstdataClient) Authorize(request *sleet.AuthorizationRequest) (*
 		Response:             string(firstdataResponse.TransactionState),
 		AvsResultRaw:         fmt.Sprintf("%s:%s", avs.StreetMatch, avs.PostCodeMatch),
 		CvvResultRaw:         string(firstdataResponse.Processor.SecurityCodeResponse),
-		StatusCode:           *statusCode,
+		StatusCodeRaw:        statusCode,
 	}, nil
 }
 
@@ -169,7 +173,7 @@ func makeSignature(timestamp, apiKey, apiSecret, reqId, body string) string {
 
 // sendRequest sends an API request with the give payload and appropriate headers to the specified firstdata endpoint.
 // If the request is successfully sent, its response message will be returned.
-func (client *FirstdataClient) sendRequest(reqId, url string, data Request) (*Response, *int, error) {
+func (client *FirstdataClient) sendRequest(reqId, url string, data Request) (*Response, *http.Response, error) {
 
 	bodyJSON, err := json.Marshal(data)
 	if err != nil {
@@ -209,5 +213,5 @@ func (client *FirstdataClient) sendRequest(reqId, url string, data Request) (*Re
 	if err != nil {
 		return nil, nil, err
 	}
-	return &firstdataResponse, &resp.StatusCode, nil
+	return &firstdataResponse, resp, nil
 }

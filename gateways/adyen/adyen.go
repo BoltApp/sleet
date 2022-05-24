@@ -53,7 +53,7 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 	// potentially do something with http response
 	result, httpResp, err := adyenClient.Checkout.Payments(buildAuthRequest(request, client.merchantAccount))
 	var statusCode int
-	if httpResp != nil {
+	if httpResp != nil && !sleet.IsTokenizerProxyError(httpResp.Header) {
 		statusCode = httpResp.StatusCode
 	}
 	if err != nil {
@@ -62,13 +62,13 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 			TransactionReference: "",
 			AvsResult:            sleet.AVSResponseUnknown,
 			CvvResult:            sleet.CVVResponseUnknown,
-			StatusCode:           statusCode,
+			StatusCodeRaw:        statusCode,
 		}, err
 	}
 
 	response := &sleet.AuthorizationResponse{
 		TransactionReference: result.PspReference,
-		StatusCode:           statusCode,
+		StatusCodeRaw:        statusCode,
 	}
 	if result.AdditionalData != nil {
 		values, ok := result.AdditionalData.(map[string]interface{})

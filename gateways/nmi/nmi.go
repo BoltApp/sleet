@@ -42,18 +42,22 @@ func NewWithHttpClient(env common.Environment, securityKey string, httpClient *h
 func (client *NMIClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	nmiAuthRequest := buildAuthRequest(client.testMode, client.securityKey, request)
 
-	nmiResponse, statusCode, err := client.sendRequest(nmiAuthRequest)
+	nmiResponse, httpResponse, err := client.sendRequest(nmiAuthRequest)
 	if err != nil {
 		return nil, err
 	}
 
+	var statusCode int
+	if !sleet.IsTokenizerProxyError(httpResponse.Header) {
+		statusCode = httpResponse.StatusCode
+	}
 	// "2" means declined and "3" means bad request
 	if nmiResponse.Response != "1" {
 		return &sleet.AuthorizationResponse{
-			Success:    false,
-			Response:   nmiResponse.ResponseCode,
-			ErrorCode:  nmiResponse.ResponseCode,
-			StatusCode: *statusCode,
+			Success:       false,
+			Response:      nmiResponse.ResponseCode,
+			ErrorCode:     nmiResponse.ResponseCode,
+			StatusCodeRaw: statusCode,
 		}, nil
 	}
 
@@ -65,7 +69,7 @@ func (client *NMIClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.
 		Response:             nmiResponse.ResponseCode,
 		AvsResultRaw:         nmiResponse.AVSResponseCode,
 		CvvResultRaw:         nmiResponse.CVVResponseCode,
-		StatusCode:           *statusCode,
+		StatusCodeRaw:        statusCode,
 	}, nil
 }
 
@@ -150,7 +154,7 @@ func (client *NMIClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResp
 
 // sendRequest sends an API request with the given payload to the NMI transaction endpoint.
 // If the request is successfully sent, its response message will be returned.
-func (client *NMIClient) sendRequest(data *Request) (*Response, *int, error) {
+func (client *NMIClient) sendRequest(data *Request) (*Response, *http.Response, error) {
 	encoder := form.NewEncoder()
 	formData, err := encoder.Encode(data)
 	if err != nil {
@@ -196,5 +200,5 @@ func (client *NMIClient) sendRequest(data *Request) (*Response, *int, error) {
 		return nil, nil, err
 	}
 
-	return &nmiResponse, &resp.StatusCode, nil
+	return &nmiResponse, resp, nil
 }

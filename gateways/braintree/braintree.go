@@ -76,7 +76,7 @@ func (client *BraintreeClient) Authorize(request *sleet.AuthorizationRequest) (*
 		if respErr, ok := err.(braintree_go.InvalidResponseError); ok {
 			statusCode = respErr.Response().StatusCode
 		}
-		return &sleet.AuthorizationResponse{Success: false, StatusCode: statusCode}, err
+		return &sleet.AuthorizationResponse{Success: false, StatusCodeRaw: statusCode}, err
 	}
 
 	avsResult := fmt.Sprintf("%s:%s:%s", auth.AVSErrorResponseCode, auth.AVSStreetAddressResponseCode, auth.AVSStreetAddressResponseCode)
