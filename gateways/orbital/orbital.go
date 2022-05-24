@@ -49,14 +49,14 @@ func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sl
 	}
 	if orbitalResponse.Body.ProcStatus != ProcStatusSuccess {
 		if orbitalResponse.Body.RespCode != "" {
-			return &sleet.AuthorizationResponse{ErrorCode: orbitalResponse.Body.RespCode, StatusCodeRaw: statusCode}, nil
+			return &sleet.AuthorizationResponse{ErrorCode: orbitalResponse.Body.RespCode, StatusCode: statusCode}, nil
 		}
 
-		return &sleet.AuthorizationResponse{ErrorCode: RespCodeNotPresent, StatusCodeRaw: statusCode}, nil
+		return &sleet.AuthorizationResponse{ErrorCode: RespCodeNotPresent, StatusCode: statusCode}, nil
 	}
 
 	if orbitalResponse.Body.RespCode != RespCodeApproved {
-		return &sleet.AuthorizationResponse{ErrorCode: orbitalResponse.Body.RespCode, StatusCodeRaw: statusCode}, nil
+		return &sleet.AuthorizationResponse{ErrorCode: orbitalResponse.Body.RespCode, StatusCode: statusCode}, nil
 	}
 
 	return &sleet.AuthorizationResponse{
@@ -67,7 +67,7 @@ func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sl
 		Response:             strconv.Itoa(int(orbitalResponse.Body.ApprovalStatus)),
 		AvsResultRaw:         string(orbitalResponse.Body.AVSRespCode),
 		CvvResultRaw:         string(orbitalResponse.Body.CVV2RespCode),
-		StatusCodeRaw:        statusCode,
+		StatusCode:           statusCode,
 	}, nil
 }
 

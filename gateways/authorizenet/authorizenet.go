@@ -59,7 +59,7 @@ func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest)
 		CvvResultRaw:         string(txnResponse.CVVResultCode),
 		Response:             string(txnResponse.ResponseCode),
 		ErrorCode:            errorCode,
-		StatusCodeRaw:        statusCode,
+		StatusCode:           statusCode,
 	}, nil
 }
 

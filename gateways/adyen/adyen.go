@@ -62,13 +62,13 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 			TransactionReference: "",
 			AvsResult:            sleet.AVSResponseUnknown,
 			CvvResult:            sleet.CVVResponseUnknown,
-			StatusCodeRaw:        statusCode,
+			StatusCode:           statusCode,
 		}, err
 	}
 
 	response := &sleet.AuthorizationResponse{
 		TransactionReference: result.PspReference,
-		StatusCodeRaw:        statusCode,
+		StatusCode:           statusCode,
 	}
 	if result.AdditionalData != nil {
 		values, ok := result.AdditionalData.(map[string]interface{})

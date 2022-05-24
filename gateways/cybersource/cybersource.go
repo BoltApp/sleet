@@ -67,7 +67,7 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 	}
 	// Status 400 or 502 - Failed
 	if cybersourceResponse.ErrorReason != nil {
-		response := sleet.AuthorizationResponse{Success: false, ErrorCode: *cybersourceResponse.ErrorReason, StatusCodeRaw: statusCode}
+		response := sleet.AuthorizationResponse{Success: false, ErrorCode: *cybersourceResponse.ErrorReason, StatusCode: statusCode}
 		return &response, nil
 	}
 
@@ -86,7 +86,7 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 		TransactionReference: *cybersourceResponse.ID,
 		Response:             cybersourceResponse.Status,
 		ErrorCode:            errorCode,
-		StatusCodeRaw:        statusCode,
+		StatusCode:           statusCode,
 	}
 	if cybersourceResponse.ProcessorInformation != nil {
 		response.AvsResult = translateAvs(cybersourceResponse.ProcessorInformation.AVS.Code)
