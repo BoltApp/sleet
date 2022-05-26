@@ -117,14 +117,14 @@ func (client *PaypalPayflowClient) Authorize(request *sleet.AuthorizationRequest
 			Success:              true,
 			TransactionReference: transactionID,
 			StatusCode:           httpResponse.StatusCode,
-			ResponseHeader:       responseHeader,
+			Header:               responseHeader,
 		}, nil
 	}
 
 	return &sleet.AuthorizationResponse{
-		ErrorCode:      result,
-		StatusCode:     httpResponse.StatusCode,
-		ResponseHeader: responseHeader,
+		ErrorCode:  result,
+		StatusCode: httpResponse.StatusCode,
+		Header:     responseHeader,
 	}, nil
 }
 

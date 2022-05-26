@@ -65,10 +65,10 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 	// Status 400 or 502 - Failed
 	if cybersourceResponse.ErrorReason != nil {
 		response := sleet.AuthorizationResponse{
-			Success:        false,
-			ErrorCode:      *cybersourceResponse.ErrorReason,
-			StatusCode:     httpResponse.StatusCode,
-			ResponseHeader: responseHeader,
+			Success:    false,
+			ErrorCode:  *cybersourceResponse.ErrorReason,
+			StatusCode: httpResponse.StatusCode,
+			Header:     responseHeader,
 		}
 		return &response, nil
 	}
@@ -89,7 +89,7 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 		Response:             cybersourceResponse.Status,
 		ErrorCode:            errorCode,
 		StatusCode:           httpResponse.StatusCode,
-		ResponseHeader:       responseHeader,
+		Header:               responseHeader,
 	}
 	if cybersourceResponse.ProcessorInformation != nil {
 		response.AvsResult = translateAvs(cybersourceResponse.ProcessorInformation.AVS.Code)

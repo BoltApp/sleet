@@ -122,7 +122,7 @@ type AuthorizationResponse struct {
 	RTAUResult            *RTAUResponse
 	AdyenAdditionalData   map[string]string // store additional recurring info (will be refactored to general naming on next major version upgrade)
 	StatusCode            int               // the status code from raw PSP http response.
-	ResponseHeader        http.Header       // the http response header
+	Header                http.Header       // the http response header
 }
 
 // CaptureRequest specifies the authorized transaction to capture and also an amount for partial capture use cases

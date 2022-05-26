@@ -72,10 +72,10 @@ func (client *FirstdataClient) Authorize(request *sleet.AuthorizationRequest) (*
 	responseHeader := sleet.GetHTTPResponseHeader(request.Options, *httpResponse)
 	if firstdataResponse.Error != nil {
 		response := sleet.AuthorizationResponse{
-			Success:        false,
-			ErrorCode:      firstdataResponse.Error.Code,
-			StatusCode:     httpResponse.StatusCode,
-			ResponseHeader: responseHeader,
+			Success:    false,
+			ErrorCode:  firstdataResponse.Error.Code,
+			StatusCode: httpResponse.StatusCode,
+			Header:     responseHeader,
 		}
 		return &response, nil
 	}
@@ -95,7 +95,7 @@ func (client *FirstdataClient) Authorize(request *sleet.AuthorizationRequest) (*
 		AvsResultRaw:         fmt.Sprintf("%s:%s", avs.StreetMatch, avs.PostCodeMatch),
 		CvvResultRaw:         string(firstdataResponse.Processor.SecurityCodeResponse),
 		StatusCode:           httpResponse.StatusCode,
-		ResponseHeader:       responseHeader,
+		Header:               responseHeader,
 	}, nil
 }
 

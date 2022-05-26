@@ -57,7 +57,7 @@ func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest)
 		Response:             string(txnResponse.ResponseCode),
 		ErrorCode:            errorCode,
 		StatusCode:           httpResp.StatusCode,
-		ResponseHeader:       responseHeader,
+		Header:               responseHeader,
 	}, nil
 }
 

@@ -51,11 +51,11 @@ func (client *NMIClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.
 	// "2" means declined and "3" means bad request
 	if nmiResponse.Response != "1" {
 		return &sleet.AuthorizationResponse{
-			Success:        false,
-			Response:       nmiResponse.ResponseCode,
-			ErrorCode:      nmiResponse.ResponseCode,
-			StatusCode:     httpResponse.StatusCode,
-			ResponseHeader: responseHeader,
+			Success:    false,
+			Response:   nmiResponse.ResponseCode,
+			ErrorCode:  nmiResponse.ResponseCode,
+			StatusCode: httpResponse.StatusCode,
+			Header:     responseHeader,
 		}, nil
 	}
 
@@ -68,7 +68,7 @@ func (client *NMIClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.
 		AvsResultRaw:         nmiResponse.AVSResponseCode,
 		CvvResultRaw:         nmiResponse.CVVResponseCode,
 		StatusCode:           httpResponse.StatusCode,
-		ResponseHeader:       responseHeader,
+		Header:               responseHeader,
 	}, nil
 }
 
