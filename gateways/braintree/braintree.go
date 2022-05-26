@@ -73,7 +73,7 @@ func (client *BraintreeClient) Authorize(request *sleet.AuthorizationRequest) (*
 	auth, err := btClient.Transaction().Create(context.TODO(), authRequest)
 	if err != nil {
 		var statusCode int
-		if respErr, ok := err.(*braintree_go.BraintreeError); ok {
+		if respErr, ok := err.(*braintree_go.BraintreeError); ok && respErr != nil {
 			statusCode = respErr.StatusCode()
 		}
 		return &sleet.AuthorizationResponse{Success: false, StatusCode: statusCode}, err
