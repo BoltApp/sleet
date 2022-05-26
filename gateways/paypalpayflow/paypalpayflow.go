@@ -109,23 +109,22 @@ func (client *PaypalPayflowClient) Authorize(request *sleet.AuthorizationRequest
 		return nil, err
 	}
 
-	var statusCode int
-	if !sleet.IsTokenizerProxyError(httpResponse.Header) {
-		statusCode = httpResponse.StatusCode
-	}
+	responseHeader := sleet.GetHTTPResponseHeader(request.Options, *httpResponse)
 	transactionID, ok1 := (*response)[transactionFieldName]
 	result, ok2 := (*response)[resultFieldName]
 	if ok1 && ok2 && result == successResponse {
 		return &sleet.AuthorizationResponse{
 			Success:              true,
 			TransactionReference: transactionID,
-			StatusCode:           statusCode,
+			StatusCode:           httpResponse.StatusCode,
+			ResponseHeader:       responseHeader,
 		}, nil
 	}
 
 	return &sleet.AuthorizationResponse{
-		ErrorCode:  result,
-		StatusCode: statusCode,
+		ErrorCode:      result,
+		StatusCode:     httpResponse.StatusCode,
+		ResponseHeader: responseHeader,
 	}, nil
 }
 

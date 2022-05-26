@@ -43,20 +43,29 @@ func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sl
 		return nil, err
 	}
 
-	var statusCode int
-	if !sleet.IsTokenizerProxyError(httpResponse.Header) {
-		statusCode = httpResponse.StatusCode
-	}
+	responseHeader := sleet.GetHTTPResponseHeader(request.Options, *httpResponse)
 	if orbitalResponse.Body.ProcStatus != ProcStatusSuccess {
 		if orbitalResponse.Body.RespCode != "" {
-			return &sleet.AuthorizationResponse{ErrorCode: orbitalResponse.Body.RespCode, StatusCode: statusCode}, nil
+			return &sleet.AuthorizationResponse{
+				ErrorCode:      orbitalResponse.Body.RespCode,
+				StatusCode:     httpResponse.StatusCode,
+				ResponseHeader: responseHeader,
+			}, nil
 		}
 
-		return &sleet.AuthorizationResponse{ErrorCode: RespCodeNotPresent, StatusCode: statusCode}, nil
+		return &sleet.AuthorizationResponse{
+			ErrorCode:      RespCodeNotPresent,
+			StatusCode:     httpResponse.StatusCode,
+			ResponseHeader: responseHeader,
+		}, nil
 	}
 
 	if orbitalResponse.Body.RespCode != RespCodeApproved {
-		return &sleet.AuthorizationResponse{ErrorCode: orbitalResponse.Body.RespCode, StatusCode: statusCode}, nil
+		return &sleet.AuthorizationResponse{
+			ErrorCode:      orbitalResponse.Body.RespCode,
+			StatusCode:     httpResponse.StatusCode,
+			ResponseHeader: responseHeader,
+		}, nil
 	}
 
 	return &sleet.AuthorizationResponse{
@@ -67,7 +76,8 @@ func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sl
 		Response:             strconv.Itoa(int(orbitalResponse.Body.ApprovalStatus)),
 		AvsResultRaw:         string(orbitalResponse.Body.AVSRespCode),
 		CvvResultRaw:         string(orbitalResponse.Body.CVV2RespCode),
-		StatusCode:           statusCode,
+		StatusCode:           httpResponse.StatusCode,
+		ResponseHeader:       responseHeader,
 	}, nil
 }
 

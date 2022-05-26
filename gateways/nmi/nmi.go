@@ -47,17 +47,15 @@ func (client *NMIClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.
 		return nil, err
 	}
 
-	var statusCode int
-	if !sleet.IsTokenizerProxyError(httpResponse.Header) {
-		statusCode = httpResponse.StatusCode
-	}
+	responseHeader := sleet.GetHTTPResponseHeader(request.Options, *httpResponse)
 	// "2" means declined and "3" means bad request
 	if nmiResponse.Response != "1" {
 		return &sleet.AuthorizationResponse{
-			Success:    false,
-			Response:   nmiResponse.ResponseCode,
-			ErrorCode:  nmiResponse.ResponseCode,
-			StatusCode: statusCode,
+			Success:        false,
+			Response:       nmiResponse.ResponseCode,
+			ErrorCode:      nmiResponse.ResponseCode,
+			StatusCode:     httpResponse.StatusCode,
+			ResponseHeader: responseHeader,
 		}, nil
 	}
 
@@ -69,7 +67,8 @@ func (client *NMIClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.
 		Response:             nmiResponse.ResponseCode,
 		AvsResultRaw:         nmiResponse.AVSResponseCode,
 		CvvResultRaw:         nmiResponse.CVVResponseCode,
-		StatusCode:           statusCode,
+		StatusCode:           httpResponse.StatusCode,
+		ResponseHeader:       responseHeader,
 	}, nil
 }
 

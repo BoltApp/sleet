@@ -45,10 +45,7 @@ func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest)
 	if txnResponse.ResponseCode != ResponseCodeApproved {
 		errorCode = getErrorCode(txnResponse)
 	}
-	var statusCode int
-	if !sleet.IsTokenizerProxyError(httpResp.Header) {
-		statusCode = httpResp.StatusCode
-	}
+	responseHeader := sleet.GetHTTPResponseHeader(request.Options, *httpResp)
 
 	return &sleet.AuthorizationResponse{
 		Success:              txnResponse.ResponseCode == ResponseCodeApproved || txnResponse.ResponseCode == ResponseCodeHeld,
@@ -59,7 +56,8 @@ func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest)
 		CvvResultRaw:         string(txnResponse.CVVResultCode),
 		Response:             string(txnResponse.ResponseCode),
 		ErrorCode:            errorCode,
-		StatusCode:           statusCode,
+		StatusCode:           httpResp.StatusCode,
+		ResponseHeader:       responseHeader,
 	}, nil
 }
 

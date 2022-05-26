@@ -61,13 +61,15 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 		return nil, err
 	}
 
-	var statusCode int
-	if !sleet.IsTokenizerProxyError(httpResponse.Header) {
-		statusCode = httpResponse.StatusCode
-	}
+	responseHeader := sleet.GetHTTPResponseHeader(request.Options, *httpResponse)
 	// Status 400 or 502 - Failed
 	if cybersourceResponse.ErrorReason != nil {
-		response := sleet.AuthorizationResponse{Success: false, ErrorCode: *cybersourceResponse.ErrorReason, StatusCode: statusCode}
+		response := sleet.AuthorizationResponse{
+			Success:        false,
+			ErrorCode:      *cybersourceResponse.ErrorReason,
+			StatusCode:     httpResponse.StatusCode,
+			ResponseHeader: responseHeader,
+		}
 		return &response, nil
 	}
 
@@ -86,7 +88,8 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 		TransactionReference: *cybersourceResponse.ID,
 		Response:             cybersourceResponse.Status,
 		ErrorCode:            errorCode,
-		StatusCode:           statusCode,
+		StatusCode:           httpResponse.StatusCode,
+		ResponseHeader:       responseHeader,
 	}
 	if cybersourceResponse.ProcessorInformation != nil {
 		response.AvsResult = translateAvs(cybersourceResponse.ProcessorInformation.AVS.Code)

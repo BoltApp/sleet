@@ -1,6 +1,9 @@
 package sleet
 
-import "time"
+import (
+	"net/http"
+	"time"
+)
 
 // Client defines the Sleet interface which takes in a generic request and returns a generic response
 // The translations for each specific PsP takes place in the corresponding gateways/<PsP> folders
@@ -73,6 +76,10 @@ type Level3Data struct {
 	LineItems              []LineItem
 }
 
+const (
+	ResponseHeaderOption string = "ResponseHeader"
+)
+
 // AuthorizationRequest specifies needed information for request to authorize by PsPs
 // Note: Only credit cards are supported
 // Note: Options is a generic key-value pair that can be used to provide additional information to PsP
@@ -115,6 +122,7 @@ type AuthorizationResponse struct {
 	RTAUResult            *RTAUResponse
 	AdyenAdditionalData   map[string]string // store additional recurring info (will be refactored to general naming on next major version upgrade)
 	StatusCode            int               // the status code from raw PSP http response.
+	ResponseHeader        http.Header       // the http response header
 }
 
 // CaptureRequest specifies the authorized transaction to capture and also an amount for partial capture use cases
@@ -162,6 +170,17 @@ type RefundResponse struct {
 	Success              bool
 	TransactionReference string
 	ErrorCode            *string
+}
+
+// GetHTTPResponseHeader returns the http response headers specified in the given options.
+func GetHTTPResponseHeader(options map[string]interface{}, httpResp http.Response) http.Header {
+	var responseHeader http.Header
+	if options[ResponseHeaderOption] != nil {
+		for _, header := range options[ResponseHeaderOption].([]string) {
+			responseHeader.Add(header, httpResp.Header.Get(header))
+		}
+	}
+	return responseHeader
 }
 
 // Currency maps to the CURRENCIES list in currency.go specifying the symbol and precision for the currency
