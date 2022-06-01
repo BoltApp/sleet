@@ -175,8 +175,8 @@ type RefundResponse struct {
 // GetHTTPResponseHeader returns the http response headers specified in the given options.
 func GetHTTPResponseHeader(options map[string]interface{}, httpResp http.Response) http.Header {
 	var responseHeader http.Header
-	if options[ResponseHeaderOption] != nil {
-		for _, header := range options[ResponseHeaderOption].([]string) {
+	if headers, ok := options[ResponseHeaderOption].([]string); ok {
+		for _, header := range headers {
 			responseHeader.Add(header, httpResp.Header.Get(header))
 		}
 	}
