@@ -176,8 +176,11 @@ type RefundResponse struct {
 func GetHTTPResponseHeader(options map[string]interface{}, httpResp http.Response) http.Header {
 	var responseHeader http.Header
 	if headers, ok := options[ResponseHeaderOption].([]string); ok {
+		responseHeader = make(http.Header)
 		for _, header := range headers {
-			responseHeader.Add(header, httpResp.Header.Get(header))
+			if headerValue := httpResp.Header.Get(header); len(headerValue) > 0 {
+				responseHeader.Add(header, headerValue)
+			}
 		}
 	}
 	return responseHeader
