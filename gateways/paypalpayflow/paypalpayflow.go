@@ -77,6 +77,8 @@ func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, *ht
 	if err != nil {
 		log.Fatal(err)
 	}
+	req.Header.Add("User-Agent", common.UserAgent())
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
