@@ -38,21 +38,34 @@ func NewWithHttpClient(env common.Environment, credentials Credentials, httpClie
 func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	authRequest := buildAuthRequest(request, client.credentials)
 
-	orbitalResponse, err := client.sendRequest(authRequest)
+	orbitalResponse, httpResponse, err := client.sendRequest(authRequest)
 	if err != nil {
 		return nil, err
 	}
 
+	responseHeader := sleet.GetHTTPResponseHeader(request.Options, *httpResponse)
 	if orbitalResponse.Body.ProcStatus != ProcStatusSuccess {
 		if orbitalResponse.Body.RespCode != "" {
-			return &sleet.AuthorizationResponse{ErrorCode: orbitalResponse.Body.RespCode}, nil
+			return &sleet.AuthorizationResponse{
+				ErrorCode:  orbitalResponse.Body.RespCode,
+				StatusCode: httpResponse.StatusCode,
+				Header:     responseHeader,
+			}, nil
 		}
 
-		return &sleet.AuthorizationResponse{ErrorCode: RespCodeNotPresent}, nil
+		return &sleet.AuthorizationResponse{
+			ErrorCode:  RespCodeNotPresent,
+			StatusCode: httpResponse.StatusCode,
+			Header:     responseHeader,
+		}, nil
 	}
 
 	if orbitalResponse.Body.RespCode != RespCodeApproved {
-		return &sleet.AuthorizationResponse{ErrorCode: orbitalResponse.Body.RespCode}, nil
+		return &sleet.AuthorizationResponse{
+			ErrorCode:  orbitalResponse.Body.RespCode,
+			StatusCode: httpResponse.StatusCode,
+			Header:     responseHeader,
+		}, nil
 	}
 
 	return &sleet.AuthorizationResponse{
@@ -63,13 +76,15 @@ func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sl
 		Response:             strconv.Itoa(int(orbitalResponse.Body.ApprovalStatus)),
 		AvsResultRaw:         string(orbitalResponse.Body.AVSRespCode),
 		CvvResultRaw:         string(orbitalResponse.Body.CVV2RespCode),
+		StatusCode:           httpResponse.StatusCode,
+		Header:               responseHeader,
 	}, nil
 }
 
 func (client *OrbitalClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	captureRequest := buildCaptureRequest(request, client.credentials)
 
-	orbitalResponse, err := client.sendRequest(captureRequest)
+	orbitalResponse, _, err := client.sendRequest(captureRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +111,7 @@ func (client *OrbitalClient) Capture(request *sleet.CaptureRequest) (*sleet.Capt
 func (client *OrbitalClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
 	voidRequest := buildVoidRequest(request, client.credentials)
 
-	orbitalResponse, err := client.sendRequest(voidRequest)
+	orbitalResponse, _, err := client.sendRequest(voidRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +130,7 @@ func (client *OrbitalClient) Void(request *sleet.VoidRequest) (*sleet.VoidRespon
 func (client *OrbitalClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
 	refundRequest := buildRefundRequest(request, client.credentials)
 
-	orbitalResponse, err := client.sendRequest(refundRequest)
+	orbitalResponse, _, err := client.sendRequest(refundRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -135,18 +150,18 @@ func (client *OrbitalClient) Refund(request *sleet.RefundRequest) (*sleet.Refund
 	}, nil
 }
 
-func (client *OrbitalClient) sendRequest(data Request) (*Response, error) {
+func (client *OrbitalClient) sendRequest(data Request) (*Response, *http.Response, error) {
 
 	bodyXML, err := xml.Marshal(data)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	bodyWithHeader := xml.Header + string(bodyXML)
 	reader := bytes.NewReader([]byte(bodyWithHeader))
 	request, err := http.NewRequest(http.MethodPost, client.host, reader)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	request.Header.Add("MIME-Version", MIMEVersion)
@@ -158,22 +173,22 @@ func (client *OrbitalClient) sendRequest(data Request) (*Response, error) {
 
 	resp, err := client.httpClient.Do(request)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	var orbitalResponse Response
 
 	err = xml.Unmarshal(body, &orbitalResponse)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return &orbitalResponse, nil
+	return &orbitalResponse, resp, nil
 }

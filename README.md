@@ -105,10 +105,15 @@ address := sleet.BillingAddress{
   PostalCode:     &postalCode,
   CountryCode:    &countryCode,
 }
+// To get specific response headers, add them to the request options.
+// They will be attached to the AuthorizationResponse
+options := make(map[string]interface{})
+options["ResponseHeader"] = []string{"x-test-header"}
 authorizeRequest := sleet.AuthorizationRequest{
   Amount: &amount,
   CreditCard: &card,
   BillingAddress: &address,
+  Options: options,
 }
 authorizeResponse, _ := client.Authorize(&authorizeRequest)
 

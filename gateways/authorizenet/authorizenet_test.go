@@ -74,7 +74,7 @@ func TestSend(t *testing.T) {
 		var want *Response = new(Response)
 		helper.Unmarshal(authResponseRaw, want)
 
-		got, err := client.sendRequest(*request)
+		got, _, err := client.sendRequest(*request)
 
 		if err != nil {
 			t.Fatalf("Error thrown after sending request %q", err)
@@ -94,7 +94,7 @@ func TestAuthorize(t *testing.T) {
 
 	var authResponseRaw []byte
 
-	request := sleet_t.BaseAuthorizationRequest()
+	request := sleet_t.BaseAuthorizationRequestWithResponseHeaderOption()
 
 	t.Run("With Successful Response", func(t *testing.T) {
 		httpmock.Activate()
@@ -104,6 +104,7 @@ func TestAuthorize(t *testing.T) {
 			// TODO check if send json body matches test json body ?
 			authResponseRaw = helper.ReadFile("test_data/authResponse.json")
 			resp := httpmock.NewBytesResponse(http.StatusOK, authResponseRaw)
+			resp.Header = http.Header{"X-Test-Header": {"test_header_value"}}
 			return resp, nil
 		})
 
@@ -115,6 +116,8 @@ func TestAuthorize(t *testing.T) {
 			AvsResultRaw:         "Y",
 			CvvResultRaw:         "S",
 			Response:             "1",
+			StatusCode:           200,
+			Header:               http.Header{"X-Test-Header": {"test_header_value"}},
 		}
 
 		client := NewClient("MerchantName", "Key", common.Sandbox)
@@ -138,6 +141,7 @@ func TestAuthorize(t *testing.T) {
 		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
 			authResponseRaw = helper.ReadFile("test_data/authDeclineResponse.json")
 			resp := httpmock.NewBytesResponse(http.StatusOK, authResponseRaw)
+			resp.Header = http.Header{"X-Test-Header": {"test_header_value"}}
 			return resp, nil
 		})
 
@@ -150,6 +154,8 @@ func TestAuthorize(t *testing.T) {
 			AvsResultRaw:         "Y",
 			CvvResultRaw:         "P",
 			Response:             "2",
+			StatusCode:           200,
+			Header:               http.Header{"X-Test-Header": {"test_header_value"}},
 		}
 
 		client := NewClient("MerchantName", "Key", common.Sandbox)
