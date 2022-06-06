@@ -61,10 +61,10 @@ func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, *ht
 	for k, v := range fields {
 		switch v := v.(type) {
 		case string:
-			data = data + fmt.Sprintf("&%s[%d]=%s", k, len(v), v)
+			data = data + fmt.Sprintf("&%s=%s", k, v)
 		case *string:
 			if v != nil {
-				data = data + fmt.Sprintf("&%s[%d]=%s", k, len(*v), *v)
+				data = data + fmt.Sprintf("&%s=%s", k, *v)
 			}
 		default:
 			continue
