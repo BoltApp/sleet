@@ -1,4 +1,3 @@
-//go:build unit
 // +build unit
 
 package firstdata
@@ -145,7 +144,7 @@ func TestSend(t *testing.T) {
 		var want *Response = new(Response)
 		helper.Unmarshal(authResponseRaw, want)
 
-		got, _, err := firstDataClient.sendRequest(defaultReqId, url, *request)
+		got, err := firstDataClient.sendRequest(defaultReqId, url, *request)
 
 		t.Run("Response Struct", func(t *testing.T) {
 			if err != nil {
@@ -205,7 +204,7 @@ func TestSend(t *testing.T) {
 		var want *Response = new(Response)
 		helper.Unmarshal(authErrorRaw, want)
 
-		got, _, err := firstDataClient.sendRequest(defaultReqId, url, *request)
+		got, err := firstDataClient.sendRequest(defaultReqId, url, *request)
 
 		t.Run("Response Struct", func(t *testing.T) {
 			if err != nil {
@@ -255,7 +254,6 @@ func TestAuthorize(t *testing.T) {
 			CvvResult:            sleet.CVVResponseSkipped,
 			AvsResultRaw:         "NO_INPUT_DATA:NO_INPUT_DATA",
 			CvvResultRaw:         "NOT_CHECKED",
-			StatusCode:           200,
 		}
 
 		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
@@ -283,9 +281,8 @@ func TestAuthorize(t *testing.T) {
 		}
 
 		want := &sleet.AuthorizationResponse{
-			Success:    false,
-			ErrorCode:  "403",
-			StatusCode: 200,
+			Success:   false,
+			ErrorCode: "403",
 		}
 
 		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {

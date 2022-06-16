@@ -1,4 +1,3 @@
-//go:build unit
 // +build unit
 
 package orbital
@@ -99,7 +98,7 @@ func TestSend(t *testing.T) {
 		var want *Response = new(Response)
 		helper.XmlUnmarshal(responseRaw, want)
 
-		got, _, err := client.sendRequest(request)
+		got, err := client.sendRequest(request)
 
 		if err != nil {
 			t.Fatalf("Error thrown after sending request %q", err)
@@ -177,7 +176,6 @@ func TestAuthorize(t *testing.T) {
 			AvsResultRaw:         string(AVSResponseMatch),
 			CvvResultRaw:         string(CVVResponseMatched),
 			Response:             strconv.Itoa(int(ApprovalStatusApproved)),
-			StatusCode:           200,
 		}
 
 		client := NewClient(common.Sandbox, Credentials{"username", "password", 1})

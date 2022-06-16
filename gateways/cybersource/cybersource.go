@@ -12,8 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
+
+	"github.com/BoltApp/sleet"
 )
 
 const (
@@ -56,20 +57,14 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 		return nil, err
 	}
 
-	cybersourceResponse, httpResponse, err := client.sendRequest(authPath, cybersourceAuthRequest)
+	cybersourceResponse, err := client.sendRequest(authPath, cybersourceAuthRequest)
 	if err != nil {
 		return nil, err
 	}
 
-	responseHeader := sleet.GetHTTPResponseHeader(request.Options, *httpResponse)
 	// Status 400 or 502 - Failed
 	if cybersourceResponse.ErrorReason != nil {
-		response := sleet.AuthorizationResponse{
-			Success:    false,
-			ErrorCode:  *cybersourceResponse.ErrorReason,
-			StatusCode: httpResponse.StatusCode,
-			Header:     responseHeader,
-		}
+		response := sleet.AuthorizationResponse{Success: false, ErrorCode: *cybersourceResponse.ErrorReason}
 		return &response, nil
 	}
 
@@ -88,8 +83,6 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 		TransactionReference: *cybersourceResponse.ID,
 		Response:             cybersourceResponse.Status,
 		ErrorCode:            errorCode,
-		StatusCode:           httpResponse.StatusCode,
-		Header:               responseHeader,
 	}
 	if cybersourceResponse.ProcessorInformation != nil {
 		response.AvsResult = translateAvs(cybersourceResponse.ProcessorInformation.AVS.Code)
@@ -113,7 +106,7 @@ func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.
 		return nil, err
 	}
 	capturePath := authPath + request.TransactionReference + "/captures"
-	cybersourceResponse, _, err := client.sendRequest(capturePath, cybersourceCaptureRequest)
+	cybersourceResponse, err := client.sendRequest(capturePath, cybersourceCaptureRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +136,7 @@ func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidRe
 		return nil, err
 	}
 	voidPath := authPath + request.TransactionReference + "/voids"
-	cybersourceResponse, _, err := client.sendRequest(voidPath, cybersourceVoidRequest)
+	cybersourceResponse, err := client.sendRequest(voidPath, cybersourceVoidRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -173,7 +166,7 @@ func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 		return nil, err
 	}
 	refundPath := authPath + request.TransactionReference + "/refunds"
-	cybersourceResponse, _, err := client.sendRequest(refundPath, cybersourceRefundRequest)
+	cybersourceResponse, err := client.sendRequest(refundPath, cybersourceRefundRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -194,19 +187,19 @@ func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 
 // sendRequest sends an API request with the give payload to the specified CyberSource endpoint.
 // If the request is successfully sent, its response message will be returned.
-func (client *CybersourceClient) sendRequest(path string, data *Request) (*Response, *http.Response, error) {
+func (client *CybersourceClient) sendRequest(path string, data *Request) (*Response, error) {
 	payload, err := json.Marshal(data)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	req, err := client.buildPOSTRequest(path, payload)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	req.Header.Add("User-Agent", common.UserAgent())
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	defer func() {
 		err := resp.Body.Close()
@@ -218,14 +211,14 @@ func (client *CybersourceClient) sendRequest(path string, data *Request) (*Respo
 	fmt.Printf("status %s\n", resp.Status) // debug
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	var cybersourceResponse Response
 	err = json.Unmarshal(respBody, &cybersourceResponse)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return &cybersourceResponse, resp, nil
+	return &cybersourceResponse, nil
 }
 
 // buildPOSTRequest creates an HTTP request for a given payload destined for a specified endpoint.

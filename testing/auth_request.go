@@ -39,14 +39,6 @@ func BaseAuthorizationRequestWithEmailPhoneNumber() *sleet.AuthorizationRequest 
 	return base
 }
 
-func BaseAuthorizationRequestWithResponseHeaderOption() *sleet.AuthorizationRequest {
-	base := BaseAuthorizationRequest()
-	base.Options = map[string]interface{}{
-		sleet.ResponseHeaderOption: []string{"x-test-header"},
-	}
-	return base
-}
-
 // BaseLevel3Data is used as a testing helper method to standardize request calls for integration tests
 func BaseLevel3Data() *sleet.Level3Data {
 	return &sleet.Level3Data{
