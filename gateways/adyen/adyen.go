@@ -51,11 +51,14 @@ func (client *AdyenClient) Authorize(request *sleet.AuthorizationRequest) (*slee
 	)
 
 	result, httpResp, err := adyenClient.Checkout.Payments(buildAuthRequest(request, client.merchantAccount))
-	var statusCode int
+	var (
+		statusCode     int
+		responseHeader http.Header
+	)
 	if httpResp != nil {
 		statusCode = httpResp.StatusCode
+		responseHeader = sleet.GetHTTPResponseHeader(request.Options, *httpResp)
 	}
-	responseHeader := sleet.GetHTTPResponseHeader(request.Options, *httpResp)
 	if err != nil {
 		return &sleet.AuthorizationResponse{
 			Success:              false,
