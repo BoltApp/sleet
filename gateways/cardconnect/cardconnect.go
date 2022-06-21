@@ -3,7 +3,6 @@ package cardconnect
 import (
 	"bytes"
 	"encoding/base64"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -50,8 +49,6 @@ func (client *CardConnectClient) sendRequest(request *Request, path string) (*Re
 	if err != nil {
 		return nil, nil, err
 	}
-	fmt.Println(url)
-	fmt.Println(string(data))
 
 	req, err := http.NewRequest("POST", url, bytes.NewReader(data))
 	if err != nil {
@@ -75,7 +72,6 @@ func (client *CardConnectClient) sendRequest(request *Request, path string) (*Re
 	if err != nil {
 		return nil, resp, err
 	}
-	fmt.Println(string(bodyText))
 
 	response, err := UnmarshalResponse(bodyText)
 	if err != nil {
