@@ -33,6 +33,11 @@ func TestBuildAuthRequest(t *testing.T) {
 	applepayBase.ECI = "5"
 	applepayBase.Cryptogram = "crypto"
 
+	visaName := applepayBase.CreditCard.FirstName + " " + applepayBase.CreditCard.LastName
+	discoverName := applepayBase.CreditCard.FirstName + " " + applepayBase.CreditCard.LastName
+	mastercardName := applepayBase.CreditCard.FirstName + " " + applepayBase.CreditCard.LastName
+	applepayName := applepayBase.CreditCard.FirstName + " " + applepayBase.CreditCard.LastName
+
 	cases := []struct {
 		label string
 		in    *sleet.AuthorizationRequest
@@ -47,6 +52,14 @@ func TestBuildAuthRequest(t *testing.T) {
 				Expiry:   &defaultTestExpirationDate,
 				CVV2:     &visaBase.CreditCard.CVV,
 				Currency: &visaBase.Amount.Currency,
+				Name:     &visaName,
+				OrderID:  &visaBase.MerchantOrderReference,
+				Region:   visaBase.BillingAddress.RegionCode,
+				Address:  visaBase.BillingAddress.StreetAddress1,
+				Address2: visaBase.BillingAddress.StreetAddress2,
+				City:     visaBase.BillingAddress.Locality,
+				Postal:   visaBase.BillingAddress.PostalCode,
+				Country:  visaBase.BillingAddress.CountryCode,
 			},
 		},
 		{
@@ -58,6 +71,14 @@ func TestBuildAuthRequest(t *testing.T) {
 				Expiry:   &defaultTestExpirationDate,
 				CVV2:     &discoverBase.CreditCard.CVV,
 				Currency: &discoverBase.Amount.Currency,
+				Name:     &discoverName,
+				OrderID:  &discoverBase.MerchantOrderReference,
+				Region:   discoverBase.BillingAddress.RegionCode,
+				Address:  discoverBase.BillingAddress.StreetAddress1,
+				Address2: discoverBase.BillingAddress.StreetAddress2,
+				City:     discoverBase.BillingAddress.Locality,
+				Postal:   discoverBase.BillingAddress.PostalCode,
+				Country:  discoverBase.BillingAddress.CountryCode,
 			},
 		},
 		{
@@ -69,6 +90,14 @@ func TestBuildAuthRequest(t *testing.T) {
 				Expiry:   &defaultTestExpirationDate,
 				Currency: &mastercardBase.Amount.Currency,
 				CVV2:     &mastercardBase.CreditCard.CVV,
+				Name:     &mastercardName,
+				OrderID:  &mastercardBase.MerchantOrderReference,
+				Region:   mastercardBase.BillingAddress.RegionCode,
+				Address:  mastercardBase.BillingAddress.StreetAddress1,
+				Address2: mastercardBase.BillingAddress.StreetAddress2,
+				City:     mastercardBase.BillingAddress.Locality,
+				Postal:   mastercardBase.BillingAddress.PostalCode,
+				Country:  mastercardBase.BillingAddress.CountryCode,
 			},
 		},
 		{
@@ -80,6 +109,14 @@ func TestBuildAuthRequest(t *testing.T) {
 				Expiry:   &defaultTestExpirationDate,
 				Currency: &applepayBase.Amount.Currency,
 				CVV2:     &applepayBase.CreditCard.CVV,
+				OrderID:  &applepayBase.MerchantOrderReference,
+				Region:   applepayBase.BillingAddress.RegionCode,
+				Name:     &applepayName,
+				Address:  applepayBase.BillingAddress.StreetAddress1,
+				Address2: applepayBase.BillingAddress.StreetAddress2,
+				City:     applepayBase.BillingAddress.Locality,
+				Postal:   applepayBase.BillingAddress.PostalCode,
+				Country:  applepayBase.BillingAddress.CountryCode,
 			},
 		},
 	}
