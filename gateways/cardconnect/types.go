@@ -5,6 +5,13 @@ import (
 	"net/http"
 )
 
+const (
+	AuthorizePath = "/cardconnect/rest/auth"
+	CapturePath   = "/cardconnect/rest/capture"
+	VoidPath      = "/cardconnect/rest/void"
+	RefundPath    = "/cardconnect/rest/refund"
+)
+
 type CardConnectClient struct {
 	username   string
 	password   string
@@ -30,10 +37,21 @@ type Request struct {
 	Amount        *string `json:"amount,omitempty"`
 	Currency      *string `json:"currency,omitempty"`
 	CVV2          *string `json:"cvv2,omitempty"`
-	COF           *string `json:"cvv2,omitempty"`
+	COF           *string `json:"cof,omitempty"`
 	COFScheduled  *string `json:"cofscheduled,omitempty"`
 	Authorization *string `json:"authcode,omitempty"`
 	RetRef        *string `json:"retref,omitempty"`
+	OrderID       *string `json:"orderid,omitempty"`
+	Region        *string `json:"region,omitempty"`
+	Name          *string `json:"name,omitempty"`
+	Address       *string `json:"address,omitempty"`
+	Address2      *string `json:"address2,omitempty"`
+	Country       *string `json:"country,omitempty"`
+	City          *string `json:"city,omitempty"`
+	Postal        *string `json:"postal,omitempty"`
+	Phone         *string `json:"phone,omitempty"`
+	Email         *string `json:"email,omitempty"`
+	Company       *string `json:"company,omitempty"`
 }
 
 func UnmarshalResponse(data []byte) (Response, error) {

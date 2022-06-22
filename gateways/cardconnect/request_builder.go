@@ -40,6 +40,8 @@ func buildAuthorizeParams(request *sleet.AuthorizationRequest) *Request {
 		}
 	}
 
+	name := request.CreditCard.FirstName + " " + request.CreditCard.LastName
+
 	return &Request{
 		Amount:       &amount,
 		Expiry:       &expirationDate,
@@ -48,6 +50,17 @@ func buildAuthorizeParams(request *sleet.AuthorizationRequest) *Request {
 		COF:          COF,
 		COFScheduled: COFScheduled,
 		Currency:     &request.Amount.Currency,
+		OrderID:      &request.MerchantOrderReference,
+		Name:         &name,
+		Region:       request.BillingAddress.RegionCode,
+		Country:      request.BillingAddress.CountryCode,
+		City:         request.BillingAddress.Locality,
+		Company:      request.BillingAddress.Company,
+		Address:      request.BillingAddress.StreetAddress1,
+		Address2:     request.BillingAddress.StreetAddress2,
+		Postal:       request.BillingAddress.PostalCode,
+		Phone:        request.BillingAddress.PhoneNumber,
+		Email:        request.BillingAddress.Email,
 	}
 }
 

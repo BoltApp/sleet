@@ -83,7 +83,7 @@ func (client *CardConnectClient) sendRequest(request *Request, path string) (*Re
 
 // Authorize a transaction. This transaction must be captured to receive funds
 func (client *CardConnectClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
-	response, httpResponse, err := client.sendRequest(buildAuthorizeParams(request), "/cardconnect/rest/auth")
+	response, httpResponse, err := client.sendRequest(buildAuthorizeParams(request), AuthorizePath)
 	if err != nil {
 		return nil, err
 	}
@@ -95,6 +95,8 @@ func (client *CardConnectClient) Authorize(request *sleet.AuthorizationRequest) 
 			TransactionReference: response.RetRef,
 			StatusCode:           httpResponse.StatusCode,
 			Header:               responseHeader,
+			AvsResultRaw:         response.AvsResp,
+			CvvResultRaw:         response.CVVResp,
 		}, nil
 	}
 
@@ -107,7 +109,7 @@ func (client *CardConnectClient) Authorize(request *sleet.AuthorizationRequest) 
 
 // Capture an authorized transaction
 func (client *CardConnectClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
-	response, httpResponse, err := client.sendRequest(buildCaptureParams(request), "/cardconnect/rest/capture")
+	response, httpResponse, err := client.sendRequest(buildCaptureParams(request), CapturePath)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +128,7 @@ func (client *CardConnectClient) Capture(request *sleet.CaptureRequest) (*sleet.
 
 // Void an authorized transaction
 func (client *CardConnectClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
-	response, httpResponse, err := client.sendRequest(buildVoidParams(request), "/cardconnect/rest/void")
+	response, httpResponse, err := client.sendRequest(buildVoidParams(request), VoidPath)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +146,7 @@ func (client *CardConnectClient) Void(request *sleet.VoidRequest) (*sleet.VoidRe
 
 // Refund a captured transaction
 func (client *CardConnectClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
-	response, httpResponse, err := client.sendRequest(buildRefundParams(request), "/cardconnect/rest/refund")
+	response, httpResponse, err := client.sendRequest(buildRefundParams(request), RefundPath)
 	if err != nil {
 		return nil, err
 	}
