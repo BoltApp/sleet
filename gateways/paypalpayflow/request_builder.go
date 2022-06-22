@@ -77,12 +77,16 @@ func buildVoidParams(request *sleet.VoidRequest) *Request {
 }
 
 func buildRefundParams(request *sleet.RefundRequest) *Request {
-	amount := sleet.AmountToDecimalString(request.Amount)
+	var amount *string = nil
+	if request.Amount != nil {
+		res := sleet.AmountToDecimalString(request.Amount)
+		amount = &res
+	}
 	return &Request{
 		TrxType:    REFUND,
 		OriginalID: &request.TransactionReference,
 		Verbosity:  &defaultVerbosity,
 		Tender:     &defaultTender,
-		Amount:     &amount,
+		Amount:     amount,
 	}
 }

@@ -3,7 +3,6 @@ package paypalpayflow
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 
@@ -75,8 +74,9 @@ func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, *ht
 
 	req, err := http.NewRequest("POST", client.url, strings.NewReader(data))
 	if err != nil {
-		log.Fatal(err)
+		return nil, nil, err
 	}
+
 	req.Header.Add("User-Agent", common.UserAgent())
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
