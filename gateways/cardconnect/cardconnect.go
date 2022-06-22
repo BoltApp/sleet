@@ -91,12 +91,15 @@ func (client *CardConnectClient) Authorize(request *sleet.AuthorizationRequest) 
 	responseHeader := sleet.GetHTTPResponseHeader(request.Options, *httpResponse)
 	if httpResponse.StatusCode == http.StatusOK && response.RespStat == "A" {
 		return &sleet.AuthorizationResponse{
-			Success:              true,
-			TransactionReference: response.RetRef,
-			StatusCode:           httpResponse.StatusCode,
-			Header:               responseHeader,
-			AvsResultRaw:         response.AvsResp,
-			CvvResultRaw:         response.CVVResp,
+			Success:               true,
+			TransactionReference:  response.RetRef,
+			StatusCode:            httpResponse.StatusCode,
+			Header:                responseHeader,
+			AvsResultRaw:          response.AvsResp,
+			AvsResult:             translateAvs(response.AvsResp),
+			CvvResultRaw:          response.CVVResp,
+			CvvResult:             translateCvv(response.CVVResp),
+			ExternalTransactionID: response.RetRef,
 		}, nil
 	}
 
