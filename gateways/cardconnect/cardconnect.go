@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
@@ -22,7 +23,7 @@ func NewWithHttpClient(username string, password string, merchantID string, URL 
 		username:   username,
 		password:   password,
 		merchantID: merchantID,
-		URL:        URL,
+		URL:        normalizeURL(URL),
 	}
 }
 
@@ -36,6 +37,14 @@ func (client *CardConnectClient) buildURL(path string) (string, error) {
 	url.Scheme = "https"
 
 	return url.String(), nil
+}
+
+func normalizeURL(URL string) string {
+	if strings.HasPrefix(URL, "http://") || strings.HasPrefix(URL, "https://") {
+		return URL
+	}
+
+	return "https://" + URL
 }
 
 func (client *CardConnectClient) sendRequest(request *Request, path string) (*Response, *http.Response, error) {
