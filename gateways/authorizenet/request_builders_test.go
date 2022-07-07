@@ -27,7 +27,8 @@ func TestBuildAuthRequest(t *testing.T) {
 	baseL2L3MultipleItems.Level3Data = sleet_testing.BaseLevel3DataMultipleItem()
 	baseL2L3MultipleItems.ShippingAddress = baseL2L3MultipleItems.BillingAddress
 
-	withCustomerIP := sleet_testing.BaseAuthorizationRequest()
+	withCustomerIP := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
+	withCustomerIP.MerchantOrderReference = randomdata.Alphanumeric(InvoiceNumberMaxLength + 5)
 	customerIP := common.SPtr("192.168.0.1")
 	if withCustomerIP.Options == nil {
 		withCustomerIP.Options = make(map[string]interface{})
@@ -239,24 +240,24 @@ func TestBuildAuthRequest(t *testing.T) {
 							CreditCard: CreditCard{
 								CardNumber:     "4111111111111111",
 								ExpirationDate: "2023-10",
-								CardCode:       base.CreditCard.CVV,
+								CardCode:       withCustomerIP.CreditCard.CVV,
 							},
 						},
 						BillingAddress: &BillingAddress{
 							FirstName:   "Bolt",
 							LastName:    "Checkout",
-							Address:     base.BillingAddress.StreetAddress1,
-							City:        base.BillingAddress.Locality,
-							State:       base.BillingAddress.RegionCode,
-							Zip:         base.BillingAddress.PostalCode,
-							Country:     base.BillingAddress.CountryCode,
-							PhoneNumber: base.BillingAddress.PhoneNumber,
+							Address:     withCustomerIP.BillingAddress.StreetAddress1,
+							City:        withCustomerIP.BillingAddress.Locality,
+							State:       withCustomerIP.BillingAddress.RegionCode,
+							Zip:         withCustomerIP.BillingAddress.PostalCode,
+							Country:     withCustomerIP.BillingAddress.CountryCode,
+							PhoneNumber: withCustomerIP.BillingAddress.PhoneNumber,
 						},
 						Order: &Order{
-							InvoiceNumber: base.MerchantOrderReference[:InvoiceNumberMaxLength],
+							InvoiceNumber: withCustomerIP.MerchantOrderReference[:InvoiceNumberMaxLength],
 						},
 						Customer: &Customer{
-							Email: *base.BillingAddress.Email,
+							Email: *withCustomerIP.BillingAddress.Email,
 						},
 						CustomerIP: customerIP,
 					},
