@@ -1,3 +1,4 @@
+//go:build unit
 // +build unit
 
 package authorizenet
@@ -26,6 +27,10 @@ func TestBuildAuthRequest(t *testing.T) {
 	baseL2L3MultipleItems.Level3Data = sleet_testing.BaseLevel3DataMultipleItem()
 	baseL2L3MultipleItems.ShippingAddress = baseL2L3MultipleItems.BillingAddress
 
+	withCustomerIP := sleet_testing.BaseAuthorizationRequest()
+	customerIP := common.SPtr("192.168.0.1")
+	withCustomerIP.Options[customerIPOption] = customerIP
+
 	amount := "1.00"
 	cases := []struct {
 		label string
@@ -49,13 +54,13 @@ func TestBuildAuthRequest(t *testing.T) {
 							},
 						},
 						BillingAddress: &BillingAddress{
-							FirstName: "Bolt",
-							LastName:  "Checkout",
-							Address:   base.BillingAddress.StreetAddress1,
-							City:      base.BillingAddress.Locality,
-							State:     base.BillingAddress.RegionCode,
-							Zip:       base.BillingAddress.PostalCode,
-							Country:   base.BillingAddress.CountryCode,
+							FirstName:   "Bolt",
+							LastName:    "Checkout",
+							Address:     base.BillingAddress.StreetAddress1,
+							City:        base.BillingAddress.Locality,
+							State:       base.BillingAddress.RegionCode,
+							Zip:         base.BillingAddress.PostalCode,
+							Country:     base.BillingAddress.CountryCode,
 							PhoneNumber: base.BillingAddress.PhoneNumber,
 						},
 						Order: &Order{
@@ -92,13 +97,13 @@ func TestBuildAuthRequest(t *testing.T) {
 							},
 						},
 						BillingAddress: &BillingAddress{
-							FirstName: "Bolt",
-							LastName:  "Checkout",
-							Address:   base.BillingAddress.StreetAddress1,
-							City:      base.BillingAddress.Locality,
-							State:     base.BillingAddress.RegionCode,
-							Zip:       base.BillingAddress.PostalCode,
-							Country:   base.BillingAddress.CountryCode,
+							FirstName:   "Bolt",
+							LastName:    "Checkout",
+							Address:     base.BillingAddress.StreetAddress1,
+							City:        base.BillingAddress.Locality,
+							State:       base.BillingAddress.RegionCode,
+							Zip:         base.BillingAddress.PostalCode,
+							Country:     base.BillingAddress.CountryCode,
 							PhoneNumber: base.BillingAddress.PhoneNumber,
 						},
 						Customer: &Customer{
@@ -214,6 +219,43 @@ func TestBuildAuthRequest(t *testing.T) {
 							Zip:       base.BillingAddress.PostalCode,
 							Country:   base.BillingAddress.CountryCode,
 						},
+					},
+				},
+			},
+		},
+		{
+			"Basic Auth Request with customer IP",
+			withCustomerIP,
+			&Request{
+				CreateTransactionRequest: CreateTransactionRequest{
+					MerchantAuthentication: MerchantAuthentication{Name: "MerchantName", TransactionKey: "Key"},
+					TransactionRequest: TransactionRequest{
+						TransactionType: TransactionTypeAuthOnly,
+						Amount:          &amount,
+						Payment: &Payment{
+							CreditCard: CreditCard{
+								CardNumber:     "4111111111111111",
+								ExpirationDate: "2023-10",
+								CardCode:       base.CreditCard.CVV,
+							},
+						},
+						BillingAddress: &BillingAddress{
+							FirstName:   "Bolt",
+							LastName:    "Checkout",
+							Address:     base.BillingAddress.StreetAddress1,
+							City:        base.BillingAddress.Locality,
+							State:       base.BillingAddress.RegionCode,
+							Zip:         base.BillingAddress.PostalCode,
+							Country:     base.BillingAddress.CountryCode,
+							PhoneNumber: base.BillingAddress.PhoneNumber,
+						},
+						Order: &Order{
+							InvoiceNumber: base.MerchantOrderReference[:InvoiceNumberMaxLength],
+						},
+						Customer: &Customer{
+							Email: *base.BillingAddress.Email,
+						},
+						CustomerIP: customerIP,
 					},
 				},
 			},

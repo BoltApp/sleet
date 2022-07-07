@@ -13,6 +13,11 @@ const (
 	InvoiceNumberMaxLength = 20
 )
 
+// Options
+const (
+	customerIPOption = "CustomerIP" // Pass as a string pointer
+)
+
 func buildAuthRequest(merchantName string, transactionKey string, authRequest *sleet.AuthorizationRequest) *Request {
 	amountStr := sleet.AmountToDecimalString(&authRequest.Amount)
 	billingAddress := authRequest.BillingAddress
@@ -39,13 +44,13 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 				CreditCard: creditCard,
 			},
 			BillingAddress: &BillingAddress{
-				FirstName: authRequest.CreditCard.FirstName,
-				LastName:  authRequest.CreditCard.LastName,
-				Address:   billingAddress.StreetAddress1,
-				City:      billingAddress.Locality,
-				State:     billingAddress.RegionCode,
-				Zip:       billingAddress.PostalCode,
-				Country:   billingAddress.CountryCode,
+				FirstName:   authRequest.CreditCard.FirstName,
+				LastName:    authRequest.CreditCard.LastName,
+				Address:     billingAddress.StreetAddress1,
+				City:        billingAddress.Locality,
+				State:       billingAddress.RegionCode,
+				Zip:         billingAddress.PostalCode,
+				Country:     billingAddress.CountryCode,
 				PhoneNumber: billingAddress.PhoneNumber,
 			},
 			Customer: &Customer{
@@ -60,6 +65,14 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 	}
 
 	authorizeRequest = *addL2L3Data(authRequest, &authorizeRequest)
+
+	// Pass customer ip if included in options map
+	if authRequest.Options[customerIPOption] != nil {
+		customerIp, ok := authRequest.Options[customerIPOption].(*string)
+		if ok {
+			authorizeRequest.TransactionRequest.CustomerIP = customerIp
+		}
+	}
 
 	return &Request{CreateTransactionRequest: authorizeRequest}
 }
@@ -91,7 +104,10 @@ func buildCaptureRequest(merchantName string, transactionKey string, captureRequ
 	return request
 }
 
-func buildRefundRequest(merchantName string, transactionKey string, refundRequest *sleet.RefundRequest) (*Request, error) {
+func buildRefundRequest(merchantName string, transactionKey string, refundRequest *sleet.RefundRequest) (
+	*Request,
+	error,
+) {
 	amountStr := sleet.AmountToDecimalString(refundRequest.Amount)
 	request := &Request{
 		CreateTransactionRequest: CreateTransactionRequest{
@@ -131,7 +147,10 @@ func authentication(merchantName string, transactionKey string) MerchantAuthenti
 	}
 }
 
-func addL2L3Data(authRequest *sleet.AuthorizationRequest, authNetAuthRequest *CreateTransactionRequest) *CreateTransactionRequest {
+func addL2L3Data(
+	authRequest *sleet.AuthorizationRequest,
+	authNetAuthRequest *CreateTransactionRequest,
+) *CreateTransactionRequest {
 	if authRequest.Level3Data != nil {
 		lineItemString := buildLineItemsString(authRequest)
 		if lineItemString != nil {
@@ -161,14 +180,14 @@ func addL2L3Data(authRequest *sleet.AuthorizationRequest, authNetAuthRequest *Cr
 
 	if authRequest.ShippingAddress != nil {
 		authNetAuthRequest.TransactionRequest.ShippingAddress = &ShippingAddress{
-			FirstName: 	authRequest.CreditCard.FirstName,
-			LastName: 	authRequest.CreditCard.LastName,
-			Company: 	common.SafeStr(authRequest.ShippingAddress.Company),
-			Address: 	authRequest.ShippingAddress.StreetAddress1,
-			City:      	authRequest.ShippingAddress.Locality,
-			State:    	authRequest.ShippingAddress.RegionCode,
-			Zip:       	authRequest.ShippingAddress.PostalCode,
-			Country:   	authRequest.ShippingAddress.CountryCode,
+			FirstName: authRequest.CreditCard.FirstName,
+			LastName:  authRequest.CreditCard.LastName,
+			Company:   common.SafeStr(authRequest.ShippingAddress.Company),
+			Address:   authRequest.ShippingAddress.StreetAddress1,
+			City:      authRequest.ShippingAddress.Locality,
+			State:     authRequest.ShippingAddress.RegionCode,
+			Zip:       authRequest.ShippingAddress.PostalCode,
+			Country:   authRequest.ShippingAddress.CountryCode,
 		}
 	}
 
