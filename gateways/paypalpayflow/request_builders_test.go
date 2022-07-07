@@ -147,6 +147,7 @@ func TestBuildCaptureRequest(t *testing.T) {
 				Verbosity:  &defaultTestVerbosity,
 				Tender:     &defaultTestTender,
 				Amount:     &defaultTestAmount,
+				Currency:   &defaultTestCurrency,
 			},
 		},
 	}
@@ -208,6 +209,7 @@ func TestBuildRefundRequest(t *testing.T) {
 				Verbosity:  &defaultTestVerbosity,
 				Tender:     &defaultTestTender,
 				Amount:     &defaultTestAmount,
+				Currency:   &defaultTestCurrency,
 			},
 		},
 	}
