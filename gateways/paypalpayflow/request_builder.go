@@ -40,6 +40,7 @@ func buildAuthorizeParams(request *sleet.AuthorizationRequest) *Request {
 	return &Request{
 		TrxType:            AUTHORIZATION,
 		Amount:             &amount,
+		Currency:           &request.Amount.Currency,
 		CreditCardNumber:   &request.CreditCard.Number,
 		CardExpirationDate: &expirationDate,
 		Verbosity:          &defaultVerbosity,
