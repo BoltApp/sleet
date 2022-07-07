@@ -67,6 +67,9 @@ func TestAuthNetAuthL2L3MultipleItem(t *testing.T) {
 func TestAuthNetAuthWithCustomerIP(t *testing.T) {
 	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
+	if authRequest.Options == nil {
+		authRequest.Options = make(map[string]interface{})
+	}
 	authRequest.Options["CustomerIP"] = sPtr("192.168.0.1")
 	authRequest.Amount.Amount = int64(randomdata.Number(100))
 	authRequest.MerchantOrderReference = "test-order-ref"

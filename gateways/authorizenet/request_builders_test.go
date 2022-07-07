@@ -29,6 +29,9 @@ func TestBuildAuthRequest(t *testing.T) {
 
 	withCustomerIP := sleet_testing.BaseAuthorizationRequest()
 	customerIP := common.SPtr("192.168.0.1")
+	if withCustomerIP.Options == nil {
+		withCustomerIP.Options = make(map[string]interface{})
+	}
 	withCustomerIP.Options[customerIPOption] = customerIP
 
 	amount := "1.00"
