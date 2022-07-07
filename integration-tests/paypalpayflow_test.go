@@ -31,6 +31,25 @@ func TestPaypalAuth(t *testing.T) {
 	}
 }
 
+func TestPaypalAuthWithCurrency(t *testing.T) {
+	client := paypalpayflow.NewClient(getEnv("PAYPAL_PARTNER"), getEnv("PAYPAL_PASSWORD"), getEnv("PAYPAL_VENDOR"), getEnv("PAYPAL_USER"), common.Sandbox)
+	authRequest := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
+	authRequest.Amount.Amount = int64(randomdata.Number(10000))
+	authRequest.Amount.Currency = "CAD"
+	authRequest.MerchantOrderReference = "test-order-ref"
+	authRequest.CreditCard.ExpirationMonth = 3
+	authRequest.CreditCard.ExpirationYear = 25
+	authRequest.CreditCard.Number = "4222222222222"
+	auth, err := client.Authorize(authRequest)
+	if err != nil {
+		t.Error("Authorize request should not have failed")
+	}
+
+	if !auth.Success {
+		t.Error("Resulting auth should have been successful")
+	}
+}
+
 func TestPaypalAuthBadCredentials(t *testing.T) {
 	client := paypalpayflow.NewClient("PAYPAL_PARTNER", "PAYPAL_PASSWORD", getEnv("PAYPAL_VENDOR"), getEnv("PAYPAL_USER"), common.Sandbox)
 	authRequest := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
