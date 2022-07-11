@@ -64,6 +64,25 @@ func TestAuthNetAuthL2L3MultipleItem(t *testing.T) {
 	}
 }
 
+func TestAuthNetAuthWithCustomerIP(t *testing.T) {
+	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
+	authRequest := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
+	if authRequest.Options == nil {
+		authRequest.Options = make(map[string]interface{})
+	}
+	authRequest.Options["CustomerIP"] = sPtr("192.168.0.1")
+	authRequest.Amount.Amount = int64(randomdata.Number(100))
+	authRequest.MerchantOrderReference = "test-order-ref"
+	auth, err := client.Authorize(authRequest)
+	if err != nil {
+		t.Error("Authorize request should not have failed")
+	}
+
+	if !auth.Success {
+		t.Error("Resulting auth should have been successful")
+	}
+}
+
 // TestAuthNetRechargeAuth
 //
 // Recharge requests will not have CVV. This should successfully create an authorization on Authorize.net
@@ -203,8 +222,8 @@ func TestAuthNetAuthCaptureRefund(t *testing.T) {
 	// Refunds for AuthNet take 24 hours to settle. The only option for immediate testing is to do a non-transaction
 	// referenced refund. We will send full credit card number
 	refundRequest := &sleet.RefundRequest{
-		Amount:               &authRequest.Amount,
-		Last4: authRequest.CreditCard.Number,
+		Amount:                 &authRequest.Amount,
+		Last4:                  authRequest.CreditCard.Number,
 		MerchantOrderReference: common.SPtr(randomdata.Digits(16)),
 		Options: map[string]interface{}{
 			"TestingExpirationOverride": fmt.Sprintf("%d%d", authRequest.CreditCard.ExpirationMonth, authRequest.CreditCard.ExpirationYear),
