@@ -113,19 +113,20 @@ type MerchantAuthentication struct {
 // *************************************************************************
 // *************************************************************************
 type TransactionRequest struct {
-	TransactionType  TransactionType  `json:"transactionType"`
-	Amount           *string          `json:"amount,omitempty"`
-	Payment          *Payment         `json:"payment,omitempty"`
-	RefTransactionID *string          `json:"refTransId,omitempty"`
-	Order            *Order           `json:"order,omitempty"`
-	LineItem         json.RawMessage  `json:"lineItems,omitempty"` // this is really a repeating LineItem, but authorize.net expects it in object not array
+	TransactionType  TransactionType `json:"transactionType"`
+	Amount           *string         `json:"amount,omitempty"`
+	Payment          *Payment        `json:"payment,omitempty"`
+	RefTransactionID *string         `json:"refTransId,omitempty"`
+	Order            *Order          `json:"order,omitempty"`
+	LineItem         json.RawMessage `json:"lineItems,omitempty"` // this is really a repeating LineItem, but authorize.net expects it in object not array
 	// since not valid json, just going to represent as JSON string
-	Tax              *Tax             `json:"tax,omitempty"`
-	Duty             *Tax             `json:"duty,omitempty"`
-	Shipping         *Tax             `json:"shipping,omitempty"`
-	Customer         *Customer        `json:"customer,omitempty"`
-	BillingAddress   *BillingAddress  `json:"billTo,omitempty"`
-	ShippingAddress  *ShippingAddress `json:"shipTo,omitempty"`
+	Tax             *Tax             `json:"tax,omitempty"`
+	Duty            *Tax             `json:"duty,omitempty"`
+	Shipping        *Tax             `json:"shipping,omitempty"`
+	Customer        *Customer        `json:"customer,omitempty"`
+	BillingAddress  *BillingAddress  `json:"billTo,omitempty"`
+	ShippingAddress *ShippingAddress `json:"shipTo,omitempty"`
+	CustomerIP      *string          `json:"customerIP,omitempty"`
 }
 
 type LineItem struct {
@@ -176,14 +177,14 @@ type ShippingAddress struct {
 
 // BillingAddress is used in TransactionRequest for making an auth call
 type BillingAddress struct {
-	FirstName string  `json:"firstName"`
-	LastName  string  `json:"lastName"`
-	Company   string  `json:"company"`
-	Address   *string `json:"address"`
-	City      *string `json:"city"`
-	State     *string `json:"state"`
-	Zip       *string `json:"zip"`
-	Country   *string `json:"country"`
+	FirstName   string  `json:"firstName"`
+	LastName    string  `json:"lastName"`
+	Company     string  `json:"company"`
+	Address     *string `json:"address"`
+	City        *string `json:"city"`
+	State       *string `json:"state"`
+	Zip         *string `json:"zip"`
+	Country     *string `json:"country"`
 	PhoneNumber *string `json:"phoneNumber"`
 }
 
