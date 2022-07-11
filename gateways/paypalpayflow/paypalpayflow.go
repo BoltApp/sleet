@@ -42,6 +42,7 @@ func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, *ht
 		"USER":            client.user,
 		"TRXTYPE":         request.TrxType,
 		"AMT":             request.Amount,
+		"CURRENCY":        request.Currency,
 		"VERBOSITY":       request.Verbosity,
 		"TENDER":          request.Tender,
 		"ACCT":            request.CreditCardNumber,

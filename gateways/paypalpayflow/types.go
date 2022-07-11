@@ -27,6 +27,7 @@ const (
 type Request struct {
 	TrxType            string
 	Amount             *string
+	Currency           *string
 	Verbosity          *string
 	Tender             *string
 	CreditCardNumber   *string

@@ -13,6 +13,7 @@ var (
 	defaultTestVerbosity      string = "HIGH"
 	defaultTestTender         string = "C"
 	defaultTestAmount         string = "1.00"
+	defaultTestCurrency       string = "USD"
 	defaultTestExpirationDate string = "1023"
 	OriginalID                string = "111111"
 )
@@ -44,6 +45,7 @@ func TestBuildAuthRequest(t *testing.T) {
 			Request{
 				TrxType:            AUTHORIZATION,
 				Amount:             &defaultTestAmount,
+				Currency:           &defaultTestCurrency,
 				CreditCardNumber:   &visaBase.CreditCard.Number,
 				CardExpirationDate: &defaultTestExpirationDate,
 				Verbosity:          &defaultTestVerbosity,
@@ -63,6 +65,7 @@ func TestBuildAuthRequest(t *testing.T) {
 			Request{
 				TrxType:            AUTHORIZATION,
 				Amount:             &defaultTestAmount,
+				Currency:           &defaultTestCurrency,
 				CreditCardNumber:   &discoverBase.CreditCard.Number,
 				CardExpirationDate: &defaultTestExpirationDate,
 				Verbosity:          &defaultTestVerbosity,
@@ -82,6 +85,7 @@ func TestBuildAuthRequest(t *testing.T) {
 			Request{
 				TrxType:            AUTHORIZATION,
 				Amount:             &defaultTestAmount,
+				Currency:           &defaultTestCurrency,
 				CreditCardNumber:   &mastercardBase.CreditCard.Number,
 				CardExpirationDate: &defaultTestExpirationDate,
 				Verbosity:          &defaultTestVerbosity,
@@ -101,6 +105,7 @@ func TestBuildAuthRequest(t *testing.T) {
 			Request{
 				TrxType:            AUTHORIZATION,
 				Amount:             &defaultTestAmount,
+				Currency:           &defaultTestCurrency,
 				CreditCardNumber:   &applepayBase.CreditCard.Number,
 				CardExpirationDate: &defaultTestExpirationDate,
 				Verbosity:          &defaultTestVerbosity,
@@ -142,6 +147,7 @@ func TestBuildCaptureRequest(t *testing.T) {
 				Verbosity:  &defaultTestVerbosity,
 				Tender:     &defaultTestTender,
 				Amount:     &defaultTestAmount,
+				Currency:   &defaultTestCurrency,
 			},
 		},
 	}
@@ -203,6 +209,7 @@ func TestBuildRefundRequest(t *testing.T) {
 				Verbosity:  &defaultTestVerbosity,
 				Tender:     &defaultTestTender,
 				Amount:     &defaultTestAmount,
+				Currency:   &defaultTestCurrency,
 			},
 		},
 	}

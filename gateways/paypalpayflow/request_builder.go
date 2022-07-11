@@ -40,6 +40,7 @@ func buildAuthorizeParams(request *sleet.AuthorizationRequest) *Request {
 	return &Request{
 		TrxType:            AUTHORIZATION,
 		Amount:             &amount,
+		Currency:           &request.Amount.Currency,
 		CreditCardNumber:   &request.CreditCard.Number,
 		CardExpirationDate: &expirationDate,
 		Verbosity:          &defaultVerbosity,
@@ -64,6 +65,7 @@ func buildCaptureParams(request *sleet.CaptureRequest) *Request {
 		Verbosity:  &defaultVerbosity,
 		Tender:     &defaultTender,
 		Amount:     &amount,
+		Currency:   &request.Amount.Currency,
 	}
 }
 
@@ -77,10 +79,14 @@ func buildVoidParams(request *sleet.VoidRequest) *Request {
 }
 
 func buildRefundParams(request *sleet.RefundRequest) *Request {
-	var amount *string = nil
+	var (
+		amount   *string
+		currency *string
+	)
 	if request.Amount != nil {
 		res := sleet.AmountToDecimalString(request.Amount)
 		amount = &res
+		currency = &request.Amount.Currency
 	}
 	return &Request{
 		TrxType:    REFUND,
@@ -88,5 +94,6 @@ func buildRefundParams(request *sleet.RefundRequest) *Request {
 		Verbosity:  &defaultVerbosity,
 		Tender:     &defaultTender,
 		Amount:     amount,
+		Currency:   currency,
 	}
 }

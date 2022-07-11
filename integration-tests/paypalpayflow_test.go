@@ -162,3 +162,51 @@ func TestPaypalAuthCaptureRefund(t *testing.T) {
 		t.Error("Resulting refund should have been successful")
 	}
 }
+
+func TestPaypalAuthCaptureRefundWithNonUSDCurrency(t *testing.T) {
+	transactionID := "test-order-refund"
+	client := paypalpayflow.NewClient(getEnv("PAYPAL_PARTNER"), getEnv("PAYPAL_PASSWORD"), getEnv("PAYPAL_VENDOR"), getEnv("PAYPAL_USER"), common.Sandbox)
+	authRequest := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
+	authRequest.Amount.Amount = int64(randomdata.Number(100) * 100)
+	authRequest.Amount.Currency = "CAD"
+	authRequest.MerchantOrderReference = transactionID
+	authRequest.CreditCard.ExpirationMonth = 3
+	authRequest.CreditCard.ExpirationYear = 25
+	authRequest.CreditCard.Number = "4012888888881881"
+	auth, err := client.Authorize(authRequest)
+	if err != nil {
+		t.Error("Authorize request should not have failed")
+	}
+
+	if !auth.Success {
+		t.Error("Resulting auth should have been successful")
+	}
+
+	captureRequest := &sleet.CaptureRequest{
+		Amount:               &authRequest.Amount,
+		TransactionReference: auth.TransactionReference,
+	}
+
+	capture, err := client.Capture(captureRequest)
+	if err != nil {
+		t.Error("Capture request should not have failed")
+	}
+
+	if !capture.Success {
+		t.Error("Resulting capture should have been successful")
+	}
+
+	refundRequest := &sleet.RefundRequest{
+		Amount:               &authRequest.Amount,
+		Last4:                authRequest.CreditCard.Number,
+		TransactionReference: capture.TransactionReference,
+	}
+
+	refund, err := client.Refund(refundRequest)
+	if err != nil {
+		t.Error("Refund request should not have failed")
+	}
+	if !refund.Success {
+		t.Error("Resulting refund should have been successful")
+	}
+}
