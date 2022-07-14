@@ -85,9 +85,17 @@ const (
 
 const expirationDateXXXX = "XXXX"
 
+const transactionStatusSettledSuccessfully = "settledSuccessfully"
+
 // Request contains a createTransactionRequest for authorizations
 type Request struct {
-	CreateTransactionRequest CreateTransactionRequest `json:"createTransactionRequest"`
+	CreateTransactionRequest     *CreateTransactionRequest     `json:"createTransactionRequest,omitempty"`
+	GetTransactionDetailsRequest *GetTransactionDetailsRequest `json:"getTransactionDetailsRequest,omitempty"`
+}
+
+type GetTransactionDetailsRequest struct {
+	MerchantAuthentication MerchantAuthentication `json:"merchantAuthentication"`
+	TransID                string                 `json:"transId"`
 }
 
 // CreateTransactionRequest specifies the merchant authentication to be used for request as well as transaction
@@ -215,6 +223,21 @@ type TransactionResponse struct {
 	Messages       []TransactionResponseMessage `json:"messages"`
 	Errors         []Error                      `json:"errors"`
 }
+
+type TransactionDetailsResponse struct {
+	GetTransactionDetailsResponse GetTransactionDetailsResponse `json:"getTransactionDetailsResponse"`
+}
+type GetTransactionDetailsResponse struct {
+	Messages    Messages    `json:"messages"`
+	Transaction Transaction `json:"transaction"`
+}
+
+type Transaction struct {
+	ResponseCode      ResponseCode      `json:"responseCode"`
+	TransactionStatus TransactionStatus `json:"transactionStatus"`
+}
+
+type TransactionStatus string
 
 // MessageResponseCode message API response codes specific to AuthorizeNet
 type MessageResponseCode string

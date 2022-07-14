@@ -74,12 +74,12 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 		}
 	}
 
-	return &Request{CreateTransactionRequest: authorizeRequest}
+	return &Request{CreateTransactionRequest: &authorizeRequest}
 }
 
 func buildVoidRequest(merchantName string, transactionKey string, voidRequest *sleet.VoidRequest) *Request {
 	return &Request{
-		CreateTransactionRequest: CreateTransactionRequest{
+		CreateTransactionRequest: &CreateTransactionRequest{
 			MerchantAuthentication: authentication(merchantName, transactionKey),
 			TransactionRequest: TransactionRequest{
 				TransactionType:  TransactionTypeVoid,
@@ -92,7 +92,7 @@ func buildVoidRequest(merchantName string, transactionKey string, voidRequest *s
 func buildCaptureRequest(merchantName string, transactionKey string, captureRequest *sleet.CaptureRequest) *Request {
 	amountStr := sleet.AmountToDecimalString(captureRequest.Amount)
 	request := &Request{
-		CreateTransactionRequest: CreateTransactionRequest{
+		CreateTransactionRequest: &CreateTransactionRequest{
 			MerchantAuthentication: authentication(merchantName, transactionKey),
 			TransactionRequest: TransactionRequest{
 				TransactionType:  TransactionTypePriorAuthCapture,
@@ -104,13 +104,22 @@ func buildCaptureRequest(merchantName string, transactionKey string, captureRequ
 	return request
 }
 
+func buildTransactionDetailRequest(merchantName string, transactionKey string, transactionID string) *Request {
+	return &Request{
+		GetTransactionDetailsRequest: &GetTransactionDetailsRequest{
+			MerchantAuthentication: authentication(merchantName, transactionKey),
+			TransID:                transactionID,
+		},
+	}
+}
+
 func buildRefundRequest(merchantName string, transactionKey string, refundRequest *sleet.RefundRequest) (
 	*Request,
 	error,
 ) {
 	amountStr := sleet.AmountToDecimalString(refundRequest.Amount)
 	request := &Request{
-		CreateTransactionRequest: CreateTransactionRequest{
+		CreateTransactionRequest: &CreateTransactionRequest{
 			MerchantAuthentication: authentication(merchantName, transactionKey),
 			TransactionRequest: TransactionRequest{
 				TransactionType:  TransactionTypeRefund,
