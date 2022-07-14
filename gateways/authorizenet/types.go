@@ -224,18 +224,17 @@ type TransactionResponse struct {
 	Errors         []Error                      `json:"errors"`
 }
 
-type TransactionDetailsResponse struct {
-	GetTransactionDetailsResponse GetTransactionDetailsResponse `json:"getTransactionDetailsResponse"`
-}
 type GetTransactionDetailsResponse struct {
 	Messages    Messages    `json:"messages"`
 	Transaction Transaction `json:"transaction"`
 }
 
 type Transaction struct {
-	ResponseCode      ResponseCode      `json:"responseCode"`
-	TransactionStatus TransactionStatus `json:"transactionStatus"`
+	TransactionStatus       TransactionStatus       `json:"transactionStatus"`
+	TransactionResponseCode TransactionResponseCode `json:"responseCode"`
 }
+
+type TransactionResponseCode int
 
 type TransactionStatus string
 

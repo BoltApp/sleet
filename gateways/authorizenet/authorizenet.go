@@ -3,7 +3,6 @@ package authorizenet
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -101,15 +100,12 @@ func (client *AuthorizeNetClient) Void(request *sleet.VoidRequest) (*sleet.VoidR
 
 func (client *AuthorizeNetClient) isTransactionSettled(merchantName string, transactionKey string, transactionID string) (bool, error) {
 	authorizeNetGetTransactionDetailsRequest := buildTransactionDetailRequest(merchantName, transactionKey, transactionID)
-	authorizeNetResponse, resp, err := client.sendGetTransactionDetailsRequest(*authorizeNetGetTransactionDetailsRequest)
+	authorizeNetResponse, _, err := client.sendGetTransactionDetailsRequest(*authorizeNetGetTransactionDetailsRequest)
 	if err != nil {
 		return false, err
 	}
 
-	if resp != nil {
-		fmt.Print("test resp")
-	}
-	transactionStatus := authorizeNetResponse.GetTransactionDetailsResponse.Transaction.TransactionStatus
+	transactionStatus := authorizeNetResponse.Transaction.TransactionStatus
 	if transactionStatus != transactionStatusSettledSuccessfully {
 		return false, nil
 	}
@@ -163,13 +159,13 @@ func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.R
 	}, nil
 }
 
-func (client *AuthorizeNetClient) sendGetTransactionDetailsRequest(data Request) (*TransactionDetailsResponse, *http.Response, error) {
+func (client *AuthorizeNetClient) sendGetTransactionDetailsRequest(data Request) (*GetTransactionDetailsResponse, *http.Response, error) {
 	bodyBytes, resp, err := client.sendRequestAndReturnBytes(data)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var transactionDetailsResponse TransactionDetailsResponse
+	var transactionDetailsResponse GetTransactionDetailsResponse
 	err = json.Unmarshal(*bodyBytes, &transactionDetailsResponse)
 	if err != nil {
 		return nil, nil, err
