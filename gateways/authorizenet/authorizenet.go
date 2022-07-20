@@ -111,6 +111,13 @@ func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.R
 	}
 
 	if authorizeNetResponse.TransactionResponse.ResponseCode != ResponseCodeApproved {
+		if shouldVoidUnsettledCapture(request.Options) {
+			for _, errorCode := range authorizeNetResponse.TransactionResponse.Errors {
+				if errorCode.ErrorCode == ErrorCodeIneligibleForIssuingCredit {
+					return sendVoidFromRefundRequest(client, request)
+				}
+			}
+		}
 		errorCode := getErrorCode(authorizeNetResponse.TransactionResponse)
 		response := sleet.RefundResponse{ErrorCode: &errorCode}
 		return &response, nil
@@ -118,6 +125,38 @@ func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.R
 	return &sleet.RefundResponse{
 		Success:              true,
 		TransactionReference: authorizeNetResponse.TransactionResponse.TransID,
+	}, nil
+}
+
+func shouldVoidUnsettledCapture(requestOptions map[string]interface{}) bool {
+	if requestOptions[shouldVoidUnsettledCaptureOption] != nil {
+		shouldVoidUnsettledCapture, ok := requestOptions[shouldVoidUnsettledCaptureOption].(bool)
+		if ok {
+			return shouldVoidUnsettledCapture
+		}
+	}
+	return false
+}
+
+func sendVoidFromRefundRequest(client *AuthorizeNetClient, request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	voidRequest := sleet.VoidRequest{
+		TransactionReference:       request.TransactionReference,
+		ClientTransactionReference: request.ClientTransactionReference,
+		MerchantOrderReference:     request.MerchantOrderReference,
+	}
+
+	authorzeNetVoidResponse, err := client.Void(&voidRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	if authorzeNetVoidResponse.ErrorCode != nil {
+		return &sleet.RefundResponse{ErrorCode: authorzeNetVoidResponse.ErrorCode}, nil
+	}
+
+	return &sleet.RefundResponse{
+		Success:              true,
+		TransactionReference: authorzeNetVoidResponse.TransactionReference,
 	}, nil
 }
 

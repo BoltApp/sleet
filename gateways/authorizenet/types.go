@@ -225,6 +225,10 @@ type TransactionResponseMessage struct {
 	Description string              `json:"description"`
 }
 
+const (
+	ErrorCodeIneligibleForIssuingCredit = "54"
+)
+
 // Error specifies a code and text explaining what happened
 type Error struct {
 	ErrorCode string `json:"errorCode"`
