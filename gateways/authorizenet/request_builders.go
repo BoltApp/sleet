@@ -15,8 +15,8 @@ const (
 
 // Options
 const (
-	customerIPOption                 = "CustomerIP" // Pass as a string pointer
-	shouldVoidUnsettledCaptureOption = "ShouldVoidUnsettledCapture"
+	customerIPOption                 = "CustomerIP"                 // Pass as a string pointer
+	shouldVoidUnsettledCaptureOption = "ShouldVoidUnsettledCapture" // Pass as a bool
 )
 
 func buildAuthRequest(merchantName string, transactionKey string, authRequest *sleet.AuthorizationRequest) *Request {
