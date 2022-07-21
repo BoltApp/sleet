@@ -12,7 +12,7 @@ require (
 	github.com/go-xmlfmt/xmlfmt v0.0.0-20191208150333-d5b6f63a941b
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/google/go-cmp v0.5.1
-	github.com/jarcoal/httpmock v1.0.5
+	github.com/jarcoal/httpmock v1.0.8
 	github.com/rocketgate/rocketgate-go-sdk v0.0.0-20220106233346-17d98d87a0ff
 	github.com/shopspring/decimal v1.3.1
 	github.com/stripe/stripe-go v70.11.0+incompatible

@@ -1,0 +1,30 @@
+{
+    "transactionResponse": {
+        "responseCode": "3",
+        "authCode": "",
+        "avsResultCode": "P",
+        "cvvResultCode": "",
+        "cavvResultCode": "",
+        "transId": "0",
+        "refTransID": "2149181544",
+        "transHash": "D6C9036F443BADE785D57DA2B44CD190",
+        "accountNumber": "XXXX5678",
+        "accountType": "eCheck",
+        "errors": [
+            {
+                "errorCode": "54",
+                "errorText": "The transaction cannot be found."
+            }
+        ]
+    },
+    "refId": "123456",
+    "messages": {
+        "resultCode": "Error",
+        "message": [
+            {
+                "code": "E00027",
+                "text": "The transaction was unsuccessful."
+            }
+        ]
+    }
+}

@@ -369,6 +369,76 @@ func TestRefund(t *testing.T) {
 		}
 	})
 
+	t.Run("With Error 54 Response and ShouldVoidUnsettledCapture disabled", func(t *testing.T) {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		request := sleet_t.BaseRefundRequest()
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			refundResponseRaw := helper.ReadFile("test_data/refundError54Response.json")
+			resp := httpmock.NewBytesResponse(http.StatusOK, refundResponseRaw)
+			return resp, nil
+		})
+
+		want := &sleet.RefundResponse{
+			Success:   false,
+			ErrorCode: common.SPtr("54"),
+		}
+
+		client := NewClient("MerchantName", "Key", common.Sandbox)
+
+		got, err := client.Refund(request)
+
+		if err != nil {
+			t.Fatalf("Error thrown after sending request %q", err)
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+	})
+
+	t.Run("With Error 54 Response and ShouldVoidUnsettledCapture enabled", func(t *testing.T) {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		request := sleet_t.BaseRefundRequest()
+
+		request.Options = map[string]interface{}{
+			"ShouldVoidUnsettledCapture": true,
+		}
+
+		refundResponseRaw := helper.ReadFile("test_data/refundError54Response.json")
+		voidResponseRaw := helper.ReadFile("test_data/voidResponse.json")
+
+		httpmock.RegisterResponder("POST", url, httpmock.ResponderFromMultipleResponses(
+			[]*http.Response{
+				httpmock.NewBytesResponse(http.StatusOK, refundResponseRaw),
+				httpmock.NewBytesResponse(http.StatusOK, voidResponseRaw),
+			},
+			t.Log),
+		)
+
+		want := &sleet.RefundResponse{
+			Success:              true,
+			TransactionReference: "1234567890",
+		}
+
+		client := NewClient("MerchantName", "Key", common.Sandbox)
+
+		got, err := client.Refund(request)
+
+		if err != nil {
+			t.Fatalf("Error thrown after sending request %q", err)
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+	})
+
 	t.Run("With Network Error", func(t *testing.T) {
 		request := sleet_t.BaseRefundRequest()
 		httpmock.Activate()
