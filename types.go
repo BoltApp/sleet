@@ -102,6 +102,10 @@ type AuthorizationRequest struct {
 	Options map[string]interface{}
 }
 
+const (
+	AuthCodeMetadata string = "authCode"
+)
+
 // AuthorizationResponse is a generic response returned back to client after data massaging from PsP Response
 // The raw AVS and CVV are included if applicable
 // Success is true if Auth went through successfully
@@ -121,8 +125,9 @@ type AuthorizationResponse struct {
 	CvvResultRaw          string
 	RTAUResult            *RTAUResponse
 	AdyenAdditionalData   map[string]string // store additional recurring info (will be refactored to general naming on next major version upgrade)
-	StatusCode            int               // the status code from raw PSP http response.
-	Header                http.Header       // the http response header
+	Metadata              map[string]string
+	StatusCode            int         // the status code from raw PSP http response.
+	Header                http.Header // the http response header
 }
 
 // CaptureRequest specifies the authorized transaction to capture and also an amount for partial capture use cases

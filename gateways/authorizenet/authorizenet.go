@@ -47,7 +47,7 @@ func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest)
 	}
 	responseHeader := sleet.GetHTTPResponseHeader(request.Options, *httpResp)
 
-	return &sleet.AuthorizationResponse{
+	resp := sleet.AuthorizationResponse{
 		Success:              txnResponse.ResponseCode == ResponseCodeApproved || txnResponse.ResponseCode == ResponseCodeHeld,
 		TransactionReference: txnResponse.TransID,
 		AvsResult:            translateAvs(txnResponse.AVSResultCode),
@@ -57,8 +57,11 @@ func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest)
 		Response:             string(txnResponse.ResponseCode),
 		ErrorCode:            errorCode,
 		StatusCode:           httpResp.StatusCode,
+		Metadata:             buildResponseMetadata(txnResponse),
 		Header:               responseHeader,
-	}, nil
+	}
+
+	return &resp, nil
 }
 
 // Capture an authorized transaction by transaction reference using the transactionTypePriorAuthCapture flag
@@ -178,4 +181,11 @@ func isAlreadyCaptured(txnResponse TransactionResponse) bool {
 		}
 	}
 	return false
+}
+
+func buildResponseMetadata(txnResponse TransactionResponse) map[string]string {
+	metadata := make(map[string]string)
+	metadata[sleet.AuthCodeMetadata] = txnResponse.AuthCode
+
+	return metadata
 }
