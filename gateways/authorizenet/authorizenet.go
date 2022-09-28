@@ -186,9 +186,11 @@ func isAlreadyCaptured(txnResponse TransactionResponse) bool {
 func buildResponseMetadata(txnResponse TransactionResponse) map[string]string {
 	metadata := make(map[string]string)
 
-	if txnResponse.AuthCode != "" {
-		metadata[sleet.AuthCodeMetadata] = txnResponse.AuthCode
+	if txnResponse.AuthCode == "" {
+		return nil
 	}
+
+	metadata[sleet.AuthCodeMetadata] = txnResponse.AuthCode
 
 	return metadata
 }
