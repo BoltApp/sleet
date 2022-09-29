@@ -108,6 +108,9 @@ func TestAuthorize(t *testing.T) {
 			return resp, nil
 		})
 
+		metadata := make(map[string]string)
+		metadata[sleet.AuthCodeMetadata] = "HH5414"
+
 		want := &sleet.AuthorizationResponse{
 			Success:              true,
 			TransactionReference: "2149186848",
@@ -116,6 +119,7 @@ func TestAuthorize(t *testing.T) {
 			AvsResultRaw:         "Y",
 			CvvResultRaw:         "S",
 			Response:             "1",
+			Metadata:             metadata,
 			StatusCode:           200,
 			Header:               http.Header{"X-Test-Header": {"test_header_value"}},
 		}
