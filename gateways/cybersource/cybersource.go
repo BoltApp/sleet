@@ -71,6 +71,9 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 			Header:     responseHeader,
 		}
 		return &response, nil
+	// Status 401 - during a cybersource outage, most fields were empty and ID was nil
+	} else if cybersourceResponse.ID == nil {
+		return &sleet.AuthorizationResponse{Success: false}, nil
 	}
 
 	// Status 201 - Succeeded or failed
