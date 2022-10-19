@@ -264,6 +264,39 @@ func TestBuildAuthRequest(t *testing.T) {
 				},
 			},
 		},
+		{
+			"Basic Auth Request with nil Billing Address",
+			&sleet.AuthorizationRequest{
+				Amount:                     base.Amount,
+				CreditCard:                 base.CreditCard,
+				ClientTransactionReference: base.ClientTransactionReference,
+				ShopperReference:           "test",
+				MerchantOrderReference:     base.MerchantOrderReference,
+			},
+			&Request{
+				CreateTransactionRequest: CreateTransactionRequest{
+					MerchantAuthentication: MerchantAuthentication{Name: "MerchantName", TransactionKey: "Key"},
+					TransactionRequest: TransactionRequest{
+						TransactionType: TransactionTypeAuthOnly,
+						Amount:          &amount,
+						Payment: &Payment{
+							CreditCard: CreditCard{
+								CardNumber:     "4111111111111111",
+								ExpirationDate: "2023-10",
+								CardCode:       base.CreditCard.CVV,
+							},
+						},
+						BillingAddress: &BillingAddress{
+							FirstName: "Bolt",
+							LastName:  "Checkout",
+						},
+						Order: &Order{
+							InvoiceNumber: base.MerchantOrderReference[:InvoiceNumberMaxLength],
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, c := range cases {

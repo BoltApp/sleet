@@ -44,19 +44,26 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 				CreditCard: creditCard,
 			},
 			BillingAddress: &BillingAddress{
-				FirstName:   authRequest.CreditCard.FirstName,
-				LastName:    authRequest.CreditCard.LastName,
-				Address:     billingAddress.StreetAddress1,
-				City:        billingAddress.Locality,
-				State:       billingAddress.RegionCode,
-				Zip:         billingAddress.PostalCode,
-				Country:     billingAddress.CountryCode,
-				PhoneNumber: billingAddress.PhoneNumber,
-			},
-			Customer: &Customer{
-				Email: common.SafeStr(billingAddress.Email),
+				FirstName: authRequest.CreditCard.FirstName,
+				LastName:  authRequest.CreditCard.LastName,
 			},
 		},
+	}
+
+	if billingAddress != nil {
+		authorizeRequest.TransactionRequest.BillingAddress = &BillingAddress{
+			FirstName:   authRequest.CreditCard.FirstName,
+			LastName:    authRequest.CreditCard.LastName,
+			Address:     billingAddress.StreetAddress1,
+			City:        billingAddress.Locality,
+			State:       billingAddress.RegionCode,
+			Zip:         billingAddress.PostalCode,
+			Country:     billingAddress.CountryCode,
+			PhoneNumber: billingAddress.PhoneNumber,
+		}
+		authorizeRequest.TransactionRequest.Customer = &Customer{
+			Email: common.SafeStr(billingAddress.Email),
+		}
 	}
 
 	if authRequest.MerchantOrderReference != "" {
