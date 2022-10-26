@@ -4,6 +4,7 @@
 package firstdata
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 	"strings"
@@ -146,7 +147,7 @@ func TestSend(t *testing.T) {
 		var want *Response = new(Response)
 		helper.Unmarshal(authResponseRaw, want)
 
-		got, _, err := firstDataClient.sendRequest(defaultReqId, url, *request)
+		got, _, err := firstDataClient.sendRequest(context.TODO(), defaultReqId, url, *request)
 
 		t.Run("Response Struct", func(t *testing.T) {
 			if err != nil {
@@ -206,7 +207,7 @@ func TestSend(t *testing.T) {
 		var want *Response = new(Response)
 		helper.Unmarshal(authErrorRaw, want)
 
-		got, _, err := firstDataClient.sendRequest(defaultReqId, url, *request)
+		got, _, err := firstDataClient.sendRequest(context.TODO(), defaultReqId, url, *request)
 
 		t.Run("Response Struct", func(t *testing.T) {
 			if err != nil {

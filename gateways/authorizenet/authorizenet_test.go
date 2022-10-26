@@ -4,6 +4,7 @@
 package authorizenet
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -76,7 +77,7 @@ func TestSend(t *testing.T) {
 		var want *Response = new(Response)
 		helper.Unmarshal(authResponseRaw, want)
 
-		got, _, err := client.sendRequest(*request)
+		got, _, err := client.sendRequest(context.TODO(), *request)
 
 		if err != nil {
 			t.Fatalf("Error thrown after sending request %q", err)
