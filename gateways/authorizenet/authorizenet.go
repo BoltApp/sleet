@@ -2,12 +2,18 @@ package authorizenet
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
+)
+
+var (
+	// assert client interface
+	_ sleet.ClientWithContext = &AuthorizeNetClient{}
 )
 
 // AuthorizeNetClient uses merchant name and transaction key to process requests. Optionally can provide custom http clients
@@ -35,8 +41,13 @@ func NewWithHttpClient(merchantName string, transactionKey string, environment c
 
 // Authorize a transaction for specified amount using Auth.net REST APIs
 func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
+	return client.AuthorizeWithContext(context.TODO(), request)
+}
+
+// AuthorizeWithContext a transaction for specified amount using Auth.net REST APIs
+func (client *AuthorizeNetClient) AuthorizeWithContext(ctx context.Context, request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	authorizeNetAuthorizeRequest := buildAuthRequest(client.merchantName, client.transactionKey, request)
-	response, httpResp, err := client.sendRequest(*authorizeNetAuthorizeRequest)
+	response, httpResp, err := client.sendRequest(ctx, *authorizeNetAuthorizeRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -66,8 +77,13 @@ func (client *AuthorizeNetClient) Authorize(request *sleet.AuthorizationRequest)
 
 // Capture an authorized transaction by transaction reference using the transactionTypePriorAuthCapture flag
 func (client *AuthorizeNetClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
+	return client.CaptureWithContext(context.TODO(), request)
+}
+
+// CaptureWithContext captures an authorized transaction by transaction reference using the transactionTypePriorAuthCapture flag
+func (client *AuthorizeNetClient) CaptureWithContext(ctx context.Context, request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	authorizeNetCaptureRequest := buildCaptureRequest(client.merchantName, client.transactionKey, request)
-	authorizeNetResponse, _, err := client.sendRequest(*authorizeNetCaptureRequest)
+	authorizeNetResponse, _, err := client.sendRequest(ctx, *authorizeNetCaptureRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -85,8 +101,13 @@ func (client *AuthorizeNetClient) Capture(request *sleet.CaptureRequest) (*sleet
 
 // Void an existing authorized transaction
 func (client *AuthorizeNetClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+	return client.VoidWithContext(context.TODO(), request)
+}
+
+// VoidWithContext voids an existing authorized transaction
+func (client *AuthorizeNetClient) VoidWithContext(ctx context.Context, request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
 	authorizeNetCaptureRequest := buildVoidRequest(client.merchantName, client.transactionKey, request)
-	authorizeNetResponse, _, err := client.sendRequest(*authorizeNetCaptureRequest)
+	authorizeNetResponse, _, err := client.sendRequest(ctx, *authorizeNetCaptureRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -103,12 +124,17 @@ func (client *AuthorizeNetClient) Void(request *sleet.VoidRequest) (*sleet.VoidR
 
 // Refund a captured transaction with amount and captured transaction reference
 func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	return client.RefundWithContext(context.TODO(), request)
+}
+
+// RefundWithContext refunds a captured transaction with amount and captured transaction reference
+func (client *AuthorizeNetClient) RefundWithContext(ctx context.Context, request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
 	authorizeNetRefundRequest, err := buildRefundRequest(client.merchantName, client.transactionKey, request)
 	if err != nil {
 		return nil, err
 	}
 
-	authorizeNetResponse, _, err := client.sendRequest(*authorizeNetRefundRequest)
+	authorizeNetResponse, _, err := client.sendRequest(ctx, *authorizeNetRefundRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -124,14 +150,14 @@ func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.R
 	}, nil
 }
 
-func (client *AuthorizeNetClient) sendRequest(data Request) (*Response, *http.Response, error) {
+func (client *AuthorizeNetClient) sendRequest(ctx context.Context, data Request) (*Response, *http.Response, error) {
 	bodyJSON, err := json.Marshal(data)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	reader := bytes.NewReader(bodyJSON)
-	request, err := http.NewRequest(http.MethodPost, client.url, reader)
+	request, err := http.NewRequestWithContext(ctx, http.MethodPost, client.url, reader)
 	if err != nil {
 		return nil, nil, err
 	}

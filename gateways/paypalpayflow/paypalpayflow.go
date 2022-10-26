@@ -1,6 +1,7 @@
 package paypalpayflow
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -8,6 +9,11 @@ import (
 
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
+)
+
+var (
+	// assert client interface
+	_ sleet.ClientWithContext = &PaypalPayflowClient{}
 )
 
 func NewClient(partner string, password string, vendor string, user string, environment common.Environment) *PaypalPayflowClient {
@@ -33,7 +39,7 @@ func paypalURL(env common.Environment) string {
 	return "https://payflowpro.paypal.com"
 }
 
-func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, *http.Response, error) {
+func (client *PaypalPayflowClient) sendRequest(ctx context.Context, request *Request) (*Response, *http.Response, error) {
 	data := ""
 	fields := map[string]interface{}{
 		"PARTNER":         client.partner,
@@ -73,7 +79,7 @@ func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, *ht
 
 	data = strings.TrimLeft(data, "&")
 
-	req, err := http.NewRequest("POST", client.url, strings.NewReader(data))
+	req, err := http.NewRequestWithContext(ctx, "POST", client.url, strings.NewReader(data))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -107,7 +113,12 @@ func (client *PaypalPayflowClient) sendRequest(request *Request) (*Response, *ht
 
 // Authorize a transaction. This transaction must be captured to receive funds
 func (client *PaypalPayflowClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
-	response, httpResponse, err := client.sendRequest(buildAuthorizeParams(request))
+	return client.AuthorizeWithContext(context.TODO(), request)
+}
+
+// AuthorizeWithContext a transaction. This transaction must be captured to receive funds
+func (client *PaypalPayflowClient) AuthorizeWithContext(ctx context.Context, request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
+	response, httpResponse, err := client.sendRequest(ctx, buildAuthorizeParams(request))
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +144,12 @@ func (client *PaypalPayflowClient) Authorize(request *sleet.AuthorizationRequest
 
 // Capture an authorized transaction
 func (client *PaypalPayflowClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
-	response, _, err := client.sendRequest(buildCaptureParams(request))
+	return client.CaptureWithContext(context.TODO(), request)
+}
+
+// CaptureWithContext an authorized transaction
+func (client *PaypalPayflowClient) CaptureWithContext(ctx context.Context, request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
+	response, _, err := client.sendRequest(ctx, buildCaptureParams(request))
 	if err != nil {
 		return nil, err
 	}
@@ -154,7 +170,12 @@ func (client *PaypalPayflowClient) Capture(request *sleet.CaptureRequest) (*slee
 
 // Void an authorized transaction
 func (client *PaypalPayflowClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
-	response, _, err := client.sendRequest(buildVoidParams(request))
+	return client.VoidWithContext(context.TODO(), request)
+}
+
+// VoidWithContext an authorized transaction
+func (client *PaypalPayflowClient) VoidWithContext(ctx context.Context, request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+	response, _, err := client.sendRequest(ctx, buildVoidParams(request))
 	if err != nil {
 		return nil, err
 	}
@@ -173,7 +194,12 @@ func (client *PaypalPayflowClient) Void(request *sleet.VoidRequest) (*sleet.Void
 
 // Refund a captured transaction
 func (client *PaypalPayflowClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
-	response, _, err := client.sendRequest(buildRefundParams(request))
+	return client.RefundWithContext(context.TODO(), request)
+}
+
+// RefundWithContext a captured transaction
+func (client *PaypalPayflowClient) RefundWithContext(ctx context.Context, request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	response, _, err := client.sendRequest(ctx, buildRefundParams(request))
 	if err != nil {
 		return nil, err
 	}

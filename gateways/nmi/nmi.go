@@ -1,6 +1,7 @@
 package nmi
 
 import (
+	"context"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -14,6 +15,11 @@ import (
 
 const (
 	transactionEndpoint = "https://secure.networkmerchants.com/api/transact.php"
+)
+
+var (
+	// assert client interface
+	_ sleet.ClientWithContext = &NMIClient{}
 )
 
 // NMIClient represents an HTTP client and the associated authentication information required for making a Direct Post API request.
@@ -41,9 +47,15 @@ func NewWithHttpClient(env common.Environment, securityKey string, httpClient *h
 // Authorize makes a payment authorization request to NMI for the given payment details. If successful, the
 // authorization response will be returned.
 func (client *NMIClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
+	return client.AuthorizeWithContext(context.TODO(), request)
+}
+
+// AuthorizeWithContext makes a payment authorization request to NMI for the given payment details. If successful, the
+// authorization response will be returned.
+func (client *NMIClient) AuthorizeWithContext(ctx context.Context, request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	nmiAuthRequest := buildAuthRequest(client.testMode, client.securityKey, request)
 
-	nmiResponse, httpResponse, err := client.sendRequest(nmiAuthRequest)
+	nmiResponse, httpResponse, err := client.sendRequest(ctx, nmiAuthRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -76,9 +88,15 @@ func (client *NMIClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.
 // Capture captures an authorized payment through NMI. If successful, the capture response will be returned.
 // Multiple captures cannot be made on the same authorization.
 func (client *NMIClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
+	return client.CaptureWithContext(context.TODO(), request)
+}
+
+// CaptureWithContext captures an authorized payment through NMI. If successful, the capture response will be returned.
+// Multiple captures cannot be made on the same authorization.
+func (client *NMIClient) CaptureWithContext(ctx context.Context, request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	nmiCaptureRequest := buildCaptureRequest(client.testMode, client.securityKey, request)
 
-	nmiResponse, _, err := client.sendRequest(nmiCaptureRequest)
+	nmiResponse, _, err := client.sendRequest(ctx, nmiCaptureRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -102,9 +120,15 @@ func (client *NMIClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureR
 // Void cancels a NMI transaction. If successful, the void response will be returned. A previously voided
 // transaction or one that has already been settled cannot be voided.
 func (client *NMIClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+	return client.VoidWithContext(context.TODO(), request)
+}
+
+// VoidWithContext cancels a NMI transaction. If successful, the void response will be returned. A previously voided
+// transaction or one that has already been settled cannot be voided.
+func (client *NMIClient) VoidWithContext(ctx context.Context, request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
 	nmiVoidRequest := buildVoidRequest(client.testMode, client.securityKey, request)
 
-	nmiResponse, _, err := client.sendRequest(nmiVoidRequest)
+	nmiResponse, _, err := client.sendRequest(ctx, nmiVoidRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -129,9 +153,16 @@ func (client *NMIClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, 
 // If successful, the refund response will be returned.
 // Multiple refunds can be made on the same payment, but the total amount refunded should not exceed the payment total.
 func (client *NMIClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	return client.RefundWithContext(context.TODO(), request)
+}
+
+// RefundWithContext refunds a NMI transaction that has been captured or settled.
+// If successful, the refund response will be returned.
+// Multiple refunds can be made on the same payment, but the total amount refunded should not exceed the payment total.
+func (client *NMIClient) RefundWithContext(ctx context.Context, request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
 	nmiRefundRequest := buildRefundRequest(client.testMode, client.securityKey, request)
 
-	nmiResponse, _, err := client.sendRequest(nmiRefundRequest)
+	nmiResponse, _, err := client.sendRequest(ctx, nmiRefundRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -154,14 +185,14 @@ func (client *NMIClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResp
 
 // sendRequest sends an API request with the given payload to the NMI transaction endpoint.
 // If the request is successfully sent, its response message will be returned.
-func (client *NMIClient) sendRequest(data *Request) (*Response, *http.Response, error) {
+func (client *NMIClient) sendRequest(ctx context.Context, data *Request) (*Response, *http.Response, error) {
 	encoder := form.NewEncoder()
 	formData, err := encoder.Encode(data)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, transactionEndpoint, strings.NewReader(formData.Encode()))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, transactionEndpoint, strings.NewReader(formData.Encode()))
 	if err != nil {
 		return nil, nil, err
 	}

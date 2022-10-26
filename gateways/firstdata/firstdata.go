@@ -2,6 +2,7 @@ package firstdata
 
 import (
 	"bytes"
+	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
@@ -18,6 +19,11 @@ import (
 
 const (
 	endpoint = "/payments"
+)
+
+var (
+	// assert client interface
+	_ sleet.ClientWithContext = &FirstdataClient{}
 )
 
 // FirstdataClient contains the endpoint and credentials for the firstdata api as well as a client to send requests
@@ -58,12 +64,18 @@ func (client *FirstdataClient) secondaryURL(ref string) string {
 // Authorize make a payment authorization request to FirstData for the given payment details. If successful, the
 // authorization response will be returned.
 func (client *FirstdataClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
+	return client.AuthorizeWithContext(context.TODO(), request)
+}
+
+// AuthorizeWithContext make a payment authorization request to FirstData for the given payment details. If successful, the
+// authorization response will be returned.
+func (client *FirstdataClient) AuthorizeWithContext(ctx context.Context, request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	firstdataAuthRequest, err := buildAuthRequest(request)
 	if err != nil {
 		return nil, err
 	}
 
-	firstdataResponse, httpResponse, err := client.sendRequest(*request.ClientTransactionReference, client.primaryURL(), *firstdataAuthRequest)
+	firstdataResponse, httpResponse, err := client.sendRequest(ctx, *request.ClientTransactionReference, client.primaryURL(), *firstdataAuthRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -101,9 +113,14 @@ func (client *FirstdataClient) Authorize(request *sleet.AuthorizationRequest) (*
 
 // Capture captures an authorized payment through FirstData. If successful, the capture response will be returned.
 func (client *FirstdataClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
+	return client.CaptureWithContext(context.TODO(), request)
+}
+
+// CaptureWithContext captures an authorized payment through FirstData. If successful, the capture response will be returned.
+func (client *FirstdataClient) CaptureWithContext(ctx context.Context, request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	firstdataCaptureRequest := buildCaptureRequest(request)
 
-	firstdataResponse, _, err := client.sendRequest(
+	firstdataResponse, _, err := client.sendRequest(ctx,
 		*request.ClientTransactionReference,
 		client.secondaryURL(request.TransactionReference),
 		firstdataCaptureRequest,
@@ -123,9 +140,15 @@ func (client *FirstdataClient) Capture(request *sleet.CaptureRequest) (*sleet.Ca
 // Void transforms a sleet void request into a first data VoidTransaction request and makes the request
 // A transaction that has not yet been capture or has already been settled cannot be voided
 func (client *FirstdataClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+	return client.VoidWithContext(context.TODO(), request)
+}
+
+// VoidWithContext transforms a sleet void request into a first data VoidTransaction request and makes the request
+// A transaction that has not yet been capture or has already been settled cannot be voided
+func (client *FirstdataClient) VoidWithContext(ctx context.Context, request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
 	firstdataVoidRequest := buildVoidRequest(request)
 
-	firstdataResponse, _, err := client.sendRequest(
+	firstdataResponse, _, err := client.sendRequest(ctx,
 		*request.ClientTransactionReference,
 		client.secondaryURL(request.TransactionReference),
 		firstdataVoidRequest,
@@ -144,9 +167,15 @@ func (client *FirstdataClient) Void(request *sleet.VoidRequest) (*sleet.VoidResp
 // Refund refunds a Firstdata payment.
 // Multiple refunds can be made on the same payment, but the total amount refunded should not exceed the payment total.
 func (client *FirstdataClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	return client.RefundWithContext(context.TODO(), request)
+}
+
+// RefundWithContext refunds a Firstdata payment.
+// Multiple refunds can be made on the same payment, but the total amount refunded should not exceed the payment total.
+func (client *FirstdataClient) RefundWithContext(ctx context.Context, request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
 	firstdataRefundRequest := buildRefundRequest(request)
 
-	firstdataResponse, _, err := client.sendRequest(
+	firstdataResponse, _, err := client.sendRequest(ctx,
 		*request.ClientTransactionReference,
 		client.secondaryURL(request.TransactionReference),
 		firstdataRefundRequest,
@@ -175,7 +204,7 @@ func makeSignature(timestamp, apiKey, apiSecret, reqId, body string) string {
 
 // sendRequest sends an API request with the give payload and appropriate headers to the specified firstdata endpoint.
 // If the request is successfully sent, its response message will be returned.
-func (client *FirstdataClient) sendRequest(reqId, url string, data Request) (*Response, *http.Response, error) {
+func (client *FirstdataClient) sendRequest(ctx context.Context, reqId, url string, data Request) (*Response, *http.Response, error) {
 
 	bodyJSON, err := json.Marshal(data)
 	if err != nil {
@@ -187,7 +216,7 @@ func (client *FirstdataClient) sendRequest(reqId, url string, data Request) (*Re
 
 	reader := bytes.NewReader(bodyJSON)
 
-	request, err := http.NewRequest(http.MethodPost, url, reader)
+	request, err := http.NewRequestWithContext(ctx, http.MethodPost, url, reader)
 	if err != nil {
 		return nil, nil, err
 	}

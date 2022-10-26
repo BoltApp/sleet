@@ -1,18 +1,22 @@
 package stripe
 
 import (
+	"context"
 	"crypto/tls"
 	"net/http"
 	"time"
 
-	"github.com/stripe/stripe-go"
-
+	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 
+	"github.com/stripe/stripe-go"
 	"github.com/stripe/stripe-go/charge"
 	"github.com/stripe/stripe-go/refund"
+)
 
-	"github.com/BoltApp/sleet"
+var (
+	// assert client interface
+	_ sleet.ClientWithContext = &StripeClient{}
 )
 
 // StripeClient uses API-Key and custom http client to make http calls
@@ -48,8 +52,13 @@ func NewWithHTTPClient(apiKey string, httpClient *http.Client) *StripeClient {
 
 // Authorize a transaction for specified amount using stripe-go library
 func (client *StripeClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
+	return client.AuthorizeWithContext(context.TODO(), request)
+}
+
+// AuthorizeWithContext a transaction for specified amount using stripe-go library
+func (client *StripeClient) AuthorizeWithContext(ctx context.Context, request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	chargeClient := charge.Client{B: stripe.GetBackend(stripe.APIBackend), Key: client.apiKey}
-	charge, err := chargeClient.New(buildChargeParams(request))
+	charge, err := chargeClient.New(buildChargeParams(ctx, request))
 	if err != nil {
 		return &sleet.AuthorizationResponse{Success: false, TransactionReference: "", AvsResult: sleet.AVSResponseUnknown, CvvResult: sleet.CVVResponseUnknown, ErrorCode: err.Error()}, err
 	}
@@ -64,8 +73,13 @@ func (client *StripeClient) Authorize(request *sleet.AuthorizationRequest) (*sle
 
 // Capture an authorized transaction by charge ID
 func (client *StripeClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
+	return client.CaptureWithContext(context.TODO(), request)
+}
+
+// CaptureWithContext an authorized transaction by charge ID
+func (client *StripeClient) CaptureWithContext(ctx context.Context, request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	chargeClient := charge.Client{B: stripe.GetBackend(stripe.APIBackend), Key: client.apiKey}
-	capture, err := chargeClient.Capture(request.TransactionReference, buildCaptureParams(request))
+	capture, err := chargeClient.Capture(request.TransactionReference, buildCaptureParams(ctx, request))
 	if err != nil {
 		return &sleet.CaptureResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, nil
 	}
@@ -74,8 +88,13 @@ func (client *StripeClient) Capture(request *sleet.CaptureRequest) (*sleet.Captu
 
 // Refund a captured transaction with amount and charge ID
 func (client *StripeClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	return client.RefundWithContext(context.TODO(), request)
+}
+
+// RefundWithContext a captured transaction with amount and charge ID
+func (client *StripeClient) RefundWithContext(ctx context.Context, request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
 	refundClient := refund.Client{B: stripe.GetBackend(stripe.APIBackend), Key: client.apiKey}
-	refund, err := refundClient.New(buildRefundParams(request))
+	refund, err := refundClient.New(buildRefundParams(ctx, request))
 	if err != nil {
 		return &sleet.RefundResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, nil
 	}
@@ -84,8 +103,13 @@ func (client *StripeClient) Refund(request *sleet.RefundRequest) (*sleet.RefundR
 
 // Void an authorized transaction with charge ID
 func (client *StripeClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+	return client.VoidWithContext(context.TODO(), request)
+}
+
+// VoidWithContext an authorized transaction with charge ID
+func (client *StripeClient) VoidWithContext(ctx context.Context, request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
 	voidClient := refund.Client{B: stripe.GetBackend(stripe.APIBackend), Key: client.apiKey}
-	void, err := voidClient.New(buildVoidParams(request))
+	void, err := voidClient.New(buildVoidParams(ctx, request))
 	if err != nil {
 		return &sleet.VoidResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, nil
 	}

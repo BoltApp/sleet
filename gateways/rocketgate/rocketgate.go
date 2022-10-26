@@ -1,6 +1,7 @@
 package rocketgate
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/rocketgate/rocketgate-go-sdk/response"
@@ -8,6 +9,11 @@ import (
 
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
+)
+
+var (
+	// assert client interface
+	_ sleet.ClientWithContext = &RocketgateClient{}
 )
 
 // RocketgateClient represents an HTTP client and the associated authentication information required for
@@ -49,6 +55,12 @@ func NewWithHttpClient(
 
 // Authorize a transaction. This transaction must be captured to receive funds
 func (client *RocketgateClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
+	return client.AuthorizeWithContext(context.TODO(), request)
+}
+
+// AuthorizeWithContext a transaction. This transaction must be captured to receive funds
+// NOTE -- RocketGate's SDK does not support context, this method exists to fulfill the ClientWithContext interface
+func (client *RocketgateClient) AuthorizeWithContext(_ context.Context, request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	gatewayService := service.NewGatewayService()
 	gatewayResponse := response.NewGatewayResponse()
 	gatewayRequest := buildAuthRequest(client.merchantID, client.merchantPassword, client.merchantAccount, request)
@@ -76,6 +88,12 @@ func (client *RocketgateClient) Authorize(request *sleet.AuthorizationRequest) (
 
 // Capture an authorized transaction
 func (client *RocketgateClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
+	return client.CaptureWithContext(context.TODO(), request)
+}
+
+// CaptureWithContext an authorized transaction
+// NOTE -- RocketGate's SDK does not support context, this method exists to fulfill the ClientWithContext interface
+func (client *RocketgateClient) CaptureWithContext(_ context.Context, request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	gatewayService := service.NewGatewayService()
 	gatewayResponse := response.NewGatewayResponse()
 	gatewayRequest := buildCaptureRequest(client.merchantID, client.merchantPassword, request)
@@ -99,6 +117,12 @@ func (client *RocketgateClient) Capture(request *sleet.CaptureRequest) (*sleet.C
 
 // Void an authorized transaction
 func (client *RocketgateClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+	return client.VoidWithContext(context.TODO(), request)
+}
+
+// VoidWithContext an authorized transaction
+// NOTE -- RocketGate's SDK does not support context, this method exists to fulfill the ClientWithContext interface
+func (client *RocketgateClient) VoidWithContext(_ context.Context, request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
 	gatewayService := service.NewGatewayService()
 	gatewayResponse := response.NewGatewayResponse()
 	gatewayRequest := buildVoidRequest(client.merchantID, client.merchantPassword, request)
@@ -121,6 +145,12 @@ func (client *RocketgateClient) Void(request *sleet.VoidRequest) (*sleet.VoidRes
 
 // Refund a captured transaction
 func (client *RocketgateClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	return client.RefundWithContext(context.TODO(), request)
+}
+
+// RefundWithContext a captured transaction
+// NOTE -- RocketGate's SDK does not support context, this method exists to fulfill the ClientWithContext interface
+func (client *RocketgateClient) RefundWithContext(_ context.Context, request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
 	gatewayService := service.NewGatewayService()
 	gatewayResponse := response.NewGatewayResponse()
 	gatewayRequest := buildRefundRequest(client.merchantID, client.merchantPassword, request)

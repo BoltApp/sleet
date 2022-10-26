@@ -2,6 +2,7 @@ package cardconnect
 
 import (
 	"bytes"
+	"context"
 	"encoding/base64"
 	"io/ioutil"
 	"net/http"
@@ -10,6 +11,11 @@ import (
 
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
+)
+
+var (
+	// assert client interface
+	_ sleet.ClientWithContext = &CardConnectClient{}
 )
 
 func NewClient(username string, password string, merchantID string, URL string, environment common.Environment) *CardConnectClient {
@@ -47,7 +53,7 @@ func normalizeURL(URL string) string {
 	return "https://" + URL
 }
 
-func (client *CardConnectClient) sendRequest(request *Request, path string) (*Response, *http.Response, error) {
+func (client *CardConnectClient) sendRequest(ctx context.Context, request *Request, path string) (*Response, *http.Response, error) {
 	request.MerchantID = client.merchantID
 
 	data, err := request.Marshal()
@@ -59,7 +65,7 @@ func (client *CardConnectClient) sendRequest(request *Request, path string) (*Re
 		return nil, nil, err
 	}
 
-	req, err := http.NewRequest("POST", url, bytes.NewReader(data))
+	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(data))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -92,7 +98,12 @@ func (client *CardConnectClient) sendRequest(request *Request, path string) (*Re
 
 // Authorize a transaction. This transaction must be captured to receive funds
 func (client *CardConnectClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
-	response, httpResponse, err := client.sendRequest(buildAuthorizeParams(request), AuthorizePath)
+	return client.AuthorizeWithContext(context.TODO(), request)
+}
+
+// AuthorizeWithContext authorizes a transaction. This transaction must be captured to receive funds
+func (client *CardConnectClient) AuthorizeWithContext(ctx context.Context, request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
+	response, httpResponse, err := client.sendRequest(ctx, buildAuthorizeParams(request), AuthorizePath)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +132,12 @@ func (client *CardConnectClient) Authorize(request *sleet.AuthorizationRequest) 
 
 // Capture an authorized transaction
 func (client *CardConnectClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
-	response, httpResponse, err := client.sendRequest(buildCaptureParams(request), CapturePath)
+	return client.CaptureWithContext(context.TODO(), request)
+}
+
+// CaptureWithContext captures an authorized transaction
+func (client *CardConnectClient) CaptureWithContext(ctx context.Context, request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
+	response, httpResponse, err := client.sendRequest(ctx, buildCaptureParams(request), CapturePath)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +156,12 @@ func (client *CardConnectClient) Capture(request *sleet.CaptureRequest) (*sleet.
 
 // Void an authorized transaction
 func (client *CardConnectClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
-	response, httpResponse, err := client.sendRequest(buildVoidParams(request), VoidPath)
+	return client.VoidWithContext(context.TODO(), request)
+}
+
+// VoidWithContext voids an authorized transaction
+func (client *CardConnectClient) VoidWithContext(ctx context.Context, request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+	response, httpResponse, err := client.sendRequest(ctx, buildVoidParams(request), VoidPath)
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +179,12 @@ func (client *CardConnectClient) Void(request *sleet.VoidRequest) (*sleet.VoidRe
 
 // Refund a captured transaction
 func (client *CardConnectClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
-	response, httpResponse, err := client.sendRequest(buildRefundParams(request), RefundPath)
+	return client.RefundWithContext(context.TODO(), request)
+}
+
+// RefundWithContext refunds a captured transaction
+func (client *CardConnectClient) RefundWithContext(ctx context.Context, request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	response, httpResponse, err := client.sendRequest(ctx, buildRefundParams(request), RefundPath)
 	if err != nil {
 		return nil, err
 	}

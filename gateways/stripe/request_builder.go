@@ -1,6 +1,7 @@
 package stripe
 
 import (
+	"context"
 	"strconv"
 
 	"github.com/stripe/stripe-go"
@@ -8,8 +9,11 @@ import (
 	"github.com/BoltApp/sleet"
 )
 
-func buildChargeParams(authRequest *sleet.AuthorizationRequest) *stripe.ChargeParams {
+func buildChargeParams(ctx context.Context, authRequest *sleet.AuthorizationRequest) *stripe.ChargeParams {
 	return &stripe.ChargeParams{
+		Params: stripe.Params{
+			Context: ctx,
+		},
 		Amount:   stripe.Int64(authRequest.Amount.Amount),
 		Currency: stripe.String(authRequest.Amount.Currency),
 		Source: &stripe.SourceParams{
@@ -25,21 +29,30 @@ func buildChargeParams(authRequest *sleet.AuthorizationRequest) *stripe.ChargePa
 	}
 }
 
-func buildRefundParams(refundRequest *sleet.RefundRequest) *stripe.RefundParams {
+func buildRefundParams(ctx context.Context, refundRequest *sleet.RefundRequest) *stripe.RefundParams {
 	return &stripe.RefundParams{
+		Params: stripe.Params{
+			Context: ctx,
+		},
 		Amount: stripe.Int64(refundRequest.Amount.Amount),
 		Charge: stripe.String(refundRequest.TransactionReference),
 	}
 }
 
-func buildCaptureParams(captureRequest *sleet.CaptureRequest) *stripe.CaptureParams {
+func buildCaptureParams(ctx context.Context, captureRequest *sleet.CaptureRequest) *stripe.CaptureParams {
 	return &stripe.CaptureParams{
+		Params: stripe.Params{
+			Context: ctx,
+		},
 		Amount: stripe.Int64(captureRequest.Amount.Amount),
 	}
 }
 
-func buildVoidParams(voidRequest *sleet.VoidRequest) *stripe.RefundParams {
+func buildVoidParams(ctx context.Context, voidRequest *sleet.VoidRequest) *stripe.RefundParams {
 	return &stripe.RefundParams{
+		Params: stripe.Params{
+			Context: ctx,
+		},
 		Charge: stripe.String(voidRequest.TransactionReference),
 	}
 }
