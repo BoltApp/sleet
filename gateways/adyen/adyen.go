@@ -3,10 +3,11 @@ package adyen
 import (
 	"net/http"
 
-	"github.com/BoltApp/sleet"
-	"github.com/BoltApp/sleet/common"
 	"github.com/adyen/adyen-go-api-library/v4/src/adyen"
 	adyen_common "github.com/adyen/adyen-go-api-library/v4/src/common"
+
+	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
 )
 
 // AdyenClient represents the authentication fields needed to make API Requests for a given environment

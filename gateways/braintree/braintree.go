@@ -9,6 +9,7 @@ import (
 	"time"
 
 	braintree_go "github.com/BoltApp/braintree-go"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 )

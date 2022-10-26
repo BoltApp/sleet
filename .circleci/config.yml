@@ -36,12 +36,14 @@ jobs:
       - swissknife/fail_if_dirty:
           pattern: ".*.go$"
           invert-pattern: false
-          custom-error-message: Please run 'goimports -w ./' and push up again
+          custom-error-message: Please run 'goimports -w -local github.com/BoltApp/sleet ./' and push up again
           print-modified-files: true
           steps-to-run:
             - run:
                 name: Run goimports
-                command: goimports -w ./
+                command: |
+                  cd ../
+                  goimports -w -local github.com/BoltApp/sleet ./
       - save_cache:
           key: v1-pkg-cache
           paths:

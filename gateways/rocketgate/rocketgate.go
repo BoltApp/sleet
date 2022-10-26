@@ -3,10 +3,11 @@ package rocketgate
 import (
 	"net/http"
 
-	"github.com/BoltApp/sleet"
-	"github.com/BoltApp/sleet/common"
 	"github.com/rocketgate/rocketgate-go-sdk/response"
 	"github.com/rocketgate/rocketgate-go-sdk/service"
+
+	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
 )
 
 // RocketgateClient represents an HTTP client and the associated authentication information required for

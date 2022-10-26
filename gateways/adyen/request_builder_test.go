@@ -7,9 +7,10 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/BoltApp/sleet"
 	"github.com/adyen/adyen-go-api-library/v4/src/checkout"
 	"github.com/go-test/deep"
+
+	"github.com/BoltApp/sleet"
 
 	"github.com/BoltApp/sleet/common"
 	sleet_testing "github.com/BoltApp/sleet/testing"

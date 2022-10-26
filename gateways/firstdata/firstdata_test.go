@@ -10,11 +10,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
+	"github.com/jarcoal/httpmock"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	sleet_t "github.com/BoltApp/sleet/testing"
-	"github.com/google/go-cmp/cmp"
-	"github.com/jarcoal/httpmock"
 )
 
 const defaultApiKey string = "12345"

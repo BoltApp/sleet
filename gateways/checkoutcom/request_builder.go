@@ -1,10 +1,11 @@
 package checkoutcom
 
 import (
-	"github.com/BoltApp/sleet"
-	"github.com/BoltApp/sleet/common"
 	checkout_com_common "github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/payments"
+
+	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
 )
 
 // Cof specifies the transaction type under the Credential-on-File framework

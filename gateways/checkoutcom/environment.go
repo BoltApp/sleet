@@ -1,8 +1,9 @@
 package checkoutcom
 
 import (
-	"github.com/BoltApp/sleet/common"
 	"github.com/checkout/checkout-sdk-go"
+
+	"github.com/BoltApp/sleet/common"
 )
 
 func GetEnv(env common.Environment) checkout.SupportedEnvironment {

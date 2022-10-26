@@ -5,12 +5,14 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/BoltApp/sleet/common"
 	"github.com/stripe/stripe-go"
 
-	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
+
 	"github.com/stripe/stripe-go/charge"
 	"github.com/stripe/stripe-go/refund"
+
+	"github.com/BoltApp/sleet"
 )
 
 // StripeClient uses API-Key and custom http client to make http calls

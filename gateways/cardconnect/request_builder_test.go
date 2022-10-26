@@ -5,8 +5,9 @@ import (
 
 	"github.com/BoltApp/sleet"
 
-	sleet_testing "github.com/BoltApp/sleet/testing"
 	"github.com/go-test/deep"
+
+	sleet_testing "github.com/BoltApp/sleet/testing"
 )
 
 var (

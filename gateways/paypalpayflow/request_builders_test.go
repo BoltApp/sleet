@@ -3,8 +3,9 @@ package paypalpayflow
 import (
 	"testing"
 
-	"github.com/BoltApp/sleet"
 	"github.com/go-test/deep"
+
+	"github.com/BoltApp/sleet"
 
 	sleet_testing "github.com/BoltApp/sleet/testing"
 )

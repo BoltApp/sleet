@@ -7,8 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/BoltApp/sleet"
 	"github.com/go-test/deep"
+
+	"github.com/BoltApp/sleet"
 )
 
 func TestGetRTAUStatus(t *testing.T) {

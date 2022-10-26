@@ -7,8 +7,9 @@ import (
 	"github.com/BoltApp/sleet/common"
 	"github.com/BoltApp/sleet/gateways/cardconnect"
 
-	sleet_testing "github.com/BoltApp/sleet/testing"
 	"github.com/Pallinder/go-randomdata"
+
+	sleet_testing "github.com/BoltApp/sleet/testing"
 )
 
 func NewClient() *cardconnect.CardConnectClient {
