@@ -32,9 +32,9 @@ jobs:
       - run:
           name: Install goimports
           command: |
-            go install golang.org/x/tools/cmd/goimports@v0.2.0
+            go get golang.org/x/tools/cmd/goimports@v0.2.0
       - swissknife/fail_if_dirty:
-          pattern: .*.go
+          pattern: ".*.go$"
           invert-pattern: false
           custom-error-message: Please run 'goimports -w ./' and push up again
           print-modified-files: true
