@@ -2,12 +2,13 @@ package test
 
 import (
 	"context"
+	"testing"
+
 	braintree_go "github.com/BoltApp/braintree-go"
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/BoltApp/sleet/gateways/braintree"
 	sleet_testing "github.com/BoltApp/sleet/testing"
-	"testing"
 )
 
 // Note: Because we use the same amount for testing we turn off the duplicate checking in Braintree Control Panel

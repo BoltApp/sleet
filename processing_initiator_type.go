@@ -5,13 +5,13 @@ type ProcessingInitiatorType string
 
 const (
 	// ProcessingInitiatorTypeInitialCardOnFile initial non-recurring payment
-	ProcessingInitiatorTypeInitialCardOnFile         ProcessingInitiatorType = "initial_card_on_file"
+	ProcessingInitiatorTypeInitialCardOnFile ProcessingInitiatorType = "initial_card_on_file"
 	// ProcessingInitiatorTypeInitialRecurring initiating recurring payment
-	ProcessingInitiatorTypeInitialRecurring          ProcessingInitiatorType = "initial_recurring"
+	ProcessingInitiatorTypeInitialRecurring ProcessingInitiatorType = "initial_recurring"
 	// ProcessingInitiatorTypeStoredCardholderInitiated initiated by cardholder using stored card
 	ProcessingInitiatorTypeStoredCardholderInitiated ProcessingInitiatorType = "stored_cardholder_initiated"
 	// ProcessingInitiatorTypeStoredMerchantInitiated initiated by merchant using stored card
-	ProcessingInitiatorTypeStoredMerchantInitiated   ProcessingInitiatorType = "stored_merchant_initiated"
+	ProcessingInitiatorTypeStoredMerchantInitiated ProcessingInitiatorType = "stored_merchant_initiated"
 	// ProcessingInitiatorTypeFollowingRecurring recurring payment
-	ProcessingInitiatorTypeFollowingRecurring        ProcessingInitiatorType = "following_recurring"
+	ProcessingInitiatorTypeFollowingRecurring ProcessingInitiatorType = "following_recurring"
 )

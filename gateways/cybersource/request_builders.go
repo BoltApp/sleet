@@ -4,9 +4,10 @@ import (
 	"errors"
 	"fmt"
 
+	"strconv"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
-	"strconv"
 )
 
 const (

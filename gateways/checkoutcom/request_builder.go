@@ -12,12 +12,12 @@ const recurringPaymentType = "Recurring"
 
 func buildChargeParams(authRequest *sleet.AuthorizationRequest, processingChannelId *string) (*payments.Request, error) {
 	var source = payments.CardSource{
-		Type: "card",
-		Number: authRequest.CreditCard.Number,
+		Type:        "card",
+		Number:      authRequest.CreditCard.Number,
 		ExpiryMonth: uint64(authRequest.CreditCard.ExpirationMonth),
-		ExpiryYear: uint64(authRequest.CreditCard.ExpirationYear),
-		Name: authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
-		CVV: authRequest.CreditCard.CVV,
+		ExpiryYear:  uint64(authRequest.CreditCard.ExpirationYear),
+		Name:        authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
+		CVV:         authRequest.CreditCard.CVV,
 		BillingAddress: &checkout_com_common.Address{
 			AddressLine1: common.SafeStr(authRequest.BillingAddress.StreetAddress1),
 			AddressLine2: common.SafeStr(authRequest.BillingAddress.StreetAddress2),
@@ -29,10 +29,10 @@ func buildChargeParams(authRequest *sleet.AuthorizationRequest, processingChanne
 	}
 
 	request := &payments.Request{
-		Source:   source,
-		Amount:   uint64(authRequest.Amount.Amount),
-		Capture:  common.BPtr(false),
-		Currency: authRequest.Amount.Currency,
+		Source:    source,
+		Amount:    uint64(authRequest.Amount.Amount),
+		Capture:   common.BPtr(false),
+		Currency:  authRequest.Amount.Currency,
 		Reference: authRequest.MerchantOrderReference,
 		Customer: &payments.Customer{
 			Email: common.SafeStr(authRequest.BillingAddress.Email),
@@ -76,7 +76,7 @@ func initializeProcessingInitiator(authRequest *sleet.AuthorizationRequest, requ
 
 func buildRefundParams(refundRequest *sleet.RefundRequest) (*payments.RefundsRequest, error) {
 	request := &payments.RefundsRequest{
-		Amount:    uint64(refundRequest.Amount.Amount),
+		Amount: uint64(refundRequest.Amount.Amount),
 	}
 
 	if refundRequest.MerchantOrderReference != nil {
@@ -88,7 +88,7 @@ func buildRefundParams(refundRequest *sleet.RefundRequest) (*payments.RefundsReq
 
 func buildCaptureParams(captureRequest *sleet.CaptureRequest) (*payments.CapturesRequest, error) {
 	request := &payments.CapturesRequest{
-		Amount:    uint64(captureRequest.Amount.Amount),
+		Amount:      uint64(captureRequest.Amount.Amount),
 		CaptureType: payments.NonFinal,
 	}
 
@@ -100,7 +100,7 @@ func buildCaptureParams(captureRequest *sleet.CaptureRequest) (*payments.Capture
 }
 
 func buildVoidParams(voidRequest *sleet.VoidRequest) (*payments.VoidsRequest, error) {
-	request := &payments.VoidsRequest {}
+	request := &payments.VoidsRequest{}
 
 	if voidRequest.MerchantOrderReference != nil {
 		request.Reference = *voidRequest.MerchantOrderReference
@@ -108,5 +108,3 @@ func buildVoidParams(voidRequest *sleet.VoidRequest) (*payments.VoidsRequest, er
 
 	return request, nil
 }
-
-

@@ -2,12 +2,13 @@ package test
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/BoltApp/sleet/gateways/authorizenet"
 	sleet_testing "github.com/BoltApp/sleet/testing"
 	"github.com/Pallinder/go-randomdata"
-	"testing"
 )
 
 // Authorize.net has pretty strict duplicate checking mechanisms, simply change amount in tests

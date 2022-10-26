@@ -1,17 +1,18 @@
 package test
 
 import (
+	"testing"
+	"time"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/BoltApp/sleet/gateways/checkoutcom"
 	sleet_testing "github.com/BoltApp/sleet/testing"
-	"testing"
-	"time"
 )
 
 type ClientNamePair struct {
 	client *checkoutcom.CheckoutComClient
-	name string
+	name   string
 }
 
 func generateClients() []ClientNamePair {
@@ -21,11 +22,11 @@ func generateClients() []ClientNamePair {
 	clients := []ClientNamePair{
 		{
 			client: pcidClient,
-			name: "PCID Client",
+			name:   "PCID Client",
 		},
 		{
 			client: legacyClient,
-			name: "Legacy Client",
+			name:   "Legacy Client",
 		},
 	}
 	return clients
