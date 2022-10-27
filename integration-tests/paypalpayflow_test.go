@@ -3,11 +3,12 @@ package test
 import (
 	"testing"
 
+	"github.com/Pallinder/go-randomdata"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/BoltApp/sleet/gateways/paypalpayflow"
 	sleet_testing "github.com/BoltApp/sleet/testing"
-	"github.com/Pallinder/go-randomdata"
 )
 
 // TestPaypalAuth

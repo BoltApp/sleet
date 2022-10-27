@@ -11,13 +11,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/BoltApp/sleet"
-	"github.com/BoltApp/sleet/common"
-	sleet_t "github.com/BoltApp/sleet/testing"
 	"github.com/go-test/deep"
 	"github.com/go-xmlfmt/xmlfmt"
 	"github.com/google/go-cmp/cmp"
 	"github.com/jarcoal/httpmock"
+
+	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
+	sleet_t "github.com/BoltApp/sleet/testing"
 )
 
 var credentials Credentials = Credentials{"username", "password", 1}

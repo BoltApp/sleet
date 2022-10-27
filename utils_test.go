@@ -1,14 +1,15 @@
 package sleet
 
 import (
-	"github.com/google/go-cmp/cmp"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestAmountToString(t *testing.T) {
 	t.Run("convert", func(t *testing.T) {
 		actual := AmountToString(&Amount{
-			Amount: 100,
+			Amount:   100,
 			Currency: "USD",
 		})
 		if !cmp.Equal(actual, "100") {
@@ -20,7 +21,7 @@ func TestAmountToString(t *testing.T) {
 func TestAmountToDecimalString(t *testing.T) {
 	t.Run("convert", func(t *testing.T) {
 		actual := AmountToDecimalString(&Amount{
-			Amount: 100,
+			Amount:   100,
 			Currency: "USD",
 		})
 		if !cmp.Equal(actual, "1.00") {

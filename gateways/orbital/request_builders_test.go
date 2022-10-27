@@ -1,3 +1,4 @@
+//go:build unit
 // +build unit
 
 package orbital
@@ -6,8 +7,9 @@ import (
 	"encoding/xml"
 	"testing"
 
-	"github.com/BoltApp/sleet"
 	"github.com/go-test/deep"
+
+	"github.com/BoltApp/sleet"
 
 	sleet_testing "github.com/BoltApp/sleet/testing"
 )

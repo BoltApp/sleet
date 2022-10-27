@@ -5,13 +5,15 @@ package authorizenet
 
 import (
 	"fmt"
+	"net/http"
+	"testing"
+
+	"github.com/google/go-cmp/cmp"
+	"github.com/jarcoal/httpmock"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	sleet_t "github.com/BoltApp/sleet/testing"
-	"github.com/google/go-cmp/cmp"
-	"github.com/jarcoal/httpmock"
-	"net/http"
-	"testing"
 )
 
 func TestNewClient(t *testing.T) {

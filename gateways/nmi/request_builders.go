@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/BoltApp/sleet"
 	"github.com/shopspring/decimal"
+
+	"github.com/BoltApp/sleet"
 )
 
 // NMI transaction types

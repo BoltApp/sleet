@@ -1,12 +1,15 @@
+//go:build unit
 // +build unit
 
 package adyen
 
 import (
-	"github.com/BoltApp/sleet"
-	"github.com/go-test/deep"
 	"testing"
 	"time"
+
+	"github.com/go-test/deep"
+
+	"github.com/BoltApp/sleet"
 )
 
 func TestGetRTAUStatus(t *testing.T) {

@@ -1,12 +1,14 @@
 package checkoutcom
 
 import (
-	"github.com/BoltApp/sleet"
-	"github.com/BoltApp/sleet/common"
-	"github.com/checkout/checkout-sdk-go"
-	"github.com/checkout/checkout-sdk-go/payments"
 	"net/http"
 	"strconv"
+
+	"github.com/checkout/checkout-sdk-go"
+	"github.com/checkout/checkout-sdk-go/payments"
+
+	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
 )
 
 // checkout.com documentation here: https://www.checkout.com/docs/four/payments/accept-payments, SDK here: https://github.com/checkout/checkout-sdk-go

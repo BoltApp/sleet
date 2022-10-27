@@ -7,9 +7,10 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/BoltApp/sleet"
 	"github.com/adyen/adyen-go-api-library/v4/src/checkout"
 	"github.com/go-test/deep"
+
+	"github.com/BoltApp/sleet"
 
 	"github.com/BoltApp/sleet/common"
 	sleet_testing "github.com/BoltApp/sleet/testing"
@@ -48,11 +49,11 @@ func TestBuildAuthRequest(t *testing.T) {
 					Value:    100,
 				},
 				BillingAddress: &checkout.Address{
-					City:            *base.BillingAddress.Locality,
-					Country:         *base.BillingAddress.CountryCode,
-					PostalCode:      *base.BillingAddress.PostalCode,
-					StateOrProvince: *base.BillingAddress.RegionCode,
-					Street:          "Railroad Street",
+					City:              *base.BillingAddress.Locality,
+					Country:           *base.BillingAddress.CountryCode,
+					PostalCode:        *base.BillingAddress.PostalCode,
+					StateOrProvince:   *base.BillingAddress.RegionCode,
+					Street:            "Railroad Street",
 					HouseNumberOrName: "7683",
 				},
 				MerchantAccount: "merchant-account",
@@ -80,11 +81,11 @@ func TestBuildAuthRequest(t *testing.T) {
 					Value:    100,
 				},
 				BillingAddress: &checkout.Address{
-					City:            *baseWithAydenData.BillingAddress.Locality,
-					Country:         *baseWithAydenData.BillingAddress.CountryCode,
-					PostalCode:      *baseWithAydenData.BillingAddress.PostalCode,
-					StateOrProvince: *baseWithAydenData.BillingAddress.RegionCode,
-					Street:          "Railroad Street",
+					City:              *baseWithAydenData.BillingAddress.Locality,
+					Country:           *baseWithAydenData.BillingAddress.CountryCode,
+					PostalCode:        *baseWithAydenData.BillingAddress.PostalCode,
+					StateOrProvince:   *baseWithAydenData.BillingAddress.RegionCode,
+					Street:            "Railroad Street",
 					HouseNumberOrName: "7683",
 				},
 				MerchantAccount: "merchant-account",
@@ -102,11 +103,11 @@ func TestBuildAuthRequest(t *testing.T) {
 				StorePaymentMethod:       true,
 				ShopperReference:         "test",
 				DeliveryAddress: &checkout.Address{
-					City:            *baseWithAydenData.ShippingAddress.Locality,
-					Country:         *baseWithAydenData.ShippingAddress.CountryCode,
-					PostalCode:      *baseWithAydenData.ShippingAddress.PostalCode,
-					StateOrProvince: *baseWithAydenData.ShippingAddress.RegionCode,
-					Street:          "Railroad Street",
+					City:              *baseWithAydenData.ShippingAddress.Locality,
+					Country:           *baseWithAydenData.ShippingAddress.CountryCode,
+					PostalCode:        *baseWithAydenData.ShippingAddress.PostalCode,
+					StateOrProvince:   *baseWithAydenData.ShippingAddress.RegionCode,
+					Street:            "Railroad Street",
 					HouseNumberOrName: "7683",
 				},
 				ShopperEmail: *baseWithAydenData.BillingAddress.Email,
@@ -122,11 +123,11 @@ func TestBuildAuthRequest(t *testing.T) {
 					Value:    100,
 				},
 				BillingAddress: &checkout.Address{
-					City:            *requestWithLevel3Data.BillingAddress.Locality,
-					Country:         *requestWithLevel3Data.BillingAddress.CountryCode,
-					PostalCode:      *requestWithLevel3Data.BillingAddress.PostalCode,
-					StateOrProvince: *requestWithLevel3Data.BillingAddress.RegionCode,
-					Street:          "Railroad Street",
+					City:              *requestWithLevel3Data.BillingAddress.Locality,
+					Country:           *requestWithLevel3Data.BillingAddress.CountryCode,
+					PostalCode:        *requestWithLevel3Data.BillingAddress.PostalCode,
+					StateOrProvince:   *requestWithLevel3Data.BillingAddress.RegionCode,
+					Street:            "Railroad Street",
 					HouseNumberOrName: "7683",
 				},
 				MerchantAccount: "merchant-account",
@@ -169,11 +170,11 @@ func TestBuildAuthRequest(t *testing.T) {
 					Value:    100,
 				},
 				BillingAddress: &checkout.Address{
-					City:            *requestWithLevel3Data.BillingAddress.Locality,
-					Country:         *requestWithLevel3Data.BillingAddress.CountryCode,
-					PostalCode:      *requestWithLevel3Data.BillingAddress.PostalCode,
-					StateOrProvince: *requestWithLevel3Data.BillingAddress.RegionCode,
-					Street:          "Railroad Street",
+					City:              *requestWithLevel3Data.BillingAddress.Locality,
+					Country:           *requestWithLevel3Data.BillingAddress.CountryCode,
+					PostalCode:        *requestWithLevel3Data.BillingAddress.PostalCode,
+					StateOrProvince:   *requestWithLevel3Data.BillingAddress.RegionCode,
+					Street:            "Railroad Street",
 					HouseNumberOrName: "7683",
 				},
 				MerchantAccount: "merchant-account",
@@ -217,11 +218,11 @@ func TestBuildAuthRequest(t *testing.T) {
 					Value:    100,
 				},
 				BillingAddress: &checkout.Address{
-					City:            *requestCitiPLCC.BillingAddress.Locality,
-					Country:         *requestCitiPLCC.BillingAddress.CountryCode,
-					PostalCode:      *requestCitiPLCC.BillingAddress.PostalCode,
-					StateOrProvince: *requestCitiPLCC.BillingAddress.RegionCode,
-					Street:          "Railroad Street",
+					City:              *requestCitiPLCC.BillingAddress.Locality,
+					Country:           *requestCitiPLCC.BillingAddress.CountryCode,
+					PostalCode:        *requestCitiPLCC.BillingAddress.PostalCode,
+					StateOrProvince:   *requestCitiPLCC.BillingAddress.RegionCode,
+					Street:            "Railroad Street",
 					HouseNumberOrName: "7683",
 				},
 				MerchantAccount: "merchant-account",
@@ -249,16 +250,16 @@ func TestBuildAuthRequest(t *testing.T) {
 					Value:    100,
 				},
 				BillingAddress: &checkout.Address{
-					City:            *base.BillingAddress.Locality,
-					Country:         *base.BillingAddress.CountryCode,
-					PostalCode:      *base.BillingAddress.PostalCode,
-					StateOrProvince: *base.BillingAddress.RegionCode,
-					Street:          "Railroad Street",
+					City:              *base.BillingAddress.Locality,
+					Country:           *base.BillingAddress.CountryCode,
+					PostalCode:        *base.BillingAddress.PostalCode,
+					StateOrProvince:   *base.BillingAddress.RegionCode,
+					Street:            "Railroad Street",
 					HouseNumberOrName: "7683",
 				},
 				MerchantAccount: "merchant-account",
 				PaymentMethod: map[string]interface{}{
-					"type":        "applepay",
+					"type":          "applepay",
 					"applePayToken": "testApplePayToken",
 				},
 				ShopperInteraction:       "ContAuth",

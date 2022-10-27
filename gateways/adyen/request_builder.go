@@ -5,10 +5,11 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/BoltApp/sleet"
-	"github.com/BoltApp/sleet/common"
 	"github.com/adyen/adyen-go-api-library/v4/src/checkout"
 	"github.com/adyen/adyen-go-api-library/v4/src/payments"
+
+	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
 )
 
 const (
@@ -20,7 +21,7 @@ const (
 // Options
 const (
 	applePayTokenOption = "ApplePayToken"
-	shopperIPOption = "ShopperIP"
+	shopperIPOption     = "ShopperIP"
 )
 
 // Shopper Interactions
@@ -62,7 +63,7 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 			Currency: authRequest.Amount.Currency,
 		},
 		// Adyen requires a reference in request so this will panic if client doesn't pass it. Assuming this is good for now
-		Reference: *authRequest.ClientTransactionReference,
+		Reference:              *authRequest.ClientTransactionReference,
 		MerchantAccount:        merchantAccount,
 		MerchantOrderReference: authRequest.MerchantOrderReference,
 
@@ -120,7 +121,7 @@ func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *
 	// Add PaymentMethod field
 	if authRequest.Options[applePayTokenOption] != nil {
 		request.PaymentMethod = map[string]interface{}{
-			"type": "applepay",
+			"type":          "applepay",
 			"applePayToken": authRequest.Options[applePayTokenOption].(string),
 		}
 	} else {
@@ -273,8 +274,9 @@ func addIfNonEmpty(value string, key string, data *map[string]string) {
 }
 
 // extractAdyenStreetFormat extracts adyen street format from generic street address
-//                          returns (streetNumber, streetName) format
-//                          If address does not have leading street number, will return ("", street)
+//
+//	returns (streetNumber, streetName) format
+//	If address does not have leading street number, will return ("", street)
 func extractAdyenStreetFormat(streetAddress string) (string, string) {
 	streetExtraction := streetNumberRegex.FindStringSubmatch(streetAddress)
 	if streetExtraction == nil {

@@ -1,13 +1,14 @@
 package test
 
 import (
+	"math/rand"
+	"testing"
+	"time"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/BoltApp/sleet/gateways/nmi"
 	sleet_testing "github.com/BoltApp/sleet/testing"
-	"math/rand"
-	"testing"
-	"time"
 )
 
 func TestNMIAuthorize(t *testing.T) {

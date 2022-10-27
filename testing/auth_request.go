@@ -1,9 +1,10 @@
 package testing
 
 import (
+	"github.com/Pallinder/go-randomdata"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
-	"github.com/Pallinder/go-randomdata"
 )
 
 // BaseAuthorizationRequest is used as a testing helper method to standardize request calls for integration tests

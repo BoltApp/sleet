@@ -1,8 +1,9 @@
 package adyen
 
 import (
-	"github.com/BoltApp/sleet"
 	"time"
+
+	"github.com/BoltApp/sleet"
 )
 
 const (

@@ -6,9 +6,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/go-test/deep"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
-	"github.com/go-test/deep"
 
 	sleet_testing "github.com/BoltApp/sleet/testing"
 )

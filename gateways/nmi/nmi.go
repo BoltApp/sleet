@@ -6,9 +6,10 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/go-playground/form"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
-	"github.com/go-playground/form"
 )
 
 const (

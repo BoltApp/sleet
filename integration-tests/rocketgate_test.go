@@ -1,11 +1,12 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 	"github.com/BoltApp/sleet/gateways/rocketgate"
 	sleet_testing "github.com/BoltApp/sleet/testing"
-	"testing"
 )
 
 /*

@@ -2,7 +2,9 @@ package braintree
 
 import (
 	"fmt"
+
 	braintree_go "github.com/BoltApp/braintree-go"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 )

@@ -1,11 +1,12 @@
 package test
 
 import (
+	"strings"
+	"testing"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/gateways/stripe"
 	sleet_testing "github.com/BoltApp/sleet/testing"
-	"strings"
-	"testing"
 )
 
 // Note: For all of these tests, we enabled raw credit card processing to charges API

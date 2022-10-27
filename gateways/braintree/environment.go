@@ -2,6 +2,7 @@ package braintree
 
 import (
 	"github.com/BoltApp/braintree-go"
+
 	"github.com/BoltApp/sleet/common"
 )
 
