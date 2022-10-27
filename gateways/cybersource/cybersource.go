@@ -1,6 +1,7 @@
 package cybersource
 
 import (
+	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
@@ -18,6 +19,11 @@ import (
 
 const (
 	authPath = "/pts/v2/payments/"
+)
+
+var (
+	// assert client interface
+	_ sleet.ClientWithContext = &CybersourceClient{}
 )
 
 // CybersourceClient represents an HTTP client and the associated authentication information required for making an API request.
@@ -51,12 +57,20 @@ func NewWithHttpClient(env common.Environment, merchantID string, sharedSecretKe
 // a CustomerReference, the ClientReferenceInformation of this request will be overridden in order to to match the
 // level 3 data's CustomerReference.
 func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
+	return client.AuthorizeWithContext(context.TODO(), request)
+}
+
+// AuthorizeWithContext make a payment authorization request to CyberSource for the given payment details. If successful, the
+// authorization response will be returned. If level 3 data is present in the authorization request and contains
+// a CustomerReference, the ClientReferenceInformation of this request will be overridden in order to to match the
+// level 3 data's CustomerReference.
+func (client *CybersourceClient) AuthorizeWithContext(ctx context.Context, request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	cybersourceAuthRequest, err := buildAuthRequest(request)
 	if err != nil {
 		return nil, err
 	}
 
-	cybersourceResponse, httpResponse, err := client.sendRequest(authPath, cybersourceAuthRequest)
+	cybersourceResponse, httpResponse, err := client.sendRequest(ctx, authPath, cybersourceAuthRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -108,6 +122,13 @@ func (client *CybersourceClient) Authorize(request *sleet.AuthorizationRequest) 
 // Multiple captures can be made on the same authorization, but the total amount captured should not exceed the
 // total authorized amount.
 func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
+	return client.CaptureWithContext(context.TODO(), request)
+}
+
+// CaptureWithContext captures an authorized payment through CyberSource. If successful, the capture response will be returned.
+// Multiple captures can be made on the same authorization, but the total amount captured should not exceed the
+// total authorized amount.
+func (client *CybersourceClient) CaptureWithContext(ctx context.Context, request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	if request.TransactionReference == "" {
 		return nil, errors.New("TransactionReference given to capture request is empty")
 	}
@@ -116,7 +137,7 @@ func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.
 		return nil, err
 	}
 	capturePath := authPath + request.TransactionReference + "/captures"
-	cybersourceResponse, _, err := client.sendRequest(capturePath, cybersourceCaptureRequest)
+	cybersourceResponse, _, err := client.sendRequest(ctx, capturePath, cybersourceCaptureRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -138,6 +159,12 @@ func (client *CybersourceClient) Capture(request *sleet.CaptureRequest) (*sleet.
 // Void cancels a CyberSource payment. If successful, the void response will be returned. A previously voided
 // payment or one that has already been settled cannot be voided.
 func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+	return client.VoidWithContext(context.TODO(), request)
+}
+
+// VoidWithContext cancels a CyberSource payment. If successful, the void response will be returned. A previously voided
+// payment or one that has already been settled cannot be voided.
+func (client *CybersourceClient) VoidWithContext(ctx context.Context, request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
 	if request.TransactionReference == "" {
 		return nil, errors.New("TransactionReference given to void request is empty")
 	}
@@ -146,7 +173,7 @@ func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidRe
 		return nil, err
 	}
 	voidPath := authPath + request.TransactionReference + "/voids"
-	cybersourceResponse, _, err := client.sendRequest(voidPath, cybersourceVoidRequest)
+	cybersourceResponse, _, err := client.sendRequest(ctx, voidPath, cybersourceVoidRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -168,6 +195,12 @@ func (client *CybersourceClient) Void(request *sleet.VoidRequest) (*sleet.VoidRe
 // Refund refunds a CyberSource payment. If successful, the refund response will be returned. Multiple
 // refunds can be made on the same payment, but the total amount refunded should not exceed the payment total.
 func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	return client.RefundWithContext(context.TODO(), request)
+}
+
+// RefundWithContext refunds a CyberSource payment. If successful, the refund response will be returned. Multiple
+// refunds can be made on the same payment, but the total amount refunded should not exceed the payment total.
+func (client *CybersourceClient) RefundWithContext(ctx context.Context, request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
 	if request.TransactionReference == "" {
 		return nil, errors.New("TransactionReference given to refund request is empty")
 	}
@@ -176,7 +209,7 @@ func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 		return nil, err
 	}
 	refundPath := authPath + request.TransactionReference + "/refunds"
-	cybersourceResponse, _, err := client.sendRequest(refundPath, cybersourceRefundRequest)
+	cybersourceResponse, _, err := client.sendRequest(ctx, refundPath, cybersourceRefundRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -197,12 +230,12 @@ func (client *CybersourceClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 
 // sendRequest sends an API request with the give payload to the specified CyberSource endpoint.
 // If the request is successfully sent, its response message will be returned.
-func (client *CybersourceClient) sendRequest(path string, data *Request) (*Response, *http.Response, error) {
+func (client *CybersourceClient) sendRequest(ctx context.Context, path string, data *Request) (*Response, *http.Response, error) {
 	payload, err := json.Marshal(data)
 	if err != nil {
 		return nil, nil, err
 	}
-	req, err := client.buildPOSTRequest(path, payload)
+	req, err := client.buildPOSTRequest(ctx, path, payload)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -234,7 +267,7 @@ func (client *CybersourceClient) sendRequest(path string, data *Request) (*Respo
 // buildPOSTRequest creates an HTTP request for a given payload destined for a specified endpoint.
 // The HTTP request will be returned signed and ready to send, and its body and existing headers
 // should not be modified.
-func (client *CybersourceClient) buildPOSTRequest(path string, data []byte) (*http.Request, error) {
+func (client *CybersourceClient) buildPOSTRequest(ctx context.Context, path string, data []byte) (*http.Request, error) {
 	url := "https://" + client.host + path // weird thing where we need path to include forward /
 
 	// Create request digest and signature
@@ -257,7 +290,7 @@ func (client *CybersourceClient) buildPOSTRequest(path string, data []byte) (*ht
 	headers := "host date (request-target) digest v-c-merchant-id"
 	signatureHeader := fmt.Sprintf(`keyid="%s",algorithm="%s",headers="%s",signature="%s"`, keyID, algorithm, headers, signature)
 
-	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(string(data)))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, strings.NewReader(string(data)))
 	if err != nil {
 		return nil, err
 	}

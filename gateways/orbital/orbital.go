@@ -2,6 +2,7 @@ package orbital
 
 import (
 	"bytes"
+	"context"
 	"encoding/xml"
 	"io/ioutil"
 	"net/http"
@@ -9,6 +10,11 @@ import (
 
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
+)
+
+var (
+	// assert client interface
+	_ sleet.Client = &OrbitalClient{}
 )
 
 type Credentials struct {
@@ -36,9 +42,13 @@ func NewWithHttpClient(env common.Environment, credentials Credentials, httpClie
 }
 
 func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
+	return client.AuthorizeWithContext(context.TODO(), request)
+}
+
+func (client *OrbitalClient) AuthorizeWithContext(ctx context.Context, request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	authRequest := buildAuthRequest(request, client.credentials)
 
-	orbitalResponse, httpResponse, err := client.sendRequest(authRequest)
+	orbitalResponse, httpResponse, err := client.sendRequest(ctx, authRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -82,9 +92,13 @@ func (client *OrbitalClient) Authorize(request *sleet.AuthorizationRequest) (*sl
 }
 
 func (client *OrbitalClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
+	return client.CaptureWithContext(context.TODO(), request)
+}
+
+func (client *OrbitalClient) CaptureWithContext(ctx context.Context, request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	captureRequest := buildCaptureRequest(request, client.credentials)
 
-	orbitalResponse, _, err := client.sendRequest(captureRequest)
+	orbitalResponse, _, err := client.sendRequest(ctx, captureRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -109,9 +123,13 @@ func (client *OrbitalClient) Capture(request *sleet.CaptureRequest) (*sleet.Capt
 }
 
 func (client *OrbitalClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+	return client.VoidWithContext(context.TODO(), request)
+}
+
+func (client *OrbitalClient) VoidWithContext(ctx context.Context, request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
 	voidRequest := buildVoidRequest(request, client.credentials)
 
-	orbitalResponse, _, err := client.sendRequest(voidRequest)
+	orbitalResponse, _, err := client.sendRequest(ctx, voidRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -128,9 +146,13 @@ func (client *OrbitalClient) Void(request *sleet.VoidRequest) (*sleet.VoidRespon
 }
 
 func (client *OrbitalClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	return client.RefundWithContext(context.TODO(), request)
+}
+
+func (client *OrbitalClient) RefundWithContext(ctx context.Context, request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
 	refundRequest := buildRefundRequest(request, client.credentials)
 
-	orbitalResponse, _, err := client.sendRequest(refundRequest)
+	orbitalResponse, _, err := client.sendRequest(ctx, refundRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -150,8 +172,7 @@ func (client *OrbitalClient) Refund(request *sleet.RefundRequest) (*sleet.Refund
 	}, nil
 }
 
-func (client *OrbitalClient) sendRequest(data Request) (*Response, *http.Response, error) {
-
+func (client *OrbitalClient) sendRequest(ctx context.Context, data Request) (*Response, *http.Response, error) {
 	bodyXML, err := xml.Marshal(data)
 	if err != nil {
 		return nil, nil, err
@@ -159,7 +180,7 @@ func (client *OrbitalClient) sendRequest(data Request) (*Response, *http.Respons
 
 	bodyWithHeader := xml.Header + string(bodyXML)
 	reader := bytes.NewReader([]byte(bodyWithHeader))
-	request, err := http.NewRequest(http.MethodPost, client.host, reader)
+	request, err := http.NewRequestWithContext(ctx, http.MethodPost, client.host, reader)
 	if err != nil {
 		return nil, nil, err
 	}

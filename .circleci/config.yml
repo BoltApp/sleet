@@ -20,9 +20,13 @@ jobs:
       - run:
           name: Unit Test
           command: |
-            go test -v \
-              -coverpkg $(go list ./... | grep -v integration-tests | grep -v testing | tr '\n' ',' | sed -e 's/.$//') \
-              -coverprofile=unit_coverage.profile -tags=unit \
+            # comma separated list of packages
+            GOCOVER_LIST=$(go list ./... | grep -v integration-tests | grep -v testing | tr '\n' ',' | sed -e 's/.$//')
+            go test \
+              -v \
+              -tags=unit \
+              -coverpkg="$GOCOVER_LIST"  \
+              -coverprofile=unit_coverage.profile \
               $(go list ./... | grep -v integration-tests)
       - run:
           name: Integration Test

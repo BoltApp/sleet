@@ -5,6 +5,7 @@ package orbital
 
 import (
 	"bytes"
+	"context"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -100,7 +101,7 @@ func TestSend(t *testing.T) {
 		var want *Response = new(Response)
 		helper.XmlUnmarshal(responseRaw, want)
 
-		got, _, err := client.sendRequest(request)
+		got, _, err := client.sendRequest(context.TODO(), request)
 
 		if err != nil {
 			t.Fatalf("Error thrown after sending request %q", err)

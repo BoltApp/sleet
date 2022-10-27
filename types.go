@@ -1,6 +1,7 @@
 package sleet
 
 import (
+	"context"
 	"net/http"
 	"time"
 )
@@ -13,6 +14,16 @@ type Client interface {
 	Capture(request *CaptureRequest) (*CaptureResponse, error)
 	Void(request *VoidRequest) (*VoidResponse, error)
 	Refund(request *RefundRequest) (*RefundResponse, error)
+}
+
+// ClientWithContext is a superset of `Client` that includes addtional methods that take
+// `context.Context` as parameters.
+type ClientWithContext interface {
+	Client // supset includes the normal Client interface
+	AuthorizeWithContext(ctx context.Context, request *AuthorizationRequest) (*AuthorizationResponse, error)
+	CaptureWithContext(ctx context.Context, request *CaptureRequest) (*CaptureResponse, error)
+	VoidWithContext(ctx context.Context, request *VoidRequest) (*VoidResponse, error)
+	RefundWithContext(ctx context.Context, request *RefundRequest) (*RefundResponse, error)
 }
 
 // Amount specifies both quantity and currency

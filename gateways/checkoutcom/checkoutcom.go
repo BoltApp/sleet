@@ -1,14 +1,20 @@
 package checkoutcom
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 
-	"github.com/checkout/checkout-sdk-go"
-	"github.com/checkout/checkout-sdk-go/payments"
-
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
+
+	"github.com/checkout/checkout-sdk-go"
+	"github.com/checkout/checkout-sdk-go/payments"
+)
+
+var (
+	// assert client interface
+	_ sleet.ClientWithContext = &CheckoutComClient{}
 )
 
 // checkout.com documentation here: https://www.checkout.com/docs/four/payments/accept-payments, SDK here: https://github.com/checkout/checkout-sdk-go
@@ -52,6 +58,12 @@ func (client *CheckoutComClient) generateCheckoutDCClient() (*payments.Client, e
 
 // Authorize a transaction for specified amount
 func (client *CheckoutComClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
+	return client.AuthorizeWithContext(context.TODO(), request)
+}
+
+// AuthorizeWithContext authorizes a transaction for specified amount
+// NOTE -- checkout's SDK does not support context...
+func (client *CheckoutComClient) AuthorizeWithContext(_ context.Context, request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	checkoutComClient, err := client.generateCheckoutDCClient()
 	if err != nil {
 		return nil, err
@@ -105,6 +117,12 @@ func (client *CheckoutComClient) Authorize(request *sleet.AuthorizationRequest) 
 
 // Capture an authorized transaction by charge ID
 func (client *CheckoutComClient) Capture(request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
+	return client.CaptureWithContext(context.TODO(), request)
+}
+
+// CaptureWithContext authorizes an authorized transaction by charge ID
+// NOTE -- checkout's SDK does not support context...
+func (client *CheckoutComClient) CaptureWithContext(ctx context.Context, request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
 	checkoutComClient, err := client.generateCheckoutDCClient()
 	if err != nil {
 		return nil, err
@@ -134,6 +152,12 @@ func (client *CheckoutComClient) Capture(request *sleet.CaptureRequest) (*sleet.
 
 // Refund a captured transaction with amount and charge ID
 func (client *CheckoutComClient) Refund(request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	return client.RefundWithContext(context.TODO(), request)
+}
+
+// RefundWithContext refunds a captured transaction with amount and charge ID
+// NOTE -- checkout's SDK does not support context...
+func (client *CheckoutComClient) RefundWithContext(ctx context.Context, request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
 	checkoutComClient, err := client.generateCheckoutDCClient()
 	if err != nil {
 		return nil, err
@@ -162,6 +186,12 @@ func (client *CheckoutComClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 
 // Void an authorized transaction with charge ID
 func (client *CheckoutComClient) Void(request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
+	return client.VoidWithContext(context.TODO(), request)
+}
+
+// VoidWithContext voids an authorized transaction with charge ID
+// NOTE -- checkout's SDK does not support context...
+func (client *CheckoutComClient) VoidWithContext(ctx context.Context, request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
 	checkoutComClient, err := client.generateCheckoutDCClient()
 	if err != nil {
 		return nil, err
