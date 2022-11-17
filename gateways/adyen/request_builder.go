@@ -130,6 +130,8 @@ func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *
 			"type":          "applepay",
 			"applePayToken": authRequest.Options[applePayTokenOption].(string),
 		}
+	} else if authRequest.Options[googlePayTokenOption] != nil {
+		request.PaymentMethod = nil
 	} else {
 		request.PaymentMethod = map[string]interface{}{
 			"expiryMonth": strconv.Itoa(authRequest.CreditCard.ExpirationMonth),
