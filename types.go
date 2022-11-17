@@ -89,6 +89,7 @@ type Level3Data struct {
 
 const (
 	ResponseHeaderOption string = "ResponseHeader"
+	GooglePayTokenOption string = "GooglePayToken"
 )
 
 // AuthorizationRequest specifies needed information for request to authorize by PsPs
