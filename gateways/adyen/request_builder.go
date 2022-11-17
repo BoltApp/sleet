@@ -93,11 +93,16 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 	}
 
 	level3 := authRequest.Level3Data
-	if authRequest.Options[googlePayTokenOption] != nil {
+	if authRequest.Options[googlePayTokenOption] != nil && level3 == nil {
 		googlePayData := map[string]interface{}{
 			"payment.token": authRequest.Options[googlePayTokenOption].(string),
 		}
 		request.AdditionalData = googlePayData
+	} else if level3 != nil && authRequest.Options[googlePayTokenOption] != nil {
+		var builtL3Data map[string]string
+		builtL3Data = buildLevel3Data(level3)
+		builtL3Data["payment.token"] = authRequest.Options[googlePayTokenOption].(string)
+		request.AdditionalData = builtL3Data
 	} else if level3 != nil {
 		request.AdditionalData = buildLevel3Data(level3)
 	}
