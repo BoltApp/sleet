@@ -289,15 +289,16 @@ func TestBuildAuthRequest(t *testing.T) {
 					Street:            "Railroad Street",
 					HouseNumberOrName: "7683",
 				},
-				MerchantAccount:          "merchant-account",
+				MerchantAccount: "merchant-account",
+				PaymentMethod: map[string]interface{}{
+					"type":           "googlepay",
+					"googlePayToken": "testGooglePayToken",
+				},
 				ShopperInteraction:       "ContAuth",
 				RecurringProcessingModel: "CardOnFile",
 				Reference:                *requestWithGooglePayToken.ClientTransactionReference,
 				StorePaymentMethod:       false,
 				ShopperReference:         "test",
-				AdditionalData: map[string]interface{}{
-					"payment.token": "testGooglePayToken",
-				},
 			},
 		},
 	}
