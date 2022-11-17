@@ -20,8 +20,9 @@ const (
 
 // Options
 const (
-	applePayTokenOption = "ApplePayToken"
-	shopperIPOption     = "ShopperIP"
+	applePayTokenOption  = "ApplePayToken"
+	googlePayTokenOption = "GooglePayToken"
+	shopperIPOption      = "ShopperIP"
 )
 
 // Shopper Interactions
@@ -92,7 +93,12 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 	}
 
 	level3 := authRequest.Level3Data
-	if level3 != nil {
+	if authRequest.Options[googlePayTokenOption] != nil {
+		googlePayData := map[string]interface{}{
+			"payment.token": authRequest.Options[googlePayTokenOption].(string),
+		}
+		request.AdditionalData = googlePayData
+	} else if level3 != nil {
 		request.AdditionalData = buildLevel3Data(level3)
 	}
 
