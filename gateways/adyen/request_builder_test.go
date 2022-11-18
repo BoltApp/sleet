@@ -29,6 +29,10 @@ func TestBuildAuthRequest(t *testing.T) {
 	requestWithApplePayToken.CreditCard.CVV = ""
 	requestWithApplePayToken.Options = map[string]interface{}{applePayTokenOption: "testApplePayToken"}
 
+	requestWithGooglePayToken := sleet_testing.BaseAuthorizationRequest()
+	requestWithGooglePayToken.CreditCard.CVV = ""
+	requestWithGooglePayToken.Options = map[string]interface{}{googlePayTokenOption: "testGooglePayToken"}
+
 	baseWithAydenData := sleet_testing.BaseAuthorizationRequest()
 	enhanceBaseAuthorizationDataWithAdditionalFields(baseWithAydenData)
 
@@ -265,6 +269,34 @@ func TestBuildAuthRequest(t *testing.T) {
 				ShopperInteraction:       "ContAuth",
 				RecurringProcessingModel: "CardOnFile",
 				Reference:                *requestWithApplePayToken.ClientTransactionReference,
+				StorePaymentMethod:       false,
+				ShopperReference:         "test",
+			},
+		},
+		{
+			"Basic Auth Request With GooglePayToken",
+			requestWithGooglePayToken,
+			&checkout.PaymentRequest{
+				Amount: checkout.Amount{
+					Currency: "USD",
+					Value:    100,
+				},
+				BillingAddress: &checkout.Address{
+					City:              *base.BillingAddress.Locality,
+					Country:           *base.BillingAddress.CountryCode,
+					PostalCode:        *base.BillingAddress.PostalCode,
+					StateOrProvince:   *base.BillingAddress.RegionCode,
+					Street:            "Railroad Street",
+					HouseNumberOrName: "7683",
+				},
+				MerchantAccount: "merchant-account",
+				PaymentMethod: map[string]interface{}{
+					"type":           "googlepay",
+					"googlePayToken": "testGooglePayToken",
+				},
+				ShopperInteraction:       "ContAuth",
+				RecurringProcessingModel: "CardOnFile",
+				Reference:                *requestWithGooglePayToken.ClientTransactionReference,
 				StorePaymentMethod:       false,
 				ShopperReference:         "test",
 			},
