@@ -54,7 +54,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						TransactionType: TransactionTypeAuthOnly,
 						Amount:          &amount,
 						Payment: &Payment{
-							CreditCard: CreditCard{
+							CreditCard: &CreditCard{
 								CardNumber:     "4111111111111111",
 								ExpirationDate: "2023-10",
 								CardCode:       base.CreditCard.CVV,
@@ -96,7 +96,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						TransactionType: TransactionTypeAuthOnly,
 						Amount:          &amount,
 						Payment: &Payment{
-							CreditCard: CreditCard{
+							CreditCard: &CreditCard{
 								CardNumber:     "4111111111111111",
 								ExpirationDate: "2023-10",
 								IsPaymentToken: common.BPtr(true),
@@ -137,7 +137,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						TransactionType: TransactionTypeAuthCapture,
 						Amount:          &amount,
 						Payment: &Payment{
-							OpaqueData: OpaqueData{
+							OpaqueData: &OpaqueData{
 								DataDescriptor: GooglePayPaymentDescriptor,
 								DataValue:      base64.StdEncoding.EncodeToString([]byte("testGooglePayToken")),
 							},
@@ -169,7 +169,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						TransactionType: TransactionTypeAuthOnly,
 						Amount:          &amount,
 						Payment: &Payment{
-							CreditCard: CreditCard{
+							CreditCard: &CreditCard{
 								CardNumber:     "4111111111111111",
 								ExpirationDate: "2023-10",
 								CardCode:       base.CreditCard.CVV,
@@ -224,7 +224,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						TransactionType: TransactionTypeAuthOnly,
 						Amount:          &amount,
 						Payment: &Payment{
-							CreditCard: CreditCard{
+							CreditCard: &CreditCard{
 								CardNumber:     "4111111111111111",
 								ExpirationDate: "2023-10",
 								CardCode:       base.CreditCard.CVV,
@@ -279,7 +279,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						TransactionType: TransactionTypeAuthOnly,
 						Amount:          &amount,
 						Payment: &Payment{
-							CreditCard: CreditCard{
+							CreditCard: &CreditCard{
 								CardNumber:     "4111111111111111",
 								ExpirationDate: "2023-10",
 								CardCode:       withCustomerIP.CreditCard.CVV,
@@ -322,7 +322,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						TransactionType: TransactionTypeAuthOnly,
 						Amount:          &amount,
 						Payment: &Payment{
-							CreditCard: CreditCard{
+							CreditCard: &CreditCard{
 								CardNumber:     "4111111111111111",
 								ExpirationDate: "2023-10",
 								CardCode:       base.CreditCard.CVV,
@@ -445,7 +445,7 @@ func TestBuildRefundRequest(t *testing.T) {
 							Amount:           &amount,
 							RefTransactionID: &base.TransactionReference,
 							Payment: &Payment{
-								CreditCard: CreditCard{
+								CreditCard: &CreditCard{
 									CardNumber:     "1111",
 									ExpirationDate: expirationDateXXXX,
 								},

@@ -49,7 +49,7 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 			TransactionType: TransactionTypeAuthCapture,
 			Amount:          &amountStr,
 			Payment: &Payment{
-				OpaqueData: OpaqueData{
+				OpaqueData: &OpaqueData{
 					DataDescriptor: GooglePayPaymentDescriptor,
 					DataValue:      encodedGooglePayToken,
 				},
@@ -60,7 +60,7 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 			TransactionType: TransactionTypeAuthOnly,
 			Amount:          &amountStr,
 			Payment: &Payment{
-				CreditCard: creditCard,
+				CreditCard: &creditCard,
 			},
 			BillingAddress: &BillingAddress{
 				FirstName: authRequest.CreditCard.FirstName,
@@ -144,7 +144,7 @@ func buildRefundRequest(merchantName string, transactionKey string, refundReques
 				Amount:           &amountStr,
 				RefTransactionID: &refundRequest.TransactionReference,
 				Payment: &Payment{
-					CreditCard: CreditCard{
+					CreditCard: &CreditCard{
 						CardNumber:     refundRequest.Last4,
 						ExpirationDate: expirationDateXXXX,
 					},

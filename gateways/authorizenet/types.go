@@ -156,8 +156,8 @@ type Customer struct {
 
 // Payment specifies the credit card to be authorized (only payment option for now)
 type Payment struct {
-	CreditCard CreditCard `json:"creditCard"`
-	OpaqueData OpaqueData `json:"opaqueData"`
+	CreditCard *CreditCard `json:"creditCard,omitempty"`
+	OpaqueData *OpaqueData `json:"opaqueData,omitempty"`
 }
 
 // OpaqueData Contains dataDescriptor and dataValue
