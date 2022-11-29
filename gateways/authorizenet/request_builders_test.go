@@ -127,6 +127,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				BillingAddress:             base.BillingAddress,
 				ClientTransactionReference: base.ClientTransactionReference,
 				Options:                    map[string]interface{}{sleet.GooglePayTokenOption: "testGooglePayToken"},
+				Cryptogram:                 "testGooglePayToken",
 			},
 			&Request{
 				CreateTransactionRequest: CreateTransactionRequest{
@@ -137,7 +138,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						Payment: &Payment{
 							OpaqueData: OpaqueData{
 								DataDescriptor: GooglePayPaymentDescriptor,
-								DataValue:      authRequest.Options[sleet.GooglePayTokenOption].(string),
+								DataValue:      "testGooglePayToken",
 							},
 						},
 						BillingAddress: &BillingAddress{
