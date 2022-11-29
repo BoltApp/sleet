@@ -37,23 +37,7 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 
 	authorizeRequest := CreateTransactionRequest{
 		MerchantAuthentication: authentication(merchantName, transactionKey),
-	}
-
-	var transactionRequest TransactionRequest
-	if authRequest.Options[sleet.GooglePayTokenOption] != nil {
-		// Google Pay request
-		transactionRequest = TransactionRequest{
-			TransactionType: TransactionTypeAuthCapture,
-			Amount:          &amountStr,
-			Payment: &Payment{
-				OpaqueData: OpaqueData{
-					DataDescriptor: GooglePayPaymentDescriptor,
-					DataValue:      authRequest.Options[sleet.GooglePayTokenOption].(string),
-				},
-			},
-		}
-	} else {
-		transactionRequest = TransactionRequest{
+		TransactionRequest: TransactionRequest{
 			TransactionType: TransactionTypeAuthOnly,
 			Amount:          &amountStr,
 			Payment: &Payment{
@@ -63,10 +47,8 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 				FirstName: authRequest.CreditCard.FirstName,
 				LastName:  authRequest.CreditCard.LastName,
 			},
-		}
+		},
 	}
-
-	authorizeRequest.TransactionRequest = transactionRequest
 
 	if billingAddress != nil {
 		authorizeRequest.TransactionRequest.BillingAddress = &BillingAddress{
