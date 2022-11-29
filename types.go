@@ -89,6 +89,7 @@ type Level3Data struct {
 
 const (
 	ResponseHeaderOption string = "ResponseHeader"
+	GooglePayTokenOption string = "GooglePayToken"
 )
 
 // AuthorizationRequest specifies needed information for request to authorize by PsPs
@@ -98,7 +99,7 @@ type AuthorizationRequest struct {
 	Amount                        Amount
 	BillingAddress                *Address
 	Channel                       string  // for PSPs that track the sales channel
-	ClientTransactionReference    *string // Custom transaction reference metadata that will be associated with this request
+	ClientTransactionReference    *string // Custom transaction reference metadata that will be associated with this reque st
 	CreditCard                    *CreditCard
 	Cryptogram                    string // for Network Tokenization methods
 	ECI                           string // E-Commerce Indicator (can be used for Network Tokenization as well)

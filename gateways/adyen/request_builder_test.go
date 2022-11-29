@@ -31,7 +31,7 @@ func TestBuildAuthRequest(t *testing.T) {
 
 	requestWithGooglePayToken := sleet_testing.BaseAuthorizationRequest()
 	requestWithGooglePayToken.CreditCard.CVV = ""
-	requestWithGooglePayToken.Options = map[string]interface{}{googlePayTokenOption: "testGooglePayToken"}
+	requestWithGooglePayToken.Options = map[string]interface{}{sleet.GooglePayTokenOption: "testGooglePayToken"}
 
 	baseWithAydenData := sleet_testing.BaseAuthorizationRequest()
 	enhanceBaseAuthorizationDataWithAdditionalFields(baseWithAydenData)

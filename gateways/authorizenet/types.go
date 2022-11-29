@@ -6,6 +6,7 @@ type TransactionType string
 
 const (
 	TransactionTypeAuthOnly         TransactionType = "authOnlyTransaction"
+	TransactionTypeAuthCapture      TransactionType = "authCaptureTransaction"
 	TransactionTypeVoid             TransactionType = "voidTransaction"
 	TransactionTypePriorAuthCapture TransactionType = "priorAuthCaptureTransaction"
 	TransactionTypeRefund           TransactionType = "refundTransaction"
@@ -31,6 +32,10 @@ type ResultCode string
 const (
 	ResultCodeOK    ResultCode = "Ok"
 	ResultCodeError ResultCode = "Error"
+)
+
+const (
+	GooglePayPaymentDescriptor = "COMMON.GOOGLE.INAPP.PAYMENT"
 )
 
 // AVSResultCode result of AVS check
@@ -152,6 +157,15 @@ type Customer struct {
 // Payment specifies the credit card to be authorized (only payment option for now)
 type Payment struct {
 	CreditCard CreditCard `json:"creditCard"`
+	OpaqueData OpaqueData `json:"opaqueData"`
+}
+
+// OpaqueData Contains dataDescriptor and dataValue
+// dataDescriptor Specifies how the request should be processed.
+// dataValue Base64 encoded data that contains encrypted payment data known as the payment nonce. The nonce is valid for 15 minutes
+type OpaqueData struct {
+	DataDescriptor string `json:"dataDescriptor"`
+	DataValue      string `json:"dataValue"`
 }
 
 // CreditCard is raw cc info

@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/Pallinder/go-randomdata"
 	"github.com/go-test/deep"
 
 	"github.com/BoltApp/sleet"
@@ -100,6 +99,44 @@ func TestBuildAuthRequest(t *testing.T) {
 								ExpirationDate: "2023-10",
 								IsPaymentToken: common.BPtr(true),
 								Cryptogram:     "cryptogram",
+							},
+						},
+						BillingAddress: &BillingAddress{
+							FirstName:   "Bolt",
+							LastName:    "Checkout",
+							Address:     base.BillingAddress.StreetAddress1,
+							City:        base.BillingAddress.Locality,
+							State:       base.BillingAddress.RegionCode,
+							Zip:         base.BillingAddress.PostalCode,
+							Country:     base.BillingAddress.CountryCode,
+							PhoneNumber: base.BillingAddress.PhoneNumber,
+						},
+						Customer: &Customer{
+							Email: *base.BillingAddress.Email,
+						},
+					},
+				},
+			},
+		},
+		{
+			"Google Pay Auth Request",
+			&sleet.AuthorizationRequest{
+				Amount:                     base.Amount,
+				BillingAddress:             base.BillingAddress,
+				ClientTransactionReference: base.ClientTransactionReference,
+				Cryptogram:                 "testGooglePayToken",
+				Options:                    map[string]interface{}{sleet.GooglePayTokenOption: "testGooglePayToken"},
+			},
+			&Request{
+				CreateTransactionRequest: CreateTransactionRequest{
+					MerchantAuthentication: MerchantAuthentication{Name: "MerchantName", TransactionKey: "Key"},
+					TransactionRequest: TransactionRequest{
+						TransactionType: TransactionTypeAuthCapture,
+						Amount:          &amount,
+						Payment: &Payment{
+							OpaqueData: OpaqueData{
+								DataDescriptor: GooglePayPaymentDescriptor,
+								DataValue:      "testGooglePayToken",
 							},
 						},
 						BillingAddress: &BillingAddress{
