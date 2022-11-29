@@ -20,9 +20,8 @@ const (
 
 // Options
 const (
-	applePayTokenOption  = "ApplePayToken"
-	googlePayTokenOption = "GooglePayToken"
-	shopperIPOption      = "ShopperIP"
+	applePayTokenOption = "ApplePayToken"
+	shopperIPOption     = "ShopperIP"
 )
 
 // Shopper Interactions
@@ -125,10 +124,10 @@ func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *
 			"type":          "applepay",
 			"applePayToken": authRequest.Options[applePayTokenOption].(string),
 		}
-	} else if authRequest.Options[googlePayTokenOption] != nil {
+	} else if authRequest.Options[sleet.GooglePayTokenOption] != nil {
 		request.PaymentMethod = map[string]interface{}{
 			"type":           "googlepay",
-			"googlePayToken": authRequest.Options[googlePayTokenOption].(string),
+			"googlePayToken": authRequest.Options[sleet.GooglePayTokenOption].(string),
 		}
 	} else {
 		request.PaymentMethod = map[string]interface{}{
