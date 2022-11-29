@@ -134,7 +134,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				CreateTransactionRequest: CreateTransactionRequest{
 					MerchantAuthentication: MerchantAuthentication{Name: "MerchantName", TransactionKey: "Key"},
 					TransactionRequest: TransactionRequest{
-						TransactionType: TransactionTypeAuthCapture,
+						TransactionType: TransactionTypeAuthOnly,
 						Amount:          &amount,
 						Payment: &Payment{
 							OpaqueData: &OpaqueData{

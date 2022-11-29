@@ -46,7 +46,7 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 		googlePayToken := authRequest.Options[sleet.GooglePayTokenOption].(string)
 		encodedGooglePayToken := base64.StdEncoding.EncodeToString([]byte(googlePayToken))
 		transactionRequest = TransactionRequest{
-			TransactionType: TransactionTypeAuthCapture,
+			TransactionType: TransactionTypeAuthOnly,
 			Amount:          &amountStr,
 			Payment: &Payment{
 				OpaqueData: &OpaqueData{
