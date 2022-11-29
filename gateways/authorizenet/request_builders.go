@@ -1,6 +1,7 @@
 package authorizenet
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -42,13 +43,15 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 	var transactionRequest TransactionRequest
 	if authRequest.Options[sleet.GooglePayTokenOption] != nil {
 		// Google Pay request
+		googlePayToken := authRequest.Options[sleet.GooglePayTokenOption].(string)
+		encodedGooglePayToken := base64.StdEncoding.EncodeToString([]byte(googlePayToken))
 		transactionRequest = TransactionRequest{
 			TransactionType: TransactionTypeAuthCapture,
 			Amount:          &amountStr,
 			Payment: &Payment{
 				OpaqueData: OpaqueData{
 					DataDescriptor: GooglePayPaymentDescriptor,
-					DataValue:      authRequest.Options[sleet.GooglePayTokenOption].(string),
+					DataValue:      encodedGooglePayToken,
 				},
 			},
 		}

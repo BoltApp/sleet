@@ -4,6 +4,7 @@
 package authorizenet
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"testing"
 
@@ -138,7 +139,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						Payment: &Payment{
 							OpaqueData: OpaqueData{
 								DataDescriptor: GooglePayPaymentDescriptor,
-								DataValue:      "testGooglePayToken",
+								DataValue:      base64.StdEncoding.EncodeToString([]byte("testGooglePayToken")),
 							},
 						},
 						BillingAddress: &BillingAddress{
