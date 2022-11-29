@@ -120,6 +120,44 @@ func TestBuildAuthRequest(t *testing.T) {
 			},
 		},
 		{
+			"Google Pay Auth Request",
+			&sleet.AuthorizationRequest{
+				Amount:                     base.Amount,
+				CreditCard:                 base.CreditCard,
+				BillingAddress:             base.BillingAddress,
+				ClientTransactionReference: base.ClientTransactionReference,
+				Options:                    map[string]interface{}{sleet.GooglePayTokenOption: "testGooglePayToken"},
+			},
+			&Request{
+				CreateTransactionRequest: CreateTransactionRequest{
+					MerchantAuthentication: MerchantAuthentication{Name: "MerchantName", TransactionKey: "Key"},
+					TransactionRequest: TransactionRequest{
+						TransactionType: TransactionTypeAuthCapture,
+						Amount:          &amount,
+						Payment: &Payment{
+							OpaqueData: OpaqueData{
+								DataDescriptor: GooglePayPaymentDescriptor,
+								DataValue:      authRequest.Options[sleet.GooglePayTokenOption].(string),
+							},
+						},
+						BillingAddress: &BillingAddress{
+							FirstName:   "Bolt",
+							LastName:    "Checkout",
+							Address:     base.BillingAddress.StreetAddress1,
+							City:        base.BillingAddress.Locality,
+							State:       base.BillingAddress.RegionCode,
+							Zip:         base.BillingAddress.PostalCode,
+							Country:     base.BillingAddress.CountryCode,
+							PhoneNumber: base.BillingAddress.PhoneNumber,
+						},
+						Customer: &Customer{
+							Email: *base.BillingAddress.Email,
+						},
+					},
+				},
+			},
+		},
+		{
 			"L2L3 Data",
 			baseL2L3,
 			&Request{
