@@ -165,7 +165,7 @@ type Payment struct {
 // dataValue Base64 encoded data that contains encrypted payment data known as the payment nonce. The nonce is valid for 15 minutes
 type OpaqueData struct {
 	DataDescriptor string `json:"dataDescriptor"`
-	DataValue      []byte `json:"dataValue"`
+	DataValue      string `json:"dataValue"`
 }
 
 // CreditCard is raw cc info

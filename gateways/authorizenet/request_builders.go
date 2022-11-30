@@ -48,7 +48,7 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 			Payment: &Payment{
 				OpaqueData: &OpaqueData{
 					DataDescriptor: GooglePayPaymentDescriptor,
-					DataValue:      authRequest.Options[sleet.GooglePayTokenOption].([]byte),
+					DataValue:      authRequest.Options[sleet.GooglePayTokenOption].(string),
 				},
 			},
 		}
