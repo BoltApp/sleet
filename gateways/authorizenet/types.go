@@ -6,6 +6,7 @@ type TransactionType string
 
 const (
 	TransactionTypeAuthOnly         TransactionType = "authOnlyTransaction"
+	TransactionTypeAuthCapture      TransactionType = "authCaptureTransaction"
 	TransactionTypeVoid             TransactionType = "voidTransaction"
 	TransactionTypePriorAuthCapture TransactionType = "priorAuthCaptureTransaction"
 	TransactionTypeRefund           TransactionType = "refundTransaction"
@@ -23,6 +24,10 @@ const (
 
 const (
 	MessageResponseCodeAlreadyCaptured = "311"
+)
+
+const (
+	GooglePayPaymentDescriptor = "COMMON.GOOGLE.INAPP.PAYMENT"
 )
 
 // ResultCode result of request (ok/error)
@@ -151,7 +156,16 @@ type Customer struct {
 
 // Payment specifies the credit card to be authorized (only payment option for now)
 type Payment struct {
-	CreditCard CreditCard `json:"creditCard"`
+	CreditCard *CreditCard `json:"creditCard,omitempty"`
+	OpaqueData *OpaqueData `json:"opaqueData,omitempty"`
+}
+
+// OpaqueData Contains dataDescriptor and dataValue
+// dataDescriptor Specifies how the request should be processed.
+// dataValue Base64 encoded data that contains encrypted payment data known as the payment nonce. The nonce is valid for 15 minutes
+type OpaqueData struct {
+	DataDescriptor string `json:"dataDescriptor"`
+	DataValue      string `json:"dataValue"`
 }
 
 // CreditCard is raw cc info

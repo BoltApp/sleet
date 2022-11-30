@@ -4,6 +4,7 @@
 package authorizenet
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"testing"
 
@@ -53,7 +54,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						TransactionType: TransactionTypeAuthOnly,
 						Amount:          &amount,
 						Payment: &Payment{
-							CreditCard: CreditCard{
+							CreditCard: &CreditCard{
 								CardNumber:     "4111111111111111",
 								ExpirationDate: "2023-10",
 								CardCode:       base.CreditCard.CVV,
@@ -95,11 +96,50 @@ func TestBuildAuthRequest(t *testing.T) {
 						TransactionType: TransactionTypeAuthOnly,
 						Amount:          &amount,
 						Payment: &Payment{
-							CreditCard: CreditCard{
+							CreditCard: &CreditCard{
 								CardNumber:     "4111111111111111",
 								ExpirationDate: "2023-10",
 								IsPaymentToken: common.BPtr(true),
 								Cryptogram:     "cryptogram",
+							},
+						},
+						BillingAddress: &BillingAddress{
+							FirstName:   "Bolt",
+							LastName:    "Checkout",
+							Address:     base.BillingAddress.StreetAddress1,
+							City:        base.BillingAddress.Locality,
+							State:       base.BillingAddress.RegionCode,
+							Zip:         base.BillingAddress.PostalCode,
+							Country:     base.BillingAddress.CountryCode,
+							PhoneNumber: base.BillingAddress.PhoneNumber,
+						},
+						Customer: &Customer{
+							Email: *base.BillingAddress.Email,
+						},
+					},
+				},
+			},
+		},
+		{
+			"Google Pay Auth Request",
+			&sleet.AuthorizationRequest{
+				Amount:                     base.Amount,
+				CreditCard:                 base.CreditCard,
+				BillingAddress:             base.BillingAddress,
+				ClientTransactionReference: base.ClientTransactionReference,
+				Options:                    map[string]interface{}{sleet.GooglePayTokenOption: "testGooglePayToken"},
+				Cryptogram:                 "testGooglePayToken",
+			},
+			&Request{
+				CreateTransactionRequest: CreateTransactionRequest{
+					MerchantAuthentication: MerchantAuthentication{Name: "MerchantName", TransactionKey: "Key"},
+					TransactionRequest: TransactionRequest{
+						TransactionType: TransactionTypeAuthOnly,
+						Amount:          &amount,
+						Payment: &Payment{
+							OpaqueData: &OpaqueData{
+								DataDescriptor: GooglePayPaymentDescriptor,
+								DataValue:      base64.StdEncoding.EncodeToString([]byte("testGooglePayToken")),
 							},
 						},
 						BillingAddress: &BillingAddress{
@@ -129,7 +169,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						TransactionType: TransactionTypeAuthOnly,
 						Amount:          &amount,
 						Payment: &Payment{
-							CreditCard: CreditCard{
+							CreditCard: &CreditCard{
 								CardNumber:     "4111111111111111",
 								ExpirationDate: "2023-10",
 								CardCode:       base.CreditCard.CVV,
@@ -184,7 +224,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						TransactionType: TransactionTypeAuthOnly,
 						Amount:          &amount,
 						Payment: &Payment{
-							CreditCard: CreditCard{
+							CreditCard: &CreditCard{
 								CardNumber:     "4111111111111111",
 								ExpirationDate: "2023-10",
 								CardCode:       base.CreditCard.CVV,
@@ -239,7 +279,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						TransactionType: TransactionTypeAuthOnly,
 						Amount:          &amount,
 						Payment: &Payment{
-							CreditCard: CreditCard{
+							CreditCard: &CreditCard{
 								CardNumber:     "4111111111111111",
 								ExpirationDate: "2023-10",
 								CardCode:       withCustomerIP.CreditCard.CVV,
@@ -282,7 +322,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						TransactionType: TransactionTypeAuthOnly,
 						Amount:          &amount,
 						Payment: &Payment{
-							CreditCard: CreditCard{
+							CreditCard: &CreditCard{
 								CardNumber:     "4111111111111111",
 								ExpirationDate: "2023-10",
 								CardCode:       base.CreditCard.CVV,
@@ -405,7 +445,7 @@ func TestBuildRefundRequest(t *testing.T) {
 							Amount:           &amount,
 							RefTransactionID: &base.TransactionReference,
 							Payment: &Payment{
-								CreditCard: CreditCard{
+								CreditCard: &CreditCard{
 									CardNumber:     "1111",
 									ExpirationDate: expirationDateXXXX,
 								},

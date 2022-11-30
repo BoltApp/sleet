@@ -1,6 +1,7 @@
 package authorizenet
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -37,18 +38,37 @@ func buildAuthRequest(merchantName string, transactionKey string, authRequest *s
 
 	authorizeRequest := CreateTransactionRequest{
 		MerchantAuthentication: authentication(merchantName, transactionKey),
-		TransactionRequest: TransactionRequest{
+	}
+
+	var transactionRequest TransactionRequest
+	if authRequest.Options[sleet.GooglePayTokenOption] != nil {
+		// Google Pay request
+		googlePayToken := authRequest.Options[sleet.GooglePayTokenOption].(string)
+		encodedGooglePayToken := base64.StdEncoding.EncodeToString([]byte(googlePayToken))
+		transactionRequest = TransactionRequest{
 			TransactionType: TransactionTypeAuthOnly,
 			Amount:          &amountStr,
 			Payment: &Payment{
-				CreditCard: creditCard,
+				OpaqueData: &OpaqueData{
+					DataDescriptor: GooglePayPaymentDescriptor,
+					DataValue:      encodedGooglePayToken,
+				},
+			},
+		}
+	} else {
+		transactionRequest = TransactionRequest{
+			TransactionType: TransactionTypeAuthOnly,
+			Amount:          &amountStr,
+			Payment: &Payment{
+				CreditCard: &creditCard,
 			},
 			BillingAddress: &BillingAddress{
 				FirstName: authRequest.CreditCard.FirstName,
 				LastName:  authRequest.CreditCard.LastName,
 			},
-		},
+		}
 	}
+	authorizeRequest.TransactionRequest = transactionRequest
 
 	if billingAddress != nil {
 		authorizeRequest.TransactionRequest.BillingAddress = &BillingAddress{
@@ -124,7 +144,7 @@ func buildRefundRequest(merchantName string, transactionKey string, refundReques
 				Amount:           &amountStr,
 				RefTransactionID: &refundRequest.TransactionReference,
 				Payment: &Payment{
-					CreditCard: CreditCard{
+					CreditCard: &CreditCard{
 						CardNumber:     refundRequest.Last4,
 						ExpirationDate: expirationDateXXXX,
 					},
