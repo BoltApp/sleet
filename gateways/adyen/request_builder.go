@@ -20,8 +20,7 @@ const (
 
 // Options
 const (
-	applePayTokenOption = "ApplePayToken"
-	shopperIPOption     = "ShopperIP"
+	shopperIPOption = "ShopperIP"
 )
 
 // Shopper Interactions
@@ -119,10 +118,10 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 // addPaymentSpecificFields adds fields to the Adyen Payment request that are dependent on the payment method
 func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
 	// Add PaymentMethod field
-	if authRequest.Options[applePayTokenOption] != nil {
+	if authRequest.Options[sleet.ApplePayTokenOption] != nil {
 		request.PaymentMethod = map[string]interface{}{
 			"type":          "applepay",
-			"applePayToken": authRequest.Options[applePayTokenOption].(string),
+			"applePayToken": authRequest.Options[sleet.ApplePayTokenOption].(string),
 		}
 	} else if authRequest.Options[sleet.GooglePayTokenOption] != nil {
 		request.PaymentMethod = map[string]interface{}{
@@ -171,7 +170,7 @@ func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *
 
 // addAddresses adds the billing address and shipping address to the Ayden Payment request if available
 func addAddresses(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
-	if authRequest.BillingAddress != nil {
+	if authRequest.BillingAddress != nil && authRequest.Options[sleet.GooglePayTokenOption] == nil {
 		billingStreetNumber, billingStreetName := extractAdyenStreetFormat(common.SafeStr(authRequest.BillingAddress.StreetAddress1))
 		request.BillingAddress = &checkout.Address{
 			City:              common.SafeStr(authRequest.BillingAddress.Locality),

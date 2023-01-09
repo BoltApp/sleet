@@ -27,7 +27,7 @@ func TestBuildAuthRequest(t *testing.T) {
 	requestWithLevel3ItemDiscount.Level3Data.LineItems[0].ItemDiscountAmount.Amount = 100
 	requestWithApplePayToken := sleet_testing.BaseAuthorizationRequest()
 	requestWithApplePayToken.CreditCard.CVV = ""
-	requestWithApplePayToken.Options = map[string]interface{}{applePayTokenOption: "testApplePayToken"}
+	requestWithApplePayToken.Options = map[string]interface{}{sleet.ApplePayTokenOption: "testApplePayToken"}
 
 	requestWithGooglePayToken := sleet_testing.BaseAuthorizationRequest()
 	requestWithGooglePayToken.CreditCard.CVV = ""
@@ -280,14 +280,6 @@ func TestBuildAuthRequest(t *testing.T) {
 				Amount: checkout.Amount{
 					Currency: "USD",
 					Value:    100,
-				},
-				BillingAddress: &checkout.Address{
-					City:              *base.BillingAddress.Locality,
-					Country:           *base.BillingAddress.CountryCode,
-					PostalCode:        *base.BillingAddress.PostalCode,
-					StateOrProvince:   *base.BillingAddress.RegionCode,
-					Street:            "Railroad Street",
-					HouseNumberOrName: "7683",
 				},
 				MerchantAccount: "merchant-account",
 				PaymentMethod: map[string]interface{}{
