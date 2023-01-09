@@ -253,6 +253,14 @@ func TestBuildAuthRequest(t *testing.T) {
 					Currency: "USD",
 					Value:    100,
 				},
+				BillingAddress: &checkout.Address{
+					City:              *base.BillingAddress.Locality,
+					Country:           *base.BillingAddress.CountryCode,
+					PostalCode:        *base.BillingAddress.PostalCode,
+					StateOrProvince:   *base.BillingAddress.RegionCode,
+					Street:            "Railroad Street",
+					HouseNumberOrName: "7683",
+				},
 				MerchantAccount: "merchant-account",
 				PaymentMethod: map[string]interface{}{
 					"type":          "applepay",

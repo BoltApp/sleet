@@ -170,7 +170,7 @@ func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *
 
 // addAddresses adds the billing address and shipping address to the Ayden Payment request if available
 func addAddresses(authRequest *sleet.AuthorizationRequest, request *checkout.PaymentRequest) {
-	if authRequest.BillingAddress != nil && authRequest.Options[sleet.ApplePayTokenOption] == nil && authRequest.Options[sleet.GooglePayTokenOption] == nil {
+	if authRequest.BillingAddress != nil && authRequest.Options[sleet.GooglePayTokenOption] == nil {
 		billingStreetNumber, billingStreetName := extractAdyenStreetFormat(common.SafeStr(authRequest.BillingAddress.StreetAddress1))
 		request.BillingAddress = &checkout.Address{
 			City:              common.SafeStr(authRequest.BillingAddress.Locality),
