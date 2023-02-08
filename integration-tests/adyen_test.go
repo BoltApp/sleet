@@ -18,13 +18,25 @@ func TestAdyenAuthorizeFailed(t *testing.T) {
 	failedRequest := adyenBaseAuthRequest()
 	// set ClientTransactionReference to be empty
 	failedRequest.ClientTransactionReference = sPtr("")
-	_, err := client.Authorize(failedRequest)
+	auth, err := client.Authorize(failedRequest)
 	if err == nil {
 		t.Error("Authorize request should have failed with missing reference")
 	}
 
 	if !strings.Contains(err.Error(), "'reference' is not provided") {
 		t.Errorf("Response should contain missing reference error, response - %s", err.Error())
+	}
+
+	if auth.ResultType != sleet.ResultTypeAPIError {
+		t.Errorf("ResultType should be APIError, got %s", auth.ResultType)
+	}
+
+	if auth.ErrorCode == "" {
+		t.Errorf("ErrorCode should not be empty")
+	}
+
+	if auth.Message == "" {
+		t.Errorf("Message should not be empty")
 	}
 }
 
@@ -50,6 +62,10 @@ func TestAdyenExpiredCard(t *testing.T) {
 
 	if auth.Response != "Expired Card" {
 		t.Error("Response should have been Expired Card")
+	}
+
+	if auth.ResultType != sleet.ResultTypePaymentError {
+		t.Errorf("ResultType should be PaymentError, got %s", auth.ResultType)
 	}
 }
 
@@ -90,6 +106,10 @@ func TestAdyenAuthFailedAVSPresent(t *testing.T) {
 
 	if auth.AvsResultRaw != "2" {
 		t.Error("AVS Result Raw should have been code 1")
+	}
+
+	if auth.ResultType != sleet.ResultTypePaymentError {
+		t.Errorf("ResultType should be PaymentError, got %s", auth.ResultType)
 	}
 }
 
