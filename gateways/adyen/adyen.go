@@ -2,6 +2,7 @@ package adyen
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/adyen/adyen-go-api-library/v4/src/adyen"
@@ -71,6 +72,17 @@ func (client *AdyenClient) AuthorizeWithContext(ctx context.Context, request *sl
 		responseHeader = sleet.GetHTTPResponseHeader(request.Options, *httpResp)
 	}
 	if err != nil {
+		var adyenError adyen_common.APIError
+		if errors.As(err, &adyenError) {
+			return &sleet.AuthorizationResponse{
+				Success:    false,
+				StatusCode: statusCode,
+				Header:     responseHeader,
+				ErrorCode:  adyenError.Code,
+				Message:    adyenError.Message,
+				ResultType: sleet.ResultTypeAPIError,
+			}, err
+		}
 		return &sleet.AuthorizationResponse{
 			Success:              false,
 			TransactionReference: "",
@@ -78,6 +90,7 @@ func (client *AdyenClient) AuthorizeWithContext(ctx context.Context, request *sl
 			CvvResult:            sleet.CVVResponseUnknown,
 			StatusCode:           statusCode,
 			Header:               responseHeader,
+			ResultType:           sleet.ResultTypeServerError,
 		}, err
 	}
 
@@ -100,6 +113,7 @@ func (client *AdyenClient) AuthorizeWithContext(ctx context.Context, request *sl
 		response.Success = false
 		response.ErrorCode = result.RefusalReasonCode
 		response.Response = result.RefusalReason
+		response.ResultType = sleet.ResultTypePaymentError
 	}
 	return response, nil
 }

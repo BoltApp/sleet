@@ -134,6 +134,8 @@ type AuthorizationResponse struct {
 	CvvResult             CVVResponse
 	Response              string
 	ErrorCode             string
+	Message               string // message from the gateway describing the reason for a failed auth
+	ResultType            ResultType
 	AvsResultRaw          string
 	CvvResultRaw          string
 	RTAUResult            *RTAUResponse
@@ -241,3 +243,13 @@ type ThreeDS struct {
 	Version          string // 3DS Version
 	XID              string // Transaction ID from authentication processing (for 3DS1)
 }
+
+type ResultType string
+
+const (
+	ResultTypeSuccess      ResultType = "Approved"
+	ResultTypeUnknownError ResultType = "Unknown"
+	ResultTypePaymentError ResultType = "PaymentError" // payment or credit card related error
+	ResultTypeAPIError     ResultType = "APIError"     // error related to the PSPs API (validation error, authentication, idempotency, etc)
+	ResultTypeServerError  ResultType = "ServerError"  // network, connection, timeout etc. errors
+)
