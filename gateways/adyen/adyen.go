@@ -81,7 +81,7 @@ func (client *AdyenClient) AuthorizeWithContext(ctx context.Context, request *sl
 				ErrorCode:  adyenError.Code,
 				Message:    adyenError.Message,
 				ResultType: sleet.ResultTypeAPIError,
-			}, err
+			}, nil
 		}
 		return &sleet.AuthorizationResponse{
 			Success:              false,
