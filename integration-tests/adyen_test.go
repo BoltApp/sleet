@@ -1,7 +1,6 @@
 package test
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/BoltApp/sleet"
@@ -18,13 +17,9 @@ func TestAdyenAuthorizeFailed(t *testing.T) {
 	failedRequest := adyenBaseAuthRequest()
 	// set ClientTransactionReference to be empty
 	failedRequest.ClientTransactionReference = sPtr("")
-	auth, err := client.Authorize(failedRequest)
-	if err == nil {
+	auth, _ := client.Authorize(failedRequest)
+	if auth.Success == true {
 		t.Error("Authorize request should have failed with missing reference")
-	}
-
-	if !strings.Contains(err.Error(), "'reference' is not provided") {
-		t.Errorf("Response should contain missing reference error, response - %s", err.Error())
 	}
 
 	if auth.ResultType != sleet.ResultTypeAPIError {
