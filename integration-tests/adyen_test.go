@@ -1,6 +1,8 @@
 package test
 
 import (
+	"errors"
+	"net/http"
 	"testing"
 
 	"github.com/BoltApp/sleet"
@@ -33,6 +35,30 @@ func TestAdyenAuthorizeFailed(t *testing.T) {
 	if auth.Message == "" {
 		t.Errorf("Message should not be empty")
 	}
+}
+
+// TestAdyenServerFailed
+//
+// Handle and return a server error not from Adyen
+func TestAdyenServerFailed(t *testing.T) {
+	ft := &fakeTransport{}
+	httpClient := http.Client{Transport: ft}
+
+	client := adyen.NewWithHTTPClient(getEnv("ADYEN_ACCOUNT"), getEnv("ADYEN_KEY"), "", common.Sandbox, &httpClient)
+	request := adyenBaseAuthRequest()
+	auth, _ := client.Authorize(request)
+
+	if auth.ResultType != sleet.ResultTypeServerError {
+		t.Errorf("ResultType should be ServerError, got %s", auth.ResultType)
+	}
+}
+
+type fakeTransport struct{}
+
+func (ft *fakeTransport) RoundTrip(*http.Request) (*http.Response, error) {
+	return &http.Response{
+		StatusCode: http.StatusInternalServerError,
+	}, errors.New("test error")
 }
 
 // TestAdyenExpiredCard
