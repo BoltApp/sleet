@@ -2,7 +2,6 @@ package adyen
 
 import (
 	"context"
-	"errors"
 	"net/http"
 
 	"github.com/adyen/adyen-go-api-library/v4/src/adyen"
@@ -72,8 +71,7 @@ func (client *AdyenClient) AuthorizeWithContext(ctx context.Context, request *sl
 		responseHeader = sleet.GetHTTPResponseHeader(request.Options, *httpResp)
 	}
 	if err != nil {
-		var adyenError adyen_common.APIError
-		if errors.As(err, &adyenError) {
+		if adyenError, ok := err.(adyen_common.APIError); ok {
 			return &sleet.AuthorizationResponse{
 				Success:    false,
 				StatusCode: statusCode,
