@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/BoltApp/sleet"
-	"github.com/BoltApp/sleet/common"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+
+	"github.com/BoltApp/sleet"
+	"github.com/BoltApp/sleet/common"
 )
 
 var (
