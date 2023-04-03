@@ -217,7 +217,7 @@ type Order struct {
 // Response is a generic Auth.net response
 type Response struct {
 	TransactionResponse TransactionResponse `json:"transactionResponse"`
-	Transaction         Transaction         `json:"transaction,omitempty"`
+	Transaction         *Transaction        `json:"transaction,omitempty"`
 	RefID               string              `json:"refId"`
 	Messsages           Messages            `json:"messages"`
 }
