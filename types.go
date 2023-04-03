@@ -192,6 +192,16 @@ type RefundResponse struct {
 	ErrorCode            *string
 }
 
+// TransactionDetailsRequest for fetching a transaction's details
+type TransactionDetailsRequest struct {
+	TransactionReference string
+}
+
+// TransactionDetailsResponse indicating the transaction details. Currently, only the last 4 digits of credit card is returned.
+type TransactionDetailsResponse struct {
+	CardNumber string
+}
+
 // GetHTTPResponseHeader returns the http response headers specified in the given options.
 func GetHTTPResponseHeader(options map[string]interface{}, httpResp http.Response) http.Header {
 	var responseHeader http.Header

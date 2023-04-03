@@ -260,3 +260,16 @@ func buildLineItemsString(authRequest *sleet.AuthorizationRequest) *string {
 	}
 	return nil
 }
+
+func BuildTransactionDetailsRequest(merchantName string, transactionKey string, transactionDetailsRequest *sleet.TransactionDetailsRequest) (
+	*Request,
+	error,
+) {
+	request := &Request{
+		GetTransactionDetailsRequest: GetTransactionDetailsRequest{
+			MerchantAuthentication: authentication(merchantName, transactionKey),
+			TransID:                transactionDetailsRequest.TransactionReference,
+		},
+	}
+	return request, nil
+}

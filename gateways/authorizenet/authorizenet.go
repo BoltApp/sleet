@@ -4,11 +4,10 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"io/ioutil"
-	"net/http"
-
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
+	"io/ioutil"
+	"net/http"
 )
 
 var (
@@ -134,6 +133,20 @@ func (client *AuthorizeNetClient) RefundWithContext(ctx context.Context, request
 		return nil, err
 	}
 
+	var transactionDetailsResponse *sleet.TransactionDetailsResponse
+	if request.Options != nil && request.Options[sleet.GooglePayTokenOption].(bool) {
+		transactionDetailsResponse, err = client.GetTransactionDetails(&sleet.TransactionDetailsRequest{
+			TransactionReference: request.TransactionReference,
+		})
+		if err != nil {
+			return nil, err
+		}
+		//Past last 4 digits of card number
+		creditCardNumber := transactionDetailsResponse.CardNumber
+		last4 := creditCardNumber[len(creditCardNumber)-4:]
+		authorizeNetRefundRequest.CreateTransactionRequest.TransactionRequest.Payment.CreditCard.CardNumber = last4
+	}
+
 	authorizeNetResponse, _, err := client.sendRequest(ctx, *authorizeNetRefundRequest)
 	if err != nil {
 		return nil, err
@@ -147,6 +160,30 @@ func (client *AuthorizeNetClient) RefundWithContext(ctx context.Context, request
 	return &sleet.RefundResponse{
 		Success:              true,
 		TransactionReference: authorizeNetResponse.TransactionResponse.TransID,
+	}, nil
+}
+
+// GetTransactionDetails Use this function to get detailed information about a specific transaction.
+// Used to get the last 4 digits of a card to support Google Pay
+func (client *AuthorizeNetClient) GetTransactionDetails(request *sleet.TransactionDetailsRequest) (*sleet.TransactionDetailsResponse, error) {
+	return client.GetTransactionDetailsWithContext(context.TODO(), request)
+}
+
+// GetTransactionDetails Use this function to get detailed information about a specific transaction.
+// Used to get the last 4 digits of a card to support Google Pay
+func (client *AuthorizeNetClient) GetTransactionDetailsWithContext(ctx context.Context, request *sleet.TransactionDetailsRequest) (*sleet.TransactionDetailsResponse, error) {
+	authorizeNetTransactionDetailsRequest, err := BuildTransactionDetailsRequest(client.merchantName, client.transactionKey, request)
+	if err != nil {
+		return nil, err
+	}
+
+	authorizeNetResponse, _, err := client.sendRequest(ctx, *authorizeNetTransactionDetailsRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	return &sleet.TransactionDetailsResponse{
+		CardNumber: authorizeNetResponse.Transaction.Payment.CreditCard.CardNumber,
 	}, nil
 }
 
