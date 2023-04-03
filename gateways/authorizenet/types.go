@@ -92,7 +92,7 @@ const expirationDateXXXX = "XXXX"
 
 // Request contains a createTransactionRequest for authorizations
 type Request struct {
-	CreateTransactionRequest     CreateTransactionRequest     `json:"createTransactionRequest,omitempty"`
+	CreateTransactionRequest     CreateTransactionRequest     `json:"createTransactionRequest"`
 	GetTransactionDetailsRequest GetTransactionDetailsRequest `json:"getTransactionDetailsRequest,omitempty"`
 }
 
