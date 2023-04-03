@@ -48,7 +48,7 @@ func TestBuildAuthRequest(t *testing.T) {
 			"Basic Auth Request",
 			base,
 			&Request{
-				CreateTransactionRequest: CreateTransactionRequest{
+				CreateTransactionRequest: &CreateTransactionRequest{
 					MerchantAuthentication: MerchantAuthentication{Name: "MerchantName", TransactionKey: "Key"},
 					TransactionRequest: TransactionRequest{
 						TransactionType: TransactionTypeAuthOnly,
@@ -90,7 +90,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				Cryptogram:                 "cryptogram",
 			},
 			&Request{
-				CreateTransactionRequest: CreateTransactionRequest{
+				CreateTransactionRequest: &CreateTransactionRequest{
 					MerchantAuthentication: MerchantAuthentication{Name: "MerchantName", TransactionKey: "Key"},
 					TransactionRequest: TransactionRequest{
 						TransactionType: TransactionTypeAuthOnly,
@@ -131,7 +131,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				Cryptogram:                 "testGooglePayToken",
 			},
 			&Request{
-				CreateTransactionRequest: CreateTransactionRequest{
+				CreateTransactionRequest: &CreateTransactionRequest{
 					MerchantAuthentication: MerchantAuthentication{Name: "MerchantName", TransactionKey: "Key"},
 					TransactionRequest: TransactionRequest{
 						TransactionType: TransactionTypeAuthOnly,
@@ -163,7 +163,7 @@ func TestBuildAuthRequest(t *testing.T) {
 			"L2L3 Data",
 			baseL2L3,
 			&Request{
-				CreateTransactionRequest: CreateTransactionRequest{
+				CreateTransactionRequest: &CreateTransactionRequest{
 					MerchantAuthentication: MerchantAuthentication{Name: "MerchantName", TransactionKey: "Key"},
 					TransactionRequest: TransactionRequest{
 						TransactionType: TransactionTypeAuthOnly,
@@ -218,7 +218,7 @@ func TestBuildAuthRequest(t *testing.T) {
 			"L2L3 Data Multiple items",
 			baseL2L3MultipleItems,
 			&Request{
-				CreateTransactionRequest: CreateTransactionRequest{
+				CreateTransactionRequest: &CreateTransactionRequest{
 					MerchantAuthentication: MerchantAuthentication{Name: "MerchantName", TransactionKey: "Key"},
 					TransactionRequest: TransactionRequest{
 						TransactionType: TransactionTypeAuthOnly,
@@ -273,7 +273,7 @@ func TestBuildAuthRequest(t *testing.T) {
 			"Basic Auth Request with customer IP",
 			withCustomerIP,
 			&Request{
-				CreateTransactionRequest: CreateTransactionRequest{
+				CreateTransactionRequest: &CreateTransactionRequest{
 					MerchantAuthentication: MerchantAuthentication{Name: "MerchantName", TransactionKey: "Key"},
 					TransactionRequest: TransactionRequest{
 						TransactionType: TransactionTypeAuthOnly,
@@ -316,7 +316,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				MerchantOrderReference:     base.MerchantOrderReference,
 			},
 			&Request{
-				CreateTransactionRequest: CreateTransactionRequest{
+				CreateTransactionRequest: &CreateTransactionRequest{
 					MerchantAuthentication: MerchantAuthentication{Name: "MerchantName", TransactionKey: "Key"},
 					TransactionRequest: TransactionRequest{
 						TransactionType: TransactionTypeAuthOnly,
@@ -364,7 +364,7 @@ func TestBuildCaptureRequest(t *testing.T) {
 			"Basic Capture Request",
 			base,
 			&Request{
-				CreateTransactionRequest: CreateTransactionRequest{
+				CreateTransactionRequest: &CreateTransactionRequest{
 					MerchantAuthentication: MerchantAuthentication{Name: "MerchantName", TransactionKey: "Key"},
 					TransactionRequest: TransactionRequest{
 						TransactionType:  TransactionTypePriorAuthCapture,
@@ -398,7 +398,7 @@ func TestBuildVoidRequest(t *testing.T) {
 			"Basic Void Request",
 			base,
 			&Request{
-				CreateTransactionRequest: CreateTransactionRequest{
+				CreateTransactionRequest: &CreateTransactionRequest{
 					MerchantAuthentication: MerchantAuthentication{Name: "MerchantName", TransactionKey: "Key"},
 					TransactionRequest: TransactionRequest{
 						TransactionType:  TransactionTypeVoid,
@@ -438,7 +438,7 @@ func TestBuildRefundRequest(t *testing.T) {
 				"Basic Refund Request",
 				base,
 				&Request{
-					CreateTransactionRequest: CreateTransactionRequest{
+					CreateTransactionRequest: &CreateTransactionRequest{
 						MerchantAuthentication: MerchantAuthentication{Name: "MerchantName", TransactionKey: "Key"},
 						TransactionRequest: TransactionRequest{
 							TransactionType:  TransactionTypeRefund,
