@@ -8,6 +8,7 @@ import (
 	"github.com/BoltApp/sleet/common"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 )
 
 var (
@@ -134,17 +135,21 @@ func (client *AuthorizeNetClient) RefundWithContext(ctx context.Context, request
 	}
 
 	var transactionDetailsResponse *sleet.TransactionDetailsResponse
-	if request.Options != nil && request.Options[sleet.GooglePayTokenOption].(bool) {
-		transactionDetailsResponse, err = client.GetTransactionDetails(&sleet.TransactionDetailsRequest{
-			TransactionReference: request.TransactionReference,
-		})
-		if err != nil {
-			return nil, err
+	if request.Options != nil {
+		var boolValue bool
+		boolValue, _ = strconv.ParseBool(request.Options[sleet.GooglePayTokenOption].(string))
+		if boolValue {
+			transactionDetailsResponse, err = client.GetTransactionDetails(&sleet.TransactionDetailsRequest{
+				TransactionReference: request.TransactionReference,
+			})
+			if err != nil {
+				return nil, err
+			}
+			//Past last 4 digits of card number
+			creditCardNumber := transactionDetailsResponse.CardNumber
+			last4 := creditCardNumber[len(creditCardNumber)-4:]
+			authorizeNetRefundRequest.CreateTransactionRequest.TransactionRequest.Payment.CreditCard.CardNumber = last4
 		}
-		//Past last 4 digits of card number
-		creditCardNumber := transactionDetailsResponse.CardNumber
-		last4 := creditCardNumber[len(creditCardNumber)-4:]
-		authorizeNetRefundRequest.CreateTransactionRequest.TransactionRequest.Payment.CreditCard.CardNumber = last4
 	}
 
 	authorizeNetResponse, _, err := client.sendRequest(ctx, *authorizeNetRefundRequest)
