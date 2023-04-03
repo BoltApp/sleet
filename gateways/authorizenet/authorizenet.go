@@ -135,7 +135,7 @@ func (client *AuthorizeNetClient) RefundWithContext(ctx context.Context, request
 	}
 
 	var transactionDetailsResponse *sleet.TransactionDetailsResponse
-	if request.Options != nil {
+	if request.Options != nil && request.Options[sleet.GooglePayTokenOption] != nil {
 		var boolValue bool
 		boolValue, _ = strconv.ParseBool(request.Options[sleet.GooglePayTokenOption].(string))
 		if boolValue {
