@@ -92,14 +92,14 @@ const expirationDateXXXX = "XXXX"
 
 // Request contains a createTransactionRequest for authorizations
 type Request struct {
-	CreateTransactionRequest     CreateTransactionRequest     `json:"createTransactionRequest,omitempty"`
-	GetTransactionDetailsRequest GetTransactionDetailsRequest `json:"getTransactionDetailsRequest,omitempty"`
+	CreateTransactionRequest     *CreateTransactionRequest     `json:"createTransactionRequest,omitempty"`
+	GetTransactionDetailsRequest *GetTransactionDetailsRequest `json:"getTransactionDetailsRequest,omitempty"`
 }
 
 // GetTransactionDetailsRequest contains a transaction ID for fetching transaction details
 type GetTransactionDetailsRequest struct {
-	MerchantAuthentication MerchantAuthentication `json:"merchantAuthentication"`
-	TransID                string                 `json:"transId"`
+	MerchantAuthentication MerchantAuthentication `json:"merchantAuthentication,omitempty"`
+	TransID                string                 `json:"transId,omitempty"`
 }
 
 // CreateTransactionRequest specifies the merchant authentication to be used for request as well as transaction
