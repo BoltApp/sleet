@@ -199,6 +199,7 @@ type TransactionDetailsRequest struct {
 
 // TransactionDetailsResponse indicating the transaction details. Currently, only the last 4 digits of credit card is returned.
 type TransactionDetailsResponse struct {
+	ResultCode string
 	CardNumber string
 }
 

@@ -4,12 +4,10 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"io/ioutil"
-	"net/http"
-	"strconv"
-
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
+	"io/ioutil"
+	"net/http"
 )
 
 var (
@@ -130,27 +128,16 @@ func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.R
 
 // RefundWithContext refunds a captured transaction with amount and captured transaction reference
 func (client *AuthorizeNetClient) RefundWithContext(ctx context.Context, request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
+	transactionDetailsResponse, err := client.GetTransactionDetails(&sleet.TransactionDetailsRequest{
+		TransactionReference: request.TransactionReference,
+	})
+	creditCardNumber := transactionDetailsResponse.CardNumber
+	last4 := creditCardNumber[len(creditCardNumber)-4:]
+	request.Last4 = last4
+
 	authorizeNetRefundRequest, err := buildRefundRequest(client.merchantName, client.transactionKey, request)
 	if err != nil {
 		return nil, err
-	}
-
-	var transactionDetailsResponse *sleet.TransactionDetailsResponse
-	if request.Options != nil && request.Options[sleet.GooglePayTokenOption] != nil {
-		var boolValue bool
-		boolValue, _ = strconv.ParseBool(request.Options[sleet.GooglePayTokenOption].(string))
-		if boolValue {
-			transactionDetailsResponse, err = client.GetTransactionDetails(&sleet.TransactionDetailsRequest{
-				TransactionReference: request.TransactionReference,
-			})
-			if err != nil {
-				return nil, err
-			}
-			//Past last 4 digits of card number
-			creditCardNumber := transactionDetailsResponse.CardNumber
-			last4 := creditCardNumber[len(creditCardNumber)-4:]
-			authorizeNetRefundRequest.CreateTransactionRequest.TransactionRequest.Payment.CreditCard.CardNumber = last4
-		}
 	}
 
 	authorizeNetResponse, _, err := client.sendRequest(ctx, *authorizeNetRefundRequest)
@@ -188,7 +175,14 @@ func (client *AuthorizeNetClient) GetTransactionDetailsWithContext(ctx context.C
 		return nil, err
 	}
 
+	if authorizeNetResponse.Messsages.ResultCode != ResultCodeOK {
+		return &sleet.TransactionDetailsResponse{
+			ResultCode: string(authorizeNetResponse.Messsages.ResultCode),
+		}, nil
+	}
+
 	return &sleet.TransactionDetailsResponse{
+		ResultCode: string(authorizeNetResponse.Messsages.ResultCode),
 		CardNumber: authorizeNetResponse.Transaction.Payment.CreditCard.CardNumber,
 	}, nil
 }
