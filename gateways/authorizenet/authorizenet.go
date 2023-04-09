@@ -131,6 +131,9 @@ func (client *AuthorizeNetClient) RefundWithContext(ctx context.Context, request
 	transactionDetailsResponse, err := client.GetTransactionDetails(&sleet.TransactionDetailsRequest{
 		TransactionReference: request.TransactionReference,
 	})
+	if err != nil {
+		return nil, err
+	}
 	creditCardNumber := transactionDetailsResponse.CardNumber
 	last4 := creditCardNumber[len(creditCardNumber)-4:]
 	request.Last4 = last4
