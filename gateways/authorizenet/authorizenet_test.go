@@ -319,6 +319,12 @@ func TestRefund(t *testing.T) {
 	t.Run("With Success Response", func(t *testing.T) {
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
+		
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			transactionDetailsResponseRaw := helper.ReadFile("test_data/transactionDetailsSuccessResponse.json")
+			resp := httpmock.NewBytesResponse(http.StatusOK, transactionDetailsResponseRaw)
+			return resp, nil
+		})
 
 		request := sleet_t.BaseRefundRequest()
 		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
