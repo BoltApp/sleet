@@ -1,0 +1,74 @@
+{
+  "transaction": {
+    "transId": "40116993894",
+    "submitTimeUTC": "2023-03-21T20:01:31.243Z",
+    "submitTimeLocal": "2023-03-21T13:01:31.243",
+    "transactionType": "authOnlyTransaction",
+    "transactionStatus": "settledSuccessfully",
+    "responseCode": 1,
+    "responseReasonCode": 1,
+    "responseReasonDescription": "Approval",
+    "authCode": "6UBJKU",
+    "AVSResponse": "Y",
+    "cardCodeResponse": "P",
+    "batch": {
+      "batchId": "13855989",
+      "settlementTimeUTC": "2023-03-22T03:40:34.663Z",
+      "settlementTimeLocal": "2023-03-21T20:40:34.663",
+      "settlementState": "settledSuccessfully"
+    },
+    "order": {
+      "invoiceNumber": "9006052827063014",
+      "discountAmount": 0,
+      "taxIsAfterDiscount": false
+    },
+    "authAmount": 100.5,
+    "settleAmount": 100.5,
+    "taxExempt": false,
+    "payment": {
+      "creditCard": {
+        "cardNumber": "XXXX1111",
+        "expirationDate": "XXXX",
+        "cardType": "Visa"
+      }
+    },
+    "customer": {
+      "email": "pansetwar@bolt.com"
+    },
+    "billTo": {
+      "phoneNumber": "13126470579",
+      "firstName": "Abhishek",
+      "lastName": "Tidke",
+      "address": "21150 N Tatum Blvd Apt 2088",
+      "city": "Phoenix",
+      "state": "Arizona",
+      "zip": "85050",
+      "country": "US"
+    },
+    "shipTo": {
+      "firstName": "Abhishek",
+      "lastName": "Tidke",
+      "address": "21150 N Tatum Blvd Apt 2088",
+      "city": "Phoenix",
+      "state": "Arizona",
+      "zip": "85050",
+      "country": "US"
+    },
+    "recurringBilling": false,
+    "customerIP": "70.176.143.138",
+    "product": "Card Not Present",
+    "marketType": "eCommerce",
+    "networkTransId": "L49LOS1DVBGDNPKEVZG3NOG",
+    "authorizationIndicator": "pre"
+  },
+  "messages": {
+    "resultCode": "Ok",
+    "message": [
+      {
+        "code": "I00001",
+        "text": "Successful."
+      }
+    ]
+  }
+}
+

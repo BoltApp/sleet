@@ -320,6 +320,12 @@ func TestRefund(t *testing.T) {
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
 
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			transactionDetailsResponseRaw := helper.ReadFile("test_data/transactionDetailsSuccessResponse.json")
+			resp := httpmock.NewBytesResponse(http.StatusOK, transactionDetailsResponseRaw)
+			return resp, nil
+		})
+
 		request := sleet_t.BaseRefundRequest()
 		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
 			refundResponseRaw := helper.ReadFile("test_data/refundSuccessResponse.json")
@@ -391,6 +397,74 @@ func TestRefund(t *testing.T) {
 
 		if err == nil {
 			t.Fatalf("Error has to be thrown")
+		}
+	})
+}
+
+func TestGetTransactionDetails(t *testing.T) {
+	helper := sleet_t.NewTestHelper(t)
+	url := "https://apitest.authorize.net/xml/v1/request.api"
+
+	t.Run("With Success Response", func(t *testing.T) {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		request := &sleet.TransactionDetailsRequest{
+			TransactionReference: "1234569999",
+		}
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			transactionDetailsResponseRaw := helper.ReadFile("test_data/transactionDetailsSuccessResponse.json")
+			resp := httpmock.NewBytesResponse(http.StatusOK, transactionDetailsResponseRaw)
+			return resp, nil
+		})
+
+		want := &sleet.TransactionDetailsResponse{
+			ResultCode: "Ok",
+			CardNumber: "XXXX1111",
+		}
+
+		client := NewClient("MerchantName", "Key", common.Sandbox)
+
+		got, err := client.GetTransactionDetails(request)
+
+		if err != nil {
+			t.Fatalf("Error thrown after sending request %q", err)
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
+		}
+	})
+
+	t.Run("With Error Response", func(t *testing.T) {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		request := &sleet.TransactionDetailsRequest{
+			TransactionReference: "1234569999",
+		}
+		httpmock.RegisterResponder("POST", url, func(req *http.Request) (*http.Response, error) {
+			transactionDetailsResponseRaw := helper.ReadFile("test_data/transactionDetailsErrorResponse.json")
+			resp := httpmock.NewBytesResponse(http.StatusOK, transactionDetailsResponseRaw)
+			return resp, nil
+		})
+
+		want := &sleet.TransactionDetailsResponse{
+			ResultCode: string(ResultCodeError),
+		}
+
+		client := NewClient("MerchantName", "Key", common.Sandbox)
+
+		got, err := client.GetTransactionDetails(request)
+
+		if err != nil {
+			t.Fatalf("Error thrown after sending request %q", err)
+		}
+
+		if !cmp.Equal(*got, *want, sleet_t.CompareUnexported) {
+			t.Error("Response body does not match expected")
+			t.Error(cmp.Diff(*want, *got, sleet_t.CompareUnexported))
 		}
 	})
 }

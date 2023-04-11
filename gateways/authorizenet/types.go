@@ -92,7 +92,14 @@ const expirationDateXXXX = "XXXX"
 
 // Request contains a createTransactionRequest for authorizations
 type Request struct {
-	CreateTransactionRequest CreateTransactionRequest `json:"createTransactionRequest"`
+	CreateTransactionRequest     *CreateTransactionRequest     `json:"createTransactionRequest,omitempty"`
+	GetTransactionDetailsRequest *GetTransactionDetailsRequest `json:"getTransactionDetailsRequest,omitempty"`
+}
+
+// GetTransactionDetailsRequest contains a transaction ID for fetching transaction details
+type GetTransactionDetailsRequest struct {
+	MerchantAuthentication MerchantAuthentication `json:"merchantAuthentication,omitempty"`
+	TransID                string                 `json:"transId,omitempty"`
 }
 
 // CreateTransactionRequest specifies the merchant authentication to be used for request as well as transaction
@@ -210,8 +217,15 @@ type Order struct {
 // Response is a generic Auth.net response
 type Response struct {
 	TransactionResponse TransactionResponse `json:"transactionResponse"`
+	Transaction         *Transaction        `json:"transaction,omitempty"`
 	RefID               string              `json:"refId"`
 	Messsages           Messages            `json:"messages"`
+}
+
+// Transaction describes the transaction details
+type Transaction struct {
+	TransID string   `json:"transId,omitempty"`
+	Payment *Payment `json:"payment,omitempty"`
 }
 
 // TransactionResponse contains the information from issuer about AVS, CVV and whether or not authorization was successful

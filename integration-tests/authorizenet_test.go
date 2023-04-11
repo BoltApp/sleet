@@ -240,3 +240,35 @@ func TestAuthNetAuthCaptureRefund(t *testing.T) {
 		t.Error("Resulting refund should have been successful")
 	}
 }
+
+// TestAuthNetGetTransactionDetails
+// This should successfully fetch transaction details from Authorize.net
+func TestAuthNetGetTransactionDetails(t *testing.T) {
+	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
+	authRequest := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
+	authRequest.Amount.Amount = int64(randomdata.Number(100))
+	auth, err := client.Authorize(authRequest)
+	if err != nil {
+		t.Error("Authorize request should not have failed")
+	}
+
+	if !auth.Success {
+		t.Error("Resulting auth should have been successful")
+	}
+
+	transactionDetailsRequest := &sleet.TransactionDetailsRequest{
+		TransactionReference: auth.TransactionReference,
+	}
+	transactionDetailsResponse, err := client.GetTransactionDetails(transactionDetailsRequest)
+	if err != nil {
+		t.Error("Transaction Details request should not have failed")
+	}
+
+	if transactionDetailsResponse.ResultCode != string(authorizenet.ResultCodeOK) {
+		t.Error("Transaction details request should have been successful")
+	}
+
+	if transactionDetailsResponse.CardNumber == "" {
+		t.Error("Card Number should not be empty")
+	}
+}
