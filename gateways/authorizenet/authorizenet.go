@@ -129,15 +129,18 @@ func (client *AuthorizeNetClient) Refund(request *sleet.RefundRequest) (*sleet.R
 
 // RefundWithContext refunds a captured transaction with amount and captured transaction reference
 func (client *AuthorizeNetClient) RefundWithContext(ctx context.Context, request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
-	transactionDetailsResponse, err := client.GetTransactionDetails(&sleet.TransactionDetailsRequest{
-		TransactionReference: request.TransactionReference,
-	})
-	if err != nil {
-		return nil, err
+
+	if request.Options != nil && request.Options[sleet.GooglePayTokenOption] != nil {
+		transactionDetailsResponse, err := client.GetTransactionDetails(&sleet.TransactionDetailsRequest{
+			TransactionReference: request.TransactionReference,
+		})
+		if err != nil {
+			return nil, err
+		}
+		creditCardNumber := transactionDetailsResponse.CardNumber
+		last4 := creditCardNumber[len(creditCardNumber)-4:]
+		request.Last4 = last4
 	}
-	creditCardNumber := transactionDetailsResponse.CardNumber
-	last4 := creditCardNumber[len(creditCardNumber)-4:]
-	request.Last4 = last4
 
 	authorizeNetRefundRequest, err := buildRefundRequest(client.merchantName, client.transactionKey, request)
 	if err != nil {
