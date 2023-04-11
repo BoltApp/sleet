@@ -245,6 +245,8 @@ func TestAuthNetAuthCaptureRefund(t *testing.T) {
 // This should successfully fetch transaction details from Authorize.net
 func TestAuthNetGetTransactionDetails(t *testing.T) {
 	client := authorizenet.NewClient(getEnv("AUTH_NET_LOGIN_ID"), getEnv("AUTH_NET_TXN_KEY"), common.Sandbox)
+	fmt.Println("Login ID: ", getEnv("AUTH_NET_LOGIN_ID"))
+	fmt.Println("TXN Key: ", getEnv("AUTH_NET_TXN_KEY"))
 	transactionDetailsRequest := &sleet.TransactionDetailsRequest{
 		TransactionReference: "40116993894",
 	}
