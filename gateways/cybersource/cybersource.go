@@ -114,6 +114,8 @@ func (client *CybersourceClient) AuthorizeWithContext(ctx context.Context, reque
 		response.CvvResult = translateCvv(cybersourceResponse.ProcessorInformation.CardVerification.ResultCode)
 		response.CvvResultRaw = cybersourceResponse.ProcessorInformation.CardVerification.ResultCode
 		response.ExternalTransactionID = cybersourceResponse.ProcessorInformation.TransactionID
+		response.Metadata[sleet.ApprovalCodeMetadata] = cybersourceResponse.ProcessorInformation.ApprovalCode
+		response.Metadata[sleet.ResponseCodeMetadata] = cybersourceResponse.ProcessorInformation.ResponseCode
 	}
 	return response, nil
 }
