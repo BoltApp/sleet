@@ -114,10 +114,16 @@ func (client *CybersourceClient) AuthorizeWithContext(ctx context.Context, reque
 		response.CvvResult = translateCvv(cybersourceResponse.ProcessorInformation.CardVerification.ResultCode)
 		response.CvvResultRaw = cybersourceResponse.ProcessorInformation.CardVerification.ResultCode
 		response.ExternalTransactionID = cybersourceResponse.ProcessorInformation.TransactionID
-		response.Metadata[sleet.ApprovalCodeMetadata] = cybersourceResponse.ProcessorInformation.ApprovalCode
-		response.Metadata[sleet.ResponseCodeMetadata] = cybersourceResponse.ProcessorInformation.ResponseCode
+		response.Metadata = buildResponseMetadata(*cybersourceResponse.ProcessorInformation)
 	}
 	return response, nil
+}
+
+func buildResponseMetadata(processorInformation ProcessorInformation) map[string]string {
+	metadata := make(map[string]string)
+	metadata[sleet.ApprovalCodeMetadata] = processorInformation.ApprovalCode
+	metadata[sleet.ResponseCodeMetadata] = processorInformation.ResponseCode
+	return metadata
 }
 
 // Capture captures an authorized payment through CyberSource. If successful, the capture response will be returned.
