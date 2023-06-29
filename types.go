@@ -116,7 +116,9 @@ type AuthorizationRequest struct {
 }
 
 const (
-	AuthCodeMetadata string = "authCode"
+	AuthCodeMetadata     string = "authCode"
+	ApprovalCodeMetadata string = "approvalCode"
+	ResponseCodeMetadata string = "responseCode"
 )
 
 // AuthorizationResponse is a generic response returned back to client after data massaging from PsP Response
