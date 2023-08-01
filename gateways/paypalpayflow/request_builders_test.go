@@ -58,6 +58,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				BillToStreet:       visaBase.BillingAddress.StreetAddress1,
 				BillToStreet2:      visaBase.BillingAddress.StreetAddress2,
 				BillToCountry:      visaBase.BillingAddress.CountryCode,
+				Comment1:           &visaBase.MerchantOrderReference,
 			},
 		},
 		{
@@ -78,6 +79,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				BillToStreet:       visaBase.BillingAddress.StreetAddress1,
 				BillToStreet2:      visaBase.BillingAddress.StreetAddress2,
 				BillToCountry:      visaBase.BillingAddress.CountryCode,
+				Comment1:           &visaBase.MerchantOrderReference,
 			},
 		},
 		{
@@ -98,6 +100,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				BillToStreet:       visaBase.BillingAddress.StreetAddress1,
 				BillToStreet2:      visaBase.BillingAddress.StreetAddress2,
 				BillToCountry:      visaBase.BillingAddress.CountryCode,
+				Comment1:           &visaBase.MerchantOrderReference,
 			},
 		},
 		{
@@ -118,6 +121,7 @@ func TestBuildAuthRequest(t *testing.T) {
 				BillToStreet:       visaBase.BillingAddress.StreetAddress1,
 				BillToStreet2:      visaBase.BillingAddress.StreetAddress2,
 				BillToCountry:      visaBase.BillingAddress.CountryCode,
+				Comment1:           &visaBase.MerchantOrderReference,
 			},
 		},
 	}
