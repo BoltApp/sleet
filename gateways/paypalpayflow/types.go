@@ -42,6 +42,7 @@ type Request struct {
 	BillToCountry      *string // country code
 	CardOnFile         *string
 	TxID               *string
+	Comment1           *string // merchant order reference
 }
 
 type Response map[string]string
