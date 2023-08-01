@@ -54,6 +54,7 @@ func buildAuthorizeParams(request *sleet.AuthorizationRequest) *Request {
 		BillToCountry:      request.BillingAddress.CountryCode,
 		CardOnFile:         CardOnFile,
 		TxID:               request.PreviousExternalTransactionID,
+		Comment1:           &request.MerchantOrderReference,
 	}
 }
 

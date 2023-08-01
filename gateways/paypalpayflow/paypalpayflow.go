@@ -63,6 +63,7 @@ func (client *PaypalPayflowClient) sendRequest(ctx context.Context, request *Req
 		"BILLTOCOUNTRY":   request.BillToCountry,
 		"CARDONFILE":      request.CardOnFile,
 		"TXID":            request.TxID,
+		"COMMENT1":        request.Comment1,
 	}
 	for k, v := range fields {
 		switch v := v.(type) {
