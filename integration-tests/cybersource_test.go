@@ -51,8 +51,12 @@ func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected no error: received: %s", err)
 	}
-	if resp.Success != true {
+	if resp != nil && resp.Success != true {
 		t.Errorf("Expected Success: received: %s", resp.ErrorCode)
+	}
+
+	if t.Failed() {
+		return
 	}
 
 	capResp, err := client.Capture(&sleet.CaptureRequest{
@@ -63,8 +67,12 @@ func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected no error: received: %s", err)
 	}
-	if capResp.ErrorCode != nil {
+	if capResp != nil && capResp.ErrorCode != nil {
 		t.Errorf("Expected No Error Code: received: %s", *capResp.ErrorCode)
+	}
+
+	if t.Failed() {
+		return
 	}
 
 	refundResp, err := client.Refund(&sleet.RefundRequest{
@@ -75,8 +83,74 @@ func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected no error: received: %s", err)
 	}
-	if refundResp.ErrorCode != nil {
+	if refundResp != nil && refundResp.ErrorCode != nil {
 		t.Errorf("Expected No Error Code: received: %s", *refundResp.ErrorCode)
+	}
+}
+
+func TestAuthorizeAndCaptureWithTokenCreation(t *testing.T) {
+	// Not all CyberSource accounts have this feature.
+	// If this test fails but you are not planning on using tokenization, you can safely ignore the result of this test.
+	client := cybersource.NewClient(common.Sandbox, getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
+	authRequest := sleet_testing.BaseAuthorizationRequest()
+	authRequest.ClientTransactionReference = sPtr("[auth]-CUSTOMER-REFERENCE-CODE")
+	authRequest.BillingAddress = &sleet.Address{
+		StreetAddress1: sPtr("77 Geary St"),
+		StreetAddress2: sPtr("Floor 4"),
+		Locality:       sPtr("San Francisco"),
+		RegionCode:     sPtr("CA"),
+		PostalCode:     sPtr("94108"),
+		CountryCode:    sPtr("US"),
+		Company:        sPtr("Bolt"),
+		Email:          sPtr("test@bolt.com"),
+	}
+	authRequest.Options = map[string]interface{}{
+		sleet.CyberSourceTokenizeOption: []sleet.TokenType{
+			sleet.TokenTypeCustomer,
+			sleet.TokenTypePayment,
+			sleet.TokenTypePaymentIdentifier,
+			sleet.TokenTypeShippingAddress,
+		},
+	}
+	resp, err := client.Authorize(authRequest)
+	if err != nil {
+		t.Errorf("Expected no error: received: %s", err)
+	}
+	if resp != nil && resp.Success != true {
+		t.Errorf("Expected Success: received: %s", resp.ErrorCode)
+	}
+
+	if t.Failed() {
+		return
+	}
+
+	if customerToken, ok := resp.CreatedTokens[sleet.TokenTypeCustomer]; len(customerToken) == 0 {
+		t.Errorf("Expected customer token, received: '%s' %t", customerToken, ok)
+	}
+	if paymentToken, ok := resp.CreatedTokens[sleet.TokenTypePayment]; len(paymentToken) == 0 {
+		t.Errorf("Expected payment token, received: '%s' %t", paymentToken, ok)
+	}
+	if paymentIdentifierToken, ok := resp.CreatedTokens[sleet.TokenTypeCustomer]; len(paymentIdentifierToken) == 0 {
+		t.Errorf("Expected payment identifier token, received: '%s' %t", paymentIdentifierToken, ok)
+	}
+	if shippingAddressToken, ok := resp.CreatedTokens[sleet.TokenTypeCustomer]; len(shippingAddressToken) == 0 {
+		t.Errorf("Expected shipping address token, received: '%s' %t", shippingAddressToken, ok)
+	}
+
+	if t.Failed() {
+		return
+	}
+
+	capResp, err := client.Capture(&sleet.CaptureRequest{
+		Amount:                     &authRequest.Amount,
+		TransactionReference:       resp.TransactionReference,
+		ClientTransactionReference: sPtr("[capture]-CUSTOMER-REFERENCE-CODE"),
+	})
+	if err != nil {
+		t.Errorf("Expected no error: received: %s", err)
+	}
+	if capResp != nil && capResp.ErrorCode != nil {
+		t.Errorf("Expected No Error Code: received: %s", *capResp.ErrorCode)
 	}
 }
 

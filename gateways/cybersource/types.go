@@ -39,11 +39,11 @@ type Response struct {
 	ErrorInformation           *ErrorInformation           `json:"errorInformation,omitempty"`
 	ClientReferenceInformation *ClientReferenceInformation `json:"clientReferenceInformation,omitempty"`
 	ProcessorInformation       *ProcessorInformation       `json:"processorInformation,omitempty"`
+	PaymentInformation         *PaymentInformation         `json:"paymentInformation,omitempty"`
 	OrderInformation           *OrderInformation           `json:"orderInformation,omitempty"`
 	ErrorReason                *string                     `json:"reason,omitempty"`
 	ErrorMessage               *string                     `json:"message,omitempty"`
 	Details                    *[]Detail                   `json:"details,omitempty"`
-	// TODO: Add payment additional response info
 }
 
 // ErrorInformation holds error information from an otherwise successful authorization request.
@@ -86,12 +86,14 @@ type ProcessorInformation struct {
 
 // ProcessingInformation specifies various fields for authorize for options (auto-capture, Level3 Data, etc)
 type ProcessingInformation struct {
-	Capture              bool                  `json:"capture,omitempty"`
-	CaptureOptions       *CaptureOptions       `json:"captureOptions,omitempty"`
-	CommerceIndicator    string                `json:"commerceIndicator"` // typically internet
-	PaymentSolution      string                `json:"paymentSolution"`
-	PurchaseLevel        string                `json:"purchaseLevel,omitempty"` // Specifies if level 3 data is being sent
-	AuthorizationOptions *AuthorizationOptions `json:"authorizationOptions,omitempty"`
+	Capture              bool                        `json:"capture,omitempty"`
+	CaptureOptions       *CaptureOptions             `json:"captureOptions,omitempty"`
+	CommerceIndicator    string                      `json:"commerceIndicator"` // typically internet
+	PaymentSolution      string                      `json:"paymentSolution"`
+	PurchaseLevel        string                      `json:"purchaseLevel,omitempty"` // Specifies if level 3 data is being sent
+	AuthorizationOptions *AuthorizationOptions       `json:"authorizationOptions,omitempty"`
+	ActionList           []ProcessingAction          `json:"actionList,omitempty"`
+	ActionTokenTypes     []ProcessingActionTokenType `json:"actionTokenTypes,omitempty"`
 }
 
 // OrderInformation is also used for authorize mainly to specify billing details and other Level3 items
@@ -159,8 +161,12 @@ type ShippingDetails struct {
 
 // PaymentInformation stores Card or TokenizedCard information (but can be extended to other payment types)
 type PaymentInformation struct {
-	Card          *CardInformation `json:"card,omitempty"`
-	TokenizedCard *TokenizedCard   `json:"tokenizedCard,omitempty"`
+	Card                 *CardInformation      `json:"card,omitempty"`
+	TokenizedCard        *TokenizedCard        `json:"tokenizedCard,omitempty"`
+	Customer             *Customer             `json:"customer,omitempty"`
+	PaymentInstrument    *PaymentInstrument    `json:"paymentInstrument,omitempty"`
+	InstrumentIdentifier *InstrumentIdentifier `json:"instrumentIdentifier,omitempty"`
+	ShippingAddress      *ShippingAddress      `json:"shippingAddress,omitempty"`
 }
 
 // MerchantDefinedInformation stores the custom data that the merchant defines.
@@ -187,6 +193,26 @@ type TokenizedCard struct {
 	Cryptogram      string `json:"cryptogram"`
 }
 
+// Customer stores tokenized customer information
+type Customer struct {
+	ID string `json:"id"`
+}
+
+// PaymentInstrument stores tokenized payment method information
+type PaymentInstrument struct {
+	ID string `json:"id"`
+}
+
+// InstrumentIdentifier stores tokenized payment method identifier information
+type InstrumentIdentifier struct {
+	ID string `json:"id"`
+}
+
+// ShippingAddress stores tokenized shipping address information.
+type ShippingAddress struct {
+	ID string `json:"id"`
+}
+
 // Links are part of the response which specify URLs to hit via REST to take follow-up actions (capture, void, etc)
 type Links struct {
 	Self         *Link `json:"self,omitempty"`
@@ -205,6 +231,28 @@ type Link struct {
 type AuthorizationOptions struct {
 	Initiator *Initiator `json:"initiator,omitempty"`
 }
+
+// ProcessingAction defines actions to be included in the payment to invoke bundled services along with payment.
+type ProcessingAction string
+
+const (
+	ProcessingActionDecisionSkip                   ProcessingAction = "DECISION_SKIP"
+	ProcessingActionTokenCreate                    ProcessingAction = "TOKEN_CREATE"
+	ProcessingActionConsumerAuthentication         ProcessingAction = "CONSUMER_AUTHENTICATION"
+	ProcessingActionValidateConsumerAuthentication ProcessingAction = "VALIDATE_CONSUMER_AUTHENTICATION"
+	ProcessingActionAlternatePaymentInitiate       ProcessingAction = "AP_INITIATE"
+	ProcessingActionWatchlistScreening             ProcessingAction = "WATCHLIST_SCREENING"
+)
+
+// ProcessingActionTokenType defines token types that can be created when using ProcessingActionTokenCreate.
+type ProcessingActionTokenType string
+
+const (
+	ProcessingActionTokenTypeCustomer             ProcessingActionTokenType = "customer"
+	ProcessingActionTokenTypePaymentInstrument    ProcessingActionTokenType = "paymentInstrument"
+	ProcessingActionTokenTypeInstrumentIdentifier ProcessingActionTokenType = "instrumentIdentifier"
+	ProcessingActionTokenTypeShippingAddress      ProcessingActionTokenType = "shippingAddress"
+)
 
 type Initiator struct {
 	InitiatorType          string `json:"type"`

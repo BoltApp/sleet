@@ -156,6 +156,27 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest) (*Request, error)
 			})
 		}
 	}
+
+	if authRequest.Options[sleet.CyberSourceTokenizeOption] != nil {
+		// It is on purpose that we set the TokenCreate option even if none of the token types convert successfully
+		// or if there are no token types provided. CyberSource offers a feature where a default token type to create is
+		// configured per-merchant, and sending TokenCreate with no token types defined is the way to use that feature.
+		request.ProcessingInformation.ActionList = append(
+			request.ProcessingInformation.ActionList,
+			ProcessingActionTokenCreate,
+		)
+		tokenTypesToCreate := authRequest.Options[sleet.CyberSourceTokenizeOption].([]sleet.TokenType)
+		for _, tokenType := range tokenTypesToCreate {
+			cybersourceTokenType, ok := translateTokenType(tokenType)
+			if ok {
+				request.ProcessingInformation.ActionTokenTypes = append(
+					request.ProcessingInformation.ActionTokenTypes,
+					cybersourceTokenType,
+				)
+			}
+		}
+	}
+
 	return request, nil
 }
 

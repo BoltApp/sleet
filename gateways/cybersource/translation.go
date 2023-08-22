@@ -48,6 +48,13 @@ var avsMap = map[string]sleet.AVSResponse{
 	"2": sleet.AVSResponseUnknown,
 }
 
+var tokenTypeMap = map[sleet.TokenType]ProcessingActionTokenType{
+	sleet.TokenTypeCustomer:          ProcessingActionTokenTypeCustomer,
+	sleet.TokenTypePayment:           ProcessingActionTokenTypePaymentInstrument,
+	sleet.TokenTypePaymentIdentifier: ProcessingActionTokenTypeInstrumentIdentifier,
+	sleet.TokenTypeShippingAddress:   ProcessingActionTokenTypeShippingAddress,
+}
+
 // translateCvv converts a CyberSource CVV response code to its equivalent Sleet standard code.
 func translateCvv(rawCvv string) sleet.CVVResponse {
 	sleetCode, ok := cvvMap[rawCvv]
@@ -64,4 +71,10 @@ func translateAvs(rawAvs string) sleet.AVSResponse {
 		return sleet.AVSResponseUnknown
 	}
 	return sleetCode
+}
+
+// translateTokenType converts a Sleet token type to a CyberSource token request action.
+func translateTokenType(sleetTokenType sleet.TokenType) (ProcessingActionTokenType, bool) {
+	cybersourceTokenType, ok := tokenTypeMap[sleetTokenType]
+	return cybersourceTokenType, ok
 }
