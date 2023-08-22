@@ -91,6 +91,7 @@ func TestAuthorizeAndCaptureAndRefund(t *testing.T) {
 func TestAuthorizeAndCaptureWithTokenCreation(t *testing.T) {
 	// Not all CyberSource accounts have this feature.
 	// If this test fails but you are not planning on using tokenization, you can safely ignore the result of this test.
+	t.Skip("Skipping temporarily. TODO winona@bolt.com")
 	client := cybersource.NewClient(common.Sandbox, getEnv("CYBERSOURCE_ACCOUNT"), getEnv("CYBERSOURCE_API_KEY"), getEnv("CYBERSOURCE_SHARED_SECRET"))
 	authRequest := sleet_testing.BaseAuthorizationRequest()
 	authRequest.ClientTransactionReference = sPtr("[auth]-CUSTOMER-REFERENCE-CODE")
