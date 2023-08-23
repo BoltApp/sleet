@@ -141,7 +141,7 @@ func buildCreatedTokens(paymentInformation PaymentInformation) map[sleet.TokenTy
 		createdTokens[sleet.TokenTypePaymentIdentifier] = paymentInformation.InstrumentIdentifier.ID
 	}
 	if paymentInformation.ShippingAddress != nil {
-		createdTokens[sleet.TokenTypeShippingAddress] = paymentInformation.InstrumentIdentifier.ID
+		createdTokens[sleet.TokenTypeShippingAddress] = paymentInformation.ShippingAddress.ID
 	}
 	if len(createdTokens) == 0 {
 		return nil
