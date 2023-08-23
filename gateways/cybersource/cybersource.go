@@ -116,6 +116,9 @@ func (client *CybersourceClient) AuthorizeWithContext(ctx context.Context, reque
 		response.ExternalTransactionID = cybersourceResponse.ProcessorInformation.TransactionID
 		response.Metadata = buildResponseMetadata(*cybersourceResponse.ProcessorInformation)
 	}
+	if cybersourceResponse.PaymentInformation != nil {
+		response.CreatedTokens = buildCreatedTokens(*cybersourceResponse.PaymentInformation)
+	}
 	return response, nil
 }
 
@@ -124,6 +127,26 @@ func buildResponseMetadata(processorInformation ProcessorInformation) map[string
 	metadata[sleet.ApprovalCodeMetadata] = processorInformation.ApprovalCode
 	metadata[sleet.ResponseCodeMetadata] = processorInformation.ResponseCode
 	return metadata
+}
+
+func buildCreatedTokens(paymentInformation PaymentInformation) map[sleet.TokenType]string {
+	createdTokens := map[sleet.TokenType]string{}
+	if paymentInformation.Customer != nil {
+		createdTokens[sleet.TokenTypeCustomer] = paymentInformation.Customer.ID
+	}
+	if paymentInformation.PaymentInstrument != nil {
+		createdTokens[sleet.TokenTypePayment] = paymentInformation.PaymentInstrument.ID
+	}
+	if paymentInformation.InstrumentIdentifier != nil {
+		createdTokens[sleet.TokenTypePaymentIdentifier] = paymentInformation.InstrumentIdentifier.ID
+	}
+	if paymentInformation.ShippingAddress != nil {
+		createdTokens[sleet.TokenTypeShippingAddress] = paymentInformation.ShippingAddress.ID
+	}
+	if len(createdTokens) == 0 {
+		return nil
+	}
+	return createdTokens
 }
 
 // Capture captures an authorized payment through CyberSource. If successful, the capture response will be returned.

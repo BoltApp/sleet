@@ -15,12 +15,23 @@ import (
 )
 
 func TestBuildAuthRequest(t *testing.T) {
-	base := getBaseAuthorizationRequest(sleet.CreditCardNetworkVisa, "")
-	visaApplepayBase := getBaseAuthorizationRequest(sleet.CreditCardNetworkVisa, "crypto")
-	mastercardApplepayBase := getBaseAuthorizationRequest(sleet.CreditCardNetworkMastercard, "crypto")
-	discoverApplepayBase := getBaseAuthorizationRequest(sleet.CreditCardNetworkDiscover, "crypto")
-	amexApplepayBase := getBaseAuthorizationRequest(sleet.CreditCardNetworkAmex, "crypto")
-	amexLongCryptoApplepayBase := getBaseAuthorizationRequest(sleet.CreditCardNetworkAmex, strings.Repeat("c", 40))
+	basic := getBaseAuthorizationRequest(sleet.CreditCardNetworkVisa, "")
+	visaApplepay := getBaseAuthorizationRequest(sleet.CreditCardNetworkVisa, "crypto")
+	mastercardApplepay := getBaseAuthorizationRequest(sleet.CreditCardNetworkMastercard, "crypto")
+	discoverApplepay := getBaseAuthorizationRequest(sleet.CreditCardNetworkDiscover, "crypto")
+	amexApplepay := getBaseAuthorizationRequest(sleet.CreditCardNetworkAmex, "crypto")
+	amexLongCryptoApplepay := getBaseAuthorizationRequest(sleet.CreditCardNetworkAmex, strings.Repeat("c", 40))
+	basicWithTokenize := getBaseAuthorizationRequest(sleet.CreditCardNetworkVisa, "")
+	basicWithTokenize.Options = map[string]interface{}{
+		sleet.CyberSourceTokenizeOption: []sleet.TokenType{
+			sleet.TokenTypeCustomer,
+			sleet.TokenTypePayment,
+		},
+	}
+	basicWithDefaultTokenize := getBaseAuthorizationRequest(sleet.CreditCardNetworkVisa, "")
+	basicWithDefaultTokenize.Options = map[string]interface{}{
+		sleet.CyberSourceTokenizeOption: []sleet.TokenType{},
+	}
 
 	cases := []struct {
 		label string
@@ -29,12 +40,12 @@ func TestBuildAuthRequest(t *testing.T) {
 	}{
 		{
 			"Basic Auth Request",
-			base,
+			basic,
 			&Request{
 				ClientReferenceInformation: &ClientReferenceInformation{
-					Code: base.MerchantOrderReference,
+					Code: basic.MerchantOrderReference,
 					Partner: Partner{
-						SolutionID: base.Channel,
+						SolutionID: basic.Channel,
 					},
 				},
 				ProcessingInformation: &ProcessingInformation{
@@ -50,10 +61,10 @@ func TestBuildAuthRequest(t *testing.T) {
 				},
 				PaymentInformation: &PaymentInformation{
 					Card: &CardInformation{
-						ExpYear:  strconv.Itoa(base.CreditCard.ExpirationYear),
-						ExpMonth: strconv.Itoa(base.CreditCard.ExpirationMonth),
-						Number:   base.CreditCard.Number,
-						CVV:      base.CreditCard.CVV,
+						ExpYear:  strconv.Itoa(basic.CreditCard.ExpirationYear),
+						ExpMonth: strconv.Itoa(basic.CreditCard.ExpirationMonth),
+						Number:   basic.CreditCard.Number,
+						CVV:      basic.CreditCard.CVV,
 					},
 				},
 				OrderInformation: &OrderInformation{
@@ -62,34 +73,34 @@ func TestBuildAuthRequest(t *testing.T) {
 						Currency: "USD",
 					},
 					BillTo: BillingInformation{
-						FirstName:  base.CreditCard.FirstName,
-						LastName:   base.CreditCard.LastName,
-						Address1:   *base.BillingAddress.StreetAddress1,
-						Address2:   common.SafeStr(base.BillingAddress.StreetAddress2),
-						PostalCode: *base.BillingAddress.PostalCode,
-						Locality:   *base.BillingAddress.Locality,
-						AdminArea:  *base.BillingAddress.RegionCode,
-						Country:    common.SafeStr(base.BillingAddress.CountryCode),
-						Email:      common.SafeStr(base.BillingAddress.Email),
-						Company:    common.SafeStr(base.BillingAddress.Company),
+						FirstName:  basic.CreditCard.FirstName,
+						LastName:   basic.CreditCard.LastName,
+						Address1:   *basic.BillingAddress.StreetAddress1,
+						Address2:   common.SafeStr(basic.BillingAddress.StreetAddress2),
+						PostalCode: *basic.BillingAddress.PostalCode,
+						Locality:   *basic.BillingAddress.Locality,
+						AdminArea:  *basic.BillingAddress.RegionCode,
+						Country:    common.SafeStr(basic.BillingAddress.CountryCode),
+						Email:      common.SafeStr(basic.BillingAddress.Email),
+						Company:    common.SafeStr(basic.BillingAddress.Company),
 					},
 				},
 				MerchantDefinedInformation: []MerchantDefinedInformation{
 					{
 						Key:   "1",
-						Value: *base.ClientTransactionReference,
+						Value: *basic.ClientTransactionReference,
 					},
 				},
 			},
 		},
 		{
 			"Apple pay Visa Auth Request",
-			visaApplepayBase,
+			visaApplepay,
 			&Request{
 				ClientReferenceInformation: &ClientReferenceInformation{
-					Code: visaApplepayBase.MerchantOrderReference,
+					Code: visaApplepay.MerchantOrderReference,
 					Partner: Partner{
-						SolutionID: visaApplepayBase.Channel,
+						SolutionID: visaApplepay.Channel,
 					},
 				},
 				ProcessingInformation: &ProcessingInformation{
@@ -106,17 +117,17 @@ func TestBuildAuthRequest(t *testing.T) {
 				},
 				PaymentInformation: &PaymentInformation{
 					TokenizedCard: &TokenizedCard{
-						Number:          visaApplepayBase.CreditCard.Number,
-						ExpirationYear:  strconv.Itoa(visaApplepayBase.CreditCard.ExpirationYear),
-						ExpirationMonth: fmt.Sprintf("%02d", visaApplepayBase.CreditCard.ExpirationMonth),
+						Number:          visaApplepay.CreditCard.Number,
+						ExpirationYear:  strconv.Itoa(visaApplepay.CreditCard.ExpirationYear),
+						ExpirationMonth: fmt.Sprintf("%02d", visaApplepay.CreditCard.ExpirationMonth),
 						TransactionType: "1",
-						Cryptogram:      visaApplepayBase.Cryptogram,
+						Cryptogram:      visaApplepay.Cryptogram,
 						Type:            "001",
 					},
 				},
 				ConsumerAuthenticationInformation: &ConsumerAuthenticationInformation{
-					Xid:  visaApplepayBase.Cryptogram,
-					Cavv: visaApplepayBase.Cryptogram,
+					Xid:  visaApplepay.Cryptogram,
+					Cavv: visaApplepay.Cryptogram,
 				},
 				OrderInformation: &OrderInformation{
 					AmountDetails: AmountDetails{
@@ -124,34 +135,34 @@ func TestBuildAuthRequest(t *testing.T) {
 						Currency: "USD",
 					},
 					BillTo: BillingInformation{
-						FirstName:  visaApplepayBase.CreditCard.FirstName,
-						LastName:   visaApplepayBase.CreditCard.LastName,
-						Address1:   *visaApplepayBase.BillingAddress.StreetAddress1,
-						Address2:   common.SafeStr(visaApplepayBase.BillingAddress.StreetAddress2),
-						PostalCode: *visaApplepayBase.BillingAddress.PostalCode,
-						Locality:   *visaApplepayBase.BillingAddress.Locality,
-						AdminArea:  *visaApplepayBase.BillingAddress.RegionCode,
-						Country:    common.SafeStr(visaApplepayBase.BillingAddress.CountryCode),
-						Email:      common.SafeStr(visaApplepayBase.BillingAddress.Email),
-						Company:    common.SafeStr(visaApplepayBase.BillingAddress.Company),
+						FirstName:  visaApplepay.CreditCard.FirstName,
+						LastName:   visaApplepay.CreditCard.LastName,
+						Address1:   *visaApplepay.BillingAddress.StreetAddress1,
+						Address2:   common.SafeStr(visaApplepay.BillingAddress.StreetAddress2),
+						PostalCode: *visaApplepay.BillingAddress.PostalCode,
+						Locality:   *visaApplepay.BillingAddress.Locality,
+						AdminArea:  *visaApplepay.BillingAddress.RegionCode,
+						Country:    common.SafeStr(visaApplepay.BillingAddress.CountryCode),
+						Email:      common.SafeStr(visaApplepay.BillingAddress.Email),
+						Company:    common.SafeStr(visaApplepay.BillingAddress.Company),
 					},
 				},
 				MerchantDefinedInformation: []MerchantDefinedInformation{
 					{
 						Key:   "1",
-						Value: *visaApplepayBase.ClientTransactionReference,
+						Value: *visaApplepay.ClientTransactionReference,
 					},
 				},
 			},
 		},
 		{
 			"Apple pay Mastercard Auth Request",
-			mastercardApplepayBase,
+			mastercardApplepay,
 			&Request{
 				ClientReferenceInformation: &ClientReferenceInformation{
-					Code: mastercardApplepayBase.MerchantOrderReference,
+					Code: mastercardApplepay.MerchantOrderReference,
 					Partner: Partner{
-						SolutionID: mastercardApplepayBase.Channel,
+						SolutionID: mastercardApplepay.Channel,
 					},
 				},
 				ProcessingInformation: &ProcessingInformation{
@@ -168,16 +179,16 @@ func TestBuildAuthRequest(t *testing.T) {
 				},
 				PaymentInformation: &PaymentInformation{
 					TokenizedCard: &TokenizedCard{
-						Number:          mastercardApplepayBase.CreditCard.Number,
-						ExpirationYear:  strconv.Itoa(mastercardApplepayBase.CreditCard.ExpirationYear),
-						ExpirationMonth: fmt.Sprintf("%02d", mastercardApplepayBase.CreditCard.ExpirationMonth),
+						Number:          mastercardApplepay.CreditCard.Number,
+						ExpirationYear:  strconv.Itoa(mastercardApplepay.CreditCard.ExpirationYear),
+						ExpirationMonth: fmt.Sprintf("%02d", mastercardApplepay.CreditCard.ExpirationMonth),
 						TransactionType: "1",
-						Cryptogram:      mastercardApplepayBase.Cryptogram,
+						Cryptogram:      mastercardApplepay.Cryptogram,
 						Type:            "002",
 					},
 				},
 				ConsumerAuthenticationInformation: &ConsumerAuthenticationInformation{
-					UcafAuthenticationData:  mastercardApplepayBase.Cryptogram,
+					UcafAuthenticationData:  mastercardApplepay.Cryptogram,
 					UcafCollectionIndicator: "2",
 				},
 				OrderInformation: &OrderInformation{
@@ -186,34 +197,34 @@ func TestBuildAuthRequest(t *testing.T) {
 						Currency: "USD",
 					},
 					BillTo: BillingInformation{
-						FirstName:  mastercardApplepayBase.CreditCard.FirstName,
-						LastName:   mastercardApplepayBase.CreditCard.LastName,
-						Address1:   *mastercardApplepayBase.BillingAddress.StreetAddress1,
-						Address2:   common.SafeStr(mastercardApplepayBase.BillingAddress.StreetAddress2),
-						PostalCode: *mastercardApplepayBase.BillingAddress.PostalCode,
-						Locality:   *mastercardApplepayBase.BillingAddress.Locality,
-						AdminArea:  *mastercardApplepayBase.BillingAddress.RegionCode,
-						Country:    common.SafeStr(mastercardApplepayBase.BillingAddress.CountryCode),
-						Email:      common.SafeStr(mastercardApplepayBase.BillingAddress.Email),
-						Company:    common.SafeStr(mastercardApplepayBase.BillingAddress.Company),
+						FirstName:  mastercardApplepay.CreditCard.FirstName,
+						LastName:   mastercardApplepay.CreditCard.LastName,
+						Address1:   *mastercardApplepay.BillingAddress.StreetAddress1,
+						Address2:   common.SafeStr(mastercardApplepay.BillingAddress.StreetAddress2),
+						PostalCode: *mastercardApplepay.BillingAddress.PostalCode,
+						Locality:   *mastercardApplepay.BillingAddress.Locality,
+						AdminArea:  *mastercardApplepay.BillingAddress.RegionCode,
+						Country:    common.SafeStr(mastercardApplepay.BillingAddress.CountryCode),
+						Email:      common.SafeStr(mastercardApplepay.BillingAddress.Email),
+						Company:    common.SafeStr(mastercardApplepay.BillingAddress.Company),
 					},
 				},
 				MerchantDefinedInformation: []MerchantDefinedInformation{
 					{
 						Key:   "1",
-						Value: *mastercardApplepayBase.ClientTransactionReference,
+						Value: *mastercardApplepay.ClientTransactionReference,
 					},
 				},
 			},
 		},
 		{
 			"Apple pay Discover Auth Request",
-			discoverApplepayBase,
+			discoverApplepay,
 			&Request{
 				ClientReferenceInformation: &ClientReferenceInformation{
-					Code: discoverApplepayBase.MerchantOrderReference,
+					Code: discoverApplepay.MerchantOrderReference,
 					Partner: Partner{
-						SolutionID: discoverApplepayBase.Channel,
+						SolutionID: discoverApplepay.Channel,
 					},
 				},
 				ProcessingInformation: &ProcessingInformation{
@@ -230,16 +241,16 @@ func TestBuildAuthRequest(t *testing.T) {
 				},
 				PaymentInformation: &PaymentInformation{
 					TokenizedCard: &TokenizedCard{
-						Number:          discoverApplepayBase.CreditCard.Number,
-						ExpirationYear:  strconv.Itoa(discoverApplepayBase.CreditCard.ExpirationYear),
-						ExpirationMonth: fmt.Sprintf("%02d", discoverApplepayBase.CreditCard.ExpirationMonth),
+						Number:          discoverApplepay.CreditCard.Number,
+						ExpirationYear:  strconv.Itoa(discoverApplepay.CreditCard.ExpirationYear),
+						ExpirationMonth: fmt.Sprintf("%02d", discoverApplepay.CreditCard.ExpirationMonth),
 						TransactionType: "1",
-						Cryptogram:      discoverApplepayBase.Cryptogram,
+						Cryptogram:      discoverApplepay.Cryptogram,
 						Type:            "004",
 					},
 				},
 				ConsumerAuthenticationInformation: &ConsumerAuthenticationInformation{
-					Cavv: discoverApplepayBase.Cryptogram,
+					Cavv: discoverApplepay.Cryptogram,
 				},
 				OrderInformation: &OrderInformation{
 					AmountDetails: AmountDetails{
@@ -247,34 +258,34 @@ func TestBuildAuthRequest(t *testing.T) {
 						Currency: "USD",
 					},
 					BillTo: BillingInformation{
-						FirstName:  discoverApplepayBase.CreditCard.FirstName,
-						LastName:   discoverApplepayBase.CreditCard.LastName,
-						Address1:   *discoverApplepayBase.BillingAddress.StreetAddress1,
-						Address2:   common.SafeStr(discoverApplepayBase.BillingAddress.StreetAddress2),
-						PostalCode: *discoverApplepayBase.BillingAddress.PostalCode,
-						Locality:   *discoverApplepayBase.BillingAddress.Locality,
-						AdminArea:  *discoverApplepayBase.BillingAddress.RegionCode,
-						Country:    common.SafeStr(discoverApplepayBase.BillingAddress.CountryCode),
-						Email:      common.SafeStr(discoverApplepayBase.BillingAddress.Email),
-						Company:    common.SafeStr(discoverApplepayBase.BillingAddress.Company),
+						FirstName:  discoverApplepay.CreditCard.FirstName,
+						LastName:   discoverApplepay.CreditCard.LastName,
+						Address1:   *discoverApplepay.BillingAddress.StreetAddress1,
+						Address2:   common.SafeStr(discoverApplepay.BillingAddress.StreetAddress2),
+						PostalCode: *discoverApplepay.BillingAddress.PostalCode,
+						Locality:   *discoverApplepay.BillingAddress.Locality,
+						AdminArea:  *discoverApplepay.BillingAddress.RegionCode,
+						Country:    common.SafeStr(discoverApplepay.BillingAddress.CountryCode),
+						Email:      common.SafeStr(discoverApplepay.BillingAddress.Email),
+						Company:    common.SafeStr(discoverApplepay.BillingAddress.Company),
 					},
 				},
 				MerchantDefinedInformation: []MerchantDefinedInformation{
 					{
 						Key:   "1",
-						Value: *discoverApplepayBase.ClientTransactionReference,
+						Value: *discoverApplepay.ClientTransactionReference,
 					},
 				},
 			},
 		},
 		{
 			"Apple pay Amex Auth Request",
-			amexApplepayBase,
+			amexApplepay,
 			&Request{
 				ClientReferenceInformation: &ClientReferenceInformation{
-					Code: amexApplepayBase.MerchantOrderReference,
+					Code: amexApplepay.MerchantOrderReference,
 					Partner: Partner{
-						SolutionID: amexApplepayBase.Channel,
+						SolutionID: amexApplepay.Channel,
 					},
 				},
 				ProcessingInformation: &ProcessingInformation{
@@ -291,16 +302,16 @@ func TestBuildAuthRequest(t *testing.T) {
 				},
 				PaymentInformation: &PaymentInformation{
 					TokenizedCard: &TokenizedCard{
-						Number:          amexApplepayBase.CreditCard.Number,
-						ExpirationYear:  strconv.Itoa(amexApplepayBase.CreditCard.ExpirationYear),
-						ExpirationMonth: fmt.Sprintf("%02d", amexApplepayBase.CreditCard.ExpirationMonth),
+						Number:          amexApplepay.CreditCard.Number,
+						ExpirationYear:  strconv.Itoa(amexApplepay.CreditCard.ExpirationYear),
+						ExpirationMonth: fmt.Sprintf("%02d", amexApplepay.CreditCard.ExpirationMonth),
 						TransactionType: "1",
-						Cryptogram:      amexApplepayBase.Cryptogram,
+						Cryptogram:      amexApplepay.Cryptogram,
 						Type:            "003",
 					},
 				},
 				ConsumerAuthenticationInformation: &ConsumerAuthenticationInformation{
-					Cavv: amexApplepayBase.Cryptogram,
+					Cavv: amexApplepay.Cryptogram,
 				},
 				OrderInformation: &OrderInformation{
 					AmountDetails: AmountDetails{
@@ -308,34 +319,34 @@ func TestBuildAuthRequest(t *testing.T) {
 						Currency: "USD",
 					},
 					BillTo: BillingInformation{
-						FirstName:  amexApplepayBase.CreditCard.FirstName,
-						LastName:   amexApplepayBase.CreditCard.LastName,
-						Address1:   *amexApplepayBase.BillingAddress.StreetAddress1,
-						Address2:   common.SafeStr(amexApplepayBase.BillingAddress.StreetAddress2),
-						PostalCode: *amexApplepayBase.BillingAddress.PostalCode,
-						Locality:   *amexApplepayBase.BillingAddress.Locality,
-						AdminArea:  *amexApplepayBase.BillingAddress.RegionCode,
-						Country:    common.SafeStr(amexApplepayBase.BillingAddress.CountryCode),
-						Email:      common.SafeStr(amexApplepayBase.BillingAddress.Email),
-						Company:    common.SafeStr(amexApplepayBase.BillingAddress.Company),
+						FirstName:  amexApplepay.CreditCard.FirstName,
+						LastName:   amexApplepay.CreditCard.LastName,
+						Address1:   *amexApplepay.BillingAddress.StreetAddress1,
+						Address2:   common.SafeStr(amexApplepay.BillingAddress.StreetAddress2),
+						PostalCode: *amexApplepay.BillingAddress.PostalCode,
+						Locality:   *amexApplepay.BillingAddress.Locality,
+						AdminArea:  *amexApplepay.BillingAddress.RegionCode,
+						Country:    common.SafeStr(amexApplepay.BillingAddress.CountryCode),
+						Email:      common.SafeStr(amexApplepay.BillingAddress.Email),
+						Company:    common.SafeStr(amexApplepay.BillingAddress.Company),
 					},
 				},
 				MerchantDefinedInformation: []MerchantDefinedInformation{
 					{
 						Key:   "1",
-						Value: *amexApplepayBase.ClientTransactionReference,
+						Value: *amexApplepay.ClientTransactionReference,
 					},
 				},
 			},
 		},
 		{
 			"Apple pay Amex Long Cryptogram Auth Request",
-			amexLongCryptoApplepayBase,
+			amexLongCryptoApplepay,
 			&Request{
 				ClientReferenceInformation: &ClientReferenceInformation{
-					Code: amexLongCryptoApplepayBase.MerchantOrderReference,
+					Code: amexLongCryptoApplepay.MerchantOrderReference,
 					Partner: Partner{
-						SolutionID: amexLongCryptoApplepayBase.Channel,
+						SolutionID: amexLongCryptoApplepay.Channel,
 					},
 				},
 				ProcessingInformation: &ProcessingInformation{
@@ -352,17 +363,17 @@ func TestBuildAuthRequest(t *testing.T) {
 				},
 				PaymentInformation: &PaymentInformation{
 					TokenizedCard: &TokenizedCard{
-						Number:          amexLongCryptoApplepayBase.CreditCard.Number,
-						ExpirationYear:  strconv.Itoa(amexLongCryptoApplepayBase.CreditCard.ExpirationYear),
-						ExpirationMonth: fmt.Sprintf("%02d", amexLongCryptoApplepayBase.CreditCard.ExpirationMonth),
+						Number:          amexLongCryptoApplepay.CreditCard.Number,
+						ExpirationYear:  strconv.Itoa(amexLongCryptoApplepay.CreditCard.ExpirationYear),
+						ExpirationMonth: fmt.Sprintf("%02d", amexLongCryptoApplepay.CreditCard.ExpirationMonth),
 						TransactionType: "1",
-						Cryptogram:      amexLongCryptoApplepayBase.Cryptogram,
+						Cryptogram:      amexLongCryptoApplepay.Cryptogram,
 						Type:            "003",
 					},
 				},
 				ConsumerAuthenticationInformation: &ConsumerAuthenticationInformation{
-					Cavv: amexLongCryptoApplepayBase.Cryptogram[:20],
-					Xid:  amexLongCryptoApplepayBase.Cryptogram[20:],
+					Cavv: amexLongCryptoApplepay.Cryptogram[:20],
+					Xid:  amexLongCryptoApplepay.Cryptogram[20:],
 				},
 				OrderInformation: &OrderInformation{
 					AmountDetails: AmountDetails{
@@ -370,22 +381,138 @@ func TestBuildAuthRequest(t *testing.T) {
 						Currency: "USD",
 					},
 					BillTo: BillingInformation{
-						FirstName:  amexLongCryptoApplepayBase.CreditCard.FirstName,
-						LastName:   amexLongCryptoApplepayBase.CreditCard.LastName,
-						Address1:   *amexLongCryptoApplepayBase.BillingAddress.StreetAddress1,
-						Address2:   common.SafeStr(amexLongCryptoApplepayBase.BillingAddress.StreetAddress2),
-						PostalCode: *amexLongCryptoApplepayBase.BillingAddress.PostalCode,
-						Locality:   *amexLongCryptoApplepayBase.BillingAddress.Locality,
-						AdminArea:  *amexLongCryptoApplepayBase.BillingAddress.RegionCode,
-						Country:    common.SafeStr(amexLongCryptoApplepayBase.BillingAddress.CountryCode),
-						Email:      common.SafeStr(amexLongCryptoApplepayBase.BillingAddress.Email),
-						Company:    common.SafeStr(amexLongCryptoApplepayBase.BillingAddress.Company),
+						FirstName:  amexLongCryptoApplepay.CreditCard.FirstName,
+						LastName:   amexLongCryptoApplepay.CreditCard.LastName,
+						Address1:   *amexLongCryptoApplepay.BillingAddress.StreetAddress1,
+						Address2:   common.SafeStr(amexLongCryptoApplepay.BillingAddress.StreetAddress2),
+						PostalCode: *amexLongCryptoApplepay.BillingAddress.PostalCode,
+						Locality:   *amexLongCryptoApplepay.BillingAddress.Locality,
+						AdminArea:  *amexLongCryptoApplepay.BillingAddress.RegionCode,
+						Country:    common.SafeStr(amexLongCryptoApplepay.BillingAddress.CountryCode),
+						Email:      common.SafeStr(amexLongCryptoApplepay.BillingAddress.Email),
+						Company:    common.SafeStr(amexLongCryptoApplepay.BillingAddress.Company),
 					},
 				},
 				MerchantDefinedInformation: []MerchantDefinedInformation{
 					{
 						Key:   "1",
-						Value: *amexLongCryptoApplepayBase.ClientTransactionReference,
+						Value: *amexLongCryptoApplepay.ClientTransactionReference,
+					},
+				},
+			},
+		},
+		{
+			"Auth Request with Tokenize Action",
+			basicWithTokenize,
+			&Request{
+				ClientReferenceInformation: &ClientReferenceInformation{
+					Code: basicWithTokenize.MerchantOrderReference,
+					Partner: Partner{
+						SolutionID: basicWithTokenize.Channel,
+					},
+				},
+				ProcessingInformation: &ProcessingInformation{
+					Capture:           false,
+					CommerceIndicator: "internet",
+					AuthorizationOptions: &AuthorizationOptions{
+						Initiator: &Initiator{
+							InitiatorType:          "",
+							CredentialStoredOnFile: false,
+							StoredCredentialUsed:   false,
+						},
+					},
+					ActionList: []ProcessingAction{ProcessingActionTokenCreate},
+					ActionTokenTypes: []ProcessingActionTokenType{
+						ProcessingActionTokenTypeCustomer,
+						ProcessingActionTokenTypePaymentInstrument,
+					},
+				},
+				PaymentInformation: &PaymentInformation{
+					Card: &CardInformation{
+						ExpYear:  strconv.Itoa(basicWithTokenize.CreditCard.ExpirationYear),
+						ExpMonth: strconv.Itoa(basicWithTokenize.CreditCard.ExpirationMonth),
+						Number:   basicWithTokenize.CreditCard.Number,
+						CVV:      basicWithTokenize.CreditCard.CVV,
+					},
+				},
+				OrderInformation: &OrderInformation{
+					AmountDetails: AmountDetails{
+						Amount:   "1.00",
+						Currency: "USD",
+					},
+					BillTo: BillingInformation{
+						FirstName:  basicWithTokenize.CreditCard.FirstName,
+						LastName:   basicWithTokenize.CreditCard.LastName,
+						Address1:   *basicWithTokenize.BillingAddress.StreetAddress1,
+						Address2:   common.SafeStr(basicWithTokenize.BillingAddress.StreetAddress2),
+						PostalCode: *basicWithTokenize.BillingAddress.PostalCode,
+						Locality:   *basicWithTokenize.BillingAddress.Locality,
+						AdminArea:  *basicWithTokenize.BillingAddress.RegionCode,
+						Country:    common.SafeStr(basicWithTokenize.BillingAddress.CountryCode),
+						Email:      common.SafeStr(basicWithTokenize.BillingAddress.Email),
+						Company:    common.SafeStr(basicWithTokenize.BillingAddress.Company),
+					},
+				},
+				MerchantDefinedInformation: []MerchantDefinedInformation{
+					{
+						Key:   "1",
+						Value: *basicWithTokenize.ClientTransactionReference,
+					},
+				},
+			},
+		},
+		{
+			"Auth Request with Default Tokenize Action",
+			basicWithDefaultTokenize,
+			&Request{
+				ClientReferenceInformation: &ClientReferenceInformation{
+					Code: basicWithDefaultTokenize.MerchantOrderReference,
+					Partner: Partner{
+						SolutionID: basicWithDefaultTokenize.Channel,
+					},
+				},
+				ProcessingInformation: &ProcessingInformation{
+					Capture:           false,
+					CommerceIndicator: "internet",
+					AuthorizationOptions: &AuthorizationOptions{
+						Initiator: &Initiator{
+							InitiatorType:          "",
+							CredentialStoredOnFile: false,
+							StoredCredentialUsed:   false,
+						},
+					},
+					ActionList: []ProcessingAction{ProcessingActionTokenCreate},
+				},
+				PaymentInformation: &PaymentInformation{
+					Card: &CardInformation{
+						ExpYear:  strconv.Itoa(basicWithDefaultTokenize.CreditCard.ExpirationYear),
+						ExpMonth: strconv.Itoa(basicWithDefaultTokenize.CreditCard.ExpirationMonth),
+						Number:   basicWithDefaultTokenize.CreditCard.Number,
+						CVV:      basicWithDefaultTokenize.CreditCard.CVV,
+					},
+				},
+				OrderInformation: &OrderInformation{
+					AmountDetails: AmountDetails{
+						Amount:   "1.00",
+						Currency: "USD",
+					},
+					BillTo: BillingInformation{
+						FirstName:  basicWithDefaultTokenize.CreditCard.FirstName,
+						LastName:   basicWithDefaultTokenize.CreditCard.LastName,
+						Address1:   *basicWithDefaultTokenize.BillingAddress.StreetAddress1,
+						Address2:   common.SafeStr(basicWithDefaultTokenize.BillingAddress.StreetAddress2),
+						PostalCode: *basicWithDefaultTokenize.BillingAddress.PostalCode,
+						Locality:   *basicWithDefaultTokenize.BillingAddress.Locality,
+						AdminArea:  *basicWithDefaultTokenize.BillingAddress.RegionCode,
+						Country:    common.SafeStr(basicWithDefaultTokenize.BillingAddress.CountryCode),
+						Email:      common.SafeStr(basicWithDefaultTokenize.BillingAddress.Email),
+						Company:    common.SafeStr(basicWithDefaultTokenize.BillingAddress.Company),
+					},
+				},
+				MerchantDefinedInformation: []MerchantDefinedInformation{
+					{
+						Key:   "1",
+						Value: *basicWithDefaultTokenize.ClientTransactionReference,
 					},
 				},
 			},

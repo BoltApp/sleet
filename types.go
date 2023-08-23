@@ -88,9 +88,21 @@ type Level3Data struct {
 }
 
 const (
+	// ResponseHeaderOption will return in the response the value for each HTTP header key listed in the option.
+	// Value type: []string
 	ResponseHeaderOption string = "ResponseHeader"
+
+	// GooglePayTokenOption will use the provided Google Pay token to authorize the payment.
+	// Value type: string
 	GooglePayTokenOption string = "GooglePayToken"
-	ApplePayTokenOption  string = "ApplePayToken"
+
+	// ApplePayTokenOption will use the provided Apple Pay token to authorize the payment.
+	// Value type: string
+	ApplePayTokenOption string = "ApplePayToken"
+
+	// CyberSourceTokenizeOption will cause tokens to be requested for each token type listed in the option.
+	// Value type: []TokenType
+	CyberSourceTokenizeOption string = "CyberSourceTokenize"
 )
 
 // AuthorizationRequest specifies needed information for request to authorize by PsPs
@@ -121,14 +133,14 @@ const (
 	ResponseCodeMetadata string = "responseCode"
 )
 
-// AuthorizationResponse is a generic response returned back to client after data massaging from PsP Response
-// The raw AVS and CVV are included if applicable
-// Success is true if Auth went through successfully
+// AuthorizationResponse is a generic response returned back to client after data massaging from PsP Response.
+// The raw AVS and CVV are included if applicable.
+// Raw fields contain the untranslated responses from processors, while
+// the non-raw fields are the best parsings to a single standard, with
+// loss of granularity minimized. The latter should be preferred when
+// treating Sleet as a black box.
 type AuthorizationResponse struct {
-	// Raw fields contain the untranslated responses from processors, while
-	// the non-raw fields are the best parsings to a single standard, with
-	// loss of granularity minimized. The latter should be preferred when
-	// treating Sleet as a black box.
+	// Success is true if Auth went through successfully
 	Success               bool
 	TransactionReference  string
 	ExternalTransactionID string
@@ -136,15 +148,22 @@ type AuthorizationResponse struct {
 	CvvResult             CVVResponse
 	Response              string
 	ErrorCode             string
-	Message               string // message from the gateway describing the reason for a failed auth
-	ResultType            ResultType
-	AvsResultRaw          string
-	CvvResultRaw          string
-	RTAUResult            *RTAUResponse
-	AdyenAdditionalData   map[string]string // store additional recurring info (will be refactored to general naming on next major version upgrade)
-	Metadata              map[string]string // store additional data that might be unique to PSP
-	StatusCode            int               // the status code from raw PSP http response.
-	Header                http.Header       // the http response header
+	// Message is from the gateway describing the reason for the response code, for example a failed auth.
+	Message      string
+	ResultType   ResultType
+	AvsResultRaw string
+	CvvResultRaw string
+	RTAUResult   *RTAUResponse
+	// AdyenAdditionalData stores additional recurring info (will be refactored to general naming on next major version upgrade)
+	AdyenAdditionalData map[string]string
+	// Metadata stores additional data that might be unique to PSP.
+	Metadata map[string]string
+	// CreatedTokens stores the tokens that were created as a result of the request, if any.
+	CreatedTokens map[TokenType]string
+	// StatusCode is the HTTP status code from the header of the PSP response.
+	StatusCode int
+	// Header is the HTTP header from the PSP response, filtered by the list of headers in the ResponseHeaderOption.
+	Header http.Header
 }
 
 // CaptureRequest specifies the authorized transaction to capture and also an amount for partial capture use cases
@@ -265,4 +284,24 @@ const (
 	ResultTypePaymentError ResultType = "PaymentError" // payment or credit card related error
 	ResultTypeAPIError     ResultType = "APIError"     // error related to the PSPs API (validation error, authentication, idempotency, etc)
 	ResultTypeServerError  ResultType = "ServerError"  // network, connection, timeout etc. errors
+)
+
+// TokenType defines the type of token, used either as input to complete a transaction, or as output to be saved for
+// future transactions.
+type TokenType string
+
+const (
+	// TokenTypeCustomer points to a token that can be mapped to information about a customer.
+	// Examples of mapped data: name + shipping address + list of preferred payment methods.
+	TokenTypeCustomer TokenType = "customerToken"
+
+	// TokenTypePayment points to a token that can be mapped to information about a payment method and its auxiliary data.
+	// Examples of mapped data: payment account number + expiration + billing address.
+	TokenTypePayment TokenType = "paymentToken"
+
+	// TokenTypePaymentIdentifier points to a token that can be mapped to only a payment account number.
+	TokenTypePaymentIdentifier TokenType = "paymentIdentifierToken"
+
+	// TokenTypeShippingAddress points to a token that can be mapped to a shipping address.
+	TokenTypeShippingAddress TokenType = "shippingAddressToken"
 )
