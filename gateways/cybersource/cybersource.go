@@ -205,10 +205,6 @@ func (client *CybersourceClient) VoidWithContext(ctx context.Context, request *s
 	}
 	voidPath := authPath + request.TransactionReference + "/voids"
 	cybersourceResponse, _, err := client.sendRequest(ctx, voidPath, cybersourceVoidRequest)
-	if cybersourceResponse != nil {
-		b, _ := json.Marshal(cybersourceResponse)
-		fmt.Printf("resp %s\n", b) // debug
-	}
 	if err != nil {
 		return nil, err
 	}
