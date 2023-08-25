@@ -116,8 +116,8 @@ func (client *CybersourceClient) AuthorizeWithContext(ctx context.Context, reque
 		response.ExternalTransactionID = cybersourceResponse.ProcessorInformation.TransactionID
 		response.Metadata = buildResponseMetadata(*cybersourceResponse.ProcessorInformation)
 	}
-	if cybersourceResponse.PaymentInformation != nil {
-		response.CreatedTokens = buildCreatedTokens(*cybersourceResponse.PaymentInformation)
+	if cybersourceResponse.TokenInformation != nil {
+		response.CreatedTokens = buildCreatedTokens(*cybersourceResponse.TokenInformation)
 	}
 	return response, nil
 }
@@ -129,19 +129,19 @@ func buildResponseMetadata(processorInformation ProcessorInformation) map[string
 	return metadata
 }
 
-func buildCreatedTokens(paymentInformation PaymentInformation) map[sleet.TokenType]string {
+func buildCreatedTokens(tokenInformation TokenInformation) map[sleet.TokenType]string {
 	createdTokens := map[sleet.TokenType]string{}
-	if paymentInformation.Customer != nil {
-		createdTokens[sleet.TokenTypeCustomer] = paymentInformation.Customer.ID
+	if tokenInformation.Customer != nil {
+		createdTokens[sleet.TokenTypeCustomer] = tokenInformation.Customer.ID
 	}
-	if paymentInformation.PaymentInstrument != nil {
-		createdTokens[sleet.TokenTypePayment] = paymentInformation.PaymentInstrument.ID
+	if tokenInformation.PaymentInstrument != nil {
+		createdTokens[sleet.TokenTypePayment] = tokenInformation.PaymentInstrument.ID
 	}
-	if paymentInformation.InstrumentIdentifier != nil {
-		createdTokens[sleet.TokenTypePaymentIdentifier] = paymentInformation.InstrumentIdentifier.ID
+	if tokenInformation.InstrumentIdentifier != nil {
+		createdTokens[sleet.TokenTypePaymentIdentifier] = tokenInformation.InstrumentIdentifier.ID
 	}
-	if paymentInformation.ShippingAddress != nil {
-		createdTokens[sleet.TokenTypeShippingAddress] = paymentInformation.ShippingAddress.ID
+	if tokenInformation.ShippingAddress != nil {
+		createdTokens[sleet.TokenTypeShippingAddress] = tokenInformation.ShippingAddress.ID
 	}
 	if len(createdTokens) == 0 {
 		return nil
