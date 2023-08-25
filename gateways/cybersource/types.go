@@ -39,7 +39,7 @@ type Response struct {
 	ErrorInformation           *ErrorInformation           `json:"errorInformation,omitempty"`
 	ClientReferenceInformation *ClientReferenceInformation `json:"clientReferenceInformation,omitempty"`
 	ProcessorInformation       *ProcessorInformation       `json:"processorInformation,omitempty"`
-	PaymentInformation         *PaymentInformation         `json:"paymentInformation,omitempty"`
+	TokenInformation           *TokenInformation           `json:"tokenInformation,omitempty"`
 	OrderInformation           *OrderInformation           `json:"orderInformation,omitempty"`
 	ErrorReason                *string                     `json:"reason,omitempty"`
 	ErrorMessage               *string                     `json:"message,omitempty"`
@@ -161,8 +161,12 @@ type ShippingDetails struct {
 
 // PaymentInformation stores Card or TokenizedCard information (but can be extended to other payment types)
 type PaymentInformation struct {
-	Card                 *CardInformation      `json:"card,omitempty"`
-	TokenizedCard        *TokenizedCard        `json:"tokenizedCard,omitempty"`
+	Card          *CardInformation `json:"card,omitempty"`
+	TokenizedCard *TokenizedCard   `json:"tokenizedCard,omitempty"`
+}
+
+// TokenInformation stores tokens that were created as a side-effect of a transaction
+type TokenInformation struct {
 	Customer             *Customer             `json:"customer,omitempty"`
 	PaymentInstrument    *PaymentInstrument    `json:"paymentInstrument,omitempty"`
 	InstrumentIdentifier *InstrumentIdentifier `json:"instrumentIdentifier,omitempty"`
@@ -236,12 +240,8 @@ type AuthorizationOptions struct {
 type ProcessingAction string
 
 const (
-	ProcessingActionDecisionSkip                   ProcessingAction = "DECISION_SKIP"
-	ProcessingActionTokenCreate                    ProcessingAction = "TOKEN_CREATE"
-	ProcessingActionConsumerAuthentication         ProcessingAction = "CONSUMER_AUTHENTICATION"
-	ProcessingActionValidateConsumerAuthentication ProcessingAction = "VALIDATE_CONSUMER_AUTHENTICATION"
-	ProcessingActionAlternatePaymentInitiate       ProcessingAction = "AP_INITIATE"
-	ProcessingActionWatchlistScreening             ProcessingAction = "WATCHLIST_SCREENING"
+	ProcessingActionTokenCreate ProcessingAction = "TOKEN_CREATE"
+	// There are other actions that we don't use
 )
 
 // ProcessingActionTokenType defines token types that can be created when using ProcessingActionTokenCreate.

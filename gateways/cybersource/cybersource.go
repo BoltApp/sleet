@@ -85,8 +85,9 @@ func (client *CybersourceClient) AuthorizeWithContext(ctx context.Context, reque
 			Header:     responseHeader,
 		}
 		return &response, nil
-		// Status 401 - during a cybersource outage, most fields were empty and ID was nil
-	} else if cybersourceResponse.ID == nil {
+	}
+	// Status 401 - during a cybersource outage, most fields were empty and ID was nil
+	if cybersourceResponse.ID == nil {
 		return &sleet.AuthorizationResponse{Success: false}, nil
 	}
 
@@ -116,8 +117,8 @@ func (client *CybersourceClient) AuthorizeWithContext(ctx context.Context, reque
 		response.ExternalTransactionID = cybersourceResponse.ProcessorInformation.TransactionID
 		response.Metadata = buildResponseMetadata(*cybersourceResponse.ProcessorInformation)
 	}
-	if cybersourceResponse.PaymentInformation != nil {
-		response.CreatedTokens = buildCreatedTokens(*cybersourceResponse.PaymentInformation)
+	if cybersourceResponse.TokenInformation != nil {
+		response.CreatedTokens = buildCreatedTokens(*cybersourceResponse.TokenInformation)
 	}
 	return response, nil
 }
@@ -129,19 +130,19 @@ func buildResponseMetadata(processorInformation ProcessorInformation) map[string
 	return metadata
 }
 
-func buildCreatedTokens(paymentInformation PaymentInformation) map[sleet.TokenType]string {
+func buildCreatedTokens(tokenInformation TokenInformation) map[sleet.TokenType]string {
 	createdTokens := map[sleet.TokenType]string{}
-	if paymentInformation.Customer != nil {
-		createdTokens[sleet.TokenTypeCustomer] = paymentInformation.Customer.ID
+	if tokenInformation.Customer != nil {
+		createdTokens[sleet.TokenTypeCustomer] = tokenInformation.Customer.ID
 	}
-	if paymentInformation.PaymentInstrument != nil {
-		createdTokens[sleet.TokenTypePayment] = paymentInformation.PaymentInstrument.ID
+	if tokenInformation.PaymentInstrument != nil {
+		createdTokens[sleet.TokenTypePayment] = tokenInformation.PaymentInstrument.ID
 	}
-	if paymentInformation.InstrumentIdentifier != nil {
-		createdTokens[sleet.TokenTypePaymentIdentifier] = paymentInformation.InstrumentIdentifier.ID
+	if tokenInformation.InstrumentIdentifier != nil {
+		createdTokens[sleet.TokenTypePaymentIdentifier] = tokenInformation.InstrumentIdentifier.ID
 	}
-	if paymentInformation.ShippingAddress != nil {
-		createdTokens[sleet.TokenTypeShippingAddress] = paymentInformation.ShippingAddress.ID
+	if tokenInformation.ShippingAddress != nil {
+		createdTokens[sleet.TokenTypeShippingAddress] = tokenInformation.ShippingAddress.ID
 	}
 	if len(createdTokens) == 0 {
 		return nil
@@ -282,7 +283,6 @@ func (client *CybersourceClient) sendRequest(ctx context.Context, path string, d
 		}
 	}()
 
-	fmt.Printf("status %s\n", resp.Status) // debug
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, nil, err

@@ -1,9 +1,11 @@
 package testing
 
 import (
+	"bytes"
 	"encoding/json"
 	"encoding/xml"
 	"io/ioutil"
+	"net/http"
 	"reflect"
 	"testing"
 
@@ -50,4 +52,40 @@ func (h TestHelper) XmlUnmarshal(data []byte, destination interface{}) {
 	if err != nil {
 		h.t.Fatalf("Error unmarshaling json %q \n", err)
 	}
+}
+
+// RoundTrip allows TestHelper to act as a HTTP RoundTripper that logs requests and responses.
+// This can be used by overriding the HTTP client used by a PSP client to be the TestHelper instance.
+//
+// Example:
+//
+//	 helper := sleet_testing.NewTestHelper(t)
+//	 httpClient := &http.Client{
+//		 Transport: helper,
+//		 Timeout:   common.DefaultTimeout,
+//	 }
+func (h TestHelper) RoundTrip(req *http.Request) (*http.Response, error) {
+	h.t.Helper()
+
+	resp, err := http.DefaultTransport.RoundTrip(req)
+
+	reqBodyStream, _ := req.GetBody()
+	defer reqBodyStream.Close()
+	reqBody, _ := ioutil.ReadAll(reqBodyStream)
+
+	respBodyStream := resp.Body
+	defer respBodyStream.Close()
+	respBody, _ := ioutil.ReadAll(respBodyStream)
+	// we need to replace the resp body to be read again by the actual handler
+	resp.Body = ioutil.NopCloser(bytes.NewBuffer(respBody))
+
+	h.t.Logf(
+		"logTransport HTTP request\n"+
+			"-> status %s\n"+
+			"-v request\n"+
+			string(reqBody)+"\n"+
+			"-v response\n"+
+			string(respBody)+"\n\n",
+		resp.Status)
+	return resp, err
 }
