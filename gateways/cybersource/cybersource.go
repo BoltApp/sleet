@@ -85,8 +85,9 @@ func (client *CybersourceClient) AuthorizeWithContext(ctx context.Context, reque
 			Header:     responseHeader,
 		}
 		return &response, nil
-		// Status 401 - during a cybersource outage, most fields were empty and ID was nil
-	} else if cybersourceResponse.ID == nil {
+	}
+	// Status 401 - during a cybersource outage, most fields were empty and ID was nil
+	if cybersourceResponse.ID == nil {
 		return &sleet.AuthorizationResponse{Success: false}, nil
 	}
 
@@ -205,10 +206,6 @@ func (client *CybersourceClient) VoidWithContext(ctx context.Context, request *s
 	}
 	voidPath := authPath + request.TransactionReference + "/voids"
 	cybersourceResponse, _, err := client.sendRequest(ctx, voidPath, cybersourceVoidRequest)
-	if cybersourceResponse != nil {
-		b, _ := json.Marshal(cybersourceResponse)
-		fmt.Printf("resp %s\n", b) // debug
-	}
 	if err != nil {
 		return nil, err
 	}
@@ -286,7 +283,6 @@ func (client *CybersourceClient) sendRequest(ctx context.Context, path string, d
 		}
 	}()
 
-	fmt.Printf("status %s\n", resp.Status) // debug
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, nil, err
