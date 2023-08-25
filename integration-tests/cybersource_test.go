@@ -177,6 +177,10 @@ func TestVoid(t *testing.T) {
 		t.Errorf("Expected Success: received: %s", resp.ErrorCode)
 	}
 
+	if t.Failed() {
+		return
+	}
+
 	// void
 	voidResp, err := client.Void(&sleet.VoidRequest{
 		TransactionReference:       resp.TransactionReference,
