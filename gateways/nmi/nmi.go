@@ -61,12 +61,13 @@ func (client *NMIClient) AuthorizeWithContext(ctx context.Context, request *slee
 	}
 
 	responseHeader := sleet.GetHTTPResponseHeader(request.Options, *httpResponse)
-	// "2" means declined and "3" means bad request
+	// "1" means successful, "2" means declined, and "3" means bad request
 	if nmiResponse.Response != "1" {
 		return &sleet.AuthorizationResponse{
 			Success:    false,
 			Response:   nmiResponse.ResponseCode,
 			ErrorCode:  nmiResponse.ResponseCode,
+			Message:    nmiResponse.ResponseText,
 			StatusCode: httpResponse.StatusCode,
 			Header:     responseHeader,
 		}, nil
@@ -78,6 +79,7 @@ func (client *NMIClient) AuthorizeWithContext(ctx context.Context, request *slee
 		AvsResult:            sleet.AVSResponseUnknown,
 		CvvResult:            sleet.CVVResponseUnknown,
 		Response:             nmiResponse.ResponseCode,
+		Message:              nmiResponse.ResponseText,
 		AvsResultRaw:         nmiResponse.AVSResponseCode,
 		CvvResultRaw:         nmiResponse.CVVResponseCode,
 		StatusCode:           httpResponse.StatusCode,
