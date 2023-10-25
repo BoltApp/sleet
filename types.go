@@ -103,6 +103,9 @@ const (
 	// CyberSourceTokenizeOption will cause tokens to be requested for each token type listed in the option.
 	// Value type: []TokenType
 	CyberSourceTokenizeOption string = "CyberSourceTokenize"
+
+	// HostedAPMOption will cause for the Adyen client to utilize the Hosted APM flow
+	HostedAPMOption string = "HostedAPM"
 )
 
 // AuthorizationRequest specifies needed information for request to authorize by PsPs
@@ -304,4 +307,15 @@ const (
 
 	// TokenTypeShippingAddress points to a token that can be mapped to a shipping address.
 	TokenTypeShippingAddress TokenType = "shippingAddressToken"
+)
+
+// Hosted APM consts
+type HostedAPMPaymentMethod string
+
+const (
+	HostedAPMPaymentMethodAfterPay      = "afterpaytouch"
+	HostedAPMPaymentMethodAffirm        = "affirm"
+	HostedAPMPaymentMethodKlarnaPayNow  = "klarna_paynow"
+	HostedAPMPaymentMethodKlarna        = "klarna"
+	HostedAPMPaymentMethodKlarnaAccount = "klarna_account"
 )

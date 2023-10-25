@@ -74,6 +74,10 @@ func buildAuthRequest(authRequest *sleet.AuthorizationRequest, merchantAccount s
 	addShopperData(authRequest, request)
 	addAddresses(authRequest, request)
 
+	//if authRequest.Options[sleet.HostedAPMOption] != nil {
+	//
+	//}
+
 	// overwrites the flag transactions
 	if authRequest.ProcessingInitiator != nil {
 		if shopperInteraction, ok := initiatorTypeToShopperInteraction[*authRequest.ProcessingInitiator]; ok {
@@ -127,6 +131,10 @@ func addPaymentSpecificFields(authRequest *sleet.AuthorizationRequest, request *
 		request.PaymentMethod = map[string]interface{}{
 			"type":           "googlepay",
 			"googlePayToken": authRequest.Options[sleet.GooglePayTokenOption].(string),
+		}
+	} else if authRequest.Options[sleet.HostedAPMOption] != nil {
+		request.PaymentMethod = map[string]interface{}{
+			"type": authRequest.Options[sleet.HostedAPMOption].(string),
 		}
 	} else {
 		request.PaymentMethod = map[string]interface{}{
