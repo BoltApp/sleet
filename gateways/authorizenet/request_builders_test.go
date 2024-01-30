@@ -30,6 +30,15 @@ func TestBuildAuthRequest(t *testing.T) {
 	baseL2L3MultipleItems.Level3Data = sleet_testing.BaseLevel3DataMultipleItem()
 	baseL2L3MultipleItems.ShippingAddress = baseL2L3MultipleItems.BillingAddress
 
+	l2l3EmptyFields := sleet_testing.BaseAuthorizationRequest()
+	l2l3EmptyFields.MerchantOrderReference = randomdata.Alphanumeric(InvoiceNumberMaxLength + 5)
+	l2l3EmptyFields.Level3Data = sleet_testing.BaseLevel3DataMultipleItem()
+	l2l3EmptyFields.ShippingAddress = baseL2L3MultipleItems.BillingAddress
+	for i := range l2l3EmptyFields.Level3Data.LineItems {
+		l2l3EmptyFields.Level3Data.LineItems[i].ProductCode = ""
+		l2l3EmptyFields.Level3Data.LineItems[i].Description = ""
+	}
+
 	withCustomerIP := sleet_testing.BaseAuthorizationRequestWithEmailPhoneNumber()
 	withCustomerIP.MerchantOrderReference = randomdata.Alphanumeric(InvoiceNumberMaxLength + 5)
 	customerIP := common.SPtr("192.168.0.1")
@@ -187,14 +196,14 @@ func TestBuildAuthRequest(t *testing.T) {
 						Order: &Order{
 							InvoiceNumber: baseL2L3.MerchantOrderReference[:InvoiceNumberMaxLength],
 						},
-						LineItem: json.RawMessage(`{"lineItem":{"itemId":"cmd","name":"abc","description":"pot","quantity":"2","unitPrice":"500"}}`),
-						Tax: &Tax{
+						LineItem: json.RawMessage(`{"lineItem":{"itemId":"abc","name":"pot","description":"pot","quantity":"2","unitPrice":"500"}}`),
+						Tax: &ExtendedAmount{
 							Amount: "100",
 						},
-						Duty: &Tax{
+						Duty: &ExtendedAmount{
 							Amount: "400",
 						},
-						Shipping: &Tax{
+						Shipping: &ExtendedAmount{
 							Amount: "300",
 						},
 						Customer: &Customer{
@@ -242,14 +251,69 @@ func TestBuildAuthRequest(t *testing.T) {
 						Order: &Order{
 							InvoiceNumber: baseL2L3MultipleItems.MerchantOrderReference[:InvoiceNumberMaxLength],
 						},
-						LineItem: json.RawMessage(`{"lineItem":{"itemId":"cmd","name":"abc","description":"pot","quantity":"2","unitPrice":"500"},"lineItem":{"itemId":"321","name":"123","description":"vase","quantity":"5","unitPrice":"1000"}}`),
-						Tax: &Tax{
+						LineItem: json.RawMessage(`{"lineItem":{"itemId":"abc","name":"pot","description":"pot","quantity":"2","unitPrice":"500"},"lineItem":{"itemId":"123","name":"vase","description":"vase","quantity":"5","unitPrice":"1000"}}`),
+						Tax: &ExtendedAmount{
 							Amount: "100",
 						},
-						Duty: &Tax{
+						Duty: &ExtendedAmount{
 							Amount: "400",
 						},
-						Shipping: &Tax{
+						Shipping: &ExtendedAmount{
+							Amount: "300",
+						},
+						Customer: &Customer{
+							Id: "customer",
+						},
+						ShippingAddress: &ShippingAddress{
+							FirstName: "Bolt",
+							LastName:  "Checkout",
+							Company:   common.SafeStr(base.BillingAddress.Company),
+							Address:   base.BillingAddress.StreetAddress1,
+							City:      base.BillingAddress.Locality,
+							State:     base.BillingAddress.RegionCode,
+							Zip:       base.BillingAddress.PostalCode,
+							Country:   base.BillingAddress.CountryCode,
+						},
+					},
+				},
+			},
+		},
+		{
+			"L2L3 Data Empty Fields",
+			l2l3EmptyFields,
+			&Request{
+				CreateTransactionRequest: &CreateTransactionRequest{
+					MerchantAuthentication: MerchantAuthentication{Name: "MerchantName", TransactionKey: "Key"},
+					TransactionRequest: TransactionRequest{
+						TransactionType: TransactionTypeAuthOnly,
+						Amount:          &amount,
+						Payment: &Payment{
+							CreditCard: &CreditCard{
+								CardNumber:     "4111111111111111",
+								ExpirationDate: "2023-10",
+								CardCode:       base.CreditCard.CVV,
+							},
+						},
+						BillingAddress: &BillingAddress{
+							FirstName: "Bolt",
+							LastName:  "Checkout",
+							Address:   base.BillingAddress.StreetAddress1,
+							City:      base.BillingAddress.Locality,
+							State:     base.BillingAddress.RegionCode,
+							Zip:       base.BillingAddress.PostalCode,
+							Country:   base.BillingAddress.CountryCode,
+						},
+						Order: &Order{
+							InvoiceNumber: l2l3EmptyFields.MerchantOrderReference[:InvoiceNumberMaxLength],
+						},
+						LineItem: json.RawMessage(`{"lineItem":{"itemId":"1","name":"1","quantity":"2","unitPrice":"500"},"lineItem":{"itemId":"2","name":"2","quantity":"5","unitPrice":"1000"}}`),
+						Tax: &ExtendedAmount{
+							Amount: "100",
+						},
+						Duty: &ExtendedAmount{
+							Amount: "400",
+						},
+						Shipping: &ExtendedAmount{
 							Amount: "300",
 						},
 						Customer: &Customer{

@@ -184,15 +184,15 @@ func addL2L3Data(
 			authNetAuthRequest.TransactionRequest.LineItem = json.RawMessage(*lineItemString)
 		}
 
-		authNetAuthRequest.TransactionRequest.Tax = &Tax{
+		authNetAuthRequest.TransactionRequest.Tax = &ExtendedAmount{
 			Amount: strconv.FormatInt(authRequest.Level3Data.TaxAmount.Amount, 10),
 		}
 
-		authNetAuthRequest.TransactionRequest.Duty = &Tax{
+		authNetAuthRequest.TransactionRequest.Duty = &ExtendedAmount{
 			Amount: strconv.FormatInt(authRequest.Level3Data.DutyAmount.Amount, 10),
 		}
 
-		authNetAuthRequest.TransactionRequest.Shipping = &Tax{
+		authNetAuthRequest.TransactionRequest.Shipping = &ExtendedAmount{
 			Amount: strconv.FormatInt(authRequest.Level3Data.ShippingAmount.Amount, 10),
 		}
 
@@ -225,20 +225,32 @@ func addL2L3Data(
 // fields. LineItems is one of them so we will build it as a raw string
 func buildLineItemsString(authRequest *sleet.AuthorizationRequest) *string {
 	hasLineItem := false
-	maxLength := 30
+	maxLineItemCount := 30
 	lineItems := "{"
 	for i, authRequestLineItem := range authRequest.Level3Data.LineItems {
 		// Max LineItem count is 30 for authorize.net
-		if i == maxLength {
+		if i == maxLineItemCount {
 			break
 		}
 
 		lineItem := &LineItem{
-			ItemId:      sleet.TruncateString(authRequestLineItem.CommodityCode, 31),
-			Name:        sleet.TruncateString(authRequestLineItem.ProductCode, 31),
+			ItemId: sleet.TruncateString(authRequestLineItem.ProductCode, 31),
+			// FIXME: Name is not available in our Sleet auth inputs yet. Description is used as a substitute.
+			Name:        sleet.TruncateString(authRequestLineItem.Description, 31),
 			Description: sleet.TruncateString(authRequestLineItem.Description, 255),
 			Quantity:    strconv.FormatInt(authRequestLineItem.Quantity, 10),
 			UnitPrice:   strconv.FormatInt(authRequestLineItem.UnitPrice.Amount, 10),
+		}
+
+		if lineItem.ItemId == "" {
+			// ItemId has a minimum length. If our auth input does not provide it, use a substitute.
+			// The definition of ItemId by Authorize.NET is flexible. We can use the item index instead.
+			// There is no enforcement of uniqueness or completeness among the ItemIds.
+			lineItem.ItemId = strconv.FormatInt(int64(i+1), 10)
+		}
+		if lineItem.Name == "" {
+			// Name has a minimum length. If our auth input does not provide it, use a substitute.
+			lineItem.Name = lineItem.ItemId
 		}
 
 		lineItemByte, err := json.Marshal(lineItem)
@@ -248,7 +260,7 @@ func buildLineItemsString(authRequest *sleet.AuthorizationRequest) *string {
 			hasLineItem = true
 
 			// Do not add a comma for the last item
-			if i < len(authRequest.Level3Data.LineItems)-1 && i < maxLength-1 {
+			if i < len(authRequest.Level3Data.LineItems)-1 && i < maxLineItemCount-1 {
 				lineItems += ","
 			}
 		}
