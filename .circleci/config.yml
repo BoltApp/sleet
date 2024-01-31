@@ -28,11 +28,13 @@ jobs:
               -coverpkg="$GOCOVER_LIST"  \
               -coverprofile=unit_coverage.profile \
               $(go list ./... | grep -v integration-tests)
-      - run:
-          name: Integration Test
-          command: |
-            cd integration-tests
-            go test -v
+# Turn off Integration tests.
+# This repo is going to be shelved, so let's not block commits to depend on an unmaintained test environment.
+#      - run:
+#          name: Integration Test
+#          command: |
+#            cd integration-tests
+#            go test -v
       - run:
           name: Install goimports
           command: |
