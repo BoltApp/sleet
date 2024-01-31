@@ -3,6 +3,8 @@ package checkoutcom
 import (
 	checkout_com_common "github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/payments"
+	"github.com/checkout/checkout-sdk-go/payments/nas"
+	"github.com/checkout/checkout-sdk-go/tokens"
 
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
@@ -11,12 +13,12 @@ import (
 // Cof specifies the transaction type under the Credential-on-File framework
 const recurringPaymentType = "Recurring"
 
-func buildChargeParams(authRequest *sleet.AuthorizationRequest, processingChannelId *string) (*payments.Request, error) {
-	var source = payments.CardSource{
+func buildChargeParams(authRequest *sleet.AuthorizationRequest, processingChannelId *string) (*nas.PaymentRequest, error) {
+	var source = tokens.CardTokenRequest{
 		Type:        "card",
 		Number:      authRequest.CreditCard.Number,
-		ExpiryMonth: uint64(authRequest.CreditCard.ExpirationMonth),
-		ExpiryYear:  uint64(authRequest.CreditCard.ExpirationYear),
+		ExpiryMonth: authRequest.CreditCard.ExpirationMonth,
+		ExpiryYear:  authRequest.CreditCard.ExpirationYear,
 		Name:        authRequest.CreditCard.FirstName + " " + authRequest.CreditCard.LastName,
 		CVV:         authRequest.CreditCard.CVV,
 		BillingAddress: &checkout_com_common.Address{
@@ -24,12 +26,12 @@ func buildChargeParams(authRequest *sleet.AuthorizationRequest, processingChanne
 			AddressLine2: common.SafeStr(authRequest.BillingAddress.StreetAddress2),
 			City:         common.SafeStr(authRequest.BillingAddress.Locality),
 			State:        common.SafeStr(authRequest.BillingAddress.RegionCode),
-			ZIP:          common.SafeStr(authRequest.BillingAddress.PostalCode),
+			Zip:          common.SafeStr(authRequest.BillingAddress.PostalCode),
 			Country:      common.SafeStr(authRequest.BillingAddress.CountryCode),
 		},
 	}
 
-	request := &payments.Request{
+	request := &nas.PaymentRequest{
 		Source:    source,
 		Amount:    uint64(authRequest.Amount.Amount),
 		Capture:   common.BPtr(false),

@@ -5,11 +5,13 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/checkout/checkout-sdk-go/configuration"
+	"github.com/checkout/checkout-sdk-go/payments/nas"
+
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
 
 	"github.com/checkout/checkout-sdk-go"
-	"github.com/checkout/checkout-sdk-go/payments"
 )
 
 var (
@@ -24,7 +26,7 @@ type CheckoutComClient struct {
 	apiKey              string
 	processingChannelId *string
 	httpClient          *http.Client
-	env                 checkout.SupportedEnvironment
+	env                 *configuration.CheckoutEnv
 }
 
 const AcceptedStatusCode = 202
@@ -46,14 +48,16 @@ func NewWithHTTPClient(env common.Environment, apiKey string, processingChannelI
 	}
 }
 
-func (client *CheckoutComClient) generateCheckoutDCClient() (*payments.Client, error) {
-	config, err := checkout.SdkConfig(common.SPtr(client.apiKey), nil, client.env)
+func (client *CheckoutComClient) generateCheckoutDCClient() (*nas.Client, error) {
+	api, err := checkout.Builder().
+		StaticKeys().
+		WithEnvironment(client.env).
+		WithSecretKey(client.apiKey).
+		Build()
 	if err != nil {
 		return nil, err
 	}
-	config.HTTPClient = client.httpClient
-
-	return payments.NewClient(*config), nil
+	return api.Payments, nil
 }
 
 // Authorize a transaction for specified amount
@@ -74,10 +78,10 @@ func (client *CheckoutComClient) AuthorizeWithContext(_ context.Context, request
 		return nil, err
 	}
 
-	response, err := checkoutComClient.Request(input, nil)
+	response, err := checkoutComClient.RequestPayment(*input, nil)
 	var statusCode int
-	if response != nil && response.StatusResponse != nil {
-		statusCode = response.StatusResponse.StatusCode
+	if response != nil {
+		statusCode = response.HttpMetadata.StatusCode
 	}
 
 	if err != nil {
@@ -91,15 +95,15 @@ func (client *CheckoutComClient) AuthorizeWithContext(_ context.Context, request
 		}, err
 	}
 
-	if *response.Processed.Approved {
+	if response.Approved {
 		return &sleet.AuthorizationResponse{
 			Success:              true,
-			TransactionReference: response.Processed.ID,
+			TransactionReference: response.Id,
 			AvsResult:            sleet.AVSresponseZipMatchAddressMatch, // TODO: Use translateAvs(AVSResponseCode(response.Processed.Source.AVSCheck)) to enable avs code handling
 			CvvResult:            sleet.CVVResponseMatch,                // TODO: use translateCvv(CVVResponseCode(response.Processed.Source.CVVCheck)) to enable cvv code handling
-			AvsResultRaw:         response.Processed.Source.AVSCheck,
-			CvvResultRaw:         response.Processed.Source.CVVCheck,
-			Response:             response.Processed.ResponseCode,
+			AvsResultRaw:         response.Source.ResponseCardSource.AvsCheck,
+			CvvResultRaw:         response.Source.ResponseCardSource.CvvCheck,
+			Response:             response.ResponseCode,
 			StatusCode:           statusCode,
 		}, nil
 	} else {
@@ -108,8 +112,8 @@ func (client *CheckoutComClient) AuthorizeWithContext(_ context.Context, request
 			TransactionReference: "",
 			AvsResult:            sleet.AVSResponseUnknown,
 			CvvResult:            sleet.CVVResponseUnknown,
-			Response:             response.Processed.ResponseCode,
-			ErrorCode:            response.Processed.ResponseCode,
+			Response:             response.ResponseCode,
+			ErrorCode:            response.ResponseCode,
 			StatusCode:           statusCode,
 		}, nil
 	}
@@ -133,18 +137,18 @@ func (client *CheckoutComClient) CaptureWithContext(ctx context.Context, request
 		return nil, err
 	}
 
-	response, err := checkoutComClient.Captures(request.TransactionReference, input, nil)
+	response, err := checkoutComClient.CapturePayment(request.TransactionReference, *input, nil)
 
 	if err != nil {
 		return &sleet.CaptureResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, err
 	}
 
-	if response.StatusResponse.StatusCode == AcceptedStatusCode {
+	if response.HttpMetadata.StatusCode == AcceptedStatusCode {
 		return &sleet.CaptureResponse{Success: true, TransactionReference: request.TransactionReference}, nil
 	} else {
 		return &sleet.CaptureResponse{
 			Success:              false,
-			ErrorCode:            common.SPtr(strconv.Itoa(response.StatusResponse.StatusCode)),
+			ErrorCode:            common.SPtr(strconv.Itoa(response.HttpMetadata.StatusCode)),
 			TransactionReference: request.TransactionReference,
 		}, nil
 	}
@@ -168,17 +172,17 @@ func (client *CheckoutComClient) RefundWithContext(ctx context.Context, request 
 		return nil, err
 	}
 
-	response, err := checkoutComClient.Refunds(request.TransactionReference, input, nil)
+	response, err := checkoutComClient.RefundPayment(request.TransactionReference, input, nil)
 	if err != nil {
 		return &sleet.RefundResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, err
 	}
 
-	if response.StatusResponse.StatusCode == AcceptedStatusCode {
-		return &sleet.RefundResponse{Success: true, TransactionReference: response.Accepted.Reference}, nil
+	if response.HttpMetadata.StatusCode == AcceptedStatusCode {
+		return &sleet.RefundResponse{Success: true, TransactionReference: response.Reference}, nil
 	} else {
 		return &sleet.RefundResponse{
 			Success:              false,
-			ErrorCode:            common.SPtr(strconv.Itoa(response.StatusResponse.StatusCode)),
+			ErrorCode:            common.SPtr(strconv.Itoa(response.HttpMetadata.StatusCode)),
 			TransactionReference: request.TransactionReference,
 		}, nil
 	}
@@ -202,18 +206,18 @@ func (client *CheckoutComClient) VoidWithContext(ctx context.Context, request *s
 		return nil, err
 	}
 
-	response, err := checkoutComClient.Voids(request.TransactionReference, input, nil)
+	response, err := checkoutComClient.VoidPayment(request.TransactionReference, input, nil)
 
 	if err != nil {
 		return &sleet.VoidResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, err
 	}
 
-	if response.StatusResponse.StatusCode == AcceptedStatusCode {
-		return &sleet.VoidResponse{Success: true, TransactionReference: response.Accepted.Reference}, nil
+	if response.HttpMetadata.StatusCode == AcceptedStatusCode {
+		return &sleet.VoidResponse{Success: true, TransactionReference: response.Reference}, nil
 	} else {
 		return &sleet.VoidResponse{
 			Success:              false,
-			ErrorCode:            common.SPtr(strconv.Itoa(response.StatusResponse.StatusCode)),
+			ErrorCode:            common.SPtr(strconv.Itoa(response.HttpMetadata.StatusCode)),
 			TransactionReference: request.TransactionReference,
 		}, nil
 	}
