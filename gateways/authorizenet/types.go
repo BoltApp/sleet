@@ -132,9 +132,9 @@ type TransactionRequest struct {
 	Order            *Order          `json:"order,omitempty"`
 	LineItem         json.RawMessage `json:"lineItems,omitempty"` // this is really a repeating LineItem, but authorize.net expects it in object not array
 	// since not valid json, just going to represent as JSON string
-	Tax             *Tax             `json:"tax,omitempty"`
-	Duty            *Tax             `json:"duty,omitempty"`
-	Shipping        *Tax             `json:"shipping,omitempty"`
+	Tax             *ExtendedAmount  `json:"tax,omitempty"`
+	Duty            *ExtendedAmount  `json:"duty,omitempty"`
+	Shipping        *ExtendedAmount  `json:"shipping,omitempty"`
 	Customer        *Customer        `json:"customer,omitempty"`
 	BillingAddress  *BillingAddress  `json:"billTo,omitempty"`
 	ShippingAddress *ShippingAddress `json:"shipTo,omitempty"`
@@ -142,14 +142,15 @@ type TransactionRequest struct {
 }
 
 type LineItem struct {
-	ItemId      string `json:"itemId,omitempty"`
-	Name        string `json:"name,omitempty"`
-	Description string `json:"description,omitempty"`
-	Quantity    string `json:"quantity,omitempty"`
-	UnitPrice   string `json:"unitPrice,omitempty"`
+	ItemId      string `json:"itemId,omitempty"`      // min length = 1, max length = 31
+	Name        string `json:"name,omitempty"`        // min length = 1, max length = 31
+	Description string `json:"description,omitempty"` // max length = 255
+	Quantity    string `json:"quantity,omitempty"`    // decimal as string, max decimal precision = 4
+	UnitPrice   string `json:"unitPrice,omitempty"`   // decimal as string, max decimal precision = 4
+	Taxable     string `json:"taxable,omitempty"`     // boolean as string
 }
 
-type Tax struct {
+type ExtendedAmount struct {
 	Amount      string `json:"amount,omitempty"`
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
