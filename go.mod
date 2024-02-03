@@ -16,7 +16,7 @@ require (
 	github.com/rocketgate/rocketgate-go-sdk v0.0.0-20220106233346-17d98d87a0ff
 	github.com/shopspring/decimal v1.3.1
 	github.com/stripe/stripe-go v70.11.0+incompatible
-	golang.org/x/net v0.0.0-20201110031124-69a78807bb2b // indirect
+	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20201109201403-9fd604954f58 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
