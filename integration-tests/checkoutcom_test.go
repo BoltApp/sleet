@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -16,6 +17,9 @@ type ClientNamePair struct {
 }
 
 func generateClients() []ClientNamePair {
+	fmt.Println(getEnv("CHECKOUTCOM_TEST_KEY"))
+	fmt.Println(getEnv("CHECKOUTCOM_TEST_KEY_WITH_PCID"))
+	fmt.Println(getEnv("CHECKOUTCOM_TEST_PCID"))
 	legacyClient := checkoutcom.NewClient(common.Sandbox, getEnv("CHECKOUTCOM_TEST_KEY"), nil)
 	pcidClient := checkoutcom.NewClient(common.Sandbox, getEnv("CHECKOUTCOM_TEST_KEY_WITH_PCID"), common.SPtr(getEnv("CHECKOUTCOM_TEST_PCID")))
 
