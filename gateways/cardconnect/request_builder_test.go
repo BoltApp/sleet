@@ -121,7 +121,6 @@ func TestBuildAuthRequest(t *testing.T) {
 			},
 		},
 	}
-
 	for _, c := range cases {
 		t.Run(c.label, func(t *testing.T) {
 			got := buildAuthorizeParams(c.in)
