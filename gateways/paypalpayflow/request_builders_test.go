@@ -15,7 +15,7 @@ var (
 	defaultTestTender         string = "C"
 	defaultTestAmount         string = "1.00"
 	defaultTestCurrency       string = "USD"
-	defaultTestExpirationDate string = "1023"
+	defaultTestExpirationDate string = "1025"
 	OriginalID                string = "111111"
 )
 
