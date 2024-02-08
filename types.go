@@ -87,6 +87,15 @@ type Level3Data struct {
 	LineItems              []LineItem
 }
 
+// AmountSplit represents a split of the total transaction amount that should be routed to a specific account
+// This is mostly used under Payfac models where we have different sub-accounts for merchants under a single platform account
+// The platform commission is taken out of the split amount and routed to the platform account
+type AmountSplit struct {
+	DestinationAccountID string
+	Amount               Amount
+	PlatformCommission   *Amount
+}
+
 const (
 	// ResponseHeaderOption will return in the response the value for each HTTP header key listed in the option.
 	// Value type: []string
@@ -123,6 +132,7 @@ type AuthorizationRequest struct {
 	ShippingAddress               *Address
 	ShopperReference              string // ShopperReference Unique reference to a shopper (shopperId, etc.)
 	ThreeDS                       *ThreeDS
+	AmountSplits                  []AmountSplit
 
 	Options map[string]interface{}
 }
@@ -173,6 +183,7 @@ type CaptureRequest struct {
 	ClientTransactionReference *string                // Custom transaction reference metadata that will be associated with this request
 	MerchantOrderReference     *string                // Custom merchant order reference that will be associated with this request
 	Options                    map[string]interface{} // For additional options that need to be passed in
+	AmountSplits               []AmountSplit
 }
 
 // CaptureResponse will have Success be true if transaction is captured and also a reference to be used for subsequent operations
@@ -204,6 +215,7 @@ type RefundRequest struct {
 	MerchantOrderReference     *string // Custom merchant order reference that will be associated with this request
 	Last4                      string
 	Options                    map[string]interface{}
+	AmountSplits               []AmountSplit
 }
 
 // RefundResponse indicating if request went through successfully
