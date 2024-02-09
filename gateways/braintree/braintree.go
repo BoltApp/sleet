@@ -165,3 +165,13 @@ func (client *BraintreeClient) RefundWithContext(ctx context.Context, request *s
 		TransactionReference: refund.Id,
 	}, nil
 }
+
+// BalanceTransfer transfers funds from a source account to a destination account
+func (client *BraintreeClient) BalanceTransfer(request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return client.BalanceTransferWithContext(context.TODO(), request)
+}
+
+// BalanceTransferWithContext transfers funds from a source account to a destination account
+func (client *BraintreeClient) BalanceTransferWithContext(ctx context.Context, request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return nil, fmt.Errorf("not implemented")
+}

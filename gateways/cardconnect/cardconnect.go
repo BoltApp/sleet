@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -198,4 +199,14 @@ func (client *CardConnectClient) RefundWithContext(ctx context.Context, request 
 	return &sleet.RefundResponse{
 		ErrorCode: &response.RespCode,
 	}, nil
+}
+
+// BalanceTransfer transfers funds from a source account to a destination account
+func (client *CardConnectClient) BalanceTransfer(request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return client.BalanceTransferWithContext(context.TODO(), request)
+}
+
+// BalanceTransferWithContext transfers funds from a source account to a destination account
+func (client *CardConnectClient) BalanceTransferWithContext(ctx context.Context, request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return nil, fmt.Errorf("not implemented")
 }

@@ -14,6 +14,7 @@ type Client interface {
 	Capture(request *CaptureRequest) (*CaptureResponse, error)
 	Void(request *VoidRequest) (*VoidResponse, error)
 	Refund(request *RefundRequest) (*RefundResponse, error)
+	BalanceTransfer(request *BalanceTransferRequest) (*BalanceTransferResponse, error)
 }
 
 // ClientWithContext is a superset of `Client` that includes addtional methods that take
@@ -24,6 +25,7 @@ type ClientWithContext interface {
 	CaptureWithContext(ctx context.Context, request *CaptureRequest) (*CaptureResponse, error)
 	VoidWithContext(ctx context.Context, request *VoidRequest) (*VoidResponse, error)
 	RefundWithContext(ctx context.Context, request *RefundRequest) (*RefundResponse, error)
+	BalanceTransferWithContext(ctx context.Context, request *BalanceTransferRequest) (*BalanceTransferResponse, error)
 }
 
 // Amount specifies both quantity and currency
@@ -222,6 +224,24 @@ type TransactionDetailsRequest struct {
 type TransactionDetailsResponse struct {
 	ResultCode string
 	CardNumber string
+}
+
+// BalanceTransferRequest request for transferring funds between a source and destination of a payment processor
+type BalanceTransferRequest struct {
+	Source                 string
+	Destination            string
+	Amount                 int64
+	MerchantOrderReference string
+	TransferType           *string
+	IsRecurring            *bool
+	IdempotencyKey         *string
+}
+
+// BalanceTransferResponse indicating a successful balance transfers properties
+type BalanceTransferResponse struct {
+	Success    bool
+	ErrorCode  *string
+	TransferID *string
 }
 
 // GetHTTPResponseHeader returns the http response headers specified in the given options.

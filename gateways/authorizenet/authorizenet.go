@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -192,6 +193,16 @@ func (client *AuthorizeNetClient) GetTransactionDetailsWithContext(ctx context.C
 		ResultCode: string(authorizeNetResponse.Messsages.ResultCode),
 		CardNumber: authorizeNetResponse.Transaction.Payment.CreditCard.CardNumber,
 	}, nil
+}
+
+// BalanceTransfer transfers funds from a source account to a destination account
+func (client *AuthorizeNetClient) BalanceTransfer(request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return client.BalanceTransferWithContext(context.TODO(), request)
+}
+
+// BalanceTransferWithContext transfers funds from a source account to a destination account
+func (client *AuthorizeNetClient) BalanceTransferWithContext(ctx context.Context, request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return nil, fmt.Errorf("not implemented")
 }
 
 func (client *AuthorizeNetClient) sendRequest(ctx context.Context, data Request) (*Response, *http.Response, error) {

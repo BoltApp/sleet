@@ -3,6 +3,7 @@ package stripe
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -114,4 +115,14 @@ func (client *StripeClient) VoidWithContext(ctx context.Context, request *sleet.
 		return &sleet.VoidResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, nil
 	}
 	return &sleet.VoidResponse{Success: true, TransactionReference: void.ID}, nil
+}
+
+// BalanceTransfer transfers funds from a source account to a destination account
+func (client *StripeClient) BalanceTransfer(request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return client.BalanceTransferWithContext(context.TODO(), request)
+}
+
+// BalanceTransferWithContext transfers funds from a source account to a destination account
+func (client *StripeClient) BalanceTransferWithContext(ctx context.Context, request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return nil, fmt.Errorf("not implemented")
 }

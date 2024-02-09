@@ -2,6 +2,7 @@ package nmi
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -234,4 +235,14 @@ func (client *NMIClient) sendRequest(ctx context.Context, data *Request) (*Respo
 	}
 
 	return &nmiResponse, resp, nil
+}
+
+// BalanceTransfer transfers funds from a source account to a destination account
+func (client *NMIClient) BalanceTransfer(request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return client.BalanceTransferWithContext(context.TODO(), request)
+}
+
+// BalanceTransferWithContext transfers funds from a source account to a destination account
+func (client *NMIClient) BalanceTransferWithContext(ctx context.Context, request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return nil, fmt.Errorf("not implemented")
 }

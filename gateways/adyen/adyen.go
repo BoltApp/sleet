@@ -2,6 +2,7 @@ package adyen
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/adyen/adyen-go-api-library/v4/src/adyen"
@@ -189,6 +190,16 @@ func (client *AdyenClient) VoidWithContext(ctx context.Context, request *sleet.V
 		Success:              true,
 		TransactionReference: void.PspReference,
 	}, nil
+}
+
+// BalanceTransfer transfers funds from a source account to a destination account
+func (client *AdyenClient) BalanceTransfer(request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return client.BalanceTransferWithContext(context.TODO(), request)
+}
+
+// BalanceTransferWithContext transfers funds from a source account to a destination account
+func (client *AdyenClient) BalanceTransferWithContext(ctx context.Context, request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return nil, fmt.Errorf("not implemented")
 }
 
 func addAdditionalDataFields(

@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -260,6 +261,31 @@ func TestCheckoutComAuthCaptureRefund(t *testing.T) {
 
 		if !refund.Success {
 			t.Errorf("%s: Resulting refund should have been successful", name)
+		}
+	}
+}
+
+func TestCheckoutComBalanceTransfer(t *testing.T) {
+	clients := generateClients()
+
+	for _, clientNamePair := range clients {
+		client := clientNamePair.client
+		name := clientNamePair.name
+
+		transferRequest := &sleet.BalanceTransferRequest{
+			Amount:                 100,
+			Source:                 "ent_azsiyswl7bwe2ynjzujy7lcjcb", // Slightly modified from the CKO docs
+			Destination:            "ent_w4jelhppmfiufdnatam37wrfc3",
+			MerchantOrderReference: "reference",
+			TransferType:           common.SPtr("commission"),
+			IdempotencyKey:         common.SPtr(fmt.Sprintf("%d", time.Now().Nanosecond())),
+		}
+		transfer, err := client.BalanceTransfer(transferRequest)
+		if err != nil {
+			t.Errorf("%s: Capture request should not have failed", name)
+		}
+		if !transfer.Success {
+			t.Errorf("%s: Resulting capture should have been successful", name)
 		}
 	}
 }

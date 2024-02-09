@@ -2,6 +2,7 @@ package rocketgate
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/rocketgate/rocketgate-go-sdk/response"
@@ -169,4 +170,14 @@ func (client *RocketgateClient) RefundWithContext(_ context.Context, request *sl
 		Success:              true,
 		TransactionReference: gatewayResponse.Get(response.TRANSACT_ID),
 	}, nil
+}
+
+// BalanceTransfer transfers funds from a source account to a destination account
+func (client *RocketgateClient) BalanceTransfer(request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return client.BalanceTransferWithContext(context.TODO(), request)
+}
+
+// BalanceTransferWithContext transfers funds from a source account to a destination account
+func (client *RocketgateClient) BalanceTransferWithContext(ctx context.Context, request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return nil, fmt.Errorf("not implemented")
 }

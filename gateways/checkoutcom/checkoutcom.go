@@ -2,11 +2,13 @@ package checkoutcom
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strconv"
 
 	"github.com/checkout/checkout-sdk-go/configuration"
 	"github.com/checkout/checkout-sdk-go/payments/nas"
+	"github.com/checkout/checkout-sdk-go/transfers"
 
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
@@ -30,6 +32,7 @@ type CheckoutComClient struct {
 }
 
 const AcceptedStatusCode = 202
+const CreatedStatusCode = 201
 
 // NewClient creates a CheckoutComClient
 // Note: PCID is optional to support legacy checkout.com merchants whose PCID is linked to their API key.
@@ -48,7 +51,7 @@ func NewWithHTTPClient(env common.Environment, apiKey string, processingChannelI
 	}
 }
 
-func (client *CheckoutComClient) generateCheckoutDCClient() (*nas.Client, error) {
+func (client *CheckoutComClient) generateCheckoutPaymentsClient() (*nas.Client, error) {
 	api, err := checkout.Builder().
 		StaticKeys().
 		WithEnvironment(client.env).
@@ -60,6 +63,18 @@ func (client *CheckoutComClient) generateCheckoutDCClient() (*nas.Client, error)
 	return api.Payments, nil
 }
 
+func (client *CheckoutComClient) generateCheckoutTransfersClient() (*transfers.Client, error) {
+	api, err := checkout.Builder().
+		StaticKeys().
+		WithEnvironment(client.env).
+		WithSecretKey(client.apiKey).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	return api.Transfers, nil
+}
+
 // Authorize a transaction for specified amount
 func (client *CheckoutComClient) Authorize(request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
 	return client.AuthorizeWithContext(context.TODO(), request)
@@ -68,7 +83,7 @@ func (client *CheckoutComClient) Authorize(request *sleet.AuthorizationRequest) 
 // AuthorizeWithContext authorizes a transaction for specified amount
 // NOTE -- checkout's SDK does not support context...
 func (client *CheckoutComClient) AuthorizeWithContext(_ context.Context, request *sleet.AuthorizationRequest) (*sleet.AuthorizationResponse, error) {
-	checkoutComClient, err := client.generateCheckoutDCClient()
+	checkoutComClient, err := client.generateCheckoutPaymentsClient()
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +142,7 @@ func (client *CheckoutComClient) Capture(request *sleet.CaptureRequest) (*sleet.
 // CaptureWithContext authorizes an authorized transaction by charge ID
 // NOTE -- checkout's SDK does not support context...
 func (client *CheckoutComClient) CaptureWithContext(ctx context.Context, request *sleet.CaptureRequest) (*sleet.CaptureResponse, error) {
-	checkoutComClient, err := client.generateCheckoutDCClient()
+	checkoutComClient, err := client.generateCheckoutPaymentsClient()
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +177,7 @@ func (client *CheckoutComClient) Refund(request *sleet.RefundRequest) (*sleet.Re
 // RefundWithContext refunds a captured transaction with amount and charge ID
 // NOTE -- checkout's SDK does not support context...
 func (client *CheckoutComClient) RefundWithContext(ctx context.Context, request *sleet.RefundRequest) (*sleet.RefundResponse, error) {
-	checkoutComClient, err := client.generateCheckoutDCClient()
+	checkoutComClient, err := client.generateCheckoutPaymentsClient()
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +211,7 @@ func (client *CheckoutComClient) Void(request *sleet.VoidRequest) (*sleet.VoidRe
 // VoidWithContext voids an authorized transaction with charge ID
 // NOTE -- checkout's SDK does not support context...
 func (client *CheckoutComClient) VoidWithContext(ctx context.Context, request *sleet.VoidRequest) (*sleet.VoidResponse, error) {
-	checkoutComClient, err := client.generateCheckoutDCClient()
+	checkoutComClient, err := client.generateCheckoutPaymentsClient()
 	if err != nil {
 		return nil, err
 	}
@@ -219,6 +234,45 @@ func (client *CheckoutComClient) VoidWithContext(ctx context.Context, request *s
 			Success:              false,
 			ErrorCode:            common.SPtr(strconv.Itoa(response.HttpMetadata.StatusCode)),
 			TransactionReference: request.TransactionReference,
+		}, nil
+	}
+}
+
+// BalanceTransfer transfers funds from a source account to a destination account
+func (client *CheckoutComClient) BalanceTransfer(request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return client.BalanceTransferWithContext(context.TODO(), request)
+}
+
+// BalanceTransferWithContext transfers funds from a source account to a destination account
+// NOTE -- checkout's SDK does not support context...
+func (client *CheckoutComClient) BalanceTransferWithContext(ctx context.Context, request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	checkoutComClient, err := client.generateCheckoutTransfersClient()
+	if err != nil {
+		return nil, err
+	}
+	if request == nil {
+		return nil, errors.New("balance transfer request are missing")
+	}
+	if request.IdempotencyKey == nil {
+		return nil, errors.New("idempotency key is required")
+	}
+	input, err := buildBalanceTransferParams(*request)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := checkoutComClient.InitiateTransferOfFounds(*input, request.IdempotencyKey)
+	if err != nil {
+		return &sleet.BalanceTransferResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, err
+	}
+
+	if response.HttpMetadata.StatusCode == AcceptedStatusCode || response.HttpMetadata.StatusCode == CreatedStatusCode {
+		return &sleet.BalanceTransferResponse{Success: true, TransferID: &response.Id}, nil
+	} else {
+		return &sleet.BalanceTransferResponse{
+			Success:    false,
+			ErrorCode:  common.SPtr(strconv.Itoa(response.HttpMetadata.StatusCode)),
+			TransferID: &response.Id,
 		}, nil
 	}
 }

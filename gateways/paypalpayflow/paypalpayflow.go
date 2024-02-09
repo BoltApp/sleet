@@ -216,3 +216,13 @@ func (client *PaypalPayflowClient) RefundWithContext(ctx context.Context, reques
 		ErrorCode: &result,
 	}, nil
 }
+
+// BalanceTransfer transfers funds from a source account to a destination account
+func (client *PaypalPayflowClient) BalanceTransfer(request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return client.BalanceTransferWithContext(context.TODO(), request)
+}
+
+// BalanceTransferWithContext transfers funds from a source account to a destination account
+func (client *PaypalPayflowClient) BalanceTransferWithContext(ctx context.Context, request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return nil, fmt.Errorf("not implemented")
+}

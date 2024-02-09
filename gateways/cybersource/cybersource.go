@@ -260,6 +260,16 @@ func (client *CybersourceClient) RefundWithContext(ctx context.Context, request 
 	return &sleet.RefundResponse{Success: true, TransactionReference: *cybersourceResponse.ID}, nil
 }
 
+// BalanceTransfer transfers funds from a source account to a destination account
+func (client *CybersourceClient) BalanceTransfer(request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return client.BalanceTransferWithContext(context.TODO(), request)
+}
+
+// BalanceTransferWithContext transfers funds from a source account to a destination account
+func (client *CybersourceClient) BalanceTransferWithContext(ctx context.Context, request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return nil, fmt.Errorf("not implemented")
+}
+
 // sendRequest sends an API request with the give payload to the specified CyberSource endpoint.
 // If the request is successfully sent, its response message will be returned.
 func (client *CybersourceClient) sendRequest(ctx context.Context, path string, data *Request) (*Response, *http.Response, error) {
