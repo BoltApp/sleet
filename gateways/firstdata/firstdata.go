@@ -192,6 +192,16 @@ func (client *FirstdataClient) RefundWithContext(ctx context.Context, request *s
 	return &sleet.RefundResponse{Success: true, TransactionReference: firstdataResponse.IPGTransactionId}, nil
 }
 
+// BalanceTransfer transfers funds from a source account to a destination account
+func (client *FirstdataClient) BalanceTransfer(request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return client.BalanceTransferWithContext(context.TODO(), request)
+}
+
+// BalanceTransferWithContext transfers funds from a source account to a destination account
+func (client *FirstdataClient) BalanceTransferWithContext(ctx context.Context, request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return nil, fmt.Errorf("not implemented")
+}
+
 // makeSignature generates a signature in accordance with the first data specification https://docs.firstdata.com/org/gateway/node/394
 func makeSignature(timestamp, apiKey, apiSecret, reqId, body string) string {
 	hashData := apiKey + reqId + timestamp + body

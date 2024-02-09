@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/xml"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -170,6 +171,16 @@ func (client *OrbitalClient) RefundWithContext(ctx context.Context, request *sle
 		Success:              true,
 		TransactionReference: orbitalResponse.Body.TxRefNum,
 	}, nil
+}
+
+// BalanceTransfer transfers funds from a source account to a destination account
+func (client *OrbitalClient) BalanceTransfer(request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return client.BalanceTransferWithContext(context.TODO(), request)
+}
+
+// BalanceTransferWithContext transfers funds from a source account to a destination account
+func (client *OrbitalClient) BalanceTransferWithContext(ctx context.Context, request *sleet.BalanceTransferRequest) (*sleet.BalanceTransferResponse, error) {
+	return nil, fmt.Errorf("not implemented")
 }
 
 func (client *OrbitalClient) sendRequest(ctx context.Context, data Request) (*Response, *http.Response, error) {
