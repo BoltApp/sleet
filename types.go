@@ -245,7 +245,6 @@ type BalanceTransferRequest struct {
 	Amount                 int64
 	MerchantOrderReference string
 	TransferType           *string
-	IsRecurring            *bool
 	IdempotencyKey         *string
 }
 
