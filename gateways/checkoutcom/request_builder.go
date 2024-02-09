@@ -97,6 +97,24 @@ func buildCaptureParams(captureRequest *sleet.CaptureRequest) (*nas.CaptureReque
 		request.Reference = *captureRequest.MerchantOrderReference
 	}
 
+	if captureRequest.AmountSplits != nil && len(captureRequest.AmountSplits) > 0 {
+		var amountAllocations []checkout_com_common.AmountAllocations
+		for _, split := range captureRequest.AmountSplits {
+			a := checkout_com_common.AmountAllocations{
+				Id:     split.DestinationAccountID,
+				Amount: split.Amount.Amount,
+			}
+
+			if split.PlatformCommission != nil {
+				a.Commission = &checkout_com_common.Commission{
+					Amount: split.PlatformCommission.Amount,
+				}
+			}
+
+			amountAllocations = append(amountAllocations, a)
+		}
+	}
+
 	return request, nil
 }
 
