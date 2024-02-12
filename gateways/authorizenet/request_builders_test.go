@@ -65,7 +65,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						Payment: &Payment{
 							CreditCard: &CreditCard{
 								CardNumber:     "4111111111111111",
-								ExpirationDate: "2023-10",
+								ExpirationDate: "2025-10",
 								CardCode:       base.CreditCard.CVV,
 							},
 						},
@@ -107,7 +107,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						Payment: &Payment{
 							CreditCard: &CreditCard{
 								CardNumber:     "4111111111111111",
-								ExpirationDate: "2023-10",
+								ExpirationDate: "2025-10",
 								IsPaymentToken: common.BPtr(true),
 								Cryptogram:     "cryptogram",
 							},
@@ -180,7 +180,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						Payment: &Payment{
 							CreditCard: &CreditCard{
 								CardNumber:     "4111111111111111",
-								ExpirationDate: "2023-10",
+								ExpirationDate: "2025-10",
 								CardCode:       base.CreditCard.CVV,
 							},
 						},
@@ -235,7 +235,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						Payment: &Payment{
 							CreditCard: &CreditCard{
 								CardNumber:     "4111111111111111",
-								ExpirationDate: "2023-10",
+								ExpirationDate: "2025-10",
 								CardCode:       base.CreditCard.CVV,
 							},
 						},
@@ -290,7 +290,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						Payment: &Payment{
 							CreditCard: &CreditCard{
 								CardNumber:     "4111111111111111",
-								ExpirationDate: "2023-10",
+								ExpirationDate: "2025-10",
 								CardCode:       base.CreditCard.CVV,
 							},
 						},
@@ -345,7 +345,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						Payment: &Payment{
 							CreditCard: &CreditCard{
 								CardNumber:     "4111111111111111",
-								ExpirationDate: "2023-10",
+								ExpirationDate: "2025-10",
 								CardCode:       withCustomerIP.CreditCard.CVV,
 							},
 						},
@@ -388,7 +388,7 @@ func TestBuildAuthRequest(t *testing.T) {
 						Payment: &Payment{
 							CreditCard: &CreditCard{
 								CardNumber:     "4111111111111111",
-								ExpirationDate: "2023-10",
+								ExpirationDate: "2025-10",
 								CardCode:       base.CreditCard.CVV,
 							},
 						},

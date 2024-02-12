@@ -18,7 +18,6 @@ type ClientNamePair struct {
 func generateClients() []ClientNamePair {
 	legacyClient := checkoutcom.NewClient(common.Sandbox, getEnv("CHECKOUTCOM_TEST_KEY"), nil)
 	pcidClient := checkoutcom.NewClient(common.Sandbox, getEnv("CHECKOUTCOM_TEST_KEY_WITH_PCID"), common.SPtr(getEnv("CHECKOUTCOM_TEST_PCID")))
-
 	clients := []ClientNamePair{
 		{
 			client: pcidClient,
