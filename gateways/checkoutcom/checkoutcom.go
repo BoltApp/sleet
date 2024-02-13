@@ -62,7 +62,7 @@ func (client *CheckoutComClient) generateCheckoutDCClient() (*nas.Client, error)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return api.Payments, nil
 }
 
