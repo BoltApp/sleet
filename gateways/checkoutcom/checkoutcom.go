@@ -49,14 +49,20 @@ func NewWithHTTPClient(env common.Environment, apiKey string, processingChannelI
 }
 
 func (client *CheckoutComClient) generateCheckoutDCClient() (*nas.Client, error) {
-	api, err := checkout.Builder().
+	builder := checkout.Builder().
 		StaticKeys().
 		WithEnvironment(client.env).
-		WithSecretKey(client.apiKey).
-		Build()
+		WithSecretKey(client.apiKey)
+
+	if client.httpClient != nil {
+		builder.WithHttpClient(client.httpClient)
+	}
+
+	api, err := builder.Build()
 	if err != nil {
 		return nil, err
 	}
+
 	return api.Payments, nil
 }
 
