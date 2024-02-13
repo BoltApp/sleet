@@ -53,6 +53,7 @@ func (client *CheckoutComClient) generateCheckoutDCClient() (*nas.Client, error)
 		StaticKeys().
 		WithEnvironment(client.env).
 		WithSecretKey(client.apiKey).
+		WithHttpClient(client.httpClient).
 		Build()
 	if err != nil {
 		return nil, err
