@@ -2,8 +2,11 @@ package checkoutcom
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strconv"
+
+	"github.com/checkout/checkout-sdk-go/transfers"
 
 	"github.com/checkout/checkout-sdk-go/configuration"
 	"github.com/checkout/checkout-sdk-go/payments/nas"
@@ -30,6 +33,7 @@ type CheckoutComClient struct {
 }
 
 const AcceptedStatusCode = 202
+const CreatedStatusCode = 201
 
 // NewClient creates a CheckoutComClient
 // Note: PCID is optional to support legacy checkout.com merchants whose PCID is linked to their API key.
@@ -64,6 +68,18 @@ func (client *CheckoutComClient) generateCheckoutDCClient() (*nas.Client, error)
 	}
 
 	return api.Payments, nil
+}
+
+func (client *CheckoutComClient) generateCheckoutTransfersClient() (*transfers.Client, error) {
+	api, err := checkout.Builder().
+		StaticKeys().
+		WithEnvironment(client.env).
+		WithSecretKey(client.apiKey).
+		Build()
+	if err != nil {
+		return nil, err
+	}
+	return api.Transfers, nil
 }
 
 // Authorize a transaction for specified amount
@@ -225,6 +241,45 @@ func (client *CheckoutComClient) VoidWithContext(ctx context.Context, request *s
 			Success:              false,
 			ErrorCode:            common.SPtr(strconv.Itoa(response.HttpMetadata.StatusCode)),
 			TransactionReference: request.TransactionReference,
+		}, nil
+	}
+}
+
+// BalanceTransfer transfers funds from a source account to a destination account
+func (client *CheckoutComClient) BalanceTransfer(request *BalanceTransferRequest) (*BalanceTransferResponse, error) {
+	return client.BalanceTransferWithContext(context.TODO(), request)
+}
+
+// BalanceTransferWithContext transfers funds from a source account to a destination account
+// NOTE -- checkout's SDK does not support context...
+func (client *CheckoutComClient) BalanceTransferWithContext(ctx context.Context, request *BalanceTransferRequest) (*BalanceTransferResponse, error) {
+	checkoutComClient, err := client.generateCheckoutTransfersClient()
+	if err != nil {
+		return nil, err
+	}
+	if request == nil {
+		return nil, errors.New("balance transfer request are missing")
+	}
+	if request.IdempotencyKey == nil {
+		return nil, errors.New("idempotency key is required")
+	}
+	input, err := buildBalanceTransferParams(*request)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := checkoutComClient.InitiateTransferOfFounds(*input, request.IdempotencyKey)
+	if err != nil {
+		return &BalanceTransferResponse{Success: false, ErrorCode: common.SPtr(err.Error())}, err
+	}
+
+	if response.HttpMetadata.StatusCode == AcceptedStatusCode || response.HttpMetadata.StatusCode == CreatedStatusCode {
+		return &BalanceTransferResponse{Success: true, TransferID: &response.Id}, nil
+	} else {
+		return &BalanceTransferResponse{
+			Success:    false,
+			ErrorCode:  common.SPtr(strconv.Itoa(response.HttpMetadata.StatusCode)),
+			TransferID: &response.Id,
 		}, nil
 	}
 }

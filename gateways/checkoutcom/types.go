@@ -43,3 +43,19 @@ const (
 	AVSResponseCardholderNameAndStreetAndPostalMatch       AVSResponseCode = "AE6"
 	AVSResponseCardholderNameAndStreetMatch                AVSResponseCode = "AE7"
 )
+
+type BalanceTransferRequest struct {
+	Source                 string
+	Destination            string
+	Amount                 int64
+	MerchantOrderReference string
+	TransferType           *string
+	IdempotencyKey         *string
+}
+
+// BalanceTransferResponse indicating a successful balance transfers properties
+type BalanceTransferResponse struct {
+	Success    bool
+	ErrorCode  *string
+	TransferID *string
+}
