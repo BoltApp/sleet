@@ -1,10 +1,12 @@
 package checkoutcom
 
 import (
+	"errors"
 	checkout_com_common "github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/payments"
 	"github.com/checkout/checkout-sdk-go/payments/abc/sources"
 	"github.com/checkout/checkout-sdk-go/payments/nas"
+	"github.com/checkout/checkout-sdk-go/transfers"
 
 	"github.com/BoltApp/sleet"
 	"github.com/BoltApp/sleet/common"
@@ -123,4 +125,21 @@ func buildVoidParams(voidRequest *sleet.VoidRequest) (*payments.VoidRequest, err
 	}
 
 	return request, nil
+}
+
+func buildBalanceTransferParams(transferRequest BalanceTransferRequest) (*transfers.TransferRequest, error) {
+	if transferRequest.TransferType == nil {
+		return nil, errors.New("transfer type must be provided")
+	}
+	return &transfers.TransferRequest{
+		Source: &transfers.TransferSourceRequest{
+			Id:     transferRequest.Source,
+			Amount: transferRequest.Amount,
+		},
+		Destination: &transfers.TransferDestinationRequest{
+			Id: transferRequest.Destination,
+		},
+		TransferType: transfers.TransferType(*transferRequest.TransferType),
+		Reference:    transferRequest.MerchantOrderReference,
+	}, nil
 }
