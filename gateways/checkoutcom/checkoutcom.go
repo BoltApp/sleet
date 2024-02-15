@@ -3,9 +3,10 @@ package checkoutcom
 import (
 	"context"
 	"errors"
-	"github.com/checkout/checkout-sdk-go/transfers"
 	"net/http"
 	"strconv"
+
+	"github.com/checkout/checkout-sdk-go/transfers"
 
 	"github.com/checkout/checkout-sdk-go/configuration"
 	"github.com/checkout/checkout-sdk-go/payments/nas"

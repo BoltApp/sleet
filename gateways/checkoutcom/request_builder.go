@@ -2,6 +2,7 @@ package checkoutcom
 
 import (
 	"errors"
+
 	checkout_com_common "github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/payments"
 	"github.com/checkout/checkout-sdk-go/payments/abc/sources"
