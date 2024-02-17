@@ -4,7 +4,7 @@ orbs:
 jobs:
   build-and-test:
     docker:
-      - image: circleci/golang:1.15
+      - image: cimg/go:1.15
 
     working_directory: /go/src/github.com/BoltApp/sleet
 
@@ -56,7 +56,7 @@ jobs:
             - "/go/pkg"
   release-github:
     docker:
-      - image: circleci/golang:1.13
+      - image: cimg/go:1.13
     steps:
       - swissknife/publish_github_release:
           tag: v1.1.$CIRCLE_BUILD_NUM
