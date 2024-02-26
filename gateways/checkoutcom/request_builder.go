@@ -113,6 +113,7 @@ func buildCaptureParams(captureRequest *sleet.CaptureRequest) (*nas.CaptureReque
 
 			amountAllocations = append(amountAllocations, a)
 		}
+		request.AmountAllocations = amountAllocations
 	}
 
 	return request, nil
