@@ -1,6 +1,6 @@
 module github.com/BoltApp/sleet
 
-go 1.15
+go 1.16
 
 retract [v0.0.0, v1.1.1372] // Bolt is changing Sleet's charter, it is now internal and private software.
 

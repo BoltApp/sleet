@@ -4,7 +4,7 @@ orbs:
 jobs:
   build-and-test:
     docker:
-      - image: circleci/golang:1.15
+      - image: circleci/golang:1.16
 
     working_directory: /go/src/github.com/BoltApp/sleet
 
