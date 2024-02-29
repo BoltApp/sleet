@@ -2,6 +2,8 @@ module github.com/BoltApp/sleet
 
 go 1.15
 
+retract [v0.0.0, v1.1.1372] // Bolt is changing Sleet's charter, it is now internal and private software.
+
 require (
 	github.com/BoltApp/braintree-go v0.26.0
 	github.com/Pallinder/go-randomdata v1.2.0
